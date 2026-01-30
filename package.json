@@ -18,7 +18,6 @@
 	},
 	"devDependencies": {
 		"@bastidood/eslint-plugin-imsort": "^0.11.0",
-		"@eslint/compat": "^2.0.1",
 		"@eslint/css": "0.9.0",
 		"@eslint/js": "^9.39.2",
 		"@html-eslint/eslint-plugin": "^0.54.0",
