@@ -28,5 +28,7 @@ jobs:
         run: pnpm fmt
       - name: Run Linters
         run: pnpm lint
+      - name: Install Playwright Browsers
+        run: pnpm exec playwright install --with-deps
       - name: Test Codebase
         run: pnpm test
