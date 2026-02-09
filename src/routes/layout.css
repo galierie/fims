@@ -4,9 +4,9 @@
 
 @theme inline {
     --font-poppins: poppins, sans-serif;
-    --color-fims-green: rgb(2 70 28);
-    --color-fims-red: rgb(118 21 25);
-    --color-fims-beige: rgb(237 231 206);
-    --color-fims-white: rgb(249 249 249);
-    --color-fims-gray: rgb(182 182 182);
+    --color-fims-green: #02461c;
+    --color-fims-red: #761519;
+    --color-fims-beige: #ede7ce;
+    --color-fims-white: #f9f9f9;
+    --color-fims-gray: #b6b6b6;
 }
