@@ -1,8 +1,6 @@
-import { redirect } from "@sveltejs/kit";
+import { redirect } from '@sveltejs/kit';
 
 export function load() {
-  // TODO: Change conditional
-  if (true) {
+    // TODO: Change conditional
     return redirect(307, '/login');
-  }
 }
