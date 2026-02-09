@@ -5,6 +5,17 @@
 @theme inline {
     --font-poppins: poppins, sans-serif;
     --color-fims-green: #02461c;
+    --color-fims-green-50: #effef4;
+    --color-fims-green-100: #d9ffe5;
+    --color-fims-green-200: #b6fccc;
+    --color-fims-green-300: #7df8a5;
+    --color-fims-green-400: #3deb77;
+    --color-fims-green-500: #14d354;
+    --color-fims-green-600: #0aaf42;
+    --color-fims-green-700: #0c8937;
+    --color-fims-green-800: #0f6c2f;
+    --color-fims-green-900: #0e592a;
+    --color-fims-green-950: #02461c;
     --color-fims-red: #761519;
     --color-fims-beige: #ede7ce;
     --color-fims-white: #f9f9f9;
