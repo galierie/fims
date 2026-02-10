@@ -19,16 +19,16 @@
 </svelte:head>
 
 <div class="flex h-screen bg-[url('/assets/login-background.png')] bg-cover bg-center">
-    <div class="flex w-212 items-center bg-[rgb(40,118,70)] pr-12 text-fims-white opacity-80">
-        <h1 class="text-right text-6xl leading-[1.2] font-bold tracking-tight">
+    <div class="flex w-282 items-center bg-[rgb(40,118,70)] pr-12 text-fims-white opacity-80">
+        <h1 class="text-right text-7xl leading-[1.2] font-bold tracking-tight">
             Faculty Information Management System
         </h1>
     </div>
-    <div class="flex w-full flex-col justify-center pl-12">
+    <div class="flex w-full flex-col justify-center pl-15">
         <!-- Error box -->
         {#if form?.error}
             <div
-                class="flex h-8 w-125 items-center rounded-lg border-2 border-fims-red bg-fims-red-100 px-4 py-6"
+                class="flex h-8 w-157 items-center rounded-lg border-2 border-fims-red bg-fims-red-100 px-4 py-6"
             >
                 <Icon icon="tabler:alert-hexagon" class="h-6 w-6 text-fims-red" />
                 <p class="px-8">{form.error}</p>
@@ -50,7 +50,7 @@
             }}
         >
             <input
-                class="my-1 h-12 w-125 rounded-lg bg-white px-4 py-3 placeholder-fims-gray"
+                class="mt-3 h-12 w-157 rounded-lg bg-white px-4 py-3 placeholder-fims-gray"
                 name="email"
                 id="email"
                 type="email"
@@ -63,7 +63,7 @@
             />
             <div class="relative w-fit">
                 <input
-                    class="my-1 h-12 w-125 rounded-lg bg-white px-4 py-3 placeholder-fims-gray"
+                    class="mt-3 h-12 w-157 rounded-lg bg-white px-4 py-3 placeholder-fims-gray"
                     name="password"
                     id="password"
                     type={isPasswordVisible ? 'text' : 'password'}
@@ -76,7 +76,7 @@
                     }}
                 />
                 <button
-                    class="absolute right-4 h-full *:h-6 *:w-6 *:text-fims-gray"
+                    class="absolute top-1.5 right-4 h-full *:h-6 *:w-6 *:text-fims-gray"
                     onclick={(event) => {
                         isPasswordVisible = !isPasswordVisible;
                         event.preventDefault();
