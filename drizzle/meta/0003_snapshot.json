@@ -1,0 +1,176 @@
+{
+  "id": "fe3270dc-4731-4f76-bc9b-fd4bcb19970a",
+  "prevId": "c3da6909-d3d2-46a8-95ab-7037ad476345",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.accountRole": {
+      "name": "accountRole",
+      "schema": "",
+      "columns": {
+        "accountRole": {
+          "name": "accountRole",
+          "type": "varchar(255)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "canAddFaculty": {
+          "name": "canAddFaculty",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "canModifyFaculty": {
+          "name": "canModifyFaculty",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "canAddAccount": {
+          "name": "canAddAccount",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "canModifyAccount": {
+          "name": "canModifyAccount",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "canViewChangeLogs": {
+          "name": "canViewChangeLogs",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.users": {
+      "name": "users",
+      "schema": "",
+      "columns": {
+        "accountId": {
+          "name": "accountId",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "password": {
+          "name": "password",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "role": {
+          "name": "role",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "google_id": {
+          "name": "google_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "users_role_accountRole_accountRole_fk": {
+          "name": "users_role_accountRole_accountRole_fk",
+          "tableFrom": "users",
+          "tableTo": "accountRole",
+          "columnsFrom": [
+            "role"
+          ],
+          "columnsTo": [
+            "accountRole"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "users_email_unique": {
+          "name": "users_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.faculty": {
+      "name": "faculty",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "first_name": {
+          "name": "first_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "last_name": {
+          "name": "last_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "department": {
+          "name": "department",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "last_updated": {
+          "name": "last_updated",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
