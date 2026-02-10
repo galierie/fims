@@ -37,7 +37,7 @@ export async function deleteAcc(id:number):Promise<boolean> {
     try {
         await db
         .delete(accounts)
-        .where(eq(accounts.accountId, id))
+        .where(eq(accounts.id, id))
     } catch(e) {
         console.log(e);
         return false;
