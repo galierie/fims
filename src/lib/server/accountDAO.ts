@@ -28,12 +28,13 @@ export async function createAccount(
     return true;
 }
 
-//users the primary key (email) to delete the account
-export async function deleteAccount(email:string):Promise<boolean> {
+//uses id to delete the account
+export async function deleteAccount(id:number):Promise<boolean> {
+    if (!Number.isInteger(id)) {return false;}
     try {
         await db
         .delete(accounts)
-        .where(eq(accounts.email, email))
+        .where(eq(accounts.accountId, id))
     } catch(e) {
         console.log(e);
         return false;
