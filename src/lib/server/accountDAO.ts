@@ -21,8 +21,8 @@ export async function createAcc(
         await db.insert(accounts)
         .values({
             email: email,
-            passwordHash: passHash,
-            accountRole: role
+            password: passHash,
+            role: role
         })
     } catch(e) {
         console.log(e); // not sure how to display errors. will just change it later to return error instead.

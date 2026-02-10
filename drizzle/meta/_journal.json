@@ -8,6 +8,27 @@
       "when": 1770645372361,
       "tag": "0000_safe_maverick",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1770730277768,
+      "tag": "0001_curved_black_tarantula",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1770730330671,
+      "tag": "0002_amused_deathstrike",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1770730416823,
+      "tag": "0003_clammy_thena",
+      "breakpoints": true
     }
   ]
 }
