@@ -1,9 +1,9 @@
 import {db} from "$lib/server/db"
-import {accounts, accountRoles} from "$lib/server/schema"
+import {accounts, roles} from "$lib/server/schema"
 import {eq} from "drizzle-orm"
 
-export type Account = typeof accounts.$inferSelect
-export type AccountRole = typeof accountRoles.$inferSelect
+export type User = typeof accounts.$inferSelect
+export type Role = typeof roles.$inferSelect
 
 /*
 creates an account with the following fields:
@@ -45,7 +45,7 @@ export async function deleteAcc(id:number):Promise<boolean> {
     return false;
 }
 
-export async function listAll():Promise<Array<Account>> {
+export async function listAll():Promise<Array<User>> {
     let res = await db.select().from(accounts);
     return res;
 }
