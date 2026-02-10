@@ -2,6 +2,7 @@
 
 import {db} from "$lib/server/db";
 import { accountRoles } from "$lib/server/schema";
+import * as accountDAO from "$lib/server/accountDAO";
 
 db.insert(accountRoles).values({
     accountRole: "testRole",
@@ -16,5 +17,7 @@ const result = await db
     .select()
     .from(accountRoles)
 console.log(result)
+
+accountDAO.deleteAccount(1);
 
 console.log ("Page loaded")
