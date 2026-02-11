@@ -1,36 +1,50 @@
-// src/routes/login/+page.server.ts
 import { fail, redirect } from '@sveltejs/kit';
-import { db } from '$lib/server/db/index';
-import { users } from '$lib/server/db/schema';
-import { eq } from 'drizzle-orm';
+import type { Actions } from './$types';
+import { auth } from '$lib/server/auth';
+
+export async function load({ locals }) {
+    if (locals.user) {
+        // then there's a logged in user
+        throw redirect(303, '/');
+    }
+
+    return {};
+};
 
 export const actions = {
-    default: async ({ request, cookies }) => {
-        const formData = await request.formData();
-        const email = formData.get('email') as string;
-        const password = formData.get('password') as string;
+    default: async ({ request }) => {
+        const data = await request.formData();
+        const email = data.get('email') as string;
+        const password = data.get('password') as string;
+        const callbackURL = '/';
 
-        // Validation: @up.edu.ph requirement
-        if (!email.endsWith('@up.edu.ph')) {
-            return fail(400, { message: 'Invalid email domain.' });
+        // Validate credentials
+        if (!email || !email.endsWith('@up.edu.ph')) {
+            return fail(400, { error: 'Invalid email.' });
         }
 
-        // Task 2: Fetch user
-        const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
-
-        if (!user || user.password !== password) {
-            return fail(401, { message: 'Incorrect email or password.' });
+        if (!password) {
+            return fail(400, { error: 'Empty password.' });
         }
 
-        // Task 6: Identity/Role Management
-        // We store the role in a cookie so the client knows if it's IT or Admin
-        cookies.set('session_role', user.role, {
-            path: '/',
-            httpOnly: true,
-            sameSite: 'strict',
-            maxAge: 60 * 60 * 24 // 1 day
-        });
+        // Log-in with credentials
+        let responseUrl: string | undefined = undefined;
+        try {
+            const response = await auth.api.signInEmail({
+                body: {
+                    email,
+                    password,
+                    callbackURL
+                },
+            });
 
-        throw redirect(303, '/dashboard');
-    }
-};
+            responseUrl = response.url;
+        } catch (error) {
+            return fail(500, { error: 'Auth failed.' });
+        }
+
+        if (responseUrl) {
+            throw redirect(303, '/');
+        }
+    },
+} satisfies Actions;
