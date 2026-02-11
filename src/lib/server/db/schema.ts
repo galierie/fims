@@ -1,4 +1,4 @@
-import { pgTable, serial, varchar, date, smallint, text, foreignKey, integer, unique, numeric, timestamp } from "drizzle-orm/pg-core"
+import { pgTable, serial, varchar, date, smallint, text, foreignKey, integer, unique, numeric, timestamp, boolean } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
 
@@ -227,11 +227,11 @@ export const facultyextension = pgTable("facultyextension", {
 
 export const accountrole = pgTable("accountrole", {
 	accountrole: varchar({ length: 50 }).primaryKey().notNull(),
-	canaddfaculty: smallint().notNull(),
-	canmodifyfaculty: smallint().notNull(),
-	canaddaccount: smallint().notNull(),
-	canmodifyaccount: smallint().notNull(),
-	canviewchangelogs: smallint().notNull(),
+	canaddfaculty: boolean().notNull(),
+	canmodifyfaculty: boolean().notNull(),
+	canaddaccount: boolean().notNull(),
+	canmodifyaccount: boolean().notNull(),
+	canviewchangelogs: boolean().notNull(),
 });
 
 export const account = pgTable("account", {
