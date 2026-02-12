@@ -1,26 +1,12 @@
-<<<<<<< HEAD
-// drizzle.config.ts
-
-
-import { defineConfig } from 'drizzle-kit';
+import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
   out: "./drizzle",
   schema: "./src/lib/server/schema.ts",
   dialect: 'postgresql',
   dbCredentials: {
-    url: process.env.DATABASE_URL!
-=======
-import { defineConfig } from "drizzle-kit"
-
-export default defineConfig({
-  out: "",
-  schema: "./src/lib/server/schema.ts",
-  dialect: 'postgresql',
-  dbCredentials: {
-    url: process.env.DATABASE_URL!,
-    user: process.env.USERANME!,
+    user: process.env.USERNAME!,
     password: process.env.PASSWORD!,
->>>>>>> cc9123c (init db code)
+    url: process.env.DATABASE_URL!
   }
 })
