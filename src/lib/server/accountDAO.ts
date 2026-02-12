@@ -1,3 +1,6 @@
+// planning to deprecate in favor of db-helpers
+// though db-helpers might be too verbose imo
+
 import {db} from "$lib/server/db"
 import { account, appuser, userinfo } from "$lib/server/db/schema"
 import {eq} from "drizzle-orm"
