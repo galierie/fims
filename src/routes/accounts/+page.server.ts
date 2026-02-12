@@ -1,24 +1,24 @@
 import { type Actions, error, fail } from '@sveltejs/kit';
 import { APIError } from 'better-auth';
 
-import { areYouHere, getRole, makeUser } from '$lib/server/db-helpers';
+import { areYouHere, getAccountList, getRole, makeUser } from '$lib/server/db-helpers';
 import { auth } from '$lib/server/auth';
 
 export async function load({ locals }) {
     const userRole = await getRole(locals.user.id);
     if (userRole !== 'IT') throw error(404, { message: 'Insufficient permissions.' });
 
-    // const accountList = await getAccountList(locals.user.id);
-    const accountList = [
-        {
-            userid: 'sdjvghkadsfhvb',
-            email: 'it@up.edu.ph',
-            role: 'IT',
-            logTimestamp: '',
-            logOperation: 'Made account.',
-            logMaker: '',
-        },
-    ];
+    const accountList = await getAccountList(locals.user.id);
+    // const accountList = [
+    //     {
+    //         userid: 'sdjvghkadsfhvb',
+    //         email: 'it@up.edu.ph',
+    //         role: 'IT',
+    //         logTimestamp: '',
+    //         logOperation: 'Made account.',
+    //         logMaker: '',
+    //     },
+    // ];
 
     return { accountList };
 }

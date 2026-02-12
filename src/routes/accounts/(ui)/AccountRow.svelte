@@ -20,7 +20,7 @@
     const { email, role, userid, logTimestamp, logOperation, logMaker }: AccountDTO =
         $derived(account);
 
-    const userRoles = ['IT', 'Admin'];
+    const userRoles = ['Admin', 'IT'];
 
     let willDelete = $state(false);
 
@@ -84,16 +84,15 @@
                 <span>Delete</span>
             </button>
 
-            <input
-                type="hidden" 
-                name="userid"
-                value={userid}
-            />
+            <input type="hidden" name="userid" value={userid} />
 
             {#if willDelete}
-                <DeleteConfirmation onDelete={() => {
-                    if (deleteForm) deleteForm.submit();
-                }} onCancel={toggleModal} />
+                <DeleteConfirmation
+                    onDelete={() => {
+                        if (deleteForm) deleteForm.submit();
+                    }}
+                    onCancel={toggleModal}
+                />
             {/if}
         </form>
     </div>

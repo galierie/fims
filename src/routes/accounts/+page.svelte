@@ -7,7 +7,7 @@
     const { accountList } = $derived(data);
 
     let isMakingAccount = $state(false);
-    let willMake = $state(false)
+    let willMake = $state(false);
 
     function toggleModal() {
         willMake = !willMake;
@@ -15,7 +15,6 @@
 
     let makeForm: HTMLFormElement | null = null;
 
-    
     const userRoles = ['Admin', 'IT'];
 </script>
 
@@ -54,13 +53,15 @@
         {#if isMakingAccount}
             <button
                 onclick={toggleModal}
-                class="flex items-center justify-center rounded-full border-2 border-fims-green bg-white px-4 py-1 text-fims-green hover:bg-fims-green hover:text-white disabled:border-fims-gray disabled:text-fims-gray mt-50"
-            >+ Save Account</button>
+                class="mt-50 flex items-center justify-center rounded-full border-2 border-fims-green bg-white px-4 py-1 text-fims-green hover:bg-fims-green hover:text-white disabled:border-fims-gray disabled:text-fims-gray"
+                >+ Save Account</button
+            >
         {:else}
             <button
-                onclick={() => isMakingAccount = true}
-                class="flex items-center justify-center rounded-full border-2 border-fims-green bg-white px-4 py-1 text-fims-green hover:bg-fims-green hover:text-white disabled:border-fims-gray disabled:text-fims-gray mt-50"
-            >+ Add Account</button>
+                onclick={() => (isMakingAccount = true)}
+                class="mt-50 flex items-center justify-center rounded-full border-2 border-fims-green bg-white px-4 py-1 text-fims-green hover:bg-fims-green hover:text-white disabled:border-fims-gray disabled:text-fims-gray"
+                >+ Add Account</button
+            >
         {/if}
     </div>
 
@@ -91,7 +92,8 @@
         <!-- Account Creation Form -->
         {#if isMakingAccount}
             <form
-                method="POST" action="?/makeAccount"
+                method="POST"
+                action="?/makeAccount"
                 class="flex justify-center [&>div]:flex [&>div]:h-12 [&>div]:items-center [&>div]:border-b [&>div]:border-fims-gray [&>div]:bg-white [&>div]:px-6"
                 bind:this={makeForm}
                 use:enhance
@@ -102,7 +104,7 @@
                         type="email"
                         name="email"
                         placeholder="Email"
-                        class="w-full h-full p-2"
+                        class="h-full w-full p-2"
                     />
                 </div>
                 <div class="w-50">
@@ -110,7 +112,7 @@
                         type="password"
                         name="password"
                         placeholder="Password"
-                        class="w-full h-full p-2"
+                        class="h-full w-full p-2"
                     />
                 </div>
                 <div class="w-75">
@@ -128,7 +130,10 @@
 </div>
 
 {#if willMake}
-    <SaveConfirmation onSave={() => {
-        if (makeForm) makeForm.submit();
-    }} onCancel={toggleModal} />
+    <SaveConfirmation
+        onSave={() => {
+            if (makeForm) makeForm.submit();
+        }}
+        onCancel={toggleModal}
+    />
 {/if}
