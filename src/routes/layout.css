@@ -4,9 +4,31 @@
 
 @theme inline {
     --font-poppins: poppins, sans-serif;
-    --color-fims-green: rgb(2 70 28);
-    --color-fims-red: rgb(118 21 25);
-    --color-fims-beige: rgb(237 231 206);
-    --color-fims-white: rgb(249 249 249);
-    --color-fims-gray: rgb(182 182 182);
+    --color-fims-green: #02461c;
+    --color-fims-green-50: #effef4;
+    --color-fims-green-100: #d9ffe5;
+    --color-fims-green-200: #b6fccc;
+    --color-fims-green-300: #7df8a5;
+    --color-fims-green-400: #3deb77;
+    --color-fims-green-500: #14d354;
+    --color-fims-green-600: #0aaf42;
+    --color-fims-green-700: #0c8937;
+    --color-fims-green-800: #0f6c2f;
+    --color-fims-green-900: #0e592a;
+    --color-fims-green-950: #02461c;
+    --color-fims-red: #761519;
+    --color-fims-red-50: #fff1f2;
+    --color-fims-red-100: #ffe0e1;
+    --color-fims-red-200: #ffc7c9;
+    --color-fims-red-300: #ffa0a4;
+    --color-fims-red-400: #ff6a70;
+    --color-fims-red-500: #f83b43;
+    --color-fims-red-600: #e61c24;
+    --color-fims-red-700: #c2131a;
+    --color-fims-red-800: #a0141a;
+    --color-fims-red-900: #761519;
+    --color-fims-red-950: #48070a;
+    --color-fims-beige: #ede7ce;
+    --color-fims-white: #f9f9f9;
+    --color-fims-gray: #b6b6b6;
 }
