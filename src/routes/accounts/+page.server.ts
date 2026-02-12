@@ -16,6 +16,9 @@ export async function load({ locals }) {
             userid: 'sdjvghkadsfhvb',
             email: 'it@up.edu.ph',
             role: 'IT',
+            logTimestamp: '',
+            logOperation: 'Made account.',
+            logMaker: '',
         },
     ];
 
