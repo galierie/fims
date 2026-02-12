@@ -19,5 +19,5 @@ export const accounts = pgTable("account", {
   accountId: serial().primaryKey().notNull(),
   email: varchar({length: 255}).notNull().unique(),
   passwordHash: varchar({length: 255}).notNull(),
-  // accountRole: varchar({length: 50}).references(() => accountRoles.accountRole).notNull()
+  accountRole: varchar({length: 50}).references(() => accountRoles.accountRole).notNull()
 });

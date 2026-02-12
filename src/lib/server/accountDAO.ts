@@ -22,7 +22,7 @@ export async function createAcc(
         .values({
             email: email,
             passwordHash: passHash,
-            // accountRole: role
+            accountRole: role
         })
     } catch(e) {
         console.log(e); // not sure how to display errors. will just change it later to return error instead.
