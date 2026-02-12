@@ -1,4 +1,9 @@
 import { drizzle } from "drizzle-orm/node-postgres"
+import { DATABASE_URL } from "$env/static/private"
+// for local/dev database, use
+// postgresql://(user):(password)@localhost:(port)/(whatever you name the local database)
+// within .env file under DATABASE
+// you can get the port using psql and doing \conninfo
 
-export const db = drizzle(process.env.DATABASE_URL!)
+export const db = drizzle(DATABASE_URL);
 
