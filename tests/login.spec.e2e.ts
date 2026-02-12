@@ -10,5 +10,17 @@ test('successful login', async ({ page }) => {
     await page.locator("#password").fill("password")
     await page.locator("#password").press("Enter")
 
-    await expect(page).toHaveURL("/");
+    await expect(page).not.toHaveURL("/login");
 });
+
+test('failed login', async ({page}) => {
+    await page.goto("/login");
+    await expect(page.locator("#email")).toBeVisible()
+    await expect(page.locator("#password")).toBeVisible()
+
+    await page.locator("#email").fill("testacc@up.edu.ph")
+    await page.locator("#password").fill("wrongpassword")
+    await page.locator("#password").press("Enter")
+
+    await expect(page).toHaveURL("login?/signInEmail");
+})
