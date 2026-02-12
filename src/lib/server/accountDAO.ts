@@ -8,6 +8,8 @@ export type AccountRole = typeof accountRoles.$inferSelect
 /*
 creates an account with the following fields:
 email, passwordHash, accountRole
+
+note: account role factored out as there's no use as of now
 */
 
 export async function createAcc(
@@ -20,7 +22,7 @@ export async function createAcc(
         .values({
             email: email,
             passwordHash: passHash,
-            accountRole: role
+            // accountRole: role
         })
     } catch(e) {
         console.log(e); // not sure how to display errors. will just change it later to return error instead.
