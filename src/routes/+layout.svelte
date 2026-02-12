@@ -14,7 +14,7 @@
 {#if isLoggedIn}
     <Header {accountColor} {email} />
     <NavBar {canViewAccounts} {accountColor} />
-    <main class="h-screen bg-[#e9e9e9]">
+    <main class="min-h-screen bg-[#e9e9e9]">
         {@render children()}
     </main>
     <Footer />
