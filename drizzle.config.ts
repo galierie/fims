@@ -1,12 +1,12 @@
-import { defineConfig } from "drizzle-kit"
+import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
-  out: "",
+  out: "./drizzle",
   schema: "./src/lib/server/schema.ts",
   dialect: 'postgresql',
   dbCredentials: {
-    url: process.env.DATABASE_URL!,
-    user: process.env.USERANME!,
+    user: process.env.USERNAME!,
     password: process.env.PASSWORD!,
+    url: process.env.DATABASE_URL!
   }
 })

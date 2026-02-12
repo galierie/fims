@@ -1,15 +1,2 @@
-<script lang="ts">
-  let { data } = $props();
-  let { facultyRecordList } = $derived(data);
-</script>
-
-<p>yippee!</p>
-{#each facultyRecordList as { lastname, firstname, status, ranktitle, adminposition, facultyid } (facultyid)}
-  <p>{lastname}, {firstname}</p>
-  <br />
-  <p>{status}</p>
-  <br />
-  <p>{ranktitle}</p>
-  <br />
-  <p>{adminposition}</p>
-{/each}
+<h1>Welcome to SvelteKit</h1>
+<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
