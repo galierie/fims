@@ -129,6 +129,22 @@ export const facultyrank = pgTable(
     ],
 );
 
+export const facultyemail = pgTable(
+    'facultyemail',
+    {
+        facultyemailid: serial().primaryKey().notNull(),
+        facultyid: integer(),
+        email: varchar({ length: 100 }).notNull(),
+    },
+    (table) => [
+        foreignKey({
+            columns: [table.facultyid],
+            foreignColumns: [faculty.facultyid],
+            name: 'facultyemail_facultyid_fkey',
+        }).onDelete('cascade'),
+    ],
+);
+
 export const semester = pgTable('semester', {
     acadsemesterid: serial().primaryKey().notNull(),
     semester: smallint().notNull(),
@@ -335,6 +351,7 @@ export const facultyRelations = relations(faculty, ({ many }) => ({
     facultyeducationalattainments: many(facultyeducationalattainment),
     facultyfieldofinterests: many(facultyfieldofinterest),
     facultyranks: many(facultyrank),
+    facultyemails: many(facultyemail),
     facultyhomeaddresses: many(facultyhomeaddress),
     facultyadministratives: many(facultyadministrative),
     facultyteachings: many(facultyteaching),
@@ -375,6 +392,13 @@ export const facultyrankRelations = relations(facultyrank, ({ one }) => ({
     rank: one(rank, {
         fields: [facultyrank.rankid],
         references: [rank.rankid],
+    })
+}));
+
+export const facultyemailRelations = relations(facultyemail, ({ one }) => ({
+    faculty: one(faculty, {
+        fields: [facultyemail.facultyid],
+        references: [faculty.facultyid],
     }),
 }));
 
