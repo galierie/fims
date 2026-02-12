@@ -185,7 +185,7 @@ export const facultysemester = pgTable(
 );
 
 export const adminposition = pgTable('adminposition', {
-    positionid: serial().primaryKey().notNull(),
+    adminpositionid: serial().primaryKey().notNull(),
     name: varchar({ length: 100 }).notNull(),
 });
 
@@ -465,7 +465,7 @@ export const facultyadministrativeRelations = relations(facultyadministrative, (
     }),
     adminposition: one(adminposition, {
         fields: [facultyadministrative.positionid],
-        references: [adminposition.positionid],
+        references: [adminposition.adminpositionid],
     }),
 }));
 
