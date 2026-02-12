@@ -1,22 +1,34 @@
-import { eq, desc, ne } from 'drizzle-orm';
+import { desc, eq, ne } from 'drizzle-orm';
 
 import { db } from './db';
 
-import { role, userinfo, faculty, facultyadminposition, adminposition, semester, rank, facultysemester, facultyrank, appuser, changelog } from './db/schema';
+import {
+    adminposition,
+    appuser,
+    changelog,
+    faculty,
+    facultyadminposition,
+    facultyrank,
+    facultysemester,
+    rank,
+    role,
+    semester,
+    userinfo,
+} from './db/schema';
 
 export async function logChange(makerid: string, tupleid: number, operation: string) {
     const logids = await db
         .insert(changelog)
         .values({
-            timestamp: (new Date()).toISOString(),
+            timestamp: new Date().toISOString(),
             userid: makerid,
             tupleid,
-            operation
+            operation,
         })
         .returning({ id: changelog.logid });
 
-    const { id: logid } = logids[0];
-    
+    const [{ id: logid }, _] = logids;
+
     return logid;
 }
 
@@ -28,10 +40,10 @@ export async function makeUser(makerid: string, id: string, role: string) {
             userid: id,
             role,
         })
-        .returning({ id: userinfo.userinfoid }); 
+        .returning({ id: userinfo.userinfoid });
 
     // Log!
-    const { id: tupleid } = returnedIds[0];
+    const [{ id: tupleid }, _] = returnedIds;
 
     const logid = await logChange(makerid, tupleid, 'Made account.');
 
@@ -79,36 +91,21 @@ export async function getFacultyRecordList() {
             logOperation: changelog.operation,
         })
         .from(rank)
-        .rightJoin(
-            facultyrank,
-            eq(facultyrank.rankid, rank.rankid)
-        )
-        .rightJoin(
-            facultysemester,
-            eq(facultysemester.currentrankid, facultyrank.facultyrankid)
-        )
-        .rightJoin(
-            faculty,
-            eq(faculty.facultyid, facultysemester.facultyid)
-        )
+        .rightJoin(facultyrank, eq(facultyrank.rankid, rank.rankid))
+        .rightJoin(facultysemester, eq(facultysemester.currentrankid, facultyrank.facultyrankid))
+        .rightJoin(faculty, eq(faculty.facultyid, facultysemester.facultyid))
         .leftJoin(
             facultyadminposition,
-            eq(facultyadminposition.facultysemesterid, facultysemester.facultysemesterid)
+            eq(facultyadminposition.facultysemesterid, facultysemester.facultysemesterid),
         )
         .leftJoin(
             adminposition,
-            eq(adminposition.adminpositionid, facultyadminposition.adminpositionid)
+            eq(adminposition.adminpositionid, facultyadminposition.adminpositionid),
         )
-        .leftJoin(
-            changelog,
-            eq(changelog.logid, faculty.latestchangelogid)
-        )
-        .leftJoin(
-            appuser,
-            eq(appuser.id, changelog.userid)
-        )
+        .leftJoin(changelog, eq(changelog.logid, faculty.latestchangelogid))
+        .leftJoin(appuser, eq(appuser.id, changelog.userid))
         .where(eq(facultysemester.acadsemesterid, currentSemester.acadsemesterid));
-    
+
     return shownFields;
 }
 
@@ -121,13 +118,10 @@ export async function getAccountList(currentUserId: string) {
             latestchangelogid: userinfo.latestchangelogid,
         })
         .from(appuser)
-        .leftJoin(
-            userinfo,
-            eq(userinfo.userid, appuser.id)
-        )
+        .leftJoin(userinfo, eq(userinfo.userid, appuser.id))
         .where(ne(appuser.id, currentUserId))
         .as('user_sq');
-    
+
     const changelogSq = db
         .select({
             logid: changelog.logid,
@@ -136,10 +130,7 @@ export async function getAccountList(currentUserId: string) {
             operation: changelog.operation,
         })
         .from(changelog)
-        .leftJoin(
-            appuser,
-            eq(appuser.id, changelog.userid)
-        )
+        .leftJoin(appuser, eq(appuser.id, changelog.userid))
         .as('changelog_sq');
 
     const shownFields = await db
@@ -152,19 +143,13 @@ export async function getAccountList(currentUserId: string) {
             logOperation: changelogSq.operation,
         })
         .from(userSq)
-        .leftJoin(
-            changelogSq,
-            eq(changelogSq.logid, userSq.latestchangelogid)
-        );
+        .leftJoin(changelogSq, eq(changelogSq.logid, userSq.latestchangelogid));
 
     return shownFields;
 }
 
 export async function areYouHere(email: string) {
-    const you = await db
-        .select()
-        .from(appuser)
-        .where(eq(appuser.email, email));
+    const you = await db.select().from(appuser).where(eq(appuser.email, email));
 
-    return (you.length !== 0);
+    return you.length !== 0;
 }

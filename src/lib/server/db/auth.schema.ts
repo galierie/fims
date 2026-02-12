@@ -1,5 +1,6 @@
 import { boolean, index, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
+
 import { changelog, userinfo } from './schema';
 
 export const appuser = pgTable('appuser', {

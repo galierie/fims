@@ -17,6 +17,24 @@ import { relations } from 'drizzle-orm';
 import { appuser } from './auth.schema';
 export * from './auth.schema';
 
+export const changelog = pgTable(
+    'changelog',
+    {
+        logid: serial().primaryKey().notNull(),
+        timestamp: timestamp({ mode: 'string' }).notNull(),
+        userid: text(),
+        tupleid: integer(),
+        operation: text().notNull(),
+    },
+    (table) => [
+        foreignKey({
+            columns: [table.userid],
+            foreignColumns: [appuser.id],
+            name: 'changelog_accountid_fkey',
+        }).onDelete('set null'),
+    ],
+);
+
 export const faculty = pgTable(
     'faculty',
     {
@@ -43,7 +61,7 @@ export const faculty = pgTable(
             foreignColumns: [changelog.logid],
             name: 'faculty_latestchangelogid_fkey',
         }),
-    ]
+    ],
 );
 
 export const facultycontactnumber = pgTable(
@@ -376,24 +394,6 @@ export const userinfo = pgTable(
     ],
 );
 
-export const changelog = pgTable(
-    'changelog',
-    {
-        logid: serial().primaryKey().notNull(),
-        timestamp: timestamp({ mode: 'string' }).notNull(),
-        userid: text(),
-        tupleid: integer(),
-        operation: text().notNull(),
-    },
-    (table) => [
-        foreignKey({
-            columns: [table.userid],
-            foreignColumns: [appuser.id],
-            name: 'changelog_accountid_fkey',
-        }).onDelete('set null'),
-    ],
-);
-
 export const facultycontactnumberRelations = relations(facultycontactnumber, ({ one }) => ({
     faculty: one(faculty, {
         fields: [facultycontactnumber.facultyid],
@@ -480,7 +480,7 @@ export const facultyhomeaddressRelations = relations(facultyhomeaddress, ({ one 
     }),
 }));
 
-export const facultyadminpositionRelations = relations(facultyadminposition, ({ many, one }) => ({
+export const facultyadminpositionRelations = relations(facultyadminposition, ({ one }) => ({
     facultysemesters: one(facultysemester, {
         fields: [facultyadminposition.facultysemesterid],
         references: [facultysemester.facultysemesterid],

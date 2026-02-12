@@ -1,0 +1,44 @@
+<script lang="ts">
+    interface FacultyRecordDTO {
+        lastname: string;
+        firstname: string;
+        status: string;
+        ranktitle: string;
+        adminposition: string;
+        logTimestamp: string;
+        logMaker: string;
+        logOperation: string;
+    }
+
+    interface Props {
+        facultyRecord: FacultyRecordDTO;
+        canViewChangeLogs: boolean;
+    }
+
+    const { facultyRecord, canViewChangeLogs }: Props = $props();
+    const {
+        lastname,
+        firstname,
+        status,
+        ranktitle,
+        adminposition,
+        logTimestamp,
+        logMaker,
+        logOperation,
+    }: FacultyRecordDTO = $derived(facultyRecord);
+</script>
+
+<div
+    class="flex justify-center [&>div]:flex [&>div]:h-12 [&>div]:items-center [&>div]:border-b [&>div]:border-fims-gray [&>div]:bg-white [&>div]:px-6"
+>
+    <div class="w-25 justify-center"><input type="checkbox" class="h-5 w-5" /></div>
+    <div class={canViewChangeLogs ? 'w-132' : 'w-182'}><span>{lastname}, {firstname}</span></div>
+    <div class="w-75 justify-center"><span>{status}</span></div>
+    <div class="w-75 justify-center"><span>{ranktitle}</span></div>
+    <div class="w-75 justify-center"><span>{adminposition}</span></div>
+    {#if canViewChangeLogs}
+        <div class="w-50">
+            <span class="truncate text-[#535353]">{logMaker} ({logTimestamp}): {logOperation}</span>
+        </div>
+    {/if}
+</div>
