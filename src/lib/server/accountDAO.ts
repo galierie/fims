@@ -1,18 +1,15 @@
 import {db} from "$lib/server/db"
-import {accounts, roles} from "$lib/server/schema"
+import {accounts, accountRoles} from "$lib/server/schema"
 import {eq} from "drizzle-orm"
 
-export type User = typeof accounts.$inferSelect
-export type Role = typeof roles.$inferSelect
+export type Account = typeof accounts.$inferSelect
+export type AccountRole = typeof accountRoles.$inferSelect
 
 /*
 creates an account with the following fields:
 email, passwordHash, accountRole
-
-note: account role factored out as there's no use as of now
 */
-
-export async function createAcc(
+export async function createAccount(
     email:string,
     passHash:string,
     role:string
@@ -21,8 +18,8 @@ export async function createAcc(
         await db.insert(accounts)
         .values({
             email: email,
-            password: passHash,
-            role: role
+            passwordHash: passHash,
+            accountRole: role
         })
     } catch(e) {
         console.log(e); // not sure how to display errors. will just change it later to return error instead.
@@ -31,13 +28,12 @@ export async function createAcc(
     return true;
 }
 
-//uses id to delete the account
-export async function deleteAcc(id:number):Promise<boolean> {
-    if (!Number.isInteger(id)) {return false;}
+//users the primary key (email) to delete the account
+export async function deleteAccount(email:string):Promise<boolean> {
     try {
         await db
         .delete(accounts)
-        .where(eq(accounts.id, id))
+        .where(eq(accounts.email, email))
     } catch(e) {
         console.log(e);
         return false;
@@ -45,7 +41,7 @@ export async function deleteAcc(id:number):Promise<boolean> {
     return false;
 }
 
-export async function listAll():Promise<Array<User>> {
+export async function listAccounts():Promise<Array<Account>> {
     let res = await db.select().from(accounts);
     return res;
 }
