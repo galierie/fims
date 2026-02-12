@@ -1,8 +1,8 @@
-import { eq, desc } from 'drizzle-orm';
+import { eq, desc, ne } from 'drizzle-orm';
 
 import { db } from './db';
 
-import { role, userinfo, faculty, facultyadminposition, adminposition, semester, rank, facultysemester, facultyrank, appuser } from './db/schema';
+import { role, userinfo, faculty, facultyadminposition, adminposition, semester, rank, facultysemester, facultyrank, appuser, changelog } from './db/schema';
 
 export async function assignRole(id: string, role: string) {
     await db.insert(userrole).values({
@@ -42,6 +42,9 @@ export async function getFacultyRecordList() {
             status: faculty.status,
             ranktitle: rank.ranktitle,
             adminposition: adminposition.name,
+            logTimestamp: changelog.timestamp,
+            logMaker: appuser.email,
+            logOperation: changelog.operation,
         })
         .from(rank)
         .rightJoin(
@@ -64,22 +67,62 @@ export async function getFacultyRecordList() {
             adminposition,
             eq(adminposition.adminpositionid, facultyadminposition.adminpositionid)
         )
+        .leftJoin(
+            changelog,
+            eq(changelog.logid, faculty.latestchangelogid)
+        )
+        .leftJoin(
+            appuser,
+            eq(appuser.id, changelog.userid)
+        )
         .where(eq(facultysemester.acadsemesterid, currentSemester.acadsemesterid));
     
     return shownFields;
 }
 
-export async function getAccountList() {
+export async function getAccountList(currentUserId: string) {
+    const userSq = db
+        .select({
+            userid: appuser.id,
+            email: appuser.email,
+            role: userinfo.role,
+            latestchangelogid: userinfo.latestchangelogid,
+        })
+        .from(appuser)
+        .leftJoin(
+            userinfo,
+            eq(userinfo.userid, appuser.id)
+        )
+        .where(ne(appuser.id, currentUserId))
+        .as('user_sq');
+    
+    const changelogSq = db
+        .select({
+            logid: changelog.logid,
+            timestamp: changelog.timestamp,
+            maker: appuser.email,
+            operation: changelog.operation,
+        })
+        .from(changelog)
+        .leftJoin(
+            appuser,
+            eq(appuser.id, changelog.userid)
+        )
+        .as('changelog_sq');
+
     const shownFields = await db
         .select({
-            userid: user.id,
-            email: user.email,
-            role: userrole.role,
+            userid: userSq.userid,
+            email: userSq.email,
+            role: userSq.role,
+            logTimestamp: changelogSq.timestamp,
+            logMaker: changelogSq.maker,
+            logOperation: changelogSq.operation,
         })
-        .from(user)
+        .from(userSq)
         .leftJoin(
-            userrole,
-            eq(userrole.userid, user.id)
+            changelogSq,
+            eq(changelogSq.logid, userSq.latestchangelogid)
         );
 
     return shownFields;
