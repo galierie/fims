@@ -26,6 +26,13 @@ jobs:
       - name: Install Dependencies
         run: pnpm install
         # declare .env variables here
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          ORIGIN: ${{ secrets.ORIGIN }}
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
       - name: Check Formatting
         run: pnpm fmt
       - name: Run Linters
