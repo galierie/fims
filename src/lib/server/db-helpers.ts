@@ -2,7 +2,7 @@ import { eq, desc } from 'drizzle-orm';
 
 import { db } from './db';
 
-import { role, userrole, faculty, facultyadminposition, adminposition, semester, rank, facultysemester, facultyrank } from './db/schema';
+import { role, userrole, faculty, facultyadminposition, adminposition, semester, rank, facultysemester, facultyrank, user } from './db/schema';
 
 export async function assignRole(id: string, role: string) {
     await db.insert(userrole).values({
@@ -66,5 +66,21 @@ export async function getFacultyRecordList() {
         )
         .where(eq(facultysemester.acadsemesterid, currentSemester.acadsemesterid));
     
+    return shownFields;
+}
+
+export async function getAccountList() {
+    const shownFields = await db
+        .select({
+            userid: user.id,
+            email: user.email,
+            role: userrole.role,
+        })
+        .from(user)
+        .leftJoin(
+            userrole,
+            eq(userrole.userid, user.id)
+        );
+
     return shownFields;
 }
