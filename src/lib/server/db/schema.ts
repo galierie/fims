@@ -221,32 +221,32 @@ export const office = pgTable('office', {
     name: varchar({ length: 100 }).notNull(),
 });
 
-export const facultyadministrative = pgTable(
-    'facultyadministrative',
+export const facultyadminposition = pgTable(
+    'facultyadminposition',
     {
-        facultyadministrativeid: serial().primaryKey().notNull(),
-        facultyid: integer(),
-        acadsemesterid: integer(),
-        positionid: integer(),
+        facultyadminpositionid: serial().primaryKey().notNull(),
+        facultysemesterid: integer(),
+        adminpositionid: integer(),
+        officeid: integer(),
         startdate: date().notNull(),
         enddate: date().notNull(),
         administrativeloadcredit: numeric({ precision: 5, scale: 2 }).notNull(),
     },
     (table) => [
         foreignKey({
-            columns: [table.facultyid],
-            foreignColumns: [faculty.facultyid],
-            name: 'facultyadministrative_facultyid_fkey',
+            columns: [table.facultysemesterid],
+            foreignColumns: [facultysemester.facultysemesterid],
+            name: 'facultyadminposition_facultysemesterid_fkey',
         }).onDelete('set null'),
         foreignKey({
-            columns: [table.acadsemesterid],
-            foreignColumns: [semester.acadsemesterid],
-            name: 'facultyadministrative_acadsemesterid_fkey',
+            columns: [table.adminpositionid],
+            foreignColumns: [adminposition.adminpositionid],
+            name: 'facultyadminposition_adminpositionid_fkey',
         }),
         foreignKey({
-            columns: [table.positionid],
-            foreignColumns: [adminposition.positionid],
-            name: 'facultyadministrative_positionid_fkey',
+            columns: [table.officeid],
+            foreignColumns: [office.officeid],
+            name: 'facultyadminposition_officeid_fkey',
         }),
     ],
 );
@@ -459,18 +459,18 @@ export const facultyhomeaddressRelations = relations(facultyhomeaddress, ({ one 
     }),
 }));
 
-export const facultyadministrativeRelations = relations(facultyadministrative, ({ one }) => ({
-    faculty: one(faculty, {
-        fields: [facultyadministrative.facultyid],
-        references: [faculty.facultyid],
-    }),
-    semester: one(semester, {
-        fields: [facultyadministrative.acadsemesterid],
-        references: [semester.acadsemesterid],
+export const facultyadminpositionRelations = relations(facultyadminposition, ({ many, one }) => ({
+    facultysemesters: one(facultysemester, {
+        fields: [facultyadminposition.facultysemesterid],
+        references: [facultysemester.facultysemesterid],
     }),
     adminposition: one(adminposition, {
-        fields: [facultyadministrative.positionid],
+        fields: [facultyadminposition.adminpositionid],
         references: [adminposition.adminpositionid],
+    }),
+    office: one(office, {
+        fields: [facultyadminposition.officeid],
+        references: [office.officeid],
     }),
 }));
 
@@ -500,7 +500,7 @@ export const facultysemesterRelations = relations(facultysemester, ({ one }) => 
 }));
 
 export const adminpositionRelations = relations(adminposition, ({ many }) => ({
-    facultyadministratives: many(facultyadministrative),
+    facultyadminpositions: many(facultyadminposition),
 }));
 
 export const facultyteachingRelations = relations(facultyteaching, ({ one }) => ({
