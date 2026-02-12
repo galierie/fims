@@ -1,5 +1,5 @@
 import {db} from "$lib/server/db"
-import { account, user, userrole } from "$lib/server/db/schema"
+import { account, appuser, userinfo } from "$lib/server/db/schema"
 import {eq} from "drizzle-orm"
 import { createAuthClient } from "better-auth/client"
 import { auth } from "./auth"
@@ -18,7 +18,7 @@ export async function createAcc(
     email:string,
     name:string,
     passHash:string,
-    role:string
+    roleName:string
 ):Promise<boolean> {
     try {
         let newAcc = await auth.api.signUpEmail({
@@ -31,10 +31,10 @@ export async function createAcc(
 
 
         // past this point, account is made. assign role
-        await db.insert(userrole)
+        await db.insert(userinfo)
         .values({
-            userid: newAcc.user.id,
-            role: role
+            role: roleName,
+            userid: newAcc.user.id
         })
     } catch(e) {
         console.log(e); // not sure how to display errors. will just change it later to return error instead.
@@ -46,7 +46,7 @@ export async function createAcc(
 //uses id to delete the account
 export async function deleteAcc(id:string):Promise<boolean> {
     try {
-        await db.delete(user).where(eq(user.id, id));
+        await db.delete(appuser).where(eq(appuser.id, id));
     } catch(e) {
         console.log(e);
         return false;
