@@ -1,7 +1,7 @@
 import { type Actions, error, fail } from '@sveltejs/kit';
 import { APIError } from 'better-auth';
 
-import { assignRole, getAccountList, getRole } from '$lib/server/db-helpers';
+import { makeUser, getAccountList, getRole, areYouHere } from '$lib/server/db-helpers';
 import { auth } from '$lib/server/auth';
 
 export async function load({ locals }) {
@@ -31,6 +31,7 @@ export const actions = {
 
         // Validate credentials
         if (!email || !email.endsWith('@up.edu.ph')) return fail(400, { error: 'Invalid email.' });
+        if (await areYouHere(email)) return fail(400, { error: 'Email is already associated with an account.' });
 
         if (!password) return fail(400, { error: 'Invalid password.' });
 
