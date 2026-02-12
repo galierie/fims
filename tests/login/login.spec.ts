@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test"
 
-test('basic login', async () => {
-
-})
+test('successful login', async ({ page }) => {
+    page.goto("/login");
+    
+});
