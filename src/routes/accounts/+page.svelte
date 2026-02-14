@@ -13,7 +13,7 @@
         willMake = !willMake;
     }
 
-    let makeForm: HTMLFormElement | null = null;
+    let makeForm: HTMLFormElement | null = $state(null);
 
     const userRoles = ['Admin', 'IT'];
 </script>
