@@ -9,5 +9,6 @@ export default defineConfig({
     dialect: 'postgresql', // You are using the 'pg' library
     dbCredentials: {
         url: env.DATABASE_URL || '', // Reads from your .env file
+        ssl: true,
     },
 });
