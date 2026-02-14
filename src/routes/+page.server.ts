@@ -16,10 +16,5 @@ export async function load({ locals }) {
         },
     ];
 
-    const userRole = await getRole(locals.user.id);
-    const permissions = await getPermissions(userRole);
-
-    const canViewChangeLogs = permissions.canviewchangelogs;
-
-    return { facultyRecordList, canViewChangeLogs };
+    return { facultyRecordList };
 }
