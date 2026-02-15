@@ -41,7 +41,22 @@ jobs:
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps
       - name: Test Codebase
-        run: pnpm build && pnpm test
+        run: pnpm test
+        # declare .env variables here
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          MODE: ${{ secrets.MODE }}
+          ORIGIN: ${{ secrets.ORIGIN }}
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          IT_EMAIL: ${{ secrets.IT_EMAIL }}
+          IT_PASS: ${{ secrets.IT_PASS }}
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          ADMIN_PASS: ${{ secrets.ADMIN_PASS }}
+          DUMMY_EMAIL: ${{ secrets.DUMMY_EMAIL }}
+          DUMMY_PASS: ${{ secrets.DUMMY_PASS }}
       - name: Upload Test Results
         uses: actions/upload-artifact@v6
         with:
