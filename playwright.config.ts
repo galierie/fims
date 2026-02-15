@@ -27,5 +27,11 @@ export default defineConfig({
             testDir: 'tests/playwright/it-specific',
             testMatch: /.e2e.(?:js|ts)/u,
         },
+        {
+            name: 'logout',
+            dependencies: ['it-auth', 'admin-auth', 'common-tests', 'it-specific-tests'],
+            testDir: 'tests/playwright/logout',
+            testMatch: /.e2e.(?:js|ts)/u,
+        }
     ],
 });
