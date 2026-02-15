@@ -2,17 +2,6 @@ import { desc, eq, ne } from 'drizzle-orm';
 
 import { db } from './db';
 
-import { createAuthClient } from 'better-auth/svelte';
-import { adminClient } from 'better-auth/client/plugins';
-
-import { BETTER_AUTH_URL, BETTER_AUTH_SECRET } from '$env/static/private';
-
-const authClient = createAuthClient({
-    baseURL: BETTER_AUTH_URL,
-    plugins:[adminClient()]
-});
-
-
 import {
     adminposition,
     appuser,
