@@ -45,7 +45,6 @@
         "eslint-plugin-svelte": "^3.14.0",
         "globals": "^17.2.0",
         "jsdom": "^28.1.0",
-        "neon-testing": "^2.4.0",
         "playwright": "^1.58.1",
         "pnpm": "^10.29.3",
         "prettier": "^3.8.1",
