@@ -21,7 +21,7 @@ export const changelog = pgTable(
     'changelog',
     {
         logid: serial().primaryKey().notNull(),
-        timestamp: timestamp({ mode: 'string' }).notNull(),
+        timestamp: timestamp().defaultNow().notNull(),
         userid: text(),
         tupleid: integer(),
         operation: text().notNull(),

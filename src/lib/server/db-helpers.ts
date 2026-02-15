@@ -20,7 +20,6 @@ export async function logChange(makerid: string, tupleid: number, operation: str
     const logids = await db
         .insert(changelog)
         .values({
-            timestamp: new Date().toISOString(),
             userid: makerid,
             tupleid,
             operation,

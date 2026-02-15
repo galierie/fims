@@ -7,7 +7,7 @@
         email: string;
         role: string | null;
         userid: string;
-        logTimestamp: string | null;
+        logTimestamp: Date | null;
         logOperation: string | null;
         logMaker: string | null;
     }

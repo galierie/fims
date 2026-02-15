@@ -5,7 +5,7 @@
         status: string;
         ranktitle: string | null;
         adminposition: string | null;
-        logTimestamp: string | null;
+        logTimestamp: Date | null;
         logMaker: string | null;
         logOperation: string | null;
     }
