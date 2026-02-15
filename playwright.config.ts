@@ -1,6 +1,6 @@
+import dotenv from 'dotenv';
 import { defineConfig } from '@playwright/test';
-import dotenv from "dotenv";
-dotenv.config({path: ".env.e2e"}); //change this to desired .env file
+dotenv.config({ path: '.env.e2e' }); //change this to desired .env file
 
 export default defineConfig({
     webServer: {
@@ -13,7 +13,7 @@ export default defineConfig({
         {
             name: 'invalid-logins',
             testMatch: /.e2e.(?:js|ts)/u,
-            testDir: "tests/playwright/invalid-login"
+            testDir: 'tests/playwright/invalid-login',
         },
         {
             name: 'admin-auth',
@@ -38,9 +38,15 @@ export default defineConfig({
         },
         {
             name: 'logout',
-            dependencies: ['it-auth', 'admin-auth', 'common-tests', 'it-specific-tests', 'invalid-logins'],
+            dependencies: [
+                'it-auth',
+                'admin-auth',
+                'common-tests',
+                'it-specific-tests',
+                'invalid-logins',
+            ],
             testDir: 'tests/playwright/logout',
             testMatch: /.e2e.(?:js|ts)/u,
-        }
+        },
     ],
 });

@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from '@playwright/test';
 
 test.use({ storageState: 'playwright/.auth/it.json' });
 
@@ -8,201 +8,198 @@ const dummyEmail = process.env.DUMMY_EMAIL!;
 const dummyPw = process.env.DUMMY_PASS!;
 
 test.describe('add account', async () => {
-  test.describe('unsuccessful', async () => {
-    test('no email', async ({ page }) => {
-      // No redirection since user is logged-in
-      page.goto('/accounts');
-      await expect(page).toHaveURL('/accounts');
+    test.describe('unsuccessful', async () => {
+        test('no email', async ({ page }) => {
+            // No redirection since user is logged-in
+            page.goto('/accounts');
+            await expect(page).toHaveURL('/accounts');
 
-      // Add Account
-      await page.getByRole('button', { name: '+ Add Account', exact: true }).click();
+            // Add Account
+            await page.getByRole('button', { name: '+ Add Account', exact: true }).click();
 
-      // No input
+            // No input
 
-      // Save Account
-      await page.getByRole('button', { name: '+ Save Account', exact: true }).click();
+            // Save Account
+            await page.getByRole('button', { name: '+ Save Account', exact: true }).click();
 
-      // Confirm
-      await page.getByRole('button', { name: 'Save', exact: true }).click();
+            // Confirm
+            await page.getByRole('button', { name: 'Save', exact: true }).click();
 
-      // Check message
-      await expect(page.getByText('Invalid email.')).toBeVisible();
+            // Check message
+            await expect(page.getByText('Invalid email.')).toBeVisible();
+        });
+
+        test('non-UP email', async ({ page }) => {
+            // No redirection since user is logged-in
+            page.goto('/accounts');
+            await expect(page).toHaveURL('/accounts');
+
+            // Add Account
+            await page.getByRole('button', { name: '+ Add Account', exact: true }).click();
+
+            // Input
+
+            // Email
+            const emailInput = page.getByRole('textbox', { name: 'Email', exact: true });
+            await expect(emailInput).toBeEmpty();
+            await expect(emailInput).toBeEditable();
+            await emailInput.fill('dummy@gmail.com');
+
+            // No need to input password
+
+            // Save Account
+            await page.getByRole('button', { name: '+ Save Account', exact: true }).click();
+
+            // Confirm
+            await page.getByRole('button', { name: 'Save', exact: true }).click();
+
+            // Check message
+            const afterMessage = await page.getByText('Invalid email.');
+            await expect(afterMessage).toBeVisible();
+        });
+
+        test('no password', async ({ page }) => {
+            // No redirection since user is logged-in
+            page.goto('/accounts');
+            await expect(page).toHaveURL('/accounts');
+
+            // Add Account
+            await page.getByRole('button', { name: '+ Add Account', exact: true }).click();
+
+            // Input
+
+            // Email
+            const emailInput = page.getByRole('textbox', { name: 'Email', exact: true });
+            await expect(emailInput).toBeEmpty();
+            await expect(emailInput).toBeEditable();
+            await emailInput.fill(dummyEmail);
+
+            // No need to input password
+
+            // Save Account
+            await page.getByRole('button', { name: '+ Save Account', exact: true }).click();
+
+            // Confirm
+            await page.getByRole('button', { name: 'Save', exact: true }).click();
+
+            // Check message
+            const afterMessage = await page.getByText('Invalid password.');
+            await expect(afterMessage).toBeVisible();
+        });
     });
 
-    test('non-UP email', async ({ page }) => {
-      // No redirection since user is logged-in
-      page.goto('/accounts');
-      await expect(page).toHaveURL('/accounts');
+    test('cancelled', async ({ page }) => {
+        // No redirection since user is logged-in
+        page.goto('/accounts');
+        await expect(page).toHaveURL('/accounts');
 
-      // Add Account
-      await page.getByRole('button', { name: '+ Add Account', exact: true }).click();
+        // Add Account
+        await page.getByRole('button', { name: '+ Add Account', exact: true }).click();
 
-      // Input
+        // Input
 
-      // Email
-      const emailInput = page.getByRole('textbox', { name: 'Email', exact: true });
-      await expect(emailInput).toBeEmpty();
-      await expect(emailInput).toBeEditable();
-      await emailInput.fill('dummy@gmail.com');
+        // Email
+        const emailInput = page.getByRole('textbox', { name: 'Email', exact: true });
+        await expect(emailInput).toBeEmpty();
+        await expect(emailInput).toBeEditable();
+        await emailInput.fill(dummyEmail);
 
-      // No need to input password
+        // Password
+        const pwInput = await page.getByRole('textbox', { name: 'Password', exact: true });
+        await expect(pwInput).toBeEmpty();
+        await expect(pwInput).toBeEditable();
+        await pwInput.fill(dummyPw);
 
-      // Save Account
-      await page.getByRole('button', { name: '+ Save Account', exact: true }).click();
+        // Save Account
+        await page.getByRole('button', { name: '+ Save Account', exact: true }).click();
 
-      // Confirm
-      await page.getByRole('button', { name: 'Save', exact: true }).click();
+        // Don't confirm
+        await page.getByRole('button', { name: 'Cancel', exact: true }).click();
 
-      // Check message
-      const afterMessage = await page.getByText('Invalid email.');
-      await expect(afterMessage).toBeVisible();
+        // The new email should not be visible
+        await expect(page.getByText(dummyEmail)).not.toBeVisible();
     });
 
-    test('no password', async ({ page }) => {
-      // No redirection since user is logged-in
-      page.goto('/accounts');
-      await expect(page).toHaveURL('/accounts');
+    test('made', async ({ page }) => {
+        // No redirection since user is logged-in
+        page.goto('/accounts');
+        await expect(page).toHaveURL('/accounts');
 
-      // Add Account
-      await page.getByRole('button', { name: '+ Add Account', exact: true }).click();
+        // Made
 
-      // Input
+        // Add Account
+        await page.getByRole('button', { name: '+ Add Account', exact: true }).click();
 
-      // Email
-      const emailInput = page.getByRole('textbox', { name: 'Email', exact: true });
-      await expect(emailInput).toBeEmpty();
-      await expect(emailInput).toBeEditable();
-      await emailInput.fill(dummyEmail);
+        // Input
 
-      // No need to input password
+        // Email
+        const emailInput = page.getByRole('textbox', { name: 'Email', exact: true });
+        await expect(emailInput).toBeEmpty();
+        await expect(emailInput).toBeEditable();
+        await emailInput.fill(dummyEmail);
 
-      // Save Account
-      await page.getByRole('button', { name: '+ Save Account', exact: true }).click();
+        // Password
+        const pwInput = await page.getByRole('textbox', { name: 'Password', exact: true });
+        await expect(pwInput).toBeEmpty();
+        await expect(pwInput).toBeEditable();
+        await pwInput.fill(dummyPw);
 
-      // Confirm
-      await page.getByRole('button', { name: 'Save', exact: true }).click();
+        // Save Account
+        await page.getByRole('button', { name: '+ Save Account', exact: true }).click();
 
-      // Check message
-      const afterMessage = await page.getByText('Invalid password.');
-      await expect(afterMessage).toBeVisible();
+        // Confirm
+        await page.getByRole('button', { name: 'Save', exact: true }).click();
+
+        // Check message
+        const afterMakeMessage = await page.getByText('Created account.');
+        await expect(afterMakeMessage).toBeVisible();
+
+        // The new email should be visible
+        const cell = page.getByText(dummyEmail);
+        await expect(cell).toBeVisible();
     });
-  });
-
-  test('cancelled', async ({ page }) => {
-    // No redirection since user is logged-in
-    page.goto('/accounts');
-    await expect(page).toHaveURL('/accounts');
-
-    // Add Account
-    await page.getByRole('button', { name: '+ Add Account', exact: true }).click();
-
-    // Input
-
-    // Email
-    const emailInput = page.getByRole('textbox', { name: 'Email', exact: true });
-    await expect(emailInput).toBeEmpty();
-    await expect(emailInput).toBeEditable();
-    await emailInput.fill(dummyEmail);
-
-    // Password
-    const pwInput = await page.getByRole('textbox', { name: 'Password', exact: true });
-    await expect(pwInput).toBeEmpty();
-    await expect(pwInput).toBeEditable();
-    await pwInput.fill(dummyPw);
-
-    // Save Account
-    await page.getByRole('button', { name: '+ Save Account', exact: true }).click();
-
-    // Don't confirm
-    await page.getByRole('button', { name: 'Cancel', exact: true }).click();
-
-    // The new email should not be visible
-    await expect(page.getByText(dummyEmail)).not.toBeVisible();
-  });
-
-  test('made', async ({ page }) => {
-    // No redirection since user is logged-in
-    page.goto('/accounts');
-    await expect(page).toHaveURL('/accounts');
-
-    // Made
-
-    // Add Account
-    await page.getByRole('button', { name: '+ Add Account', exact: true }).click();
-
-    // Input
-
-    // Email
-    const emailInput = page.getByRole('textbox', { name: 'Email', exact: true });
-    await expect(emailInput).toBeEmpty();
-    await expect(emailInput).toBeEditable();
-    await emailInput.fill(dummyEmail);
-
-    // Password
-    const pwInput = await page.getByRole('textbox', { name: 'Password', exact: true });
-    await expect(pwInput).toBeEmpty();
-    await expect(pwInput).toBeEditable();
-    await pwInput.fill(dummyPw);
-
-    // Save Account
-    await page.getByRole('button', { name: '+ Save Account', exact: true }).click();
-
-    // Confirm
-    await page.getByRole('button', { name: 'Save', exact: true }).click();
-
-    // Check message
-    const afterMakeMessage = await page.getByText('Created account.');
-    await expect(afterMakeMessage).toBeVisible();
-
-    // The new email should be visible
-    const cell = page.getByText(dummyEmail);
-    await expect(cell).toBeVisible();
-  });
 });
 
 test.describe('delete account', async () => {
-  test('cancelled', async ({ page }) => {
-    // No redirection since user is logged-in
-    page.goto('/accounts');
-    await expect(page).toHaveURL('/accounts');
+    test('cancelled', async ({ page }) => {
+        // No redirection since user is logged-in
+        page.goto('/accounts');
+        await expect(page).toHaveURL('/accounts');
 
-    // Delete Account
-    await page
-      .getByRole('button', { name: 'Delete', exact: true })
-      .nth(1) // admin@up.edu.ph is at the first row
-      .click();
+        // Delete Account
+        await page
+            .getByRole('button', { name: 'Delete', exact: true })
+            .nth(1) // admin@up.edu.ph is at the first row
+            .click();
 
-    // Don't confirm
-    await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+        // Don't confirm
+        await page.getByRole('button', { name: 'Cancel', exact: true }).click();
 
-    // The new email should still be visible
-    const cell = page.getByText(dummyEmail);
-    await expect(cell).toBeVisible();
-  });
+        // The new email should still be visible
+        const cell = page.getByText(dummyEmail);
+        await expect(cell).toBeVisible();
+    });
 
-  test('deleted', async ({ page }) => {
-    // No redirection since user is logged-in
-    page.goto('/accounts');
-    await expect(page).toHaveURL('/accounts');
+    test('deleted', async ({ page }) => {
+        // No redirection since user is logged-in
+        page.goto('/accounts');
+        await expect(page).toHaveURL('/accounts');
 
-    // Delete Account
-    await page
-      .getByRole('button', { name: 'Delete', exact: true })
-      .nth(1) // admin@up.edu.ph is at the first row
-      .click();
+        // Delete Account
+        await page
+            .getByRole('button', { name: 'Delete', exact: true })
+            .nth(1) // admin@up.edu.ph is at the first row
+            .click();
 
-    // Confirm
-    await page
-      .getByRole('button', { name: 'Delete', exact: true })
-      .last()
-      .click();
+        // Confirm
+        await page.getByRole('button', { name: 'Delete', exact: true }).last().click();
 
-    // Check message
-    const afterDeleteMessage = await page.getByText('Deleted account.');
-    await expect(afterDeleteMessage).toBeVisible();
+        // Check message
+        const afterDeleteMessage = await page.getByText('Deleted account.');
+        await expect(afterDeleteMessage).toBeVisible();
 
-    // The new email should no longer be visible
-    const cell = page.getByText(dummyEmail);
-    await expect(cell).not.toBeVisible();
-  });
+        // The new email should no longer be visible
+        const cell = page.getByText(dummyEmail);
+        await expect(cell).not.toBeVisible();
+    });
 });

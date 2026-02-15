@@ -1,39 +1,39 @@
-import { expect, test as setup } from "@playwright/test";
+import { expect, test as setup } from '@playwright/test';
 
 // NOTE: Don't simulate Google OAuth na. Hard to mock third-party UIs.
 
 const authFile = 'playwright/.auth/admin.json';
 
-const adminEmail = process.env.ADMIN_EMAIL!
-const adminPass = process.env.ADMIN_PASS!
+const adminEmail = process.env.ADMIN_EMAIL!;
+const adminPass = process.env.ADMIN_PASS!;
 
 setup('authenticate admin', async ({ page }) => {
-  // Redirect to /login since no logged-in user yet
-  await page.goto('/');
-  await expect(page).toHaveURL('/login');
+    // Redirect to /login since no logged-in user yet
+    await page.goto('/');
+    await expect(page).toHaveURL('/login');
 
-  // Log-in
+    // Log-in
 
-  // Email
-  const emailInput = page.getByRole('textbox', { name: 'Email' });
-  await expect(emailInput).toBeEmpty();
-  await expect(emailInput).toBeEditable();
-  await emailInput.fill(adminEmail);
+    // Email
+    const emailInput = page.getByRole('textbox', { name: 'Email' });
+    await expect(emailInput).toBeEmpty();
+    await expect(emailInput).toBeEditable();
+    await emailInput.fill(adminEmail);
 
-  // Password
-  const pwInput = await page.getByRole('textbox', { name: 'Password' });
-  await expect(pwInput).toBeEmpty();
-  await expect(pwInput).toBeEditable();
-  await pwInput.fill(adminPass);
-  await pwInput.press('Enter');
+    // Password
+    const pwInput = await page.getByRole('textbox', { name: 'Password' });
+    await expect(pwInput).toBeEmpty();
+    await expect(pwInput).toBeEditable();
+    await pwInput.fill(adminPass);
+    await pwInput.press('Enter');
 
-  // Redirected to main page
-  await expect(page).toHaveURL('');
+    // Redirected to main page
+    await expect(page).toHaveURL('');
 
-  // Will redirect to main page since logged-in user
-  await page.goto('/login');
-  await expect(page).toHaveURL('/');
+    // Will redirect to main page since logged-in user
+    await page.goto('/login');
+    await expect(page).toHaveURL('/');
 
-  // Save auth state
-  await page.context().storageState({ path: authFile });
+    // Save auth state
+    await page.context().storageState({ path: authFile });
 });

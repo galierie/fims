@@ -21,9 +21,9 @@ export async function logChange(makerid: string, tupleid: number, operation: str
         .insert(changelog)
         .values({
             userid: makerid,
-            tupleid: tupleid,
-            operation: operation,
-            timestamp: new Date()
+            tupleid,
+            operation,
+            timestamp: new Date(),
         })
         .returning();
 
@@ -59,21 +59,19 @@ export async function makeUser(makerid: string, id: string, role: string) {
 
 export async function deleteUser(deleterid: string, id: string) {
     const returnedIds = await db
-        .select({id: userinfo.userinfoid})
+        .select({ id: userinfo.userinfoid })
         .from(userinfo)
         .where(eq(userinfo.userid, id));
 
     const deletedID = returnedIds[0].id;
 
     // deletion
-    await db
-    .delete(appuser)
-    .where(eq(appuser.id, id))
+    await db.delete(appuser).where(eq(appuser.id, id));
 
     // log
-    const logid = await logChange(deleterid, deletedID, 'Deleted account.');    
+    const logid = await logChange(deleterid, deletedID, 'Deleted account.');
 
-    return { success: true }
+    return { success: true };
 }
 
 export async function getRole(id: string) {

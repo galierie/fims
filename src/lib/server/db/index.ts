@@ -2,8 +2,10 @@ import { drizzle as neonDrizzle } from 'drizzle-orm/neon-http';
 import { drizzle as localDrizzle } from 'drizzle-orm/node-postgres';
 import { neon } from '@neondatabase/serverless';
 import { Pool } from 'pg';
+
+import { DATABASE_URL, MODE } from '$env/static/private';
+
 import * as schema from './schema';
-import { DATABASE_URL, MODE } from "$env/static/private";
 
 // for local/dev database, use
 // postgresql://(user):(password)@localhost:(port)/(whatever you name the local database)
@@ -13,10 +15,15 @@ import { DATABASE_URL, MODE } from "$env/static/private";
 
 // there has to be a cleaner way to do this
 export const db =
-    MODE === "NEON"
-    ? neonDrizzle(neon(DATABASE_URL), { schema })
-    : MODE === "LOCAL"
-        ? localDrizzle(new Pool({
-            connectionString: DATABASE_URL,
-        }), { schema })
-        : (() => { throw new Error("INVALID MODE") })();
+    MODE === 'NEON'
+        ? neonDrizzle(neon(DATABASE_URL), { schema })
+        : MODE === 'LOCAL'
+          ? localDrizzle(
+                new Pool({
+                    connectionString: DATABASE_URL,
+                }),
+                { schema },
+            )
+          : (() => {
+                throw new Error('INVALID MODE');
+            })();

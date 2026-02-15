@@ -1,83 +1,83 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from '@playwright/test';
 
 // NOTE: Log-out button will be checked in some other test
 // TODO: Add first footer section
 
-const itEmail = process.env.IT_EMAIL!
-const adminEmail = process.env.ADMIN_EMAIL!
+const itEmail = process.env.IT_EMAIL!;
+const adminEmail = process.env.ADMIN_EMAIL!;
 
 test.describe('check header and footer as admin', async () => {
-  test.use({ storageState: 'playwright/.auth/admin.json' });
+    test.use({ storageState: 'playwright/.auth/admin.json' });
 
-  test('check header as admin', async ({ page }) => {
-    // No redirection since user is logged-in
-    page.goto('/');
-    await expect(page).toHaveURL('/');
-  
-    // Get header
-    const header = page.locator('header').first();
+    test('check header as admin', async ({ page }) => {
+        // No redirection since user is logged-in
+        page.goto('/');
+        await expect(page).toHaveURL('/');
 
-    // Check its elements
-  
-    const websiteTitle = await header.getByText('Faculty Information Management System');
-    await expect(websiteTitle).toBeVisible();
+        // Get header
+        const header = page.locator('header').first();
 
-    const loggedInEmail = await header.getByText(adminEmail);
-    await expect(loggedInEmail).toBeVisible();
-  });
+        // Check its elements
 
-  test('check footer as admin', async ({ page }) => {
-    // No redirection since user is logged-in
-    page.goto('/');
-    await expect(page).toHaveURL('/');
+        const websiteTitle = await header.getByText('Faculty Information Management System');
+        await expect(websiteTitle).toBeVisible();
 
-    // Get footer
-    const footer = page.locator('footer').first();
+        const loggedInEmail = await header.getByText(adminEmail);
+        await expect(loggedInEmail).toBeVisible();
+    });
 
-    // Check its elements
+    test('check footer as admin', async ({ page }) => {
+        // No redirection since user is logged-in
+        page.goto('/');
+        await expect(page).toHaveURL('/');
 
-    const linksHeading = await footer.getByRole('heading', { name: 'Links' });
-    await expect(linksHeading).toBeVisible();
+        // Get footer
+        const footer = page.locator('footer').first();
 
-    const contactsHeading = await footer.getByRole('heading', { name: 'Contacts' });
-    await expect(contactsHeading).toBeVisible();
-  });
+        // Check its elements
+
+        const linksHeading = await footer.getByRole('heading', { name: 'Links' });
+        await expect(linksHeading).toBeVisible();
+
+        const contactsHeading = await footer.getByRole('heading', { name: 'Contacts' });
+        await expect(contactsHeading).toBeVisible();
+    });
 });
 
 test.describe('check header and footer as it', async () => {
-  test.use({ storageState: 'playwright/.auth/it.json' });
+    test.use({ storageState: 'playwright/.auth/it.json' });
 
-  test('check header as it', async ({ page }) => {
-    // No redirection since user is logged-in
-    page.goto('/');
-    await expect(page).toHaveURL('/');
+    test('check header as it', async ({ page }) => {
+        // No redirection since user is logged-in
+        page.goto('/');
+        await expect(page).toHaveURL('/');
 
-    // Get header
-    const header = page.locator('header').first();
+        // Get header
+        const header = page.locator('header').first();
 
-    // Check its elements
+        // Check its elements
 
-    const websiteTitle = await header.getByText('Faculty Information Management System');
-    await expect(websiteTitle).toBeVisible();
+        const websiteTitle = await header.getByText('Faculty Information Management System');
+        await expect(websiteTitle).toBeVisible();
 
-    const loggedInEmail = await header.getByText(itEmail);
-    await expect(loggedInEmail).toBeVisible();
-  });
+        const loggedInEmail = await header.getByText(itEmail);
+        await expect(loggedInEmail).toBeVisible();
+    });
 
-  test('check footer as it', async ({ page }) => {
-    // No redirection since user is logged-in
-    page.goto('/');
-    await expect(page).toHaveURL('/');
+    test('check footer as it', async ({ page }) => {
+        // No redirection since user is logged-in
+        page.goto('/');
+        await expect(page).toHaveURL('/');
 
-    // Get footer
-    const footer = page.locator('footer').first();
+        // Get footer
+        const footer = page.locator('footer').first();
 
-    // Check its elements
+        // Check its elements
 
-    const linksHeading = await footer.getByRole('heading', { name: 'Links' });
-    await expect(linksHeading).toBeVisible();
+        const linksHeading = await footer.getByRole('heading', { name: 'Links' });
+        await expect(linksHeading).toBeVisible();
 
-    const contactsHeading = await footer.getByRole('heading', { name: 'Contacts' });
-    await expect(contactsHeading).toBeVisible();
-  });
+        const contactsHeading = await footer.getByRole('heading', { name: 'Contacts' });
+        await expect(contactsHeading).toBeVisible();
+    });
 });
