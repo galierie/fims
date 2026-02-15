@@ -19,22 +19,6 @@ const facultyRecordTable = [
   ...facultyRecordDummyRow,
 ];
 
-test.describe('view faculty records as admin', async () => {
-  test.use({ storageState: 'playwright/.auth/admin.json' });
-
-  test('admin', async ({ page }) => {
-    // No redirection since user is logged-in
-    await page.goto('/');
-    await expect(page).toHaveURL('/');
-
-    // Check faculty records by checking table headers and a dummy row
-    facultyRecordTable.forEach(async val => {
-      const cell = await page.getByText(val, { exact: true })
-      await expect(cell).toBeVisible();
-    });
-  });
-});
-
 test.describe('view faculty records as it', async () => {
   test.use({ storageState: 'playwright/.auth/it.json' });
 
@@ -44,13 +28,27 @@ test.describe('view faculty records as it', async () => {
     await expect(page).toHaveURL('/');
 
     // Check faculty records by checking table headers and a dummy row
-    facultyRecordTable.forEach(async val => {
-      const cell = await page.getByText(val, { exact: true });
-      await expect(cell).toBeVisible();
-    });
+    for (const val of facultyRecordTable) {
+      await expect(page.getByText(val)).toBeVisible();
+    }
 
     // Check faculty record change logs by checking the table header alone
     const changeLogCell = await page.getByText('Change Logs', { exact: true });
     await expect(changeLogCell).toBeVisible();
+  });
+});
+
+test.describe('view faculty records as admin', async () => {
+  test.use({ storageState: 'playwright/.auth/admin.json' });
+
+  test('admin', async ({ page }) => {
+    // No redirection since user is logged-in
+    await page.goto('/');
+    await expect(page).toHaveURL('/');
+
+    // Check faculty records by checking table headers and a dummy row
+    for (const val of facultyRecordTable) {
+      await expect(page.getByText(val)).toBeVisible();
+    }
   });
 });

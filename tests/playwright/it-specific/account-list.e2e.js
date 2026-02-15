@@ -2,6 +2,8 @@ import { expect, test } from "@playwright/test";
 
 test.use({ storageState: 'playwright/.auth/it.json' });
 
+const adminEmail = "testadmin@up.edu.ph"
+
 const accountTableHeaders = [
   'Email',
   'Reset Password?',
@@ -11,7 +13,7 @@ const accountTableHeaders = [
 ];
 
 const accountDummyRow = [
-  'admin@up.edu.ph',
+  adminEmail
 ];
 
 const accountTable = [
@@ -25,8 +27,7 @@ test('view account list', async ({ page }) => {
   await expect(page).toHaveURL('/accounts');
 
   // See accounts by checking table headers and a dummy row
-  accountTable.forEach(async val => {
-    const cell = await page.getByText(val, { exact: true });
-    await expect(cell).toBeVisible();
-  });
+  for (const val of accountTable) {
+    await expect(page.getByText(val, {exact: true})).toBeVisible();
+  };
 });
