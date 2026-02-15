@@ -6,7 +6,7 @@ const facultyRecordDummyRow = ['Dela Cruz, Juan', 'Active', 'Professor 7', 'Depa
 
 const facultyRecordTable = [...facultyRecordTableHeaders, ...facultyRecordDummyRow];
 
-test.describe('view faculty records as it', async () => {
+test.describe('view faculty records as it', () => {
     test.use({ storageState: 'playwright/.auth/it.json' });
 
     test('it', async ({ page }) => {
@@ -15,9 +15,7 @@ test.describe('view faculty records as it', async () => {
         await expect(page).toHaveURL('/');
 
         // Check faculty records by checking table headers and a dummy row
-        for (const val of facultyRecordTable) 
-            await expect(page.getByText(val)).toBeVisible();
-        
+        for (const val of facultyRecordTable) await expect(page.getByText(val)).toBeVisible();
 
         // Check faculty record change logs by checking the table header alone
         const changeLogCell = await page.getByText('Change Logs', { exact: true });
@@ -25,7 +23,7 @@ test.describe('view faculty records as it', async () => {
     });
 });
 
-test.describe('view faculty records as admin', async () => {
+test.describe('view faculty records as admin', () => {
     test.use({ storageState: 'playwright/.auth/admin.json' });
 
     test('admin', async ({ page }) => {
@@ -34,8 +32,6 @@ test.describe('view faculty records as admin', async () => {
         await expect(page).toHaveURL('/');
 
         // Check faculty records by checking table headers and a dummy row
-        for (const val of facultyRecordTable) 
-            await expect(page.getByText(val)).toBeVisible();
-        
+        for (const val of facultyRecordTable) await expect(page.getByText(val)).toBeVisible();
     });
 });

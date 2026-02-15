@@ -1,7 +1,7 @@
 import { type Actions, error, fail } from '@sveltejs/kit';
 import { APIError } from 'better-auth';
 
-import { areYouHere, deleteUser, getAccountList, getRole, makeUser } from '$lib/server/db-helpers';
+import { areYouHere, deleteUser, getAccountList, makeUser } from '$lib/server/db-helpers';
 import { auth } from '$lib/server/auth';
 
 export async function load({ locals, parent }) {

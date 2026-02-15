@@ -69,7 +69,7 @@ export async function deleteUser(deleterid: string, id: string) {
     await db.delete(appuser).where(eq(appuser.id, id));
 
     // log
-    const logid = await logChange(deleterid, deletedID, 'Deleted account.');
+    await logChange(deleterid, deletedID, 'Deleted account.');
 
     return { success: true };
 }

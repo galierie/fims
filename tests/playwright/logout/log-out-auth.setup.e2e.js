@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test.describe('log-out as admin', async () => {
+test.describe('log-out as admin', () => {
     test.use({ storageState: 'playwright/.auth/admin.json' });
 
     test('admin', async ({ page }) => {
@@ -17,7 +17,7 @@ test.describe('log-out as admin', async () => {
     });
 });
 
-test.describe('log-out as it', async () => {
+test.describe('log-out as it', () => {
     test.use({ storageState: 'playwright/.auth/it.json' });
 
     test('it', async ({ page }) => {

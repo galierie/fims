@@ -18,7 +18,7 @@ const emailFail = 'Invalid email.';
 const emptyPassFail = 'Empty password.';
 const genericFail = 'Invalid email or password'; //for some reason this lacks a period
 
-test.describe('invalid login cases', async () => {
+test.describe('invalid login cases', () => {
     test('non up email', async ({ page }) => {
         // Goto
         await page.goto('/');

@@ -6,7 +6,7 @@ import { expect, test } from '@playwright/test';
 const itEmail = process.env.IT_EMAIL!;
 const adminEmail = process.env.ADMIN_EMAIL!;
 
-test.describe('check header and footer as admin', async () => {
+test.describe('check header and footer as admin', () => {
     test.use({ storageState: 'playwright/.auth/admin.json' });
 
     test('check header as admin', async ({ page }) => {
@@ -44,7 +44,7 @@ test.describe('check header and footer as admin', async () => {
     });
 });
 
-test.describe('check header and footer as it', async () => {
+test.describe('check header and footer as it', () => {
     test.use({ storageState: 'playwright/.auth/it.json' });
 
     test('check header as it', async ({ page }) => {

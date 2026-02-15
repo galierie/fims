@@ -1,7 +1,6 @@
 // planning to deprecate in favor of db-helpers
 // though db-helpers might be too verbose imo
 
-import { createAuthClient } from 'better-auth/client';
 import { eq } from 'drizzle-orm';
 
 import { account, appuser, userinfo } from '$lib/server/db/schema';
@@ -10,7 +9,6 @@ import { db } from '$lib/server/db';
 import { auth } from './auth';
 
 export type Account = typeof account.$inferSelect;
-const authClient = createAuthClient();
 
 /*
 creates an account with the following fields:

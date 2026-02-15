@@ -7,8 +7,8 @@ test.use({ storageState: 'playwright/.auth/it.json' });
 const dummyEmail = process.env.DUMMY_EMAIL!;
 const dummyPw = process.env.DUMMY_PASS!;
 
-test.describe('add account', async () => {
-    test.describe('unsuccessful', async () => {
+test.describe('add account', () => {
+    test.describe('unsuccessful', () => {
         test('no email', async ({ page }) => {
             // No redirection since user is logged-in
             page.goto('/accounts');
@@ -160,7 +160,7 @@ test.describe('add account', async () => {
     });
 });
 
-test.describe('delete account', async () => {
+test.describe('delete account', () => {
     test('cancelled', async ({ page }) => {
         // No redirection since user is logged-in
         page.goto('/accounts');
