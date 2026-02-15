@@ -3,11 +3,11 @@
         lastname: string;
         firstname: string;
         status: string;
-        ranktitle: string;
-        adminposition: string;
-        logTimestamp: string;
-        logMaker: string;
-        logOperation: string;
+        ranktitle: string | null;
+        adminposition: string | null;
+        logTimestamp: Date | null;
+        logMaker: string | null;
+        logOperation: string | null;
     }
 
     interface Props {

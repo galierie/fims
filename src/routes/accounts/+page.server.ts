@@ -1,12 +1,12 @@
 import { type Actions, error, fail } from '@sveltejs/kit';
 import { APIError } from 'better-auth';
 
-import { areYouHere, getAccountList, getRole, makeUser } from '$lib/server/db-helpers';
+import { areYouHere, getAccountList, makeUser } from '$lib/server/db-helpers';
 import { auth } from '$lib/server/auth';
 
-export async function load({ locals }) {
-    const userRole = await getRole(locals.user.id);
-    if (userRole !== 'IT') throw error(404, { message: 'Insufficient permissions.' });
+export async function load({ locals, parent }) {
+    const { canViewAccounts } = await parent();
+    if (!canViewAccounts) throw error(404, { message: 'Insufficient permissions.' });
 
     const accountList = await getAccountList(locals.user.id);
     // const accountList = [

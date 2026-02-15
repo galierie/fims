@@ -1,6 +1,4 @@
-import { getPermissions, getRole } from '$lib/server/db-helpers';
-
-export async function load({ locals }) {
+export function load() {
     // const facultyRecordList = await getFacultyRecordList();
     const facultyRecordList = [
         {
@@ -10,16 +8,11 @@ export async function load({ locals }) {
             status: 'Active',
             ranktitle: 'Professor 7',
             adminposition: 'Department Chair',
-            logTimestamp: '',
+            logTimestamp: new Date(),
             logMaker: 'it@up.edu.ph',
             logOperation: 'Made record.',
         },
     ];
 
-    const userRole = await getRole(locals.user.id);
-    const permissions = await getPermissions(userRole);
-
-    const canViewChangeLogs = permissions.canviewchangelogs;
-
-    return { facultyRecordList, canViewChangeLogs };
+    return { facultyRecordList };
 }

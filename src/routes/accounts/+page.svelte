@@ -13,7 +13,7 @@
         willMake = !willMake;
     }
 
-    let makeForm: HTMLFormElement | null = null;
+    let makeForm: HTMLFormElement | null = $state(null);
 
     const userRoles = ['Admin', 'IT'];
 </script>
@@ -49,20 +49,22 @@
 
 <div>
     <!-- Make/Save Account Button -->
-    <div class="flex justify-end pr-22">
-        {#if isMakingAccount}
-            <button
-                onclick={toggleModal}
-                class="mt-50 flex items-center justify-center rounded-full border-2 border-fims-green bg-white px-4 py-1 text-fims-green hover:bg-fims-green hover:text-white disabled:border-fims-gray disabled:text-fims-gray"
-                >+ Save Account</button
-            >
-        {:else}
-            <button
-                onclick={() => (isMakingAccount = true)}
-                class="mt-50 flex items-center justify-center rounded-full border-2 border-fims-green bg-white px-4 py-1 text-fims-green hover:bg-fims-green hover:text-white disabled:border-fims-gray disabled:text-fims-gray"
-                >+ Add Account</button
-            >
-        {/if}
+    <div class="flex justify-center">
+        <div class="flex w-432 justify-end">
+            {#if isMakingAccount}
+                <button
+                    onclick={toggleModal}
+                    class="mt-50 flex items-center justify-center rounded-full border-2 border-fims-green bg-white px-4 py-1 text-fims-green hover:bg-fims-green hover:text-white disabled:border-fims-gray disabled:text-fims-gray"
+                    >+ Save Account</button
+                >
+            {:else}
+                <button
+                    onclick={() => (isMakingAccount = true)}
+                    class="mt-50 flex items-center justify-center rounded-full border-2 border-fims-green bg-white px-4 py-1 text-fims-green hover:bg-fims-green hover:text-white disabled:border-fims-gray disabled:text-fims-gray"
+                    >+ Add Account</button
+                >
+            {/if}
+        </div>
     </div>
 
     <!-- Account List Table -->

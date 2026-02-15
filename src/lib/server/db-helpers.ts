@@ -20,14 +20,13 @@ export async function logChange(makerid: string, tupleid: number, operation: str
     const logids = await db
         .insert(changelog)
         .values({
-            timestamp: new Date().toISOString(),
             userid: makerid,
             tupleid,
             operation,
         })
-        .returning({ id: changelog.logid });
+        .returning();
 
-    const [{ id: logid }, _] = logids;
+    const [{ logid }, _] = logids;
 
     return logid;
 }
@@ -40,10 +39,10 @@ export async function makeUser(makerid: string, id: string, role: string) {
             userid: id,
             role,
         })
-        .returning({ id: userinfo.userinfoid });
+        .returning();
 
     // Log!
-    const [{ id: tupleid }, _] = returnedIds;
+    const [{ userinfoid: tupleid }, _] = returnedIds;
 
     const logid = await logChange(makerid, tupleid, 'Made account.');
 

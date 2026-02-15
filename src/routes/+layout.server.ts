@@ -11,7 +11,11 @@ export async function load({ locals, url }) {
         throw redirect(307, '/login');
     } else if (locals.user) {
         const userRole = await getRole(locals.user.id);
-        const { canaddaccount, canmodifyaccount } = await getPermissions(userRole);
+        const {
+            canaddaccount,
+            canmodifyaccount,
+            canviewchangelogs: canViewChangeLogs,
+        } = await getPermissions(userRole);
 
         const accountColorMap = new Map();
         accountColorMap.set('IT', 'fims-red');
@@ -21,6 +25,7 @@ export async function load({ locals, url }) {
             isLoggedIn: true, // if it's not, then this line shouldn't have been reached
             email: locals.user.email,
             canViewAccounts: canaddaccount || canmodifyaccount,
+            canViewChangeLogs,
             accountColor: accountColorMap.get(userRole),
         };
     }
@@ -29,6 +34,7 @@ export async function load({ locals, url }) {
         isLoggedIn: false,
         email: '',
         canViewAccounts: false,
+        canViewChangeLogs: false,
         accountColor: '',
     };
 }

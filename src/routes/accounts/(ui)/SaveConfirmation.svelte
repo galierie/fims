@@ -18,10 +18,3 @@
         </div>
     </div>
 </div>
-<div>
-    <div>
-        <p>Are you sure you want to save the account?</p>
-        <button onclick={onSave}>Save</button>
-        <button onclick={onCancel}>Cancel</button>
-    </div>
-</div>
