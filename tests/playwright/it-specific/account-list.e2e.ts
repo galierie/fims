@@ -2,8 +2,6 @@ import { expect, test } from "@playwright/test";
 
 test.use({ storageState: 'playwright/.auth/it.json' });
 
-const adminEmail = "testadmin@up.edu.ph"
-
 const accountTableHeaders = [
   'Email',
   'Reset Password?',
@@ -13,7 +11,7 @@ const accountTableHeaders = [
 ];
 
 const accountDummyRow = [
-  adminEmail
+  process.env.ADMIN_EMAIL!,
 ];
 
 const accountTable = [
