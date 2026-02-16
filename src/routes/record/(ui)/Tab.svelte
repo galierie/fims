@@ -1,11 +1,7 @@
 <script lang="ts">
-    export let test:string = "";
+    export let test:string = "fewfew";
 </script>
 
 <div>
-    <span class="mt-60">{test}</span>
+    <span class="full">{test}</span>
 </div>
-
-<style>
-    @reference "tailwindcss";
-</style>
