@@ -102,16 +102,16 @@
                     <input
                         type="email"
                         name="email"
-                        placeholder="Email"
-                        class="h-full w-full p-2"
+                        placeholder="Enter email here"
+                        class="h-full w-full border-0 p-2 focus:ring-0"
                     />
                 </div>
                 <div class="w-50">
                     <input
                         type="password"
                         name="password"
-                        placeholder="Password"
-                        class="h-full w-full p-2"
+                        placeholder="Set initial password"
+                        class="h-full w-full border-0 p-2 focus:ring-0"
                     />
                 </div>
                 <div class="w-75">
