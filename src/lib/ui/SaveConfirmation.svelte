@@ -1,10 +1,10 @@
-<script>
-    const { onSave, onCancel } = $props();
+<script lang="ts">
+    const { onSave, onCancel, text } = $props();
 </script>
 
 <div class="fixed top-0 left-0 flex h-full w-full items-center justify-center bg-[rgba(0,0,0,0.9)]">
     <div class="w-[90%] max-w-150 rounded-2xl bg-fims-beige px-10 py-15 text-center">
-        <p class="mb-7.5 text-black">Are you sure you want to save the account?</p>
+        <p class="mb-7.5 text-black">{text}</p>
 
         <div class="flex justify-around gap-5">
             <button

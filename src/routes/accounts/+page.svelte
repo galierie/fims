@@ -1,7 +1,7 @@
 <script lang="ts">
     import Icon from '@iconify/svelte';
     import AccountRow from './(ui)/AccountRow.svelte';
-    import SaveConfirmation from './(ui)/SaveConfirmation.svelte';
+    import SaveConfirmation from '$lib/ui/SaveConfirmation.svelte';
     import SelectDropdown from '$lib/ui/SelectDropdown.svelte';
     import { enhance } from '$app/forms';
     const { data, form } = $props();
@@ -139,5 +139,6 @@
             if (makeForm) makeForm.submit();
         }}
         onCancel={toggleModal}
+        text="Are you sure you want to save the account?"
     />
 {/if}
