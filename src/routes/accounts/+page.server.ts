@@ -9,17 +9,7 @@ export async function load({ locals, parent }) {
     if (!canViewAccounts) throw error(404, { message: 'Insufficient permissions.' });
 
     const accountList = await getAccountList(locals.user.id);
-    // const accountList = [
-    //     {
-    //         userid: 'sdjvghkadsfhvb',
-    //         email: 'it@up.edu.ph',
-    //         role: 'IT',
-    //         logTimestamp: '',
-    //         logOperation: 'Made account.',
-    //         logMaker: '',
-    //     },
-    // ];
-
+    
     return { accountList };
 }
 
