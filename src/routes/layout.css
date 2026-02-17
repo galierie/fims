@@ -1,6 +1,7 @@
 @import url('$lib/fonts/Poppins/font.css') layer(base);
 
 @import 'tailwindcss';
+@plugin '@tailwindcss/forms';
 
 @theme inline {
     --font-poppins: poppins, sans-serif;
