@@ -13,6 +13,7 @@
     let isSaving = $state(false);
 
     function toggleModal() {
+        isMakingAccount = !isMakingAccount;
         willMake = !willMake;
     }
 
@@ -102,6 +103,7 @@
                         willMake = true;
                         cancel();
                     } else {
+                        isMakingAccount = false;
                         willMake = false;
                         isSaving = true;
                         return async ({ update }) => {
