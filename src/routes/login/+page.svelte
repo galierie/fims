@@ -47,7 +47,7 @@
                 class="mt-3 h-12 w-156 rounded-lg border-0 bg-white px-4 py-3 placeholder-fims-gray focus:ring-0"
                 name="email"
                 type="email"
-                placeholder="Enter email here"
+                placeholder="Email"
                 disabled={isSigningIn}
                 required
                 onkeypress={(event) => {
@@ -59,7 +59,7 @@
                     class="mt-3 h-12 w-156 rounded-lg border-0 bg-white px-4 py-3 placeholder-fims-gray focus:ring-0"
                     name="password"
                     type={isPasswordVisible ? 'text' : 'password'}
-                    placeholder="Set initial password"
+                    placeholder="Password"
                     disabled={isSigningIn}
                     required
                     bind:this={passwordInput}
