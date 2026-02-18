@@ -36,9 +36,10 @@
             action="?/signInEmail"
             bind:this={formElement}
             use:enhance={() => {
+                isSigningIn = true;
                 return async ({ update }) => {
-                    isSigningIn = true;
                     await update();
+                    isSigningIn = false;
                 };
             }}
         >
