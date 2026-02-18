@@ -1,6 +1,7 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
     import Icon from '@iconify/svelte';
+    import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
     import DeleteConfirmation from '$lib/ui/DeleteConfirmation.svelte';
     import SelectDropdown from '$lib/ui/SelectDropdown.svelte';
 
@@ -24,6 +25,7 @@
     const userRoles = ['Admin', 'IT'];
 
     let willDelete = $state(false);
+    let isDeleting = $state(false);
 
     function toggleModal() {
         willDelete = !willDelete;
@@ -66,14 +68,23 @@
             action="?/deleteAccount"
             class="flex items-center justify-center"
             bind:this={deleteForm}
-            use:enhance
+            use:enhance={({ cancel }) => {
+                if (!willDelete) {
+                    willDelete = true;
+                    cancel();
+                } else {
+                    willDelete = false;
+                    isDeleting = true;
+                    return async ({ update }) => {
+                        isDeleting = false;
+                        await update();
+                    }
+                }
+            }}
         >
             <button
+                type="submit"
                 class="flex items-center justify-center rounded-full border-2 border-fims-red bg-white px-4 py-1 text-fims-red hover:bg-fims-red hover:text-white disabled:border-fims-gray disabled:text-fims-gray"
-                onclick={(event) => {
-                    event.preventDefault();
-                    toggleModal();
-                }}
             >
                 <Icon icon="tabler:trash" class="mr-2 h-6 w-6" />
                 <span>Delete</span>
@@ -84,7 +95,7 @@
             {#if willDelete}
                 <DeleteConfirmation
                     onDelete={() => {
-                        if (deleteForm) deleteForm.submit();
+                        if (deleteForm) deleteForm.requestSubmit();
                     }}
                     onCancel={toggleModal}
                     text="Are you sure you want to delete the account?"
@@ -93,3 +104,7 @@
         </form>
     </div>
 </div>
+
+{#if isDeleting}
+    <LoadingScreen />
+{/if}
