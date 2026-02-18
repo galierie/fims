@@ -104,8 +104,8 @@
                         willMake = false;
                         isSaving = true;
                         return async ({ update }) => {
-                            isSaving = false;
                             await update();
+                            isSaving = false;
                         };
                     }
                     willMake = true;
