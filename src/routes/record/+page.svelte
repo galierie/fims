@@ -1,5 +1,7 @@
 <script lang="ts">
-    const tabs = ["Profile", "Semestral Records", "Tab1", "Tab2", "Tab3"]
+    import Profile from "./(tabs)/Profile.svelte";
+
+    const tabs = ["Profile"]
     const href = "/record";
     const back = "/";
     const lastName = "LastName"
@@ -18,5 +20,7 @@
             </div>
         {/each}
     </div>
+    <div id="divider" class="h-0.5 mb-10 w-full bg-fims-green"></div>
+    <Profile/>
     <!-- TODO: some hacky way of mimicking the ui in figma-->
 </div>
