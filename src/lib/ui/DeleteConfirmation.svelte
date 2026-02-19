@@ -9,12 +9,12 @@
         <div class="flex justify-around gap-5">
             <button
                 class="cursor-pointer rounded-3xl border-2 border-solid border-fims-green px-7.5 py-2.5 text-base text-fims-green transition-opacity duration-200 hover:opacity-70"
-                onclick={onDelete}
-                type="submit">Delete</button
+                onclick={onCancel}
+                type="submit">Cancel</button
             >
             <button
                 class="cursor-pointer rounded-3xl border-2 border-solid border-fims-red px-7.5 py-2.5 text-base text-fims-red transition-opacity duration-200 hover:opacity-70"
-                onclick={onCancel}>Cancel</button
+                onclick={onDelete}>Delete</button
             >
         </div>
     </div>

@@ -1,6 +1,8 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
+    import Button from '$lib/ui/Button.svelte';
     import Icon from '@iconify/svelte';
+    import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
     import DeleteConfirmation from '$lib/ui/DeleteConfirmation.svelte';
     import SelectDropdown from '$lib/ui/SelectDropdown.svelte';
 
@@ -24,6 +26,7 @@
     const userRoles = ['Admin', 'IT'];
 
     let willDelete = $state(false);
+    let isDeleting = $state(false);
 
     function toggleModal() {
         willDelete = !willDelete;
@@ -41,15 +44,10 @@
     <div class="w-66 2xl:w-132"><span>{email}</span></div>
     <div class="w-50 justify-center">
         <form method="POST" action="?/deleteAccount" class="flex items-center justify-center">
-            <button
-                type="submit"
-                name="userid"
-                value={userid}
-                class="flex items-center justify-center rounded-full border-2 border-fims-red bg-white px-4 py-1 text-fims-red hover:bg-fims-red hover:text-white disabled:border-fims-gray disabled:text-fims-gray"
-            >
+            <Button type="submit" name="userid" value={userid} color="red">
                 <Icon icon="tabler:refresh" class="mr-2 h-6 w-6" />
                 <span>Reset</span>
-            </button>
+            </Button>
         </form>
     </div>
     <div class="w-75">
@@ -66,25 +64,30 @@
             action="?/deleteAccount"
             class="flex items-center justify-center"
             bind:this={deleteForm}
-            use:enhance
+            use:enhance={({ cancel }) => {
+                if (willDelete) {
+                    willDelete = false;
+                    isDeleting = true;
+                    return async ({ update }) => {
+                        await update();
+                        isDeleting = false;
+                    };
+                }
+                willDelete = true;
+                cancel();
+            }}
         >
-            <button
-                class="flex items-center justify-center rounded-full border-2 border-fims-red bg-white px-4 py-1 text-fims-red hover:bg-fims-red hover:text-white disabled:border-fims-gray disabled:text-fims-gray"
-                onclick={(event) => {
-                    event.preventDefault();
-                    toggleModal();
-                }}
-            >
+            <Button type="submit" color="red">
                 <Icon icon="tabler:trash" class="mr-2 h-6 w-6" />
                 <span>Delete</span>
-            </button>
+            </Button>
 
             <input type="hidden" name="userid" value={userid} />
 
             {#if willDelete}
                 <DeleteConfirmation
                     onDelete={() => {
-                        if (deleteForm) deleteForm.submit();
+                        if (deleteForm) deleteForm.requestSubmit();
                     }}
                     onCancel={toggleModal}
                     text="Are you sure you want to delete the account?"
@@ -93,3 +96,7 @@
         </form>
     </div>
 </div>
+
+{#if isDeleting}
+    <LoadingScreen />
+{/if}

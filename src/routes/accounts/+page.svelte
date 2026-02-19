@@ -1,6 +1,8 @@
 <script lang="ts">
     import Icon from '@iconify/svelte';
     import AccountRow from './(ui)/AccountRow.svelte';
+    import Button from '$lib/ui/Button.svelte';
+    import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
     import SaveConfirmation from '$lib/ui/SaveConfirmation.svelte';
     import SelectDropdown from '$lib/ui/SelectDropdown.svelte';
     import { enhance } from '$app/forms';
@@ -9,8 +11,10 @@
 
     let isMakingAccount = $state(false);
     let willMake = $state(false);
+    let isSaving = $state(false);
 
     function toggleModal() {
+        isMakingAccount = !isMakingAccount;
         willMake = !willMake;
     }
 
@@ -35,7 +39,7 @@
         <div
             class="fixed right-3 bottom-3 flex h-8 w-125 items-center rounded-lg border-2 border-fims-green bg-fims-green-100 px-4 py-6"
         >
-            <Icon icon="tabler:alert-hexagon" class="h-6 w-6 text-fims-green" />
+            <Icon icon="tabler:check" class="h-6 w-6 text-fims-green" />
             <p class="px-8">{form.message}</p>
         </div>
     {:else}
@@ -53,11 +57,11 @@
     <div class="flex justify-center">
         <div class="flex w-315 justify-end 2xl:w-432">
             {#if !isMakingAccount}
-                <button
-                    onclick={() => (isMakingAccount = true)}
-                    class="mt-50 flex items-center justify-center rounded-full border-2 border-fims-green bg-white px-4 py-1 text-fims-green hover:bg-fims-green hover:text-white disabled:border-fims-gray disabled:text-fims-gray"
-                    >+ Add Account</button
-                >
+                <div class="mt-50">
+                    <Button onclick={() => (isMakingAccount = true)} color="green"
+                        >+ Add Account</Button
+                    >
+                </div>
             {:else}
                 <div class="mt-59"></div>
             {/if}
@@ -95,7 +99,19 @@
                 action="?/makeAccount"
                 class="flex justify-center [&>div]:flex [&>div]:h-12 [&>div]:items-center [&>div]:border-b [&>div]:border-fims-gray [&>div]:bg-white [&>div]:px-6"
                 bind:this={makeForm}
-                use:enhance
+                use:enhance={({ cancel }) => {
+                    if (willMake) {
+                        isMakingAccount = false;
+                        willMake = false;
+                        isSaving = true;
+                        return async ({ update }) => {
+                            await update();
+                            isSaving = false;
+                        };
+                    }
+                    willMake = true;
+                    cancel();
+                }}
             >
                 <div class="w-25"></div>
                 <div class="w-66 2xl:w-132">
@@ -119,14 +135,10 @@
                 </div>
                 <div class="w-50 2xl:w-100"></div>
                 <div class="w-50 justify-center">
-                    <button
-                        type="button"
-                        onclick={toggleModal}
-                        class="flex items-center justify-center rounded-full border-2 border-fims-green bg-white px-4 py-1 text-fims-green hover:bg-fims-green hover:text-white disabled:border-fims-gray disabled:text-fims-gray"
-                    >
+                    <Button type="submit" color="green">
                         <Icon icon="tabler:device-floppy" class="mr-2 h-6 w-6" />
                         <span>Save</span>
-                    </button>
+                    </Button>
                 </div>
             </form>
         {/if}
@@ -136,9 +148,13 @@
 {#if willMake}
     <SaveConfirmation
         onSave={() => {
-            if (makeForm) makeForm.submit();
+            if (makeForm) makeForm.requestSubmit();
         }}
         onCancel={toggleModal}
         text="Are you sure you want to save the account?"
     />
+{/if}
+
+{#if isSaving}
+    <LoadingScreen />
 {/if}
