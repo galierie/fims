@@ -35,7 +35,7 @@
         <input type="checkbox" class="h-5 w-5 rounded-sm checked:bg-fims-gray focus:ring-0" />
     </div>
     <div class={canViewChangeLogs ? 'w-66 2xl:w-132' : 'w-91 2xl:w-182'}>
-        <span>{lastname}, {firstname}</span>
+        <span><a href="/record">{lastname}, {firstname}</a></span>
     </div>
     <div class="w-50 justify-center 2xl:w-75"><span>{status}</span></div>
     <div class="w-62.5 justify-center 2xl:w-75"><span>{ranktitle}</span></div>
