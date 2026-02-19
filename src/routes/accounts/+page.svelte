@@ -1,6 +1,7 @@
 <script lang="ts">
     import Icon from '@iconify/svelte';
     import AccountRow from './(ui)/AccountRow.svelte';
+    import Button from '$lib/ui/Button.svelte';
     import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
     import SaveConfirmation from '$lib/ui/SaveConfirmation.svelte';
     import SelectDropdown from '$lib/ui/SelectDropdown.svelte';
@@ -56,11 +57,13 @@
     <div class="flex justify-center">
         <div class="flex w-315 justify-end 2xl:w-432">
             {#if !isMakingAccount}
-                <button
-                    onclick={() => (isMakingAccount = true)}
-                    class="mt-50 flex items-center justify-center rounded-full border-2 border-fims-green bg-white px-4 py-1 text-fims-green hover:bg-fims-green hover:text-white disabled:border-fims-gray disabled:text-fims-gray"
-                    >+ Add Account</button
-                >
+                <div class="mt-50">
+                    <Button
+                        onclick={() => (isMakingAccount = true)}
+                        color="green"
+                        >+ Add Account</Button
+                    >
+                </div>
             {:else}
                 <div class="mt-59"></div>
             {/if}
@@ -134,13 +137,13 @@
                 </div>
                 <div class="w-50 2xl:w-100"></div>
                 <div class="w-50 justify-center">
-                    <button
+                    <Button
                         type="submit"
-                        class="flex items-center justify-center rounded-full border-2 border-fims-green bg-white px-4 py-1 text-fims-green hover:bg-fims-green hover:text-white disabled:border-fims-gray disabled:text-fims-gray"
+                        color="green"
                     >
                         <Icon icon="tabler:device-floppy" class="mr-2 h-6 w-6" />
                         <span>Save</span>
-                    </button>
+                    </Button>
                 </div>
             </form>
         {/if}
