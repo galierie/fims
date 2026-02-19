@@ -2,6 +2,7 @@
     import Icon from '@iconify/svelte';
     import AccountRow from './(ui)/AccountRow.svelte';
     import Button from '$lib/ui/Button.svelte';
+    import FilterButton from '$lib/ui/FilterButton.svelte';
     import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
     import SaveConfirmation from '$lib/ui/SaveConfirmation.svelte';
     import SelectDropdown from '$lib/ui/SelectDropdown.svelte';
@@ -53,6 +54,16 @@
 {/if}
 
 <div>
+    <!-- Filter Buttons -->
+    <div class="flex justify-center mt-36">
+        <div class="flex items-center w-315 2xl:w-432">
+            <span class="mr-1">Show:</span>
+            <div class="mr-1">
+                <FilterButton field="Role" opts={userRoles} />
+            </div>
+        </div>
+    </div>
+
     <!-- Add Account Button -->
     <div class="flex justify-center">
         <div class="flex w-315 justify-end 2xl:w-432">
@@ -63,7 +74,7 @@
                     >
                 </div>
             {:else}
-                <div class="mt-59"></div>
+                <div class="mt-15"></div>
             {/if}
         </div>
     </div>
