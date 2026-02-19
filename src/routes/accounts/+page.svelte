@@ -58,9 +58,7 @@
         <div class="flex w-315 justify-end 2xl:w-432">
             {#if !isMakingAccount}
                 <div class="mt-50">
-                    <Button
-                        onclick={() => (isMakingAccount = true)}
-                        color="green"
+                    <Button onclick={() => (isMakingAccount = true)} color="green"
                         >+ Add Account</Button
                     >
                 </div>
@@ -137,10 +135,7 @@
                 </div>
                 <div class="w-50 2xl:w-100"></div>
                 <div class="w-50 justify-center">
-                    <Button
-                        type="submit"
-                        color="green"
-                    >
+                    <Button type="submit" color="green">
                         <Icon icon="tabler:device-floppy" class="mr-2 h-6 w-6" />
                         <span>Save</span>
                     </Button>

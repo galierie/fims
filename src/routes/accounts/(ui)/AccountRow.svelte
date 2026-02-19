@@ -44,12 +44,7 @@
     <div class="w-66 2xl:w-132"><span>{email}</span></div>
     <div class="w-50 justify-center">
         <form method="POST" action="?/deleteAccount" class="flex items-center justify-center">
-            <Button
-                type="submit"
-                name="userid"
-                value={userid}
-                color="red"
-            >
+            <Button type="submit" name="userid" value={userid} color="red">
                 <Icon icon="tabler:refresh" class="mr-2 h-6 w-6" />
                 <span>Reset</span>
             </Button>
@@ -82,10 +77,7 @@
                 cancel();
             }}
         >
-            <Button
-                type="submit"
-                color="red"
-            >
+            <Button type="submit" color="red">
                 <Icon icon="tabler:trash" class="mr-2 h-6 w-6" />
                 <span>Delete</span>
             </Button>
