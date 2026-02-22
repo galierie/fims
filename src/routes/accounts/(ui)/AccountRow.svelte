@@ -1,6 +1,6 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
-    import Button from '$lib/ui/Button.svelte';
+    import RedButton from '$lib/ui/RedButton.svelte';
     import Icon from '@iconify/svelte';
     import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
     import DeleteConfirmation from '$lib/ui/DeleteConfirmation.svelte';
@@ -44,10 +44,10 @@
     <div class="w-66 2xl:w-132"><span>{email}</span></div>
     <div class="w-50 justify-center">
         <form method="POST" action="?/deleteAccount" class="flex items-center justify-center">
-            <Button type="submit" name="userid" value={userid} color="red">
+            <RedButton type="submit" name="userid" value={userid}>
                 <Icon icon="tabler:refresh" class="mr-2 h-6 w-6" />
                 <span>Reset</span>
-            </Button>
+            </RedButton>
         </form>
     </div>
     <div class="w-75">
@@ -77,10 +77,10 @@
                 cancel();
             }}
         >
-            <Button type="submit" color="red">
+            <RedButton type="submit">
                 <Icon icon="tabler:trash" class="mr-2 h-6 w-6" />
                 <span>Delete</span>
-            </Button>
+            </RedButton>
 
             <input type="hidden" name="userid" value={userid} />
 

@@ -1,7 +1,7 @@
 <script lang="ts">
     import Icon from '@iconify/svelte';
     import AccountRow from './(ui)/AccountRow.svelte';
-    import Button from '$lib/ui/Button.svelte';
+    import GreenButton from '$lib/ui/GreenButton.svelte';
     import FilterButton from '$lib/ui/FilterButton.svelte';
     import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
     import SaveConfirmation from '$lib/ui/SaveConfirmation.svelte';
@@ -69,8 +69,8 @@
         <div class="flex w-315 justify-end 2xl:w-432">
             {#if !isMakingAccount}
                 <div class="mt-50">
-                    <Button onclick={() => (isMakingAccount = true)} color="green"
-                        >+ Add Account</Button
+                    <GreenButton onclick={() => (isMakingAccount = true)}
+                        >+ Add Account</GreenButton
                     >
                 </div>
             {:else}
@@ -146,10 +146,10 @@
                 </div>
                 <div class="w-50 2xl:w-100"></div>
                 <div class="w-50 justify-center">
-                    <Button type="submit" color="green">
+                    <GreenButton type="submit">
                         <Icon icon="tabler:device-floppy" class="mr-2 h-6 w-6" />
                         <span>Save</span>
-                    </Button>
+                    </GreenButton>
                 </div>
             </form>
         {/if}
