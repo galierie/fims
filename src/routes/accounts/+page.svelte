@@ -68,7 +68,7 @@
     <div class="flex justify-center">
         <div class="flex w-315 justify-end 2xl:w-432">
             {#if !isMakingAccount}
-                <div class="mt-50">
+                <div class="mt-6">
                     <GreenButton onclick={() => (isMakingAccount = true)}
                         >+ Add Account</GreenButton
                     >
