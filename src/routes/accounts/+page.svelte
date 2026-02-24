@@ -65,8 +65,8 @@
 
 <div>
     <!-- Filter Buttons -->
-    <div class="flex justify-center mt-36">
-        <div class="flex items-center w-315 2xl:w-432">
+    <div class="mt-36 flex justify-center">
+        <div class="flex w-315 items-center 2xl:w-432">
             <span class="mr-1">Show:</span>
             <div class="mr-1">
                 <FilterButton field="Role" opts={userRoles} />
@@ -79,8 +79,7 @@
         <div class="flex w-315 justify-end 2xl:w-432">
             {#if !isMakingAccount}
                 <div class="mt-6">
-                    <GreenButton onclick={() => (isMakingAccount = true)}
-                        >+ Add Account</GreenButton
+                    <GreenButton onclick={() => (isMakingAccount = true)}>+ Add Account</GreenButton
                     >
                 </div>
             {:else}
@@ -169,13 +168,13 @@
     <!-- Pagination Controls -->
     <div class="mt-2 flex justify-center">
         <div class="flex w-315 items-center justify-between 2xl:w-432">
-            <GreenButton onclick={() => (goToPage(false))} type="button" disabled={!hasPrev}>
-                <Icon icon="line-md:arrow-left-circle" class="h-5 w-5 mr-2" />
+            <GreenButton onclick={() => goToPage(false)} type="button" disabled={!hasPrev}>
+                <Icon icon="line-md:arrow-left-circle" class="mr-2 h-5 w-5" />
                 <span>Previous</span>
             </GreenButton>
-            <GreenButton onclick={() => (goToPage(true))} type="button" disabled={!hasNext}>
+            <GreenButton onclick={() => goToPage(true)} type="button" disabled={!hasNext}>
                 <span>Next</span>
-                <Icon icon="line-md:arrow-right-circle" class="h-5 w-5 ml-2" />
+                <Icon icon="line-md:arrow-right-circle" class="ml-2 h-5 w-5" />
             </GreenButton>
         </div>
     </div>

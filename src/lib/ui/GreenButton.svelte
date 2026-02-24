@@ -19,7 +19,6 @@
     {name}
     {value}
     {onclick}
-    class="flex items-center justify-center rounded-full border-2 border-fims-green bg-white px-4 py-1 text-fims-green hover:bg-fims-green hover:text-white disabled:border-fims-gray disabled:text-fims-gray disabled:bg-fims-white"
-    {disabled}
-    >{@render children()}</button
+    class="flex items-center justify-center rounded-full border-2 border-fims-green bg-white px-4 py-1 text-fims-green hover:bg-fims-green hover:text-white disabled:border-fims-gray disabled:bg-fims-white disabled:text-fims-gray"
+    {disabled}>{@render children()}</button
 >

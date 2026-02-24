@@ -1,4 +1,4 @@
-import { and, desc, eq, inArray, ne, or, ilike, gt, asc, lt } from 'drizzle-orm'; 
+import { and, asc, desc, eq, gt, ilike, inArray, lt, ne, or } from 'drizzle-orm';
 
 import { db } from './db';
 
@@ -84,13 +84,14 @@ export async function getFacultyRecordList(searchQuery: string = '') {
 
     // 3. Define the Search Condition
     // We search across First Name, Last Name, and Status
-    const searchCondition = searchQuery 
+    const searchCondition = searchQuery
         ? or(
-            ilike(faculty.firstname, `%${searchQuery}%`),
-            ilike(faculty.lastname, `%${searchQuery}%`),
-            ilike(faculty.status, `%${searchQuery}%`)
+              ilike(faculty.firstname, `%${searchQuery}%`),
+              ilike(faculty.lastname, `%${searchQuery}%`),
+              ilike(faculty.status, `%${searchQuery}%`),
           )
-        : undefined;
+        : // eslint-disable-next-line no-undefined -- can't use null in Drizzle WHERE queries
+          undefined;
 
     const shownFields = await db
         .select({
@@ -128,13 +129,12 @@ export async function getFacultyRecordList(searchQuery: string = '') {
             // 4. Combine the Semester check AND the Search condition
             and(
                 eq(facultysemester.acadsemesterid, latestSemester.acadsemesterid),
-                searchCondition
-            )
+                searchCondition,
+            ),
         );
 
     return shownFields;
 }
-
 
 const pageSize = 100;
 
@@ -158,14 +158,13 @@ export async function getAccountList(
         .where(
             and(
                 ne(appuser.id, currentUserId),
-                (
-                    cursor
-                        ? isNext
-                            ? gt(userinfo.userinfoid, cursor)
-                            : lt(userinfo.userinfoid, cursor)
-                        : undefined
-                )
-            )
+                cursor
+                    ? isNext
+                        ? gt(userinfo.userinfoid, cursor)
+                        : lt(userinfo.userinfoid, cursor)
+                    : // eslint-disable-next-line no-undefined -- can't use null in Drizzle WHERE queries
+                      undefined,
+            ),
         )
         .orderBy(isNext ? asc(userinfo.userinfoid) : desc(userinfo.userinfoid))
         .limit(pageSize + 1)
@@ -177,11 +176,8 @@ export async function getAccountList(
 
     const userCount = (await db.select().from(userCountSq)).length;
 
-    if (isNext) {
-        hasNext = userCount > pageSize;
-    } else {
-        hasPrev = userCount > pageSize;
-    }
+    if (isNext) hasNext = userCount > pageSize;
+    else hasPrev = userCount > pageSize;
 
     // Chop off the extra record
     const userSq = await db
@@ -192,7 +188,7 @@ export async function getAccountList(
         .as('user_sq');
 
     // Get cursors
-    let [firstId,] = await db
+    let [firstId] = await db
         .select({
             value: userSq.userinfoid,
         })
@@ -200,7 +196,7 @@ export async function getAccountList(
         .orderBy(asc(userSq.userinfoid))
         .limit(1);
 
-    let [lastId,] = await db
+    let [lastId] = await db
         .select({
             value: userSq.userinfoid,
         })

@@ -14,19 +14,12 @@ export async function load({ locals, parent, url }) {
     const newCursorStr = url.searchParams.get('cursor');
     const isNextStr = url.searchParams.get('isNext'); // 0 or 1
 
-    const newCursor = newCursorStr ? parseInt(newCursorStr) : undefined;
-    const isNext = isNextStr
-        ? parseInt(isNextStr) === 1
-        : true;
+    // eslint-disable-next-line no-undefined -- can't use null in Drizzle WHERE queries
+    const newCursor = newCursorStr ? parseInt(newCursorStr, 10) : undefined;
+    const isNext = isNextStr ? parseInt(isNextStr, 10) === 1 : true;
 
     // Get account list
-    const {
-        accountList,
-        prevCursor,
-        nextCursor,
-        hasPrev,
-        hasNext,
-    } = await getAccountList(
+    const { accountList, prevCursor, nextCursor, hasPrev, hasNext } = await getAccountList(
         locals.user.id,
         newCursor,
         isNext,
@@ -38,7 +31,7 @@ export async function load({ locals, parent, url }) {
         prevCursor,
         nextCursor,
         hasPrev,
-        hasNext
+        hasNext,
     };
 }
 
