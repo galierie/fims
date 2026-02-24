@@ -5,6 +5,7 @@
     import FilterButton from '$lib/ui/FilterButton.svelte';
     import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
     import SaveConfirmation from '$lib/ui/SaveConfirmation.svelte';
+    import SearchBar from '$lib/ui/SearchBar.svelte';
     import SelectDropdown from '$lib/ui/SelectDropdown.svelte';
     import { enhance } from '$app/forms';
     import { goto } from '$app/navigation';
@@ -65,8 +66,15 @@
 {/if}
 
 <div>
+    <!-- Search Bar -->
+    <div class="mt-25 flex justify-center">
+        <div class="flex w-315 items-center 2xl:w-432">
+            <SearchBar bind:isSearching={isSaving} />
+        </div>
+    </div>
+
     <!-- Filter Buttons -->
-    <div class="mt-36 flex justify-center">
+    <div class="mt-1 flex justify-center">
         <div class="flex w-315 items-center 2xl:w-432">
             <span class="mr-1">Show:</span>
             {#each filters as { name, filter, opts, selectedOpts } (name)}
