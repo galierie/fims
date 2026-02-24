@@ -7,6 +7,7 @@ import { db } from './db';
 import {
     appuser,
     changelog,
+    role,
     userinfo,
 } from './db/schema';
 
@@ -119,4 +120,15 @@ export async function getAccountList(
         hasPrev,
         hasNext,
     };
+}
+
+export async function getAllRoles() {
+    const uniqueRows = await db
+        .select({
+            role: role.role,
+        })
+        .from(role);
+
+    const uniqueValues = uniqueRows.map(({ role }) => role);
+    return uniqueValues;
 }
