@@ -22,11 +22,13 @@
     }
 
     async function goToPage(isNext: boolean = true) {
+        isSaving = true;
         const cursor = isNext ? nextCursor : prevCursor;
         const url = new URL(page.url);
         if (cursor) url.searchParams.set('cursor', cursor.toString());
         url.searchParams.set('isNext', isNext ? '1' : '0');
         await goto(url.toString());
+        isSaving = false;
     }
 
     let makeForm: HTMLFormElement | null = $state(null);
