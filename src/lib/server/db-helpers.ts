@@ -136,7 +136,7 @@ export async function getFacultyRecordList(searchQuery: string = '') {
     return shownFields;
 }
 
-const pageSize = 100;
+const pageSize = 50;
 
 export async function getAccountList(
     currentUserId: string,
