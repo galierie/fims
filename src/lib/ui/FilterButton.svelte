@@ -1,6 +1,8 @@
 <script lang="ts">
     import type { FilterObject } from '$lib/types/filter';
+    import { goto } from '$app/navigation';
     import Icon from '@iconify/svelte';
+    import { page } from '$app/state';
 
     interface Props extends FilterObject {
         isFiltering: boolean;
@@ -10,7 +12,24 @@
     let { name, filter, opts, selectedOpts, isFiltering = $bindable() }: Props = $props();
 
     let isFilterOpen = $state(false);
-    let selectedOpts: string[] = $state([]);
+
+    async function filterOpts() {
+        isFiltering = true;
+        const url = new URL(page.url);
+
+        // Clear pagination
+        url.searchParams.delete('cursor');
+        url.searchParams.delete('isNext');
+
+        // Clear filter
+        url.searchParams.delete(filter);
+
+        // Upload filters
+        selectedOpts.forEach(opt => { url.searchParams.append(filter, opt) });
+
+        await goto(url.toString());
+        isFiltering = false;
+    }
 
     const borderColor = $derived(selectedOpts.length ? 'border-fims-green' : 'border-fims-gray');
     const textColor = $derived(selectedOpts.length ? 'text-fims-green' : 'text-black');
@@ -43,8 +62,9 @@
                 <button
                     type="button"
                     class="flex w-full rounded-sm p-3 hover:bg-[#e9e9e9]"
-                    onclick={() => {
-                        selectedOpts = selectedOpts.filter((elem) => elem !== opt);
+                    onclick={async () => {
+                        selectedOpts = selectedOpts.filter(elem => elem !== opt);
+                        await filterOpts();
                     }}
                 >
                     <Icon icon="tabler:check" class="h-6 w-8 pr-2 text-fims-green" />
@@ -54,8 +74,9 @@
                 <button
                     type="button"
                     class="flex w-full rounded-sm p-3 hover:bg-[#e9e9e9]"
-                    onclick={() => {
+                    onclick={async () => {
                         selectedOpts.push(opt);
+                        await filterOpts();
                     }}
                 >
                     <div class="w-8 pr-2"></div>
