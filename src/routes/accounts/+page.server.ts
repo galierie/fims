@@ -10,6 +10,8 @@ export async function load({ locals, parent, url }) {
     const { canViewAccounts } = await parent();
     if (!canViewAccounts) throw error(404, { message: 'Insufficient permissions.' });
 
+    const userRoles = await getAllRoles();
+
     // Extract queries
 
     // Cursor and Direction
@@ -26,7 +28,7 @@ export async function load({ locals, parent, url }) {
         {
             name: 'Role',
             filter: 'role',
-            opts: await getAllRoles(),
+            opts: userRoles,
             selectedOpts: url.searchParams.getAll('role'),
         },
     ];
@@ -54,6 +56,7 @@ export async function load({ locals, parent, url }) {
         hasPrev,
         hasNext,
         filters,
+        userRoles,
     };
 }
 
