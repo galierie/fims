@@ -241,6 +241,17 @@ export async function getAccountList(
     };
 }
 
+export async function getAllRoles() {
+    const uniqueRows = await db
+        .select({
+            role: role.role
+        })
+        .from(role);
+    
+    const uniqueValues = uniqueRows.map(({ role }) => role);
+    return uniqueValues;
+}
+
 export async function areYouHere(email: string) {
     const you = await db.select().from(appuser).where(eq(appuser.email, email));
 
