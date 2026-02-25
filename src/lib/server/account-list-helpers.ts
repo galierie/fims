@@ -41,7 +41,7 @@ export async function getAccountList(
     // Get accounts from database
     const userCountSq = await db
         .select({
-            userid: appuser.id,
+            userid: searchSQ.id,
             userinfoid: userinfo.userinfoid,
             email: appuser.email,
             role: userinfo.role,
