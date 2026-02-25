@@ -37,6 +37,11 @@ export const changelog = pgTable(
     ],
 );
 
+export const status = pgTable('facultystatus', {
+    statusid: serial().primaryKey().notNull(),
+    status: varchar({ length: 50 }).notNull(),
+});
+
 export const faculty = pgTable(
     'faculty',
     {
@@ -46,7 +51,7 @@ export const faculty = pgTable(
         firstname: varchar({ length: 100 }).notNull(),
         suffix: varchar({ length: 50 }),
         birthdate: date().notNull(),
-        status: varchar({ length: 50 }).notNull(),
+        statusid: integer(),
         dateoforiginalappointment: date().notNull(),
         psiitem: varchar({ length: 50 }).notNull(),
         employeenumber: varchar({ length: 50 }).notNull(),
@@ -62,6 +67,11 @@ export const faculty = pgTable(
             columns: [table.latestchangelogid],
             foreignColumns: [changelog.logid],
             name: 'faculty_latestchangelogid_fkey',
+        }),
+        foreignKey({
+            columns: [table.statusid],
+            foreignColumns: [status.statusid],
+            name: 'faculty_statusid_fkey',
         }),
     ],
 );
