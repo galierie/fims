@@ -127,10 +127,7 @@ export async function getFacultyRecordList(searchQuery: string = '') {
         .leftJoin(appuser, eq(appuser.id, changelog.userid))
         .where(
             // 4. Combine the Semester check AND the Search condition
-            and(
-                eq(facultysemester.acadsemesterid, latestSemester.acadsemesterid),
-                searchCondition,
-            ),
+            and(eq(facultysemester.acadsemesterid, latestSemester.acadsemesterid), searchCondition),
         );
 
     return shownFields;
