@@ -508,6 +508,7 @@ export const facultyRelations = relations(faculty, ({ many, one }) => ({
     facultyfieldofinterests: many(facultyfieldofinterest),
     facultyranks: many(facultyrank),
     facultyhomeaddresses: many(facultyhomeaddress),
+    facultyemails: many(facultyemail),
     facultysemesters: many(facultysemester),
     changelog: one(changelog, {
         fields: [faculty.latestchangelogid],
