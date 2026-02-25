@@ -151,7 +151,7 @@ export const facultyrank = pgTable(
             columns: [table.facultyid],
             foreignColumns: [faculty.facultyid],
             name: 'facultyrank_facultyid_fkey',
-        }).onDelete('set null'),
+        }).onDelete('cascade'),
         foreignKey({
             columns: [table.rankid],
             foreignColumns: [rank.rankid],
