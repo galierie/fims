@@ -654,17 +654,13 @@ export const courseRelations = relations(course, ({ many }) => ({
     facultycourses: many(facultycourse),
 }));
 
-export const facultyteachingRelations = relations(facultyteaching, ({ one }) => ({
-    faculty: one(faculty, {
-        fields: [facultyteaching.facultyid],
-        references: [faculty.facultyid],
-    }),
-    semester: one(semester, {
-        fields: [facultyteaching.acadsemesterid],
-        references: [semester.acadsemesterid],
+export const facultycourseRelations = relations(facultycourse, ({ one }) => ({
+    facultysemester: one(facultysemester, {
+        fields: [facultycourse.facultysemesterid],
+        references: [facultysemester.facultysemesterid],
     }),
     course: one(course, {
-        fields: [facultyteaching.courseid],
+        fields: [facultycourse.courseid],
         references: [course.courseid],
     }),
 }));
