@@ -15,17 +15,25 @@ import {
 } from './db/schema';
 
 export async function getFacultyRecordList(searchQuery: string = '') {
-    // find the absolute latest semester
+    // Get entries for the current semester
+    // TODO: Find a better way to know current semester
+    const currentAcademicYear = 2026;
+    const currentSemester = 2;
     const [latestSemester] = await db
         .select({
             acadsemesterid: semester.acadsemesterid,
         })
         .from(semester)
-        .orderBy(desc(semester.academicyear), desc(semester.semester))
+        .where(
+            and(
+                eq(semester.academicyear, currentAcademicYear),
+                eq(semester.semester, currentSemester),
+            ),
+        )
         .limit(1);
 
-    // fallback ID in case the semester table is completely empty
-    const latestSemesterId = latestSemester?.acadsemesterid ?? -1;
+    // fallback ID in case there are no entries for current semester
+    const currentSemesterId = latestSemester?.acadsemesterid ?? -1;
 
     // 3. Define the Search Condition
     // We search across First Name, Last Name, and Status
@@ -55,7 +63,7 @@ export async function getFacultyRecordList(searchQuery: string = '') {
             facultysemester,
             and(
                 eq(facultysemester.facultyid, faculty.facultyid),
-                eq(facultysemester.acadsemesterid, latestSemesterId), // Match only the latest semester
+                eq(facultysemester.acadsemesterid, currentSemesterId), // Match only the current semester
             ),
         )
         .leftJoin(facultyrank, eq(facultyrank.facultyrankid, facultysemester.currentrankid))
