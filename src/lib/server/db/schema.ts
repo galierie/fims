@@ -289,7 +289,7 @@ export const facultycommmembership = pgTable(
             name: 'facultycommmembership_facultysemesterid_fkey',
         }).onDelete('set null'),
     ],
-)
+);
 
 export const facultyadminwork = pgTable(
     'facultyadminwork',
