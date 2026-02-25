@@ -1,4 +1,4 @@
-import { and, desc, eq, inArray, ne } from 'drizzle-orm';
+import { and, desc, eq, ilike, inArray, or } from 'drizzle-orm';
 
 import { db } from './db';
 
@@ -69,7 +69,7 @@ export async function getPermissions(userRole: string) {
     return fetchedRole;
 }
 
-export async function getFacultyRecordList() {
+export async function getFacultyRecordList(searchQuery: string = '') {
     // find the absolute latest semester
     const [latestSemester] = await db
         .select({
@@ -81,6 +81,17 @@ export async function getFacultyRecordList() {
 
     // fallback ID in case the semester table is completely empty
     const latestSemesterId = latestSemester?.acadsemesterid ?? -1;
+
+    // 3. Define the Search Condition
+    // We search across First Name, Last Name, and Status
+    const searchCondition = searchQuery
+        ? or(
+              ilike(faculty.firstname, `%${searchQuery}%`),
+              ilike(faculty.lastname, `%${searchQuery}%`),
+              ilike(faculty.status, `%${searchQuery}%`),
+          )
+        : // eslint-disable-next-line no-undefined -- can't use null in Drizzle WHERE queries
+          undefined;
 
     const shownFields = await db
         .select({
@@ -113,46 +124,11 @@ export async function getFacultyRecordList() {
             eq(adminposition.adminpositionid, facultyadminposition.adminpositionid),
         )
         .leftJoin(changelog, eq(changelog.logid, faculty.latestchangelogid))
-        .leftJoin(appuser, eq(appuser.id, changelog.userid));
-
-    return shownFields;
-}
-
-export async function getAccountList(currentUserId: string) {
-    const userSq = db
-        .select({
-            userid: appuser.id,
-            email: appuser.email,
-            role: userinfo.role,
-            latestchangelogid: userinfo.latestchangelogid,
-        })
-        .from(appuser)
-        .leftJoin(userinfo, eq(userinfo.userid, appuser.id))
-        .where(ne(appuser.id, currentUserId))
-        .as('user_sq');
-
-    const changelogSq = db
-        .select({
-            logid: changelog.logid,
-            timestamp: changelog.timestamp,
-            maker: appuser.email,
-            operation: changelog.operation,
-        })
-        .from(changelog)
         .leftJoin(appuser, eq(appuser.id, changelog.userid))
-        .as('changelog_sq');
-
-    const shownFields = await db
-        .select({
-            userid: userSq.userid,
-            email: userSq.email,
-            role: userSq.role,
-            logTimestamp: changelogSq.timestamp,
-            logMaker: changelogSq.maker,
-            logOperation: changelogSq.operation,
-        })
-        .from(userSq)
-        .leftJoin(changelogSq, eq(changelogSq.logid, userSq.latestchangelogid));
+        .where(
+            // 4. Combine the Semester check AND the Search condition
+            and(eq(facultysemester.acadsemesterid, latestSemester.acadsemesterid), searchCondition),
+        );
 
     return shownFields;
 }

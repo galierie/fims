@@ -1,13 +1,26 @@
 <script lang="ts">
     import Icon from '@iconify/svelte';
     import AccountRow from './(ui)/AccountRow.svelte';
-    import Button from '$lib/ui/Button.svelte';
+    import GreenButton from '$lib/ui/GreenButton.svelte';
+    import FilterButton from '$lib/ui/FilterButton.svelte';
     import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
     import SaveConfirmation from '$lib/ui/SaveConfirmation.svelte';
+    import SearchBar from '$lib/ui/SearchBar.svelte';
     import SelectDropdown from '$lib/ui/SelectDropdown.svelte';
     import { enhance } from '$app/forms';
+    import { goto } from '$app/navigation';
+    import { page } from '$app/state';
     const { data, form } = $props();
-    const { accountList } = $derived(data);
+    const {
+        accountList,
+        prevCursor,
+        nextCursor,
+        hasPrev,
+        hasNext,
+        filters,
+        userRoles,
+        searchTerm,
+    } = $derived(data);
 
     let isMakingAccount = $state(false);
     let willMake = $state(false);
@@ -18,9 +31,17 @@
         willMake = !willMake;
     }
 
-    let makeForm: HTMLFormElement | null = $state(null);
+    async function goToPage(isNext: boolean = true) {
+        isSaving = true;
+        const cursor = isNext ? nextCursor : prevCursor;
+        const url = new URL(page.url);
+        if (cursor) url.searchParams.set('cursor', cursor.toString());
+        url.searchParams.set('isNext', isNext ? '1' : '0');
+        await goto(url.toString());
+        isSaving = false;
+    }
 
-    const userRoles = ['Admin', 'IT'];
+    let makeForm: HTMLFormElement | null = $state(null);
 </script>
 
 {#if form?.error}
@@ -53,17 +74,41 @@
 {/if}
 
 <div>
+    <!-- Search Bar -->
+    <div class="mt-25 flex justify-center">
+        <div class="flex w-315 items-center 2xl:w-432">
+            <SearchBar bind:isSearching={isSaving} {searchTerm} />
+        </div>
+    </div>
+
+    <!-- Filter Buttons -->
+    <div class="mt-1 flex justify-center">
+        <div class="flex w-315 items-center 2xl:w-432">
+            <span class="mr-1">Show:</span>
+            {#each filters as { name, filter, opts, selectedOpts } (name)}
+                <div class="mr-1">
+                    <FilterButton
+                        {name}
+                        {filter}
+                        {opts}
+                        {selectedOpts}
+                        bind:isFiltering={isSaving}
+                    />
+                </div>
+            {/each}
+        </div>
+    </div>
+
     <!-- Add Account Button -->
     <div class="flex justify-center">
         <div class="flex w-315 justify-end 2xl:w-432">
             {#if !isMakingAccount}
-                <div class="mt-50">
-                    <Button onclick={() => (isMakingAccount = true)} color="green"
-                        >+ Add Account</Button
+                <div class="mt-6">
+                    <GreenButton onclick={() => (isMakingAccount = true)}>+ Add Account</GreenButton
                     >
                 </div>
             {:else}
-                <div class="mt-59"></div>
+                <div class="mt-15"></div>
             {/if}
         </div>
     </div>
@@ -80,10 +125,10 @@
                 <Icon icon="tabler:arrow-up" class="ml-3 h-5 w-5 text-white" />
             </div>
             <div class="w-50 justify-center"><span>Reset Password?</span></div>
-            <div class="w-75 justify-center">
+            <div class="w-40 justify-center">
                 <span>Type</span>
             </div>
-            <div class="w-50 justify-center 2xl:w-100"><span>Change Logs</span></div>
+            <div class="w-85 justify-center 2xl:w-100"><span>Change Logs</span></div>
             <div class="w-50 justify-center"><span>Account Action</span></div>
         </div>
 
@@ -106,6 +151,7 @@
                         isSaving = true;
                         return async ({ update }) => {
                             await update();
+                            await goto(page.url.pathname);
                             isSaving = false;
                         };
                     }
@@ -130,18 +176,32 @@
                         class="h-full w-full border-0 p-2 focus:ring-0"
                     />
                 </div>
-                <div class="w-75">
+                <div class="w-40">
                     <SelectDropdown name="role" opts={userRoles} selectedOpt={userRoles[0]} />
                 </div>
-                <div class="w-50 2xl:w-100"></div>
+                <div class="w-85 2xl:w-100"></div>
                 <div class="w-50 justify-center">
-                    <Button type="submit" color="green">
+                    <GreenButton type="submit">
                         <Icon icon="tabler:device-floppy" class="mr-2 h-6 w-6" />
                         <span>Save</span>
-                    </Button>
+                    </GreenButton>
                 </div>
             </form>
         {/if}
+    </div>
+
+    <!-- Pagination Controls -->
+    <div class="mt-2 flex justify-center">
+        <div class="flex w-315 items-center justify-between 2xl:w-432">
+            <GreenButton onclick={() => goToPage(false)} type="button" disabled={!hasPrev}>
+                <Icon icon="line-md:arrow-left-circle" class="mr-2 h-5 w-5" />
+                <span>Previous</span>
+            </GreenButton>
+            <GreenButton onclick={() => goToPage(true)} type="button" disabled={!hasNext}>
+                <span>Next</span>
+                <Icon icon="line-md:arrow-right-circle" class="ml-2 h-5 w-5" />
+            </GreenButton>
+        </div>
     </div>
 </div>
 

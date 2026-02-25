@@ -1,16 +1,73 @@
 import { type Actions, error, fail } from '@sveltejs/kit';
 import { APIError } from 'better-auth';
 
-import { areYouHere, getAccountList, makeUserInfo } from '$lib/server/db-helpers';
+import { areYouHere, makeUserInfo } from '$lib/server/db-helpers';
 import { auth } from '$lib/server/auth';
+import type { FilterColumn, FilterObject } from '$lib/types/filter';
+import {
+    getAccountList,
+    getAllRoles,
+    refreshAccountSearchView,
+} from '$lib/server/account-list-helpers';
+import { userinfo } from '$lib/server/db/schema';
 
-export async function load({ locals, parent }) {
+export async function load({ locals, parent, url }) {
     const { canViewAccounts } = await parent();
     if (!canViewAccounts) throw error(404, { message: 'Insufficient permissions.' });
 
-    const accountList = await getAccountList(locals.user.id);
+    const userRoles = await getAllRoles();
 
-    return { accountList };
+    // Extract queries
+
+    // Cursor and Direction
+    const newCursorStr = url.searchParams.get('cursor');
+    const isNextStr = url.searchParams.get('isNext'); // 0 or 1
+
+    // eslint-disable-next-line no-undefined -- can't use null in Drizzle WHERE queries
+    const newCursor = newCursorStr ? parseInt(newCursorStr, 10) : undefined;
+    const isNext = isNextStr ? parseInt(isNextStr, 10) === 1 : true;
+
+    // Filter
+
+    const filters: FilterObject[] = [
+        {
+            name: 'Role',
+            filter: 'role',
+            opts: userRoles,
+            selectedOpts: url.searchParams.getAll('role'),
+        },
+    ];
+
+    const filterMap: FilterColumn[] = [
+        {
+            obj: filters[0],
+            column: userinfo.role,
+        },
+    ];
+
+    // Search
+    const searchTerm = url.searchParams.get('search');
+
+    // Get account list
+    const { accountList, prevCursor, nextCursor, hasPrev, hasNext } = await getAccountList(
+        locals.user.id,
+        searchTerm,
+        filterMap,
+        newCursor,
+        isNext,
+        !newCursorStr && !isNextStr,
+    );
+
+    return {
+        accountList,
+        prevCursor,
+        nextCursor,
+        hasPrev,
+        hasNext,
+        filters,
+        userRoles,
+        searchTerm,
+    };
 }
 
 export const actions = {
@@ -44,6 +101,9 @@ export const actions = {
 
             // Add user info
             await makeUserInfo(locals.user.id, response.user.id, role);
+
+            // Refresh account search view
+            await refreshAccountSearchView();
         } catch (error) {
             return fail(500, {
                 error: error instanceof APIError ? error.message : 'Failed to make new account.',
@@ -70,6 +130,9 @@ export const actions = {
             },
             headers: request.headers,
         });
+
+        // Refresh account search view
+        await refreshAccountSearchView();
 
         return {
             ...response,

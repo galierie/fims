@@ -2,7 +2,8 @@
     import { enhance } from '$app/forms';
     import Icon from '@iconify/svelte';
     import FacultyRecordRow from './(ui)/FacultyRecordRow.svelte';
-    import Button from '$lib/ui/Button.svelte';
+    import GreenButton from '$lib/ui/GreenButton.svelte';
+    import RedButton from '$lib/ui/RedButton.svelte';
     import DeleteConfirmation from '$lib/ui/DeleteConfirmation.svelte';
     import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
 
@@ -32,19 +33,42 @@
 
 <br />
 
+<div class="mx-auto mt-20 w-full max-w-4xl px-6">
+    <form method="GET" action="/" class="flex items-center gap-4">
+        <div class="relative w-full">
+            <input
+                type="text"
+                name="search"
+                value={data.searchTerm}
+                placeholder="Search faculty by name..."
+                class="h-12 w-full rounded-full border-2 border-fims-green bg-white px-6 py-2 outline-none focus:ring-2 focus:ring-fims-green"
+            />
+        </div>
+        <button
+            type="submit"
+            class="hover:bg-opacity-90 h-12 rounded-full bg-fims-green px-8 font-semibold text-white"
+        >
+            Search
+        </button>
+        {#if data.searchTerm}
+            <a href="/" class="font-medium text-fims-red underline">Clear</a>
+        {/if}
+    </form>
+</div>
+
 <div>
     <div class="mt-15 flex justify-center">
         <div class="flex h-20 w-315 items-end justify-between 2xl:w-432">
             {#if selectedIds.length > 0}
                 <div class="flex gap-2">
-                    <Button onclick={selectAll} color="green">Select All</Button>
-                    <Button onclick={deselectAll} color="red">Deselect Selection</Button>
+                    <GreenButton onclick={selectAll}>Select All</GreenButton>
+                    <RedButton onclick={deselectAll}>Deselect Selection</RedButton>
                 </div>
                 <div>
-                    <Button onclick={() => (isModalOpen = true)} color="red">
+                    <RedButton onclick={() => (isModalOpen = true)}>
                         <Icon icon="tabler:trash" class="mr-2 h-6 w-6" />
                         <span>Delete ({selectedIds.length})</span>
-                    </Button>
+                    </RedButton>
                 </div>
             {/if}
         </div>

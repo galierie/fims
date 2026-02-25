@@ -2,6 +2,7 @@ import { drizzle as neonDrizzle } from 'drizzle-orm/neon-http';
 import { drizzle as localDrizzle } from 'drizzle-orm/node-postgres';
 import { neon } from '@neondatabase/serverless';
 import { Pool } from 'pg';
+import { sql } from 'drizzle-orm';
 
 import { DATABASE_URL, MODE } from '$env/static/private';
 
@@ -27,3 +28,5 @@ export const db =
           : (() => {
                 throw new Error('INVALID MODE');
             })();
+
+await db.execute(sql`CREATE EXTENSION IF NOT EXISTS pg_trgm;`);
