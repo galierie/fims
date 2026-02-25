@@ -391,24 +391,17 @@ export const facultyresearch = pgTable(
     'facultyresearch',
     {
         facultyresearchid: serial().primaryKey().notNull(),
-        facultyid: integer(),
-        acadsemesterid: integer(),
+        facultysemesterid: integer(),
         researchid: integer(),
-        startdate: date().notNull(),
-        enddate: date(),
-        funding: numeric({ precision: 10, scale: 2 }).notNull(),
+        researchloadcredit: numeric({ precision: 5, scale: 2 }).notNull(),
+        remarks: text(),
     },
     (table) => [
         foreignKey({
-            columns: [table.facultyid],
-            foreignColumns: [faculty.facultyid],
-            name: 'facultyresearch_facultyid_fkey',
-        }).onDelete('cascade'),
-        foreignKey({
-            columns: [table.acadsemesterid],
-            foreignColumns: [semester.acadsemesterid],
-            name: 'facultyresearch_acadsemesterid_fkey',
-        }),
+            columns: [table.facultysemesterid],
+            foreignColumns: [facultysemester.facultysemesterid],
+            name: 'facultyresearch_facultysemesterid_fkey',
+        }).onDelete('set null'),
         foreignKey({
             columns: [table.researchid],
             foreignColumns: [research.researchid],
