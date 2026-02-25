@@ -176,10 +176,10 @@
                         class="h-full w-full border-0 p-2 focus:ring-0"
                     />
                 </div>
-                <div class="w-75">
+                <div class="w-40">
                     <SelectDropdown name="role" opts={userRoles} selectedOpt={userRoles[0]} />
                 </div>
-                <div class="w-50 2xl:w-100"></div>
+                <div class="w-85 2xl:w-100"></div>
                 <div class="w-50 justify-center">
                     <GreenButton type="submit">
                         <Icon icon="tabler:device-floppy" class="mr-2 h-6 w-6" />
