@@ -42,6 +42,8 @@ export async function makeUserInfo(makerid: string, id: string, role: string) {
         })
         .returning();
 
+    if (returnedIds.length === 0) return { success: false };
+
     // Log!
     const [{ userinfoid: tupleid }, _] = returnedIds;
 
