@@ -129,14 +129,16 @@
                 <div>
                     <RedButton onclick={() => (willBatchDelete = true)}>
                         <Icon icon="tabler:trash" class="mr-2 h-6 w-6" />
-                        <span>Delete {selectedIds.length} {selectedIds.length > 1 ? 'Accounts' : 'Account'}</span>
+                        <span
+                            >Delete {selectedIds.length}
+                            {selectedIds.length > 1 ? 'Accounts' : 'Account'}</span
+                        >
                     </RedButton>
                 </div>
             </div>
         {:else if !isMakingAccount}
             <div class="mt-6 flex w-315 justify-end 2xl:w-432">
-                <GreenButton onclick={() => (isMakingAccount = true)}>+ Add Account</GreenButton
-                >
+                <GreenButton onclick={() => (isMakingAccount = true)}>+ Add Account</GreenButton>
             </div>
         {:else}
             <div class="mt-15"></div>

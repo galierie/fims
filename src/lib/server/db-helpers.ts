@@ -164,10 +164,7 @@ export async function deleteFacultyRecords(makerid: string, ids: number[]) {
     if (!ids || ids.length === 0) return { success: false };
 
     // Actual action
-    const returnedIds = await db
-        .delete(faculty)
-        .where(inArray(faculty.facultyid, ids))
-        .returning();
+    const returnedIds = await db.delete(faculty).where(inArray(faculty.facultyid, ids)).returning();
 
     if (returnedIds.length === 0) return { success: false };
 
