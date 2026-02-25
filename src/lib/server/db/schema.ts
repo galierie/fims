@@ -552,7 +552,7 @@ export const rankRelations = relations(rank, ({ many }) => ({
     facultyranks: many(facultyrank),
 }));
 
-export const facultyrankRelations = relations(facultyrank, ({ one }) => ({
+export const facultyrankRelations = relations(facultyrank, ({ many, one }) => ({
     faculty: one(faculty, {
         fields: [facultyrank.facultyid],
         references: [faculty.facultyid],
@@ -561,10 +561,7 @@ export const facultyrankRelations = relations(facultyrank, ({ one }) => ({
         fields: [facultyrank.rankid],
         references: [rank.rankid],
     }),
-    facultysemester: one(facultysemester, {
-        fields: [facultyrank.facultyrankid],
-        references: [facultysemester.currentrankid],
-    }),
+    facultysemesters: many(facultysemester),
 }));
 
 export const facultyhomeaddressRelations = relations(facultyhomeaddress, ({ one }) => ({
