@@ -4,7 +4,7 @@ import { APIError } from 'better-auth';
 import { areYouHere, makeUserInfo } from '$lib/server/db-helpers';
 import { auth } from '$lib/server/auth';
 import type { FilterColumn, FilterObject } from '$lib/types/filter';
-import { getAccountList, getAllRoles } from '$lib/server/account-list-helpers';
+import { getAccountList, getAllRoles, refreshAccountSearchView } from '$lib/server/account-list-helpers';
 import { userinfo } from '$lib/server/db/schema';
 
 export async function load({ locals, parent, url }) {
@@ -97,6 +97,9 @@ export const actions = {
 
             // Add user info
             await makeUserInfo(locals.user.id, response.user.id, role);
+
+            // Refresh account search view
+            await refreshAccountSearchView();
         } catch (error) {
             return fail(500, {
                 error: error instanceof APIError ? error.message : 'Failed to make new account.',
@@ -123,6 +126,9 @@ export const actions = {
             },
             headers: request.headers,
         });
+
+        // Refresh account search view
+        await refreshAccountSearchView();
 
         return {
             ...response,
