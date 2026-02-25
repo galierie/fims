@@ -413,17 +413,20 @@ export const facultyresearch = pgTable(
 export const facultyextension = pgTable(
     'facultyextension',
     {
-        extensionid: serial().primaryKey().notNull(),
-        facultyid: integer(),
-        extensiontype: varchar({ length: 50 }),
-        extensiondata: text(),
+        facultyextensionid: serial().primaryKey().notNull(),
+        facultysemesterid: integer(),
+        natureofextension: varchar({ length: 200 }).notNull(),
+        agency: varchar({ length: 150 }).notNull(),
+        startdate: date().notNull(),
+        enddate: date().notNull(),
+        extensionloadcredit: numeric({ precision: 5, scale: 2 }).notNull(),
     },
     (table) => [
         foreignKey({
-            columns: [table.facultyid],
-            foreignColumns: [faculty.facultyid],
-            name: 'facultyextension_facultyid_fkey',
-        }),
+            columns: [table.facultysemesterid],
+            foreignColumns: [facultysemester.facultysemesterid],
+            name: 'facultyextension_facultysemesterid_fkey',
+        }).onDelete('set null'),
     ],
 );
 
