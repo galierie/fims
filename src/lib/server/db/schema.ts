@@ -322,6 +322,31 @@ export const course = pgTable('course', {
     units: integer().notNull(),
 });
 
+export const facultycourse = pgTable(
+    'facultycourse',
+    {
+        facultycourseid: serial().primaryKey().notNull(),
+        facultysemesterid: integer(),
+        courseid: integer(),
+        section: varchar({ length: 50 }),
+        numberofstudents: integer(),
+        teachingloadcredit: numeric({ precision: 5, scale: 2 }).notNull(),
+        sectionset: numeric({ precision: 4, scale: 3 }),
+    },
+    (table) => [
+        foreignKey({
+            columns: [table.facultysemesterid],
+            foreignColumns: [facultysemester.facultysemesterid],
+            name: 'facultycourse_facultysemesterid_fkey',
+        }).onDelete('set null'),
+        foreignKey({
+            columns: [table.courseid],
+            foreignColumns: [course.courseid],
+            name: 'facultycourse_courseid_fkey',
+        }),
+    ],
+);
+
 export const research = pgTable('research', {
     researchid: serial().primaryKey().notNull(),
     title: varchar({ length: 200 }).notNull(),
