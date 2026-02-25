@@ -1,7 +1,7 @@
 import { type Actions, error, fail } from '@sveltejs/kit';
 import { APIError } from 'better-auth';
 
-import { areYouHere, deleteUserInfo, makeUserInfo } from '$lib/server/db-helpers';
+import { areYouHere, deleteUsersInfo, makeUserInfo } from '$lib/server/db-helpers';
 import { auth } from '$lib/server/auth';
 import type { FilterColumn, FilterObject } from '$lib/types/filter';
 import {
@@ -124,7 +124,7 @@ export const actions = {
         if (!userid) return fail(400, { error: 'Failed to delete account.' });
 
         // Delete user info
-        await deleteUserInfo(locals.user.id, userid);
+        await deleteUsersInfo(locals.user.id, [userid]);
 
         // Delete!
         const response = await auth.api.removeUser({

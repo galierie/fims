@@ -57,19 +57,21 @@ export async function makeUserInfo(makerid: string, id: string, role: string) {
     return { success: true };
 }
 
-export async function deleteUserInfo(makerid: string, userid: string) {
+export async function deleteUsersInfo(makerid: string, userids: string[]) {
+    if (!userids || userids.length === 0) return { success: false };
+
     // Actual action
     const returnedIds = await db
         .delete(userinfo)
-        .where(eq(userinfo.userid, userid))
+        .where(inArray(userinfo.userid, userids))
         .returning();
 
     if (returnedIds.length === 0) return { success: false };
 
     // Log!
-    const [{ userinfoid: tupleid }, _] = returnedIds;
-
-    await logChange(makerid, tupleid, 'Deleted account.');
+    returnedIds.forEach(async ({ userinfoid: tupleid }) => {
+        await logChange(makerid, tupleid, 'Deleted account.');
+    });
 
     return { success: true };
 }
