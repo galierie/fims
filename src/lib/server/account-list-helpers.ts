@@ -129,6 +129,15 @@ export async function getAccountList(
     };
 }
 
+export interface AccountDTO {
+    email: string | null;
+    role: string | null;
+    userid: string;
+    logTimestamp: Date | null;
+    logOperation: string | null;
+    logMaker: string | null;
+}
+
 export async function refreshAccountSearchView() {
     // NOTE: Have faith na lang that this doesn't take too long
     await db.refreshMaterializedView(accountSearchView);

@@ -2,20 +2,12 @@
     import { enhance } from '$app/forms';
     import { goto } from '$app/navigation';
     import { page } from '$app/state';
+    import type { AccountDTO } from '$lib/server/account-list-helpers';
     import RedButton from '$lib/ui/RedButton.svelte';
     import Icon from '@iconify/svelte';
     import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
     import DeleteConfirmation from '$lib/ui/DeleteConfirmation.svelte';
     import SelectDropdown from '$lib/ui/SelectDropdown.svelte';
-
-    interface AccountDTO {
-        email: string | null;
-        role: string | null;
-        userid: string | null;
-        logTimestamp: Date | null;
-        logOperation: string | null;
-        logMaker: string | null;
-    }
 
     interface Props {
         account: AccountDTO;
