@@ -29,7 +29,7 @@
     let deleteForm: HTMLFormElement | null = $state(null);
 </script>
 
-{#if userid && email}
+{#if email}
     <div
         class="flex justify-center [&>div]:flex [&>div]:h-12 [&>div]:items-center [&>div]:border-b [&>div]:border-fims-gray [&>div]:bg-white [&>div]:px-6"
     >
