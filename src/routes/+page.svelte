@@ -2,7 +2,8 @@
     import { enhance } from '$app/forms';
     import Icon from '@iconify/svelte';
     import FacultyRecordRow from './(ui)/FacultyRecordRow.svelte';
-    import Button from '$lib/ui/Button.svelte';
+    import GreenButton from '$lib/ui/GreenButton.svelte';
+    import RedButton from '$lib/ui/RedButton.svelte';
     import DeleteConfirmation from '$lib/ui/DeleteConfirmation.svelte';
     import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
 
@@ -60,14 +61,14 @@
         <div class="flex h-20 w-315 items-end justify-between 2xl:w-432">
             {#if selectedIds.length > 0}
                 <div class="flex gap-2">
-                    <Button onclick={selectAll} color="green">Select All</Button>
-                    <Button onclick={deselectAll} color="red">Deselect Selection</Button>
+                    <GreenButton onclick={selectAll}>Select All</GreenButton>
+                    <RedButton onclick={deselectAll}>Deselect Selection</RedButton>
                 </div>
                 <div>
-                    <Button onclick={() => (isModalOpen = true)} color="red">
+                    <RedButton onclick={() => (isModalOpen = true)}>
                         <Icon icon="tabler:trash" class="mr-2 h-6 w-6" />
                         <span>Delete ({selectedIds.length})</span>
-                    </Button>
+                    </RedButton>
                 </div>
             {/if}
         </div>
