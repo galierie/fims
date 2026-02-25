@@ -1,5 +1,6 @@
 <script lang="ts">
     interface FacultyRecordDTO {
+        facultyid: number;
         lastname: string;
         firstname: string;
         status: string;
@@ -11,11 +12,13 @@
     }
 
     interface Props {
-        facultyRecord: FacultyRecordDTO;
+        facultyRecord: FacultyRecordDTO & { facultyid: number };
         canViewChangeLogs: boolean;
+        isSelected: boolean;
+        onToggle: () => void;
     }
 
-    const { facultyRecord, canViewChangeLogs }: Props = $props();
+    const { facultyRecord, canViewChangeLogs, isSelected, onToggle }: Props = $props();
     const {
         lastname,
         firstname,
@@ -32,7 +35,12 @@
     class="flex justify-center [&>div]:flex [&>div]:h-12 [&>div]:items-center [&>div]:border-b [&>div]:border-fims-gray [&>div]:bg-white [&>div]:px-6"
 >
     <div class="w-25 justify-center">
-        <input type="checkbox" class="h-5 w-5 rounded-sm checked:bg-fims-gray focus:ring-0" />
+        <input
+            type="checkbox"
+            checked={isSelected}
+            onchange={onToggle}
+            class="h-5 w-5 rounded-sm checked:bg-fims-gray focus:ring-0"
+        />
     </div>
     <div class={canViewChangeLogs ? 'w-66 2xl:w-132' : 'w-91 2xl:w-182'}>
         <span>{lastname}, {firstname}</span>

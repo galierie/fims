@@ -1,4 +1,4 @@
-import { desc, eq, ne } from 'drizzle-orm';
+import { and, desc, eq, inArray, ne } from 'drizzle-orm';
 
 import { db } from './db';
 
@@ -70,13 +70,17 @@ export async function getPermissions(userRole: string) {
 }
 
 export async function getFacultyRecordList() {
-    const [currentSemester] = await db
+    // find the absolute latest semester
+    const [latestSemester] = await db
         .select({
             acadsemesterid: semester.acadsemesterid,
         })
         .from(semester)
-        .orderBy(desc(semester.academicyear))
+        .orderBy(desc(semester.academicyear), desc(semester.semester))
         .limit(1);
+
+    // fallback ID in case the semester table is completely empty
+    const latestSemesterId = latestSemester?.acadsemesterid ?? -1;
 
     const shownFields = await db
         .select({
@@ -90,10 +94,16 @@ export async function getFacultyRecordList() {
             logMaker: appuser.email,
             logOperation: changelog.operation,
         })
-        .from(rank)
-        .rightJoin(facultyrank, eq(facultyrank.rankid, rank.rankid))
-        .rightJoin(facultysemester, eq(facultysemester.currentrankid, facultyrank.facultyrankid))
-        .rightJoin(faculty, eq(faculty.facultyid, facultysemester.facultyid))
+        .from(faculty)
+        .leftJoin(
+            facultysemester,
+            and(
+                eq(facultysemester.facultyid, faculty.facultyid),
+                eq(facultysemester.acadsemesterid, latestSemesterId), // Match only the latest semester
+            ),
+        )
+        .leftJoin(facultyrank, eq(facultyrank.facultyrankid, facultysemester.currentrankid))
+        .leftJoin(rank, eq(rank.rankid, facultyrank.rankid))
         .leftJoin(
             facultyadminposition,
             eq(facultyadminposition.facultysemesterid, facultysemester.facultysemesterid),
@@ -103,8 +113,7 @@ export async function getFacultyRecordList() {
             eq(adminposition.adminpositionid, facultyadminposition.adminpositionid),
         )
         .leftJoin(changelog, eq(changelog.logid, faculty.latestchangelogid))
-        .leftJoin(appuser, eq(appuser.id, changelog.userid))
-        .where(eq(facultysemester.acadsemesterid, currentSemester.acadsemesterid));
+        .leftJoin(appuser, eq(appuser.id, changelog.userid));
 
     return shownFields;
 }
@@ -152,4 +161,11 @@ export async function areYouHere(email: string) {
     const you = await db.select().from(appuser).where(eq(appuser.email, email));
 
     return you.length !== 0;
+}
+
+export async function deleteFacultyRecords(ids: number[]) {
+    if (!ids || ids.length === 0) return { success: false };
+    await db.delete(faculty).where(inArray(faculty.facultyid, ids));
+
+    return { success: true };
 }
