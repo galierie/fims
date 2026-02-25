@@ -24,7 +24,7 @@
 
     let isMakingAccount = $state(false);
     let willMake = $state(false);
-    let isSaving = $state(false);
+    let isLoading = $state(false);
 
     function toggleModal() {
         isMakingAccount = !isMakingAccount;
@@ -32,13 +32,13 @@
     }
 
     async function goToPage(isNext: boolean = true) {
-        isSaving = true;
+        isLoading = true;
         const cursor = isNext ? nextCursor : prevCursor;
         const url = new URL(page.url);
         if (cursor) url.searchParams.set('cursor', cursor.toString());
         url.searchParams.set('isNext', isNext ? '1' : '0');
         await goto(url.toString());
-        isSaving = false;
+        isLoading = false;
     }
 
     let makeForm: HTMLFormElement | null = $state(null);
@@ -77,7 +77,7 @@
     <!-- Search Bar -->
     <div class="mt-25 flex justify-center">
         <div class="flex w-315 items-center 2xl:w-432">
-            <SearchBar bind:isSearching={isSaving} {searchTerm} />
+            <SearchBar bind:isSearching={isLoading} {searchTerm} />
         </div>
     </div>
 
@@ -92,7 +92,7 @@
                         {filter}
                         {opts}
                         {selectedOpts}
-                        bind:isFiltering={isSaving}
+                        bind:isFiltering={isLoading}
                     />
                 </div>
             {/each}
@@ -148,11 +148,11 @@
                     if (willMake) {
                         isMakingAccount = false;
                         willMake = false;
-                        isSaving = true;
+                        isLoading = true;
                         return async ({ update }) => {
                             await update();
                             await goto(page.url.pathname);
-                            isSaving = false;
+                            isLoading = false;
                         };
                     }
                     willMake = true;
@@ -215,6 +215,6 @@
     />
 {/if}
 
-{#if isSaving}
+{#if isLoading}
     <LoadingScreen />
 {/if}
