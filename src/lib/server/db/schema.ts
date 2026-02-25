@@ -381,17 +381,17 @@ export const userinfo = pgTable(
         foreignKey({
             columns: [table.userid],
             foreignColumns: [appuser.id],
-            name: 'userrole_userid_fkey',
+            name: 'userinfo_userid_fkey',
         }).onDelete('cascade'),
         foreignKey({
             columns: [table.role],
             foreignColumns: [role.role],
-            name: 'userrole_role_fkey',
+            name: 'userinfo_role_fkey',
         }),
         foreignKey({
             columns: [table.latestchangelogid],
             foreignColumns: [changelog.logid],
-            name: 'userchangelog_latestchangelogid_fkey',
+            name: 'userinfo_latestchangelogid_fkey',
         }),
     ],
 );
