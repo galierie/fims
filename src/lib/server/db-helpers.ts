@@ -57,6 +57,23 @@ export async function makeUserInfo(makerid: string, id: string, role: string) {
     return { success: true };
 }
 
+export async function deleteUserInfo(makerid: string, userid: string) {
+    // Actual action
+    const returnedIds = await db
+        .delete(userinfo)
+        .where(eq(userinfo.userid, userid))
+        .returning();
+
+    if (returnedIds.length === 0) return { success: false };
+
+    // Log!
+    const [{ userinfoid: tupleid }, _] = returnedIds;
+
+    await logChange(makerid, tupleid, 'Deleted account.');
+
+    return { success: true };
+}
+
 export async function getRole(id: string) {
     const [fetchedUser] = await db.select().from(userinfo).where(eq(userinfo.userid, id)).limit(1);
 
