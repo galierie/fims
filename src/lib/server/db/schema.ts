@@ -382,6 +382,9 @@ export const facultymentoring = pgTable(
 export const research = pgTable('research', {
     researchid: serial().primaryKey().notNull(),
     title: varchar({ length: 200 }).notNull(),
+    startdate: date().notNull(),
+    enddate: date().notNull(),
+    funding: text(),
 });
 
 export const facultyresearch = pgTable(
