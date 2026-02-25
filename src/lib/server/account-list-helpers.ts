@@ -129,6 +129,11 @@ export async function getAccountList(
     };
 }
 
+export async function refreshAccountSearchView() {
+    // NOTE: Have faith na lang that this doesn't take too long
+    await db.refreshMaterializedView(accountSearchView);
+}
+
 export async function getAllRoles() {
     const uniqueRows = await db
         .select({
