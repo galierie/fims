@@ -139,9 +139,21 @@ export async function areYouHere(email: string) {
     return you.length !== 0;
 }
 
-export async function deleteFacultyRecords(ids: number[]) {
+export async function deleteFacultyRecords(makerid: string, ids: number[]) {
     if (!ids || ids.length === 0) return { success: false };
-    await db.delete(faculty).where(inArray(faculty.facultyid, ids));
+
+    // Actual action
+    const returnedIds = await db
+        .delete(faculty)
+        .where(inArray(faculty.facultyid, ids))
+        .returning();
+
+    if (returnedIds.length === 0) return { success: false };
+
+    // Log!
+    returnedIds.forEach(async ({ facultyid: tupleid }) => {
+        await logChange(makerid, tupleid, 'Deleted account.');
+    });
 
     return { success: true };
 }

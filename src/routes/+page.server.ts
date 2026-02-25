@@ -15,7 +15,7 @@ export async function load({ url }) {
     };
 }
 export const actions = {
-    async delete({ request }) {
+    async delete({ locals, request }) {
         const formData = await request.formData();
         const idsString = formData.get('ids') as string;
 
@@ -23,7 +23,7 @@ export const actions = {
 
         try {
             const ids = JSON.parse(idsString);
-            await deleteFacultyRecords(ids);
+            await deleteFacultyRecords(locals.user.id, ids);
             return { success: true };
         } catch {
             return fail(500, { error: 'Failed to delete records.' });
