@@ -524,15 +524,12 @@ export const facultycontactnumberRelations = relations(facultycontactnumber, ({ 
 
 export const facultyeducationalattainmentRelations = relations(
     facultyeducationalattainment,
-    ({ one }) => ({
+    ({ many, one }) => ({
         faculty: one(faculty, {
             fields: [facultyeducationalattainment.facultyid],
             references: [faculty.facultyid],
         }),
-        facultysemester: one(facultysemester, {
-            fields: [facultyeducationalattainment.facultyeducationalattainmentid],
-            references: [facultysemester.currenthighesteducationalattainmentid],
-        }),
+        facultysemesters: many(facultysemester),
     }),
 );
 
