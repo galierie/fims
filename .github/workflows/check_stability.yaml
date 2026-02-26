@@ -56,6 +56,8 @@ jobs:
           ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
           ADMIN_PASS: ${{ secrets.ADMIN_PASS }}
           DUMMY_EMAIL: ${{ secrets.DUMMY_EMAIL }}
+          DUMMY_EMAIL1: ${{ secrets.DUMMY_EMAIL1 }}
+          DUMMY_EMAIL2: ${{ secrets.DUMMY_EMAIL2 }}
           DUMMY_PASS: ${{ secrets.DUMMY_PASS }}
       - name: Upload Test Results
         uses: actions/upload-artifact@v6
