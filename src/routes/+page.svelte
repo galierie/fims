@@ -102,22 +102,27 @@
     </form>
 </div>
 
-<div>
-    <div class="mt-15 flex justify-center">
-        <div class="flex h-20 w-315 items-end justify-between 2xl:w-432">
-            {#if selectedIds.length > 0}
+    <!-- Show on Row Select -->
+    <div class="flex justify-center">
+        {#if selectedIds.length > 0}
+            <div class="mt-6 flex w-315 justify-between 2xl:w-432">
                 <div class="flex gap-2">
                     <GreenButton onclick={selectAll}>Select All</GreenButton>
                     <RedButton onclick={deselectAll}>Deselect Selection</RedButton>
                 </div>
                 <div>
-                    <RedButton onclick={() => (isModalOpen = true)}>
+                    <RedButton onclick={() => (willBatchDelete = true)}>
                         <Icon icon="tabler:trash" class="mr-2 h-6 w-6" />
-                        <span>Delete ({selectedIds.length})</span>
+                        <span
+                            >Delete {selectedIds.length}
+                            {selectedIds.length > 1 ? 'Accounts' : 'Account'}</span
+                        >
                     </RedButton>
                 </div>
-            {/if}
-        </div>
+            </div>
+        {:else}
+            <div class="mt-15"></div>
+        {/if}
     </div>
 
     <!-- Faculty Record List Table -->
