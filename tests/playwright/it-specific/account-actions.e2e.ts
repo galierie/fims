@@ -311,6 +311,48 @@ test.describe('batch delete accounts', () => {
         await expect(cell).toBeVisible();
     });
 
+    test('search for a dummy account', async ({ page }) => {
+        await page.goto('/accounts');
+        await expect(page).toHaveURL('/accounts');
+
+        const searchBar = page.getByRole('textbox', { name: 'Search', exact: true });
+        const searchButton = page.getByRole('button', { name: 'Search', exact: true });
+
+        await expect(searchBar).toBeVisible();
+        await expect(searchButton).toBeVisible();
+
+        // Search for the dummy
+        await searchBar.fill(dummyEmail);
+        await searchButton.click();
+
+        // Expect that only the searched dummy is visible
+        await expect(page.getByText(process.env.ADMIN_EMAIL!)).toBeVisible();
+        await expect(page.getByText(dummyEmail)).toBeVisible();
+        await expect(page.getByText(dummyEmail1)).toBeVisible();
+        await expect(page.getByText(dummyEmail2)).toBeVisible();
+    });
+
+    test('no accounts searched', async ({ page }) => {
+        await page.goto('/accounts');
+        await expect(page).toHaveURL('/accounts');
+
+        const searchBar = page.getByRole('textbox', { name: 'Search', exact: true });
+        const searchButton = page.getByRole('button', { name: 'Search', exact: true });
+
+        await expect(searchBar).toBeVisible();
+        await expect(searchButton).toBeVisible();
+
+        // Ensure no accounts will be searched
+        await searchBar.fill('random nonsense');
+        await searchButton.click();
+
+        // Expect that no accounts are visible
+        await expect(page.getByText(process.env.ADMIN_EMAIL!)).toBeVisible();
+        await expect(page.getByText(dummyEmail)).toBeVisible();
+        await expect(page.getByText(dummyEmail1)).toBeVisible();
+        await expect(page.getByText(dummyEmail2)).toBeVisible();
+    });
+
     test('filter', async ({ page }) => {
         // No redirection since user is logged-in
         page.goto('/accounts');

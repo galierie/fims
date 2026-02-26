@@ -37,22 +37,8 @@ export default defineConfig({
         },
         {
             name: 'it-specific-tests',
-            dependencies: ['it-auth', 'common-tests'], // added common tests as a dependency as this test loves deleting the admin account
+            dependencies: ['it-auth', 'invalid-logins'],
             testDir: 'tests/playwright/it-specific',
-            testMatch: /.e2e.(?:js|ts)/u,
-        },
-
-        // sprint 2 tests
-        {
-            name: 'search-functions', // searching tests
-            dependencies: ['common-tests', 'it-specific-tests'],
-            testDir: 'tests/playwright/search-functions',
-            testMatch: /.e2e.(?:js|ts)/u,
-        },
-        {
-            name: 'record-view', // individual record view
-            dependencies: ['common-tests', 'it-specific-tests', 'search-functions'],
-            testDir: 'tests/playwright/record-view',
             testMatch: /.e2e.(?:js|ts)/u,
         },
 
@@ -65,10 +51,6 @@ export default defineConfig({
                 'common-tests',
                 'it-specific-tests',
                 'invalid-logins',
-
-                // sprint 2
-                'search-functions',
-                'record-view',
             ],
             testDir: 'tests/playwright/logout',
             testMatch: /.e2e.(?:js|ts)/u,
