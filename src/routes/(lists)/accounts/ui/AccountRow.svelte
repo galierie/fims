@@ -72,7 +72,6 @@
                         isDeleting = true;
                         return async ({ update }) => {
                             await update();
-                            await goto(page.url.pathname);
                             isDeleting = false;
                         };
                     }
