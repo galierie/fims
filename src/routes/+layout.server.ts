@@ -4,13 +4,7 @@ import { getPermissions, getRole } from '$lib/server/db-helpers.js';
 import { seedDatabase } from '$lib/server/db/seed-db.js';
 
 export async function load({ locals, url }) {
-    if (
-        !locals.user &&
-        !url.pathname.startsWith('/login') &&
-        !url.pathname.startsWith('/api/auth')
-    ) {
-        throw redirect(307, '/login');
-    } else if (locals.user) {
+    if (locals.user) {
         const userRole = await getRole(locals.user.id);
         const {
             canaddaccount,
@@ -32,14 +26,21 @@ export async function load({ locals, url }) {
             canViewChangeLogs,
             accountColor: accountColorMap.get(userRole),
         };
+    } else {
+        if (
+            !url.pathname.startsWith('/login') &&
+            !url.pathname.startsWith('/api/auth')
+        ) {
+            throw redirect(307, '/login');
+        } else {
+            return {
+                isLoggedIn: false,
+                isViewingRecord: false,
+                email: '',
+                canViewAccounts: false,
+                canViewChangeLogs: false,
+                accountColor: '',
+            };
+        }
     }
-
-    return {
-        isLoggedIn: false,
-        isViewingRecord: false,
-        email: '',
-        canViewAccounts: false,
-        canViewChangeLogs: false,
-        accountColor: '',
-    };
 }
