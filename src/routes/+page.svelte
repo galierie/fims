@@ -8,6 +8,7 @@
     import RedButton from '$lib/ui/RedButton.svelte';
     import DeleteConfirmation from '$lib/ui/DeleteConfirmation.svelte';
     import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
+    import SearchBar from '$lib/ui/SearchBar.svelte';
 
     type FacultyRecord = { facultyid: number };
     const { data, form } = $props();
@@ -18,6 +19,7 @@
         nextCursor,
         hasPrev,
         hasNext,
+        searchTerm,
     } = $derived(data);
 
     let selectedIds = $state<number[]>([]);
@@ -79,28 +81,13 @@
     {/if}
 {/if}
 
-<div class="mx-auto mt-20 w-full max-w-4xl px-6">
-    <form method="GET" action="/" class="flex items-center gap-4">
-        <div class="relative w-full">
-            <input
-                type="text"
-                name="search"
-                value={data.searchTerm}
-                placeholder="Search faculty by name..."
-                class="h-12 w-full rounded-full border-2 border-fims-green bg-white px-6 py-2 outline-none focus:ring-2 focus:ring-fims-green"
-            />
+<div>
+    <!-- Search Bar -->
+    <div class="mt-25 flex justify-center">
+        <div class="flex w-315 items-center 2xl:w-432">
+            <SearchBar bind:isSearching={isLoading} {searchTerm} />
         </div>
-        <button
-            type="submit"
-            class="hover:bg-opacity-90 h-12 rounded-full bg-fims-green px-8 font-semibold text-white"
-        >
-            Search
-        </button>
-        {#if data.searchTerm}
-            <a href="/" class="font-medium text-fims-red underline">Clear</a>
-        {/if}
-    </form>
-</div>
+    </div>
 
     <!-- Show on Row Select -->
     <div class="flex justify-center">
