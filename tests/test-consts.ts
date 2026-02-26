@@ -1,9 +1,9 @@
 //for the tests to work with different test accounts
-export const ITAcc = "testacc@up.edu.ph";
-export const AdminAcc = "testadmin@up.edu.ph";
+export const ITAcc = "it@up.edu.ph";
+export const AdminAcc = "admin@up.edu.ph";
 
 export const ITPass = "password";
-export const AdminPass = "adminpass";
+export const AdminPass = "password";
 
 export const ITConfig = "playwright/.auth/it.json";
 export const AdminConfig = "playwright/.auth/admin.json";

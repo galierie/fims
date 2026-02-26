@@ -37,7 +37,7 @@ export default defineConfig({
         },
         {
             name: 'it-specific-tests',
-            dependencies: ['it-auth'],
+            dependencies: ['it-auth', 'common-tests'], // added common tests as a dependency as this test loves deleting the admin account
             testDir: 'tests/playwright/it-specific',
             testMatch: /.e2e.(?:js|ts)/u,
         },
@@ -46,13 +46,13 @@ export default defineConfig({
         {
             name: 'search-functions', // searching tests
             dependencies: ['common-tests', 'it-specific-tests'],
-            testDir: 'tests/playwright/recordselection',
+            testDir: 'tests/playwright/search-functions',
             testMatch: /.e2e.(?:js|ts)/u,
         },
         {
-            name: 'record-view', // searching tests
+            name: 'record-view', // individual record view
             dependencies: ['common-tests', 'it-specific-tests', 'search-functions'],
-            testDir: 'tests/playwright/recordselection',
+            testDir: 'tests/playwright/record-view',
             testMatch: /.e2e.(?:js|ts)/u,
         },
 

@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import * as consts from '../../test-consts'
 
 test.use({ storageState: 'playwright/.auth/it.json' });
 
@@ -11,7 +12,7 @@ const accountTableHeaders = [
 ];
 
 const accountDummyRow = [
-  'testadmin@up.edu.ph',
+  consts.AdminAcc,
 ];
 
 const accountTable = [

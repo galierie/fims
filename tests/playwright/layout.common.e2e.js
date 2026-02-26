@@ -1,10 +1,8 @@
 import { expect, test } from "@playwright/test";
+import * as consts from '../test-consts'
 
 // NOTE: Log-out button will be checked in some other test
 // TODO: Add first footer section
-
-const expectedIT = "testacc@up.edu.ph"
-const expectedAdmin = "testadmin@up.edu.ph"
 
 test.describe('check header and footer as admin', async () => {
   test.use({ storageState: 'playwright/.auth/admin.json' });
@@ -22,7 +20,7 @@ test.describe('check header and footer as admin', async () => {
     const websiteTitle = await header.getByText('Faculty Information Management System');
     await expect(websiteTitle).toBeVisible();
 
-    const loggedInEmail = header.getByText(expectedAdmin);
+    const loggedInEmail = header.getByText(consts.AdminAcc);
     await expect(loggedInEmail).toBeVisible();
   });
 
@@ -60,7 +58,7 @@ test.describe('check header and footer as it', async () => {
     const websiteTitle = await header.getByText('Faculty Information Management System');
     await expect(websiteTitle).toBeVisible();
 
-    const loggedInEmail = header.getByText(expectedIT);
+    const loggedInEmail = header.getByText(consts.ITAcc);
     await expect(loggedInEmail).toBeVisible();
   });
 

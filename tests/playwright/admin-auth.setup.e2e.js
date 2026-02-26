@@ -1,4 +1,5 @@
 import { expect, test as setup } from "@playwright/test";
+import * as consts from '../test-consts';
 
 // NOTE: Don't simulate Google OAuth na. Hard to mock third-party UIs.
 
@@ -15,13 +16,13 @@ setup('authenticate admin', async ({ page }) => {
   const emailInput = page.getByRole('textbox', { name: 'Email' });
   await expect(emailInput).toBeEmpty();
   await expect(emailInput).toBeEditable();
-  await emailInput.fill('testadmin@up.edu.ph');
+  await emailInput.fill(consts.AdminAcc);
 
   // Password
   const pwInput = await page.getByRole('textbox', { name: 'Password' });
   await expect(pwInput).toBeEmpty();
   await expect(pwInput).toBeEditable();
-  await pwInput.fill('adminpass');
+  await pwInput.fill(consts.AdminPass);
   await pwInput.press('Enter');
 
   // Redirected to main page
