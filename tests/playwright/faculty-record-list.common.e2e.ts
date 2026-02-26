@@ -1,10 +1,10 @@
-import { expect, test } from '@playwright/test';
-import { sql } from 'drizzle-orm';
 import { drizzle as neonDrizzle } from 'drizzle-orm/neon-http';
 import { drizzle as pgDrizzle } from 'drizzle-orm/node-postgres';
 import { error } from '@sveltejs/kit';
+import { expect, test } from '@playwright/test';
 import { neon } from '@neondatabase/serverless';
 import { Pool as PgPool } from 'pg';
+import { sql } from 'drizzle-orm';
 
 import * as schema from '$lib/server/db/schema';
 
@@ -12,7 +12,9 @@ import * as schema from '$lib/server/db/schema';
 function initializeDbClient() {
     switch (process.env.MODE!) {
         case 'LOCAL': {
-            return pgDrizzle(new PgPool({ connectionString: process.env.DATABASE_URL! }), { schema });
+            return pgDrizzle(new PgPool({ connectionString: process.env.DATABASE_URL! }), {
+                schema,
+            });
         }
         case 'NEON': {
             return neonDrizzle(neon(process.env.DATABASE_URL!), { schema });
@@ -79,154 +81,146 @@ test.describe('batch delete faculty records as it', () => {
         await testDb.delete(schema.facultyrank);
         await testDb.delete(schema.facultysemester);
         await testDb.delete(schema.facultyadminposition);
-    
+
         // faculty
-        await testDb
-            .insert(schema.faculty)
-            .values([
-                {
-                    facultyid: 1,
-                    lastname: 'Galinato',
-                    middlename: 'D',
-                    firstname: 'Eriene',
-                    birthdate: (new Date()).toISOString(),
-                    status: 'Active',
-                    dateoforiginalappointment: (new Date()).toISOString(),
-                    psiitem: '',
-                    employeenumber: '',
-                    tin: '',
-                    gsis: '',
-                    philhealth: '',
-                    pagibig: '',
-                },
-                {
-                    facultyid: 2,
-                    lastname: 'Camingao',
-                    middlename: 'B',
-                    firstname: 'Ericsson Jake',
-                    birthdate: (new Date()).toISOString(),
-                    status: 'On Leave',
-                    dateoforiginalappointment: (new Date()).toISOString(),
-                    psiitem: '',
-                    employeenumber: '',
-                    tin: '',
-                    gsis: '',
-                    philhealth: '',
-                    pagibig: '',
-                },
-                {
-                    facultyid: 3,
-                    lastname: 'Dela Cruz',
-                    middlename: 'O',
-                    firstname: 'Gabrielle Zach',
-                    birthdate: (new Date()).toISOString(),
-                    status: 'Sabbatical',
-                    dateoforiginalappointment: (new Date()).toISOString(),
-                    psiitem: '',
-                    employeenumber: '',
-                    tin: '',
-                    gsis: '',
-                    philhealth: '',
-                    pagibig: '',
-                },
-                {
-                    facultyid: 4,
-                    lastname: 'Mandario',
-                    middlename: 'S',
-                    firstname: 'Maricris',
-                    birthdate: (new Date()).toISOString(),
-                    status: 'Active',
-                    dateoforiginalappointment: (new Date()).toISOString(),
-                    psiitem: '',
-                    employeenumber: '',
-                    tin: '',
-                    gsis: '',
-                    philhealth: '',
-                    pagibig: '',
-                },
-            ]);
+        await testDb.insert(schema.faculty).values([
+            {
+                facultyid: 1,
+                lastname: 'Galinato',
+                middlename: 'D',
+                firstname: 'Eriene',
+                birthdate: new Date().toISOString(),
+                status: 'Active',
+                dateoforiginalappointment: new Date().toISOString(),
+                psiitem: '',
+                employeenumber: '',
+                tin: '',
+                gsis: '',
+                philhealth: '',
+                pagibig: '',
+            },
+            {
+                facultyid: 2,
+                lastname: 'Camingao',
+                middlename: 'B',
+                firstname: 'Ericsson Jake',
+                birthdate: new Date().toISOString(),
+                status: 'On Leave',
+                dateoforiginalappointment: new Date().toISOString(),
+                psiitem: '',
+                employeenumber: '',
+                tin: '',
+                gsis: '',
+                philhealth: '',
+                pagibig: '',
+            },
+            {
+                facultyid: 3,
+                lastname: 'Dela Cruz',
+                middlename: 'O',
+                firstname: 'Gabrielle Zach',
+                birthdate: new Date().toISOString(),
+                status: 'Sabbatical',
+                dateoforiginalappointment: new Date().toISOString(),
+                psiitem: '',
+                employeenumber: '',
+                tin: '',
+                gsis: '',
+                philhealth: '',
+                pagibig: '',
+            },
+            {
+                facultyid: 4,
+                lastname: 'Mandario',
+                middlename: 'S',
+                firstname: 'Maricris',
+                birthdate: new Date().toISOString(),
+                status: 'Active',
+                dateoforiginalappointment: new Date().toISOString(),
+                psiitem: '',
+                employeenumber: '',
+                tin: '',
+                gsis: '',
+                philhealth: '',
+                pagibig: '',
+            },
+        ]);
 
         // facultyrank
-        await testDb
-            .insert(schema.facultyrank)
-            .values([
-                {
-                    facultyrankid: 1,
-                    facultyid: 1,
-                    rankid: 26,
-                    appointmentstatus: 'Tenured',
-                    dateoftenureorrenewal: (new Date()).toISOString(),
-                },
-                {
-                    facultyrankid: 2,
-                    facultyid: 2,
-                    rankid: 20,
-                    appointmentstatus: 'For Renewal',
-                    dateoftenureorrenewal: (new Date()).toISOString(),
-                },
-                {
-                    facultyrankid: 3,
-                    facultyid: 3,
-                    rankid: 6,
-                    appointmentstatus: 'For Renewal',
-                    dateoftenureorrenewal: (new Date()).toISOString(),
-                },
-                {
-                    facultyrankid: 4,
-                    facultyid: 4,
-                    rankid: 1,
-                    appointmentstatus: 'Tenured',
-                    dateoftenureorrenewal: (new Date()).toISOString(),
-                },
-            ]);
-        
+        await testDb.insert(schema.facultyrank).values([
+            {
+                facultyrankid: 1,
+                facultyid: 1,
+                rankid: 26,
+                appointmentstatus: 'Tenured',
+                dateoftenureorrenewal: new Date().toISOString(),
+            },
+            {
+                facultyrankid: 2,
+                facultyid: 2,
+                rankid: 20,
+                appointmentstatus: 'For Renewal',
+                dateoftenureorrenewal: new Date().toISOString(),
+            },
+            {
+                facultyrankid: 3,
+                facultyid: 3,
+                rankid: 6,
+                appointmentstatus: 'For Renewal',
+                dateoftenureorrenewal: new Date().toISOString(),
+            },
+            {
+                facultyrankid: 4,
+                facultyid: 4,
+                rankid: 1,
+                appointmentstatus: 'Tenured',
+                dateoftenureorrenewal: new Date().toISOString(),
+            },
+        ]);
+
         // facultysemester
-        await testDb
-            .insert(schema.facultysemester)
-            .values([
-                {
-                    facultysemesterid: 1,
-                    facultyid: 1,
-                    acadsemesterid: 1,
-                    currentrankid: 1,
-                },
-                {
-                    facultysemesterid: 2,
-                    facultyid: 2,
-                    acadsemesterid: 1,
-                    currentrankid: 2,
-                },
-                {
-                    facultysemesterid: 3,
-                    facultyid: 3,
-                    acadsemesterid: 1,
-                    currentrankid: 3,
-                },
-                {
-                    facultysemesterid: 4,
-                    facultyid: 4,
-                    acadsemesterid: 1,
-                    currentrankid: 4,
-                },
-            ]);
-        
+        await testDb.insert(schema.facultysemester).values([
+            {
+                facultysemesterid: 1,
+                facultyid: 1,
+                acadsemesterid: 1,
+                currentrankid: 1,
+            },
+            {
+                facultysemesterid: 2,
+                facultyid: 2,
+                acadsemesterid: 1,
+                currentrankid: 2,
+            },
+            {
+                facultysemesterid: 3,
+                facultyid: 3,
+                acadsemesterid: 1,
+                currentrankid: 3,
+            },
+            {
+                facultysemesterid: 4,
+                facultyid: 4,
+                acadsemesterid: 1,
+                currentrankid: 4,
+            },
+        ]);
+
         // facultyadminposition
-        await testDb
-            .insert(schema.facultyadminposition)
-            .values([
-                {
-                    facultyadminpositionid: 1,
-                    facultysemesterid: 1,
-                    adminpositionid: 1,
-                    officeid: 1,
-                    startdate: (new Date()).toISOString(),
-                    enddate: (new Date()).toISOString(),
-                    administrativeloadcredit: '5',
-                }
-            ]);
+        await testDb.insert(schema.facultyadminposition).values([
+            {
+                facultyadminpositionid: 1,
+                facultysemesterid: 1,
+                adminpositionid: 1,
+                officeid: 1,
+                startdate: new Date().toISOString(),
+                enddate: new Date().toISOString(),
+                administrativeloadcredit: '5',
+            },
+        ]);
 
         // Refresh faculty record search view
-        await testDb.execute(sql`REFRESH MATERIALIZED VIEW faculty_record_search_view`); 
+        await testDb.execute(sql`REFRESH MATERIALIZED VIEW faculty_record_search_view`);
     });
 
     test('check selection', async ({ page }) => {
@@ -243,14 +237,23 @@ test.describe('batch delete faculty records as it', () => {
         // See if the buttons are showing
         const selectAllBtn = await page.getByRole('button', { name: 'Select All', exact: true });
         expect(selectAllBtn).toBeVisible();
-        
-        const deselectSelectionBtn = await page.getByRole('button', { name: 'Deselect Selection', exact: true });
+
+        const deselectSelectionBtn = await page.getByRole('button', {
+            name: 'Deselect Selection',
+            exact: true,
+        });
         expect(deselectSelectionBtn).toBeVisible();
 
-        const exportReportsBtn = await page.getByRole('button', { name: 'Export Reports', exact: true });
+        const exportReportsBtn = await page.getByRole('button', {
+            name: 'Export Reports',
+            exact: true,
+        });
         expect(exportReportsBtn).toBeVisible();
 
-        const deleteRecordsBtn = await page.getByRole('button', { name: 'Delete Record', exact: true });
+        const deleteRecordsBtn = await page.getByRole('button', {
+            name: 'Delete Record',
+            exact: true,
+        });
         expect(deleteRecordsBtn).toBeVisible();
 
         // Select All
@@ -280,7 +283,7 @@ test.describe('batch delete faculty records as it', () => {
         expect(deselectSelectionBtn).not.toBeVisible();
         expect(deleteRecordsBtn).not.toBeVisible();
     });
-    
+
     test('cancelled deletion', async ({ page }) => {
         // No redirection since user is logged-in
         page.goto('/');
@@ -306,7 +309,10 @@ test.describe('batch delete faculty records as it', () => {
         expect(checkbox4).toBeChecked();
 
         // Delete Faculty Records
-        const deleteRecordsBtn = await page.getByRole('button', { name: 'Delete Records', exact: true });
+        const deleteRecordsBtn = await page.getByRole('button', {
+            name: 'Delete Records',
+            exact: true,
+        });
         expect(deleteRecordsBtn).toBeVisible();
         await deleteRecordsBtn.click();
 
@@ -319,7 +325,7 @@ test.describe('batch delete faculty records as it', () => {
 
         const cell1 = page.getByText('Camingao, Ericsson Jake');
         await expect(cell1).toBeVisible();
-    
+
         const cell2 = page.getByText('Dela Cruz, Gabrielle Zach');
         await expect(cell2).toBeVisible();
 
@@ -327,7 +333,10 @@ test.describe('batch delete faculty records as it', () => {
         await expect(cell3).toBeVisible();
 
         // Deselect Selection
-        const deselectSelectionBtn = await page.getByRole('button', { name: 'Deselect Selection', exact: true });
+        const deselectSelectionBtn = await page.getByRole('button', {
+            name: 'Deselect Selection',
+            exact: true,
+        });
         expect(deselectSelectionBtn).toBeVisible();
 
         await deselectSelectionBtn.click();
@@ -340,7 +349,7 @@ test.describe('batch delete faculty records as it', () => {
         expect(deselectSelectionBtn).not.toBeVisible();
         expect(deleteRecordsBtn).not.toBeVisible();
     });
-    
+
     test('deleted', async ({ page }) => {
         // No redirection since user is logged-in
         page.goto('/');
@@ -365,14 +374,16 @@ test.describe('batch delete faculty records as it', () => {
         const checkbox4 = await page.getByRole('checkbox').nth(3);
         expect(checkbox4).toBeChecked();
 
-
         const cell = page.getByText('Galinato, Eriene');
         const cell1 = page.getByText('Camingao, Ericsson Jake');
         const cell2 = page.getByText('Dela Cruz, Gabrielle Zach');
         const cell3 = page.getByText('Mandario, Maricris');
 
         // Delete Faculty Records
-        const deleteRecordsBtn = await page.getByRole('button', { name: 'Delete Records', exact: true });
+        const deleteRecordsBtn = await page.getByRole('button', {
+            name: 'Delete Records',
+            exact: true,
+        });
         expect(deleteRecordsBtn).toBeVisible();
         await deleteRecordsBtn.click();
 
@@ -402,149 +413,141 @@ test.describe('batch delete faculty records as admin', () => {
         await testDb.delete(schema.facultyadminposition);
 
         // faculty
-        await testDb
-            .insert(schema.faculty)
-            .values([
-                {
-                    facultyid: 1,
-                    lastname: 'Galinato',
-                    middlename: 'D',
-                    firstname: 'Eriene',
-                    birthdate: (new Date()).toISOString(),
-                    status: 'Active',
-                    dateoforiginalappointment: (new Date()).toISOString(),
-                    psiitem: '',
-                    employeenumber: '',
-                    tin: '',
-                    gsis: '',
-                    philhealth: '',
-                    pagibig: '',
-                },
-                {
-                    facultyid: 2,
-                    lastname: 'Camingao',
-                    middlename: 'B',
-                    firstname: 'Ericsson Jake',
-                    birthdate: (new Date()).toISOString(),
-                    status: 'On Leave',
-                    dateoforiginalappointment: (new Date()).toISOString(),
-                    psiitem: '',
-                    employeenumber: '',
-                    tin: '',
-                    gsis: '',
-                    philhealth: '',
-                    pagibig: '',
-                },
-                {
-                    facultyid: 3,
-                    lastname: 'Dela Cruz',
-                    middlename: 'O',
-                    firstname: 'Gabrielle Zach',
-                    birthdate: (new Date()).toISOString(),
-                    status: 'Sabbatical',
-                    dateoforiginalappointment: (new Date()).toISOString(),
-                    psiitem: '',
-                    employeenumber: '',
-                    tin: '',
-                    gsis: '',
-                    philhealth: '',
-                    pagibig: '',
-                },
-                {
-                    facultyid: 4,
-                    lastname: 'Mandario',
-                    middlename: 'S',
-                    firstname: 'Maricris',
-                    birthdate: (new Date()).toISOString(),
-                    status: 'Active',
-                    dateoforiginalappointment: (new Date()).toISOString(),
-                    psiitem: '',
-                    employeenumber: '',
-                    tin: '',
-                    gsis: '',
-                    philhealth: '',
-                    pagibig: '',
-                },
-            ]);
+        await testDb.insert(schema.faculty).values([
+            {
+                facultyid: 1,
+                lastname: 'Galinato',
+                middlename: 'D',
+                firstname: 'Eriene',
+                birthdate: new Date().toISOString(),
+                status: 'Active',
+                dateoforiginalappointment: new Date().toISOString(),
+                psiitem: '',
+                employeenumber: '',
+                tin: '',
+                gsis: '',
+                philhealth: '',
+                pagibig: '',
+            },
+            {
+                facultyid: 2,
+                lastname: 'Camingao',
+                middlename: 'B',
+                firstname: 'Ericsson Jake',
+                birthdate: new Date().toISOString(),
+                status: 'On Leave',
+                dateoforiginalappointment: new Date().toISOString(),
+                psiitem: '',
+                employeenumber: '',
+                tin: '',
+                gsis: '',
+                philhealth: '',
+                pagibig: '',
+            },
+            {
+                facultyid: 3,
+                lastname: 'Dela Cruz',
+                middlename: 'O',
+                firstname: 'Gabrielle Zach',
+                birthdate: new Date().toISOString(),
+                status: 'Sabbatical',
+                dateoforiginalappointment: new Date().toISOString(),
+                psiitem: '',
+                employeenumber: '',
+                tin: '',
+                gsis: '',
+                philhealth: '',
+                pagibig: '',
+            },
+            {
+                facultyid: 4,
+                lastname: 'Mandario',
+                middlename: 'S',
+                firstname: 'Maricris',
+                birthdate: new Date().toISOString(),
+                status: 'Active',
+                dateoforiginalappointment: new Date().toISOString(),
+                psiitem: '',
+                employeenumber: '',
+                tin: '',
+                gsis: '',
+                philhealth: '',
+                pagibig: '',
+            },
+        ]);
 
         // facultyrank
-        await testDb
-            .insert(schema.facultyrank)
-            .values([
-                {
-                    facultyrankid: 1,
-                    facultyid: 1,
-                    rankid: 26,
-                    appointmentstatus: 'Tenured',
-                    dateoftenureorrenewal: (new Date()).toISOString(),
-                },
-                {
-                    facultyrankid: 2,
-                    facultyid: 2,
-                    rankid: 20,
-                    appointmentstatus: 'For Renewal',
-                    dateoftenureorrenewal: (new Date()).toISOString(),
-                },
-                {
-                    facultyrankid: 3,
-                    facultyid: 3,
-                    rankid: 6,
-                    appointmentstatus: 'For Renewal',
-                    dateoftenureorrenewal: (new Date()).toISOString(),
-                },
-                {
-                    facultyrankid: 4,
-                    facultyid: 4,
-                    rankid: 1,
-                    appointmentstatus: 'Tenured',
-                    dateoftenureorrenewal: (new Date()).toISOString(),
-                },
-            ]);
+        await testDb.insert(schema.facultyrank).values([
+            {
+                facultyrankid: 1,
+                facultyid: 1,
+                rankid: 26,
+                appointmentstatus: 'Tenured',
+                dateoftenureorrenewal: new Date().toISOString(),
+            },
+            {
+                facultyrankid: 2,
+                facultyid: 2,
+                rankid: 20,
+                appointmentstatus: 'For Renewal',
+                dateoftenureorrenewal: new Date().toISOString(),
+            },
+            {
+                facultyrankid: 3,
+                facultyid: 3,
+                rankid: 6,
+                appointmentstatus: 'For Renewal',
+                dateoftenureorrenewal: new Date().toISOString(),
+            },
+            {
+                facultyrankid: 4,
+                facultyid: 4,
+                rankid: 1,
+                appointmentstatus: 'Tenured',
+                dateoftenureorrenewal: new Date().toISOString(),
+            },
+        ]);
 
         // facultysemester
-        await testDb
-            .insert(schema.facultysemester)
-            .values([
-                {
-                    facultysemesterid: 1,
-                    facultyid: 1,
-                    acadsemesterid: 1,
-                    currentrankid: 1,
-                },
-                {
-                    facultysemesterid: 2,
-                    facultyid: 2,
-                    acadsemesterid: 1,
-                    currentrankid: 2,
-                },
-                {
-                    facultysemesterid: 3,
-                    facultyid: 3,
-                    acadsemesterid: 1,
-                    currentrankid: 3,
-                },
-                {
-                    facultysemesterid: 4,
-                    facultyid: 4,
-                    acadsemesterid: 1,
-                    currentrankid: 4,
-                },
-            ]);
+        await testDb.insert(schema.facultysemester).values([
+            {
+                facultysemesterid: 1,
+                facultyid: 1,
+                acadsemesterid: 1,
+                currentrankid: 1,
+            },
+            {
+                facultysemesterid: 2,
+                facultyid: 2,
+                acadsemesterid: 1,
+                currentrankid: 2,
+            },
+            {
+                facultysemesterid: 3,
+                facultyid: 3,
+                acadsemesterid: 1,
+                currentrankid: 3,
+            },
+            {
+                facultysemesterid: 4,
+                facultyid: 4,
+                acadsemesterid: 1,
+                currentrankid: 4,
+            },
+        ]);
 
         // facultyadminposition
-        await testDb
-            .insert(schema.facultyadminposition)
-            .values([
-                {
-                    facultyadminpositionid: 1,
-                    facultysemesterid: 1,
-                    adminpositionid: 1,
-                    officeid: 1,
-                    startdate: (new Date()).toISOString(),
-                    enddate: (new Date()).toISOString(),
-                    administrativeloadcredit: '5',
-                }
-            ]);
+        await testDb.insert(schema.facultyadminposition).values([
+            {
+                facultyadminpositionid: 1,
+                facultysemesterid: 1,
+                adminpositionid: 1,
+                officeid: 1,
+                startdate: new Date().toISOString(),
+                enddate: new Date().toISOString(),
+                administrativeloadcredit: '5',
+            },
+        ]);
 
         // Refresh faculty record search view
         await testDb.execute(sql`REFRESH MATERIALIZED VIEW faculty_record_search_view`);
@@ -565,13 +568,22 @@ test.describe('batch delete faculty records as admin', () => {
         const selectAllBtn = await page.getByRole('button', { name: 'Select All', exact: true });
         expect(selectAllBtn).toBeVisible();
 
-        const deselectSelectionBtn = await page.getByRole('button', { name: 'Deselect Selection', exact: true });
+        const deselectSelectionBtn = await page.getByRole('button', {
+            name: 'Deselect Selection',
+            exact: true,
+        });
         expect(deselectSelectionBtn).toBeVisible();
 
-        const exportReportsBtn = await page.getByRole('button', { name: 'Export Reports', exact: true });
+        const exportReportsBtn = await page.getByRole('button', {
+            name: 'Export Reports',
+            exact: true,
+        });
         expect(exportReportsBtn).toBeVisible();
 
-        const deleteRecordsBtn = await page.getByRole('button', { name: 'Delete Record', exact: true });
+        const deleteRecordsBtn = await page.getByRole('button', {
+            name: 'Delete Record',
+            exact: true,
+        });
         expect(deleteRecordsBtn).toBeVisible();
 
         // Select All
@@ -627,7 +639,10 @@ test.describe('batch delete faculty records as admin', () => {
         expect(checkbox4).toBeChecked();
 
         // Delete Faculty Records
-        const deleteRecordsBtn = await page.getByRole('button', { name: 'Delete Records', exact: true });
+        const deleteRecordsBtn = await page.getByRole('button', {
+            name: 'Delete Records',
+            exact: true,
+        });
         expect(deleteRecordsBtn).toBeVisible();
         await deleteRecordsBtn.click();
 
@@ -648,7 +663,10 @@ test.describe('batch delete faculty records as admin', () => {
         await expect(cell3).toBeVisible();
 
         // Deselect Selection
-        const deselectSelectionBtn = await page.getByRole('button', { name: 'Deselect Selection', exact: true });
+        const deselectSelectionBtn = await page.getByRole('button', {
+            name: 'Deselect Selection',
+            exact: true,
+        });
         expect(deselectSelectionBtn).toBeVisible();
 
         await deselectSelectionBtn.click();
@@ -686,14 +704,16 @@ test.describe('batch delete faculty records as admin', () => {
         const checkbox4 = await page.getByRole('checkbox').nth(3);
         expect(checkbox4).toBeChecked();
 
-
         const cell = page.getByText('Galinato, Eriene');
         const cell1 = page.getByText('Camingao, Ericsson Jake');
         const cell2 = page.getByText('Dela Cruz, Gabrielle Zach');
         const cell3 = page.getByText('Mandario, Maricris');
 
         // Delete Faculty Records
-        const deleteRecordsBtn = await page.getByRole('button', { name: 'Delete Records', exact: true });
+        const deleteRecordsBtn = await page.getByRole('button', {
+            name: 'Delete Records',
+            exact: true,
+        });
         expect(deleteRecordsBtn).toBeVisible();
         await deleteRecordsBtn.click();
 
@@ -711,4 +731,3 @@ test.describe('batch delete faculty records as admin', () => {
         await expect(cell3).not.toBeVisible();
     });
 });
-

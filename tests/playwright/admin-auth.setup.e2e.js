@@ -1,4 +1,5 @@
-import { expect, test as setup } from "@playwright/test";
+import { expect, test as setup } from '@playwright/test';
+
 import * as consts from '../test-consts';
 
 // NOTE: Don't simulate Google OAuth na. Hard to mock third-party UIs.
@@ -6,32 +7,32 @@ import * as consts from '../test-consts';
 const authFile = 'playwright/.auth/admin.json';
 
 setup('authenticate admin', async ({ page }) => {
-  // Redirect to /login since no logged-in user yet
-  await page.goto('/');
-  await expect(page).toHaveURL('/login');
+    // Redirect to /login since no logged-in user yet
+    await page.goto('/');
+    await expect(page).toHaveURL('/login');
 
-  // Log-in
+    // Log-in
 
-  // Email
-  const emailInput = page.getByRole('textbox', { name: 'Email' });
-  await expect(emailInput).toBeEmpty();
-  await expect(emailInput).toBeEditable();
-  await emailInput.fill(consts.AdminAcc);
+    // Email
+    const emailInput = page.getByRole('textbox', { name: 'Email' });
+    await expect(emailInput).toBeEmpty();
+    await expect(emailInput).toBeEditable();
+    await emailInput.fill(consts.AdminAcc);
 
-  // Password
-  const pwInput = await page.getByRole('textbox', { name: 'Password' });
-  await expect(pwInput).toBeEmpty();
-  await expect(pwInput).toBeEditable();
-  await pwInput.fill(consts.AdminPass);
-  await pwInput.press('Enter');
+    // Password
+    const pwInput = await page.getByRole('textbox', { name: 'Password' });
+    await expect(pwInput).toBeEmpty();
+    await expect(pwInput).toBeEditable();
+    await pwInput.fill(consts.AdminPass);
+    await pwInput.press('Enter');
 
-  // Redirected to main page
-  await expect(page).toHaveURL('');
+    // Redirected to main page
+    await expect(page).toHaveURL('');
 
-  // Will redirect to main page since logged-in user
-  await page.goto('/login');
-  await expect(page).toHaveURL('/');
+    // Will redirect to main page since logged-in user
+    await page.goto('/login');
+    await expect(page).toHaveURL('/');
 
-  // Save auth state
-  await page.context().storageState({ path: authFile });
+    // Save auth state
+    await page.context().storageState({ path: authFile });
 });

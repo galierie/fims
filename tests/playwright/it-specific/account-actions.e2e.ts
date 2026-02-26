@@ -79,7 +79,10 @@ test.describe('add account', () => {
         await emailInput.fill(dummyEmail);
 
         // Password
-        const pwInput = await page.getByRole('textbox', { name: 'Set initial password', exact: true });
+        const pwInput = await page.getByRole('textbox', {
+            name: 'Set initial password',
+            exact: true,
+        });
         await expect(pwInput).toBeEmpty();
         await expect(pwInput).toBeEditable();
         await pwInput.fill(dummyPw);
@@ -113,7 +116,10 @@ test.describe('add account', () => {
         await emailInput.fill(dummyEmail);
 
         // Password
-        const pwInput = await page.getByRole('textbox', { name: 'Set initial password', exact: true });
+        const pwInput = await page.getByRole('textbox', {
+            name: 'Set initial password',
+            exact: true,
+        });
         await expect(pwInput).toBeEmpty();
         await expect(pwInput).toBeEditable();
         await pwInput.fill(dummyPw);
@@ -198,7 +204,10 @@ test.describe('batch delete accounts', () => {
         await emailInput.fill(dummyEmail);
 
         // Password
-        const pwInput = await page.getByRole('textbox', { name: 'Set initial password', exact: true });
+        const pwInput = await page.getByRole('textbox', {
+            name: 'Set initial password',
+            exact: true,
+        });
         await expect(pwInput).toBeEmpty();
         await expect(pwInput).toBeEditable();
         await pwInput.fill(dummyPw);
@@ -237,7 +246,10 @@ test.describe('batch delete accounts', () => {
         await emailInput.fill(dummyEmail1);
 
         // Password
-        const pwInput = await page.getByRole('textbox', { name: 'Set initial password', exact: true });
+        const pwInput = await page.getByRole('textbox', {
+            name: 'Set initial password',
+            exact: true,
+        });
         await expect(pwInput).toBeEmpty();
         await expect(pwInput).toBeEditable();
         await pwInput.fill(dummyPw);
@@ -276,7 +288,10 @@ test.describe('batch delete accounts', () => {
         await emailInput.fill(dummyEmail2);
 
         // Password
-        const pwInput = await page.getByRole('textbox', { name: 'Set initial password', exact: true });
+        const pwInput = await page.getByRole('textbox', {
+            name: 'Set initial password',
+            exact: true,
+        });
         await expect(pwInput).toBeEmpty();
         await expect(pwInput).toBeEditable();
         await pwInput.fill(dummyPw);
@@ -310,7 +325,7 @@ test.describe('batch delete accounts', () => {
 
         const cell1 = page.getByText(dummyEmail1);
         await expect(cell1).toBeVisible();
-    
+
         const cell2 = page.getByText(dummyEmail2);
         await expect(cell2).toBeVisible();
 
@@ -351,11 +366,17 @@ test.describe('batch delete accounts', () => {
         // See if the buttons are showing
         const selectAllBtn = await page.getByRole('button', { name: 'Select All', exact: true });
         expect(selectAllBtn).toBeVisible();
-        
-        const deselectSelectionBtn = await page.getByRole('button', { name: 'Deselect Selection', exact: true });
+
+        const deselectSelectionBtn = await page.getByRole('button', {
+            name: 'Deselect Selection',
+            exact: true,
+        });
         expect(deselectSelectionBtn).toBeVisible();
 
-        const deleteRecordsBtn = await page.getByRole('button', { name: 'Delete Account', exact: true });
+        const deleteRecordsBtn = await page.getByRole('button', {
+            name: 'Delete Account',
+            exact: true,
+        });
         expect(deleteRecordsBtn).toBeVisible();
 
         // Select All
@@ -414,7 +435,10 @@ test.describe('batch delete accounts', () => {
         expect(checkbox1).not.toBeChecked();
 
         // Delete Accounts
-        const deleteRecordsBtn = await page.getByRole('button', { name: 'Delete Accounts', exact: true });
+        const deleteRecordsBtn = await page.getByRole('button', {
+            name: 'Delete Accounts',
+            exact: true,
+        });
         expect(deleteRecordsBtn).toBeVisible();
         await deleteRecordsBtn.click();
 
@@ -427,7 +451,7 @@ test.describe('batch delete accounts', () => {
 
         const cell1 = page.getByText(dummyEmail);
         await expect(cell1).toBeVisible();
-    
+
         const cell2 = page.getByText(dummyEmail1);
         await expect(cell2).toBeVisible();
 
@@ -435,7 +459,10 @@ test.describe('batch delete accounts', () => {
         await expect(cell3).toBeVisible();
 
         // Deselect Selection
-        const deselectSelectionBtn = await page.getByRole('button', { name: 'Deselect Selection', exact: true });
+        const deselectSelectionBtn = await page.getByRole('button', {
+            name: 'Deselect Selection',
+            exact: true,
+        });
         expect(deselectSelectionBtn).toBeVisible();
 
         await deselectSelectionBtn.click();
@@ -448,7 +475,7 @@ test.describe('batch delete accounts', () => {
         expect(deselectSelectionBtn).not.toBeVisible();
         expect(deleteRecordsBtn).not.toBeVisible();
     });
-    
+
     test('deleted', async ({ page }) => {
         // No redirection since user is logged-in
         page.goto('/accounts');
@@ -482,7 +509,10 @@ test.describe('batch delete accounts', () => {
         const cell3 = page.getByText(dummyEmail2);
 
         // Delete Accounts
-        const deleteRecordsBtn = await page.getByRole('button', { name: 'Delete Accounts', exact: true });
+        const deleteRecordsBtn = await page.getByRole('button', {
+            name: 'Delete Accounts',
+            exact: true,
+        });
         expect(deleteRecordsBtn).toBeVisible();
         await deleteRecordsBtn.click();
 
