@@ -208,7 +208,7 @@
         <input type="hidden" name="ids" value={JSON.stringify(selectedIds)} />
 
         <DeleteConfirmation
-            text={`Are you sure you want to delete ${selectedIds.length} faculty record(s)?`}
+            text={`Are you sure you want to delete ${selectedIds.length} faculty ${selectedIds.length > 1 ? 'records' : 'record'}?`}
             onCancel={() => (willBatchDelete = false)}
             onDelete={() => {
                 if (deleteForm) deleteForm.requestSubmit();
