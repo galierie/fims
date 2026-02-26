@@ -180,6 +180,18 @@ export async function getFacultyRecordList(
     };
 }
 
+export interface FacultyRecordDTO {
+    facultyid: number;
+    lastname: string;
+    firstname: string;
+    status: string;
+    ranktitle: string | null;
+    adminposition: string | null;
+    logTimestamp: Date | null;
+    logMaker: string | null;
+    logOperation: string | null;
+}
+
 export async function getAllStatuses() {
     const uniqueRows = await db
         .select({

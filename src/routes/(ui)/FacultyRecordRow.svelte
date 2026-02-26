@@ -1,18 +1,8 @@
 <script lang="ts">
-    interface FacultyRecordDTO {
-        facultyid: number;
-        lastname: string;
-        firstname: string;
-        status: string;
-        ranktitle: string | null;
-        adminposition: string | null;
-        logTimestamp: Date | null;
-        logMaker: string | null;
-        logOperation: string | null;
-    }
+    import type { FacultyRecordDTO } from "$lib/server/faculty-records-list-helpers";
 
     interface Props {
-        facultyRecord: FacultyRecordDTO & { facultyid: number };
+        facultyRecord: FacultyRecordDTO;
         canViewChangeLogs: boolean;
         isSelected: boolean;
         onToggle: () => void;
