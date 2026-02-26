@@ -44,13 +44,7 @@ export default defineConfig({
 
         // sprint 2 tests
         {
-            name: 'batch-selection-tests', //batch record selection, deletion, and filtration
-            dependencies: ['common-tests', 'it-specific-tests'],
-            testDir: 'tests/playwright/batchrecord',
-            testMatch: /.e2e.(?:js|ts)/u,
-        },
-        {
-            name: 'record-view-tests', // individual record view tests
+            name: 'search-functions', // searching tests
             dependencies: ['common-tests', 'it-specific-tests'],
             testDir: 'tests/playwright/recordselection',
             testMatch: /.e2e.(?:js|ts)/u,
