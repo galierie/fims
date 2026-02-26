@@ -1,9 +1,9 @@
 <script lang="ts">
     import './layout.css';
     import favicon from '$lib/assets/favicon.svg';
-    import Header from './(ui)/Header.svelte';
-    import Footer from './(ui)/Footer.svelte';
-    import NavBar from './(ui)/NavBar.svelte';
+    import Header from './ui/Header.svelte';
+    import Footer from './ui/Footer.svelte';
+    import NavBar from './ui/NavBar.svelte';
 
     const { data, children } = $props();
     const { isLoggedIn, isViewingRecord, canViewAccounts, accountColor, email } = $derived(data);

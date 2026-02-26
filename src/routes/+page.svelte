@@ -3,7 +3,7 @@
     import { goto } from '$app/navigation';
     import { page } from '$app/state';
     import Icon from '@iconify/svelte';
-    import FacultyRecordRow from './(ui)/FacultyRecordRow.svelte';
+    import FacultyRecordRow from './ui/FacultyRecordRow.svelte';
     import GreenButton from '$lib/ui/GreenButton.svelte';
     import RedButton from '$lib/ui/RedButton.svelte';
     import DeleteConfirmation from '$lib/ui/DeleteConfirmation.svelte';
