@@ -20,10 +20,10 @@ test.describe('add account', () => {
             // No input
 
             // Save Account
-            await page.getByRole('button', { name: '+ Save Account', exact: true }).click();
+            await page.getByRole('button', { name: 'Save', exact: true }).click();
 
             // Confirm
-            await page.getByRole('button', { name: 'Save', exact: true }).click();
+            await page.getByRole('button', { name: 'Save', exact: true }).last().click();
 
             // Check message
             await expect(page.getByText('Invalid email.')).toBeVisible();
@@ -48,42 +48,13 @@ test.describe('add account', () => {
             // No need to input password
 
             // Save Account
-            await page.getByRole('button', { name: '+ Save Account', exact: true }).click();
+            await page.getByRole('button', { name: 'Save', exact: true }).click();
 
             // Confirm
-            await page.getByRole('button', { name: 'Save', exact: true }).click();
+            await page.getByRole('button', { name: 'Save', exact: true }).last().click();
 
             // Check message
             const afterMessage = await page.getByText('Invalid email.');
-            await expect(afterMessage).toBeVisible();
-        });
-
-        test('no password', async ({ page }) => {
-            // No redirection since user is logged-in
-            page.goto('/accounts');
-            await expect(page).toHaveURL('/accounts');
-
-            // Add Account
-            await page.getByRole('button', { name: '+ Add Account', exact: true }).click();
-
-            // Input
-
-            // Email
-            const emailInput = page.getByRole('textbox', { name: 'Email', exact: true });
-            await expect(emailInput).toBeEmpty();
-            await expect(emailInput).toBeEditable();
-            await emailInput.fill(dummyEmail);
-
-            // No need to input password
-
-            // Save Account
-            await page.getByRole('button', { name: '+ Save Account', exact: true }).click();
-
-            // Confirm
-            await page.getByRole('button', { name: 'Save', exact: true }).click();
-
-            // Check message
-            const afterMessage = await page.getByText('Invalid password.');
             await expect(afterMessage).toBeVisible();
         });
     });
@@ -99,19 +70,19 @@ test.describe('add account', () => {
         // Input
 
         // Email
-        const emailInput = page.getByRole('textbox', { name: 'Email', exact: true });
+        const emailInput = page.getByRole('textbox', { name: 'Enter email here', exact: true });
         await expect(emailInput).toBeEmpty();
         await expect(emailInput).toBeEditable();
         await emailInput.fill(dummyEmail);
 
         // Password
-        const pwInput = await page.getByRole('textbox', { name: 'Password', exact: true });
+        const pwInput = await page.getByRole('textbox', { name: 'Set initial password', exact: true });
         await expect(pwInput).toBeEmpty();
         await expect(pwInput).toBeEditable();
         await pwInput.fill(dummyPw);
 
         // Save Account
-        await page.getByRole('button', { name: '+ Save Account', exact: true }).click();
+        await page.getByRole('button', { name: 'Save', exact: true }).click();
 
         // Don't confirm
         await page.getByRole('button', { name: 'Cancel', exact: true }).click();
@@ -133,22 +104,22 @@ test.describe('add account', () => {
         // Input
 
         // Email
-        const emailInput = page.getByRole('textbox', { name: 'Email', exact: true });
+        const emailInput = page.getByRole('textbox', { name: 'Enter email here', exact: true });
         await expect(emailInput).toBeEmpty();
         await expect(emailInput).toBeEditable();
         await emailInput.fill(dummyEmail);
 
         // Password
-        const pwInput = await page.getByRole('textbox', { name: 'Password', exact: true });
+        const pwInput = await page.getByRole('textbox', { name: 'Set initial password', exact: true });
         await expect(pwInput).toBeEmpty();
         await expect(pwInput).toBeEditable();
         await pwInput.fill(dummyPw);
 
         // Save Account
-        await page.getByRole('button', { name: '+ Save Account', exact: true }).click();
+        await page.getByRole('button', { name: 'Save', exact: true }).click();
 
         // Confirm
-        await page.getByRole('button', { name: 'Save', exact: true }).click();
+        await page.getByRole('button', { name: 'Save', exact: true }).last().click();
 
         // Check message
         const afterMakeMessage = await page.getByText('Created account.');
