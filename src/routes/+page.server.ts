@@ -6,14 +6,31 @@ import { getFacultyRecordList } from '$lib/server/faculty-records-list-helpers';
 export async function load({ url }) {
     // Extract queries
 
+    // Cursor and Direction
+    const newCursorStr = url.searchParams.get('cursor');
+    const isNextStr = url.searchParams.get('isNext'); // 0 or 1
+
+    // eslint-disable-next-line no-undefined -- can't use null in Drizzle WHERE queries
+    const newCursor = newCursorStr ? parseInt(newCursorStr, 10) : undefined;
+    const isNext = isNextStr ? parseInt(isNextStr, 10) === 1 : true;
+
     // Search
     const searchTerm = url.searchParams.get('search');
 
-    // Pass the term to your helper
-    const facultyRecordList = await getFacultyRecordList(searchTerm);
+    // Get faculty record list
+    const { facultyRecordList, prevCursor, nextCursor, hasPrev, hasNext } = await getFacultyRecordList(
+        searchTerm,
+        newCursor,
+        isNext,
+        !newCursorStr && !isNextStr,
+    );
 
     return {
         facultyRecordList,
+        prevCursor,
+        nextCursor,
+        hasPrev,
+        hasNext,
         searchTerm, // We send this back to the UI
     };
 }

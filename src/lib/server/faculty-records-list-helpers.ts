@@ -1,4 +1,4 @@
-import { and, desc, eq, ilike, or } from 'drizzle-orm';
+import { and, asc, desc, eq, gt, ilike, lt } from 'drizzle-orm';
 
 import { db } from './db';
 
@@ -15,7 +15,13 @@ import {
     semester,
 } from './db/schema';
 
-export async function getFacultyRecordList(searchTerm: string | null) {
+const pageSize = 50;
+
+export async function getFacultyRecordList(searchTerm: string | null,
+    cursor?: number,
+    isNext: boolean = true,
+    initLoad: boolean = false,
+) {
     // Get entries for the current semester
     // TODO: Find a better way to know current semester
     const currentAcademicYear = 2026;
@@ -47,7 +53,7 @@ export async function getFacultyRecordList(searchTerm: string | null) {
         .as('search_sq');
 
     // Get faculty records from database
-    const shownFields = await db
+    const facultyRecordCountSq = await db
         .select({
             facultyid: searchSq.id,
             lastname: faculty.lastname,
@@ -55,9 +61,7 @@ export async function getFacultyRecordList(searchTerm: string | null) {
             status: faculty.status,
             ranktitle: rank.ranktitle,
             adminposition: adminposition.name,
-            logTimestamp: changelog.timestamp,
-            logMaker: appuser.email,
-            logOperation: changelog.operation,
+            latestchangelogid: faculty.latestchangelogid,
         })
         .from(faculty)
         .rightJoin(searchSq, eq(searchSq.id, faculty.facultyid))
@@ -78,8 +82,84 @@ export async function getFacultyRecordList(searchTerm: string | null) {
             adminposition,
             eq(adminposition.adminpositionid, facultyadminposition.adminpositionid),
         )
-        .leftJoin(changelog, eq(changelog.logid, faculty.latestchangelogid))
+        .where(
+            and(
+                cursor
+                    ? isNext
+                        ? gt(faculty.facultyid, cursor)
+                        : lt(faculty.facultyid, cursor)
+                    : // eslint-disable-next-line no-undefined -- can't use null in Drizzle WHERE queries
+                        undefined,
+                and(...filterQueries),
+            )
+        )
+        .orderBy(isNext ? asc(faculty.facultyid) : desc(faculty.facultyid))
+        .limit(pageSize + 1)
+        .as('faculty_record_count_sq');
+
+    // Check if there is a previous/next page
+    let hasPrev = !initLoad;
+    let hasNext = true;
+
+    console.log(await db.select().from(facultyRecordCountSq))
+    const facultyRecordCount = (await db.select().from(facultyRecordCountSq)).length;
+
+    if (isNext) hasNext = facultyRecordCount > pageSize;
+    else hasPrev = facultyRecordCount > pageSize;
+
+    // Chop off the extra record
+    const facultyRecordSq = await db
+        .select()
+        .from(facultyRecordCountSq)
+        .orderBy(isNext ? asc(facultyRecordCountSq.facultyid) : desc(facultyRecordCountSq.facultyid))
+        .limit(pageSize)
+        .as('user_sq');
+
+    // Get cursors
+    let [firstId] = await db
+        .select({
+            value: facultyRecordSq.facultyid,
+        })
+        .from(facultyRecordSq)
+        .orderBy(asc(facultyRecordSq.facultyid))
+        .limit(1);
+
+    let [lastId] = await db
+        .select({
+            value: facultyRecordSq.facultyid,
+        })
+        .from(facultyRecordSq)
+        .orderBy(desc(facultyRecordSq.facultyid))
+        .limit(1);
+
+    // Get changelogs
+    const shownFields = await db
+        .select({
+            facultyid: facultyRecordSq.facultyid,
+            lastname: facultyRecordSq.lastname,
+            firstname: facultyRecordSq.firstname,
+            status: facultyRecordSq.status,
+            ranktitle: facultyRecordSq.ranktitle,
+            adminposition: facultyRecordSq.adminposition,
+            logTimestamp: changelog.timestamp,
+            logMaker: appuser.email,
+            logOperation: changelog.operation,
+        })
+        .from(facultyRecordSq)
+        .leftJoin(changelog, eq(changelog.logid, facultyRecordSq.latestchangelogid))
         .leftJoin(appuser, eq(appuser.id, changelog.userid));
 
-    return shownFields;
+    // Reverse account list and cursors if previous page
+    if (!isNext) {
+        [lastId, firstId] = [firstId, lastId];
+        shownFields.reverse();
+    }
+
+    return {
+        facultyRecordList: shownFields,
+        prevCursor: firstId?.value,
+        nextCursor: lastId?.value,
+        hasPrev,
+        hasNext,
+    };
 }
