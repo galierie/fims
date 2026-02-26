@@ -783,36 +783,147 @@ export const accountSearchView = pgMaterializedView('account_search_view').as((q
     return view;
 });
 
-export const facultyRecordSearchView = pgMaterializedView('faculty_record_search_view').as((qb) => {
-    const changelogSq = qb
-        .select({
-            logid: changelog.logid,
-            timestamp: changelog.timestamp,
-            maker: appuser.email,
-            operation: changelog.operation,
-        })
-        .from(changelog)
-        .leftJoin(appuser, eq(appuser.id, changelog.userid))
-        .as('changelog_sq');
+export const facultyRecordSearchView = pgMaterializedView('faculty_record_search_view', {
+    id: integer(),
+    searchcontent: text(),
+}).as(sql`
+        SELECT
+            ${faculty.facultyid} AS id,
+            coalesce(${faculty.lastname}, '')
+                || ' ' || coalesce(${faculty.middlename}, '')
+                || ' ' || coalesce(${faculty.firstname}, '')
+                || ' ' || coalesce(${faculty.suffix}, '')
+                || ' ' || coalesce(${faculty.birthdate}::text, '')
+                || ' ' || coalesce(${status.status}, '') 
+                || ' ' || coalesce(${faculty.dateoforiginalappointment}::text, '')
+                AS searchcontent
+        FROM ${faculty}
+            LEFT JOIN ${status} ON ${faculty.status} = ${status.status}
+        UNION
+        SELECT
+            ${facultyeducationalattainment.facultyid} AS id,
+            coalesce(${facultyeducationalattainment.degree}, '')
+                || ' ' || coalesce(${facultyeducationalattainment.institution}, '')
+                || ' ' || coalesce(${facultyeducationalattainment.graduationyear}::text, '')
+                AS searchcontent
+        FROM ${facultyeducationalattainment}
+        UNION
+        SELECT
+            ${facultyfieldofinterest.facultyid} AS id,
+            coalesce(${fieldofinterest.field}, '') AS searchcontent
+        FROM ${facultyfieldofinterest}
+            LEFT JOIN ${fieldofinterest}
+                ON ${facultyfieldofinterest.fieldofinterestid} = ${fieldofinterest.fieldofinterestid}
+        UNION
+        SELECT
+            ${facultyrank.facultyid} AS id,
+            coalesce(${rank.ranktitle}, '')
+                || ' ' || coalesce(${rank.salarygrade}, '')
+                || ' ' || coalesce(${rank.salaryrate}::text, '')
+                || ' ' || coalesce(${facultyrank.appointmentstatus}, '')
+                || ' ' || coalesce(${facultyrank.dateoftenureorrenewal}::text, '')
+                AS searchcontent
+        FROM ${facultyrank}
+            LEFT JOIN ${rank} ON ${facultyrank.rankid} = ${rank.rankid}
+        UNION
+        SELECT
+            ${facultyemail.facultyid} AS id,
+            coalesce(${facultyemail.email}, '') AS searchcontent
+        FROM ${facultyemail}
+        UNION
+        SELECT
+            ${facultysemester.facultyid} AS id,
+            coalesce(${adminposition.name}, '')
+                || ' ' || coalesce(${office.name}, '')
+                || ' ' || coalesce(${facultyadminposition.startdate}::text, '')
+                || ' ' || coalesce(${facultyadminposition.enddate}::text, '')
+                AS searchcontent
+        FROM ${facultysemester}
+            LEFT JOIN ${facultyadminposition}
+                ON ${facultysemester.facultysemesterid} = ${facultyadminposition.facultysemesterid}
+            LEFT JOIN ${adminposition} ON ${facultyadminposition.adminpositionid} = ${adminposition.adminpositionid}
+            LEFT JOIN ${office} ON ${facultyadminposition.officeid} = ${office.officeid}
+        UNION
+        SELECT
+            ${facultysemester.facultyid} AS id,
+            coalesce(${facultycommmembership.membership}, '')
+                || ' ' || coalesce(${facultycommmembership.committee}, '')
+                || ' ' || coalesce(${facultycommmembership.startdate}::text, '')
+                || ' ' || coalesce(${facultycommmembership.enddate}::text, '')
+                AS searchcontent
+        FROM ${facultysemester}
+            LEFT JOIN ${facultycommmembership}
+                ON ${facultysemester.facultysemesterid} = ${facultycommmembership.facultysemesterid}
+        UNION
+        SELECT
+            ${facultysemester.facultyid} AS id,
+            coalesce(${facultyadminwork.natureofwork}, '')
+                || ' ' || coalesce(${office.name}, '')
+                || ' ' || coalesce(${facultyadminwork.startdate}::text, '')
+                || ' ' || coalesce(${facultyadminwork.enddate}::text, '')
+                AS searchcontent
+        FROM ${facultysemester}
+            LEFT JOIN ${facultyadminwork}
+                ON ${facultysemester.facultysemesterid} = ${facultyadminwork.facultysemesterid}
+            LEFT JOIN ${office} ON ${facultyadminwork.officeid} = ${office.officeid}
+        UNION
+        SELECT
+            ${facultysemester.facultyid} AS id,
+            coalesce(${course.coursename}, '')
+                || ' ' || coalesce(${facultycourse.section}, '')
+                || ' ' || coalesce(${facultycourse.numberofstudents}::text, '')
+                AS searchcontent
+        FROM ${facultysemester}
+            LEFT JOIN ${facultycourse}
+                ON ${facultysemester.facultysemesterid} = ${facultycourse.facultysemesterid}
+            LEFT JOIN ${course} ON ${facultycourse.courseid} = ${course.courseid}
+        UNION
+        SELECT
+            ${facultysemester.facultyid} AS id,
+            coalesce(${student.studentnumber}::text, '')
+                || ' ' || coalesce(${student.lastname}, '')
+                || ' ' || coalesce(${student.middlename}, '')
+                || ' ' || coalesce(${student.firstname}, '')
+                || ' ' || coalesce(${facultymentoring.category}, '')
+                || ' ' || coalesce(${facultymentoring.startdate}::text, '')
+                || ' ' || coalesce(${facultymentoring.enddate}::text, '')
+                AS searchcontent
+        FROM ${facultysemester}
+            LEFT JOIN ${facultymentoring}
+                ON ${facultysemester.facultysemesterid} = ${facultymentoring.facultysemesterid}
+            LEFT JOIN ${student} ON ${facultymentoring.studentnumber} = ${student.studentnumber}
+        UNION
+        SELECT
+            ${facultysemester.facultyid} AS id,
+            coalesce(${research.title}, '')
+                || ' ' || coalesce(${research.startdate}::text, '')
+                || ' ' || coalesce(${research.enddate}::text, '')
+                || ' ' || coalesce(${research.funding}, '')
+                AS searchcontent
+        FROM ${facultysemester}
+            LEFT JOIN ${facultyresearch}
+                ON ${facultysemester.facultysemesterid} = ${facultyresearch.facultysemesterid}
+            LEFT JOIN ${research} ON ${facultyresearch.researchid} = ${research.researchid}
+        UNION
+        SELECT
+            ${facultysemester.facultyid} AS id,
+            coalesce(${facultyextension.natureofextension}, '')
+                || ' ' || coalesce(${facultyextension.agency}, '')
+                || ' ' || coalesce(${facultyextension.startdate}::text, '')
+                || ' ' || coalesce(${facultyextension.enddate}::text, '')
+                AS searchcontent
+        FROM ${facultysemester}
+            LEFT JOIN ${facultyextension}
+                ON ${facultysemester.facultysemesterid} = ${facultyextension.facultysemesterid}
+        UNION
+        SELECT
+            ${facultysemester.facultyid} AS id,
+            coalesce(${facultystudyload.degreeprogram}, '')
+                || ' ' || coalesce(${facultystudyload.university}, '')
+                AS searchcontent
+        FROM ${facultysemester}
+            LEFT JOIN ${facultystudyload}
+                ON ${facultysemester.facultysemesterid} = ${facultystudyload.facultysemesterid}
+    `);
 
-    const searchcontentQuery = sql<string>`
-            coalesce(${appuser.email}, '')
-            || ' ' || coalesce(${userinfo.role}, '')
-            || ' ' || coalesce(${changelogSq.timestamp}::text, '')
-            || ' ' || coalesce(${changelogSq.maker}, '')
-            || ' ' || coalesce(${changelogSq.operation}, '')
-        `;
-
-    const view = qb
-        .select({
-            id: faculty.facultyid,
-            searchcontent: searchcontentQuery.as('search_content'),
-        })
-        .from(appuser)
-        .leftJoin(userinfo, eq(userinfo.userid, appuser.id))
-        .leftJoin(changelogSq, eq(changelogSq.logid, userinfo.latestchangelogid));
-
-    index('account_search_idx').using('gin', sql`${searchcontentQuery} gin_trgm_ops`);
-
-    return view;
-});
+index('faculty_record_search_idx').using('gin', sql`${facultyRecordSearchView.searchcontent} gin_trgm_ops`);
