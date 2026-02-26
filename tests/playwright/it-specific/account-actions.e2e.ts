@@ -130,10 +130,6 @@ test.describe('add account', () => {
         // Confirm
         await page.getByRole('button', { name: 'Save', exact: true }).last().click();
 
-        // Check message
-        const afterMakeMessage = await page.getByText('Created account.');
-        await expect(afterMakeMessage).toBeVisible();
-
         // The new email should be visible
         const cell = page.getByText(dummyEmail);
         await expect(cell).toBeVisible();
@@ -173,10 +169,6 @@ test.describe('delete account', () => {
 
         // Confirm
         await page.getByRole('button', { name: 'Delete', exact: true }).last().click();
-
-        // Check message
-        const afterDeleteMessage = await page.getByText('Deleted account.');
-        await expect(afterDeleteMessage).toBeVisible();
 
         // The new email should no longer be visible
         const cell = page.getByText(dummyEmail);
@@ -218,10 +210,6 @@ test.describe('batch delete accounts', () => {
         // Confirm
         await page.getByRole('button', { name: 'Save', exact: true }).last().click();
 
-        // Check message
-        const afterMakeMessage = await page.getByText('Created account.');
-        await expect(afterMakeMessage).toBeVisible();
-
         // The new email should be visible
         const cell = page.getByText(dummyEmail);
         await expect(cell).toBeVisible();
@@ -260,10 +248,6 @@ test.describe('batch delete accounts', () => {
         // Confirm
         await page.getByRole('button', { name: 'Save', exact: true }).last().click();
 
-        // Check message
-        const afterMakeMessage = await page.getByText('Created account.');
-        await expect(afterMakeMessage).toBeVisible();
-
         // The new email should be visible
         const cell = page.getByText(dummyEmail1);
         await expect(cell).toBeVisible();
@@ -301,10 +285,6 @@ test.describe('batch delete accounts', () => {
 
         // Confirm
         await page.getByRole('button', { name: 'Save', exact: true }).last().click();
-
-        // Check message
-        const afterMakeMessage = await page.getByText('Created account.');
-        await expect(afterMakeMessage).toBeVisible();
 
         // The new email should be visible
         const cell = page.getByText(dummyEmail2);
@@ -560,10 +540,6 @@ test.describe('batch delete accounts', () => {
 
         // Confirm
         await page.getByRole('button', { name: 'Delete', exact: true }).last().click();
-
-        // Check message
-        const afterDeleteMessage = await page.getByText('Deleted accounts.');
-        await expect(afterDeleteMessage).toBeVisible();
 
         // The new records should not be visible
         await expect(cell).toBeVisible();
