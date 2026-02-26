@@ -1,6 +1,6 @@
 <script lang="ts">
     import Icon from '@iconify/svelte';
-    import AccountRow from './(ui)/AccountRow.svelte';
+    import AccountRow from './ui/AccountRow.svelte';
     import GreenButton from '$lib/ui/GreenButton.svelte';
     import RedButton from '$lib/ui/RedButton.svelte';
     import FilterButton from '$lib/ui/FilterButton.svelte';

@@ -58,7 +58,6 @@ export async function load({ url }) {
             column: adminposition.name,
         },
     ];
-    */
 
     // Search
     const searchTerm = url.searchParams.get('search');

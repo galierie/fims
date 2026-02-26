@@ -3,7 +3,7 @@
     import { goto } from '$app/navigation';
     import { page } from '$app/state';
     import Icon from '@iconify/svelte';
-    import FacultyRecordRow from './(ui)/FacultyRecordRow.svelte';
+    import FacultyRecordRow from './ui/FacultyRecordRow.svelte';
     import GreenButton from '$lib/ui/GreenButton.svelte';
     import RedButton from '$lib/ui/RedButton.svelte';
     import DeleteConfirmation from '$lib/ui/DeleteConfirmation.svelte';
@@ -51,18 +51,6 @@
         url.searchParams.set('isNext', isNext ? '1' : '0');
         await goto(url.toString());
         isLoading = false;
-    }
-    
-    async function onRecordClick(id:number) {
-        const res = await fetch('/view-record', {
-            method: "POST",
-            body: JSON.stringify({requested:id}),
-            headers: {
-                'Content-Type': 'application/json'
-            },
-        });
-
-        goto('/record');
     }
 </script>
 
@@ -155,7 +143,7 @@
             class="flex justify-center [&>*>span]:text-center [&>*>span]:font-semibold [&>*>span]:text-white [&>div]:flex [&>div]:h-12 [&>div]:items-center [&>div]:bg-fims-green [&>div]:px-6"
         >
             <div class="w-25 justify-center"><span>Select</span></div>
-            <div class={canViewChangeLogs ? 'w-66 2xl:w-132' : 'w-91 2xl:w-182'}>
+            <div class={canViewChangeLogs ? 'w-66 2xl:w-132' : 'w-116 2xl:w-182'}>
                 <span>Full Name</span>
                 <Icon icon="tabler:arrow-up" class="ml-3 h-5 w-5 text-white" />
             </div>
@@ -183,7 +171,6 @@
                 {canViewChangeLogs}
                 isSelected={selectedIds.includes(facultyRecord.facultyid)}
                 onToggle={() => toggleSelection(facultyRecord.facultyid)}
-                clickCallback={onRecordClick}
             />
         {/each}
 

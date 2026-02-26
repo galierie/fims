@@ -199,6 +199,11 @@ export interface FacultyRecordDTO {
     logOperation: string | null;
 }
 
+export async function refreshFacultyRecordSearchView() {
+    // NOTE: Have faith na lang that this doesn't take too long
+    await db.refreshMaterializedView(facultyRecordSearchView);
+}
+
 export async function getAllStatuses() {
     const uniqueRows = await db
         .select({
