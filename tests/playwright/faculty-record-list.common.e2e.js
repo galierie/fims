@@ -79,9 +79,11 @@ test.describe('view faculty records common', async () => {
       await expect(page.getByText(status)).toBeVisible();
     }
 
+    /* see search-functions record-search.e2e
     await rankFilter.click()
     for (let prefix of expectedRankPrefixes) {
       await expect(page.getByText(`${prefix} 1`)).toBeVisible();
     }
+    */
   });
 });

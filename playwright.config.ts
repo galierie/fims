@@ -49,6 +49,12 @@ export default defineConfig({
             testDir: 'tests/playwright/recordselection',
             testMatch: /.e2e.(?:js|ts)/u,
         },
+        {
+            name: 'record-view', // searching tests
+            dependencies: ['common-tests', 'it-specific-tests', 'search-functions'],
+            testDir: 'tests/playwright/recordselection',
+            testMatch: /.e2e.(?:js|ts)/u,
+        },
 
         // logout tests
         {
@@ -59,6 +65,10 @@ export default defineConfig({
                 'common-tests',
                 'it-specific-tests',
                 'invalid-logins',
+
+                // sprint 2
+                'search-functions',
+                'record-view',
             ],
             testDir: 'tests/playwright/logout',
             testMatch: /.e2e.(?:js|ts)/u,
