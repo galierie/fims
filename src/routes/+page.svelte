@@ -1,5 +1,7 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
+    import { goto } from '$app/navigation';
+    import { page } from '$app/state';
     import Icon from '@iconify/svelte';
     import FacultyRecordRow from './(ui)/FacultyRecordRow.svelte';
     import GreenButton from '$lib/ui/GreenButton.svelte';
@@ -9,7 +11,14 @@
 
     type FacultyRecord = { facultyid: number };
     const { data, form } = $props();
-    const { facultyRecordList, canViewChangeLogs } = $derived(data);
+    const {
+        facultyRecordList,
+        canViewChangeLogs,
+        prevCursor,
+        nextCursor,
+        hasPrev,
+        hasNext,
+    } = $derived(data);
 
     let selectedIds = $state<number[]>([]);
 
@@ -28,6 +37,16 @@
 
     function deselectAll() {
         selectedIds = [];
+    }
+
+    async function goToPage(isNext: boolean = true) {
+        isLoading = true;
+        const cursor = isNext ? nextCursor : prevCursor;
+        const url = new URL(page.url);
+        if (cursor) url.searchParams.set('cursor', cursor.toString());
+        url.searchParams.set('isNext', isNext ? '1' : '0');
+        await goto(url.toString());
+        isLoading = false;
     }
 </script>
 
@@ -138,6 +157,20 @@
                 onToggle={() => toggleSelection(facultyRecord.facultyid)}
             />
         {/each}
+
+        <!-- Pagination Controls -->
+        <div class="mt-2 flex justify-center">
+            <div class="flex w-315 items-center justify-between 2xl:w-432">
+                <GreenButton onclick={() => goToPage(false)} type="button" disabled={!hasPrev}>
+                    <Icon icon="line-md:arrow-left-circle" class="mr-2 h-5 w-5" />
+                    <span>Previous</span>
+                </GreenButton>
+                <GreenButton onclick={() => goToPage(true)} type="button" disabled={!hasNext}>
+                    <span>Next</span>
+                    <Icon icon="line-md:arrow-right-circle" class="ml-2 h-5 w-5" />
+                </GreenButton>
+            </div>
+        </div>
     </div>
 </div>
 
