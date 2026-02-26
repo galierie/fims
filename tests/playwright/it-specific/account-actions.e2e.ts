@@ -43,7 +43,7 @@ test.describe('add account', () => {
             // Input
 
             // Email
-            const emailInput = page.getByRole('textbox', { name: 'Email', exact: true });
+            const emailInput = page.getByRole('textbox', { name: 'Enter email here', exact: true });
             await expect(emailInput).toBeEmpty();
             await expect(emailInput).toBeEditable();
             await emailInput.fill('dummy@gmail.com');
