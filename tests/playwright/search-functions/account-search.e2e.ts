@@ -24,7 +24,7 @@ test.describe('account search functions', async () => {
             await expect(page.getByText(consts.AdminAcc)).toBeVisible();
         });
 
-        await test('invalid search', async ({ page }) => {
+        await test('invalid search pt. 1', async ({ page }) => {
             await page.goto('/accounts');
             await expect(page).toHaveURL('/accounts');
 
@@ -60,7 +60,7 @@ test.describe('account search functions', async () => {
             await expect(page.getByText(consts.ITAcc)).toBeVisible();
         });
 
-        await test('invalid search', async ({ page }) => {
+        await test('invalid search pt. 2', async ({ page }) => {
             await page.goto('/accounts');
             await expect(page).toHaveURL('/accounts');
 
