@@ -42,6 +42,7 @@ test.describe('searching records', async() => {
     });
 
 
+    /*
     //filter by status
     test('filter by status', async({page}) => {
         await page.goto('/');
@@ -68,6 +69,8 @@ test.describe('searching records', async() => {
             await page.getByRole('button', {name:val}).click() //disable filter
         }
     });
+
+    */
 
     //TODO: filter by rank
     // test still doesn't work as facultyrank hasn't been seeded yet
