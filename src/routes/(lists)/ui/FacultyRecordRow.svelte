@@ -20,7 +20,6 @@
         logMaker,
         logOperation,
     }: FacultyRecordDTO = $derived(facultyRecord);
-
 </script>
 
 {#if facultyid !== null}
@@ -35,7 +34,10 @@
                 class="h-5 w-5 rounded-sm checked:bg-fims-gray focus:ring-0"
             />
         </div>
-        <a href="/faculty/{facultyid}" class="flex justify-center [&>div]:flex [&>div]:h-12 [&>div]:items-center [&>div]:border-b [&>div]:border-fims-gray [&>div]:bg-white [&>div]:px-6">
+        <a
+            href="/faculty/{facultyid}"
+            class="flex justify-center [&>div]:flex [&>div]:h-12 [&>div]:items-center [&>div]:border-b [&>div]:border-fims-gray [&>div]:bg-white [&>div]:px-6"
+        >
             <div class={canViewChangeLogs ? 'w-66 2xl:w-132' : 'w-116 2xl:w-182'}>
                 <span>{lastname}, {firstname}</span>
             </div>
@@ -47,7 +49,9 @@
         </a>
         {#if canViewChangeLogs}
             <div class="w-50">
-                <span class="truncate text-[#535353]">{logMaker} ({logTimestamp}): {logOperation}</span>
+                <span class="truncate text-[#535353]"
+                    >{logMaker} ({logTimestamp}): {logOperation}</span
+                >
             </div>
         {/if}
     </div>

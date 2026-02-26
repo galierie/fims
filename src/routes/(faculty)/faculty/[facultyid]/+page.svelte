@@ -1,14 +1,14 @@
 <script lang="ts">
-    import Icon from "@iconify/svelte";
-    import GreenButton from "$lib/ui/GreenButton.svelte";
-    import RedButton from "$lib/ui/RedButton.svelte";
-    import DeleteConfirmation from "$lib/ui/DeleteConfirmation.svelte";
-    import LoadingScreen from "$lib/ui/LoadingScreen.svelte";
+    import Icon from '@iconify/svelte';
+    import GreenButton from '$lib/ui/GreenButton.svelte';
+    import RedButton from '$lib/ui/RedButton.svelte';
+    import DeleteConfirmation from '$lib/ui/DeleteConfirmation.svelte';
+    import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
 
-    import { enhance } from "$app/forms";
-    import { page } from "$app/state";
+    import { enhance } from '$app/forms';
+    import { page } from '$app/state';
 
-    let { data, form } = $props();
+    const { data, form } = $props();
     const { lastname, firstname } = $derived(data);
 
     let willDelete = $state(false);
@@ -27,11 +27,13 @@
 {/if}
 
 <div>
-    <a href="/" class="text-fims-green flex items-center h-7">
-        <Icon icon="line-md:arrow-left-circle" class="h-6 w-6 mr-2" />
+    <a href="/" class="flex h-7 items-center text-fims-green">
+        <Icon icon="line-md:arrow-left-circle" class="mr-2 h-6 w-6" />
         <span class="underline">Back to List of Faculty Records</span>
     </a>
-    <h1 class="text-3xl text-fims-green font-semibold mt-8" id="name-display">{lastname}, {firstname}</h1>
+    <h1 class="mt-8 text-3xl font-semibold text-fims-green" id="name-display">
+        {lastname}, {firstname}
+    </h1>
     <div class="mt-4 flex justify-between">
         <GreenButton>
             <Icon icon="tabler:file-export" class="mr-2 h-5 w-5" />

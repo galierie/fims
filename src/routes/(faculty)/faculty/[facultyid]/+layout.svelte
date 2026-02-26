@@ -1,5 +1,5 @@
 <script>
-    const { children } = $props()
+    const { children } = $props();
 </script>
 
 <main class="bg-[#e9e9e9]">

@@ -26,21 +26,16 @@ export async function load({ locals, url }) {
             canViewChangeLogs,
             accountColor: accountColorMap.get(userRole),
         };
-    } else {
-        if (
-            !url.pathname.startsWith('/login') &&
-            !url.pathname.startsWith('/api/auth')
-        ) {
-            throw redirect(307, '/login');
-        } else {
-            return {
-                isLoggedIn: false,
-                isViewingRecord: false,
-                email: '',
-                canViewAccounts: false,
-                canViewChangeLogs: false,
-                accountColor: '',
-            };
-        }
     }
+    if (!url.pathname.startsWith('/login') && !url.pathname.startsWith('/api/auth'))
+        throw redirect(307, '/login');
+    else
+        return {
+            isLoggedIn: false,
+            isViewingRecord: false,
+            email: '',
+            canViewAccounts: false,
+            canViewChangeLogs: false,
+            accountColor: '',
+        };
 }

@@ -103,10 +103,7 @@ export async function deleteFacultyRecords(makerid: string, ids: number[]) {
 // grabs an individual record
 // made this as the faculty record list only gets display information
 export async function getFacultyRecord(facultyid: number) {
-    const response = await db
-        .select()
-        .from(faculty)
-        .where(eq(faculty.facultyid, facultyid));
+    const response = await db.select().from(faculty).where(eq(faculty.facultyid, facultyid));
 
     if (response.length === 0) return null;
 
