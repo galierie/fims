@@ -53,8 +53,13 @@ export async function getFacultyRecordList(
             id: facultyRecordSearchView.id,
         })
         .from(facultyRecordSearchView)
-        // eslint-disable-next-line no-undefined -- can't use null in Drizzle WHERE queries
-        .where(searchTerm ? ilike(facultyRecordSearchView.searchcontent, `%${searchTerm}%`) : undefined)
+
+        .where(
+            searchTerm
+                ? ilike(facultyRecordSearchView.searchcontent, `%${searchTerm}%`)
+                : // eslint-disable-next-line no-undefined -- can't use null in Drizzle WHERE queries
+                  undefined,
+        )
         .as('search_sq');
 
     // Process filter queries
@@ -106,9 +111,9 @@ export async function getFacultyRecordList(
                         ? gt(faculty.facultyid, cursor)
                         : lt(faculty.facultyid, cursor)
                     : // eslint-disable-next-line no-undefined -- can't use null in Drizzle WHERE queries
-                        undefined,
+                      undefined,
                 and(...filterQueries),
-            )
+            ),
         )
         .orderBy(isNext ? asc(faculty.facultyid) : desc(faculty.facultyid))
         .limit(pageSize + 1)
@@ -127,7 +132,9 @@ export async function getFacultyRecordList(
     const facultyRecordSq = await db
         .select()
         .from(facultyRecordCountSq)
-        .orderBy(isNext ? asc(facultyRecordCountSq.facultyid) : desc(facultyRecordCountSq.facultyid))
+        .orderBy(
+            isNext ? asc(facultyRecordCountSq.facultyid) : desc(facultyRecordCountSq.facultyid),
+        )
         .limit(pageSize)
         .as('user_sq');
 
@@ -198,7 +205,7 @@ export async function getAllStatuses() {
             status: status.status,
         })
         .from(status);
-    
+
     const uniqueValues = uniqueRows.map(({ status }) => status);
     return uniqueValues;
 }

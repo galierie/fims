@@ -32,9 +32,9 @@
     }
 </script>
 
-<div class="h-10 w-full flex items-center justify-between *:mx-1">
+<div class="flex h-10 w-full items-center justify-between *:mx-1">
     <input
-        class="border-0 w-full px-7.5 placeholder-fims-gray focus:ring-0 rounded-full bg-white"
+        class="w-full rounded-full border-0 bg-white px-7.5 placeholder-fims-gray focus:ring-0"
         name="search"
         type="text"
         placeholder="Search"
@@ -44,12 +44,23 @@
             if (event.key === 'Enter') await search();
         }}
     />
-    <GreenButton type="button" onclick={async () => { await search() }}>
-        <Icon icon="line-md:search" class="h-5 w-5 mr-2" />
+    <GreenButton
+        type="button"
+        onclick={async () => {
+            await search();
+        }}
+    >
+        <Icon icon="line-md:search" class="mr-2 h-5 w-5" />
         <span>Search</span>
     </GreenButton>
-    <RedButton type="button" onclick={async () => { searchTerm = ''; await search(); }}>
-        <Icon icon="tabler:x" class="h-5 w-5 mr-2" />
+    <RedButton
+        type="button"
+        onclick={async () => {
+            searchTerm = '';
+            await search();
+        }}
+    >
+        <Icon icon="tabler:x" class="mr-2 h-5 w-5" />
         <span>Clear</span>
     </RedButton>
 </div>

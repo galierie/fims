@@ -17,7 +17,7 @@ export async function getAccountList(
     initLoad: boolean = false,
 ) {
     // Search in search table all appusers affected
-    const searchSQ = await db
+    const searchSq = await db
         .select({
             id: accountSearchView.id,
         })
@@ -41,14 +41,14 @@ export async function getAccountList(
     // Get accounts from database
     const userCountSq = await db
         .select({
-            userid: searchSQ.id,
+            userid: searchSq.id,
             userinfoid: userinfo.userinfoid,
             email: appuser.email,
             role: userinfo.role,
             latestchangelogid: userinfo.latestchangelogid,
         })
         .from(appuser)
-        .rightJoin(searchSQ, eq(searchSQ.id, appuser.id))
+        .rightJoin(searchSq, eq(searchSq.id, appuser.id))
         .leftJoin(userinfo, eq(userinfo.userid, appuser.id))
         .where(
             and(

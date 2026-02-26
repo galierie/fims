@@ -1,14 +1,11 @@
 import { sql } from 'drizzle-orm';
-import { db } from './index';
+
 import { course, rank, role, status } from './schema';
+import { db } from './index';
 
 // TODO: Check if tama
 
-export const statuses = [
-    { status: 'Active' },
-    { status: 'On Leave' },
-    { status: 'Sabbatical' },
-];
+export const statuses = [{ status: 'Active' }, { status: 'On Leave' }, { status: 'Sabbatical' }];
 
 export const ranks = [
     {
@@ -204,16 +201,12 @@ export const roles = [
     },
 ];
 
-
 async function seedStatusTable() {
     // Don't proceed if table is already seeded
     const rows = await db.select().from(status).limit(1);
     if (rows.length > 0) return { success: true };
 
-    const response = await db
-        .insert(status)
-        .values(statuses)
-        .returning();
+    const response = await db.insert(status).values(statuses).returning();
 
     // Check response
     return { success: response.length === 3 };
@@ -224,10 +217,7 @@ async function seedRankTable() {
     const rows = await db.select().from(rank).limit(1);
     if (rows.length > 0) return { success: true };
 
-    const response = await db
-        .insert(rank)
-        .values(ranks)
-        .returning();
+    const response = await db.insert(rank).values(ranks).returning();
 
     // Check response
     return { success: response.length === 3 };
@@ -238,10 +228,7 @@ async function seedCourseTable() {
     const rows = await db.select().from(course).limit(1);
     if (rows.length > 0) return { success: true };
 
-    const response = await db
-        .insert(course)
-        .values(courses)
-        .returning();
+    const response = await db.insert(course).values(courses).returning();
 
     // Check response
     return { success: response.length === 3 };
@@ -252,10 +239,7 @@ async function seedRoleTable() {
     const rows = await db.select().from(role).limit(1);
     if (rows.length > 0) return { success: true };
 
-    const response = await db
-        .insert(role)
-        .values(roles)
-        .returning();
+    const response = await db.insert(role).values(roles).returning();
 
     // Check response
     return { success: response.length === 3 };

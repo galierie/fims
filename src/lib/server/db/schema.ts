@@ -926,4 +926,7 @@ export const facultyRecordSearchView = pgMaterializedView('faculty_record_search
                 ON ${facultysemester.facultysemesterid} = ${facultystudyload.facultysemesterid}
     `);
 
-index('faculty_record_search_idx').using('gin', sql`${facultyRecordSearchView.searchcontent} gin_trgm_ops`);
+index('faculty_record_search_idx').using(
+    'gin',
+    sql`${facultyRecordSearchView.searchcontent} gin_trgm_ops`,
+);

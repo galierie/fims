@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { FacultyRecordDTO } from "$lib/server/faculty-records-list-helpers";
+    import type { FacultyRecordDTO } from '$lib/server/faculty-records-list-helpers';
 
     interface Props {
         facultyRecord: FacultyRecordDTO;

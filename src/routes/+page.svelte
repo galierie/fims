@@ -36,7 +36,7 @@
 
     function selectAll() {
         selectedIds = facultyRecordList.map(({ facultyid }) => facultyid);
-        selectedIds = selectedIds.filter(elem => elem !== null);
+        selectedIds = selectedIds.filter((elem) => elem !== null);
     }
 
     function deselectAll() {
@@ -117,7 +117,7 @@
                     <GreenButton onclick={selectAll}>Select All</GreenButton>
                     <RedButton onclick={deselectAll}>Deselect Selection</RedButton>
                     <GreenButton>
-                        <Icon icon="tabler:file-export" class="h-5 w-5 mr-2" />
+                        <Icon icon="tabler:file-export" class="mr-2 h-5 w-5" />
                         <span>Export Reports</span>
                     </GreenButton>
                 </div>

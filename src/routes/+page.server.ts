@@ -1,9 +1,14 @@
 import { fail } from '@sveltejs/kit';
 
+import { adminposition, faculty, rank } from '$lib/server/db/schema';
 import { deleteFacultyRecords } from '$lib/server/db-helpers';
 import type { FilterColumn, FilterObject } from '$lib/types/filter';
-import { getAllAdminPositions, getAllRankTitles, getAllStatuses, getFacultyRecordList } from '$lib/server/faculty-records-list-helpers';
-import { adminposition, faculty, rank } from '$lib/server/db/schema';
+import {
+    getAllAdminPositions,
+    getAllRankTitles,
+    getAllStatuses,
+    getFacultyRecordList,
+} from '$lib/server/faculty-records-list-helpers';
 
 export async function load({ url }) {
     // Extract queries
@@ -58,13 +63,14 @@ export async function load({ url }) {
     const searchTerm = url.searchParams.get('search');
 
     // Get faculty record list
-    const { facultyRecordList, prevCursor, nextCursor, hasPrev, hasNext } = await getFacultyRecordList(
-        searchTerm,
-        filterMap,
-        newCursor,
-        isNext,
-        !newCursorStr && !isNextStr,
-    );
+    const { facultyRecordList, prevCursor, nextCursor, hasPrev, hasNext } =
+        await getFacultyRecordList(
+            searchTerm,
+            filterMap,
+            newCursor,
+            isNext,
+            !newCursorStr && !isNextStr,
+        );
 
     return {
         facultyRecordList,
