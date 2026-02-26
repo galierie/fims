@@ -16,7 +16,6 @@ accs with invalid roles (that shouldn't be possible i think)
 const validAcc = consts.ITAcc;
 
 const emailFail = 'Invalid email.';
-//const emptyPassFail = 'Empty password.';
 const genericFail = 'Invalid email or password'; //for some reason this lacks a period
 
 //seeds dummy data
@@ -45,7 +44,7 @@ test.describe('invalid login cases', () => {
 
         /*
         // Await fail route and expect appropriate fail message
-        await expect(page).toHaveURL('/login?/signInEmail');
+        await expect(page).toHaveURL('/login');
         await expect(page.getByText(emailFail, { exact: true })).toBeVisible();
         */
 
@@ -79,8 +78,7 @@ test.describe('invalid login cases', () => {
         await pwInput.press('Enter');
 
         // Await fail route and expect appropriate fail message
-        await expect(page).toHaveURL('/login?/signInEmail');
-        await expect(page.getByText(emptyPassFail, { exact: true })).toBeVisible();
+        await expect(page).toHaveURL('/login');
     });
     */
     test('generic fail case', async ({ page }) => {
@@ -102,7 +100,7 @@ test.describe('invalid login cases', () => {
 
         /*
         // Await fail route and expect appropriate fail message
-        await expect(page).toHaveURL('/login?/signInEmail');
+        await expect(page).toHaveURL('/login');
         await expect(page.getByText(genericFail, { exact: true })).toBeVisible();
         */
 
@@ -131,7 +129,7 @@ test.describe('invalid login cases', () => {
 
         /*
         // Await fail route and expect appropriate fail message
-        await expect(page).toHaveURL('/login?/signInEmail');
+        await expect(page).toHaveURL('/login');
         await expect(page.getByText(genericFail, { exact: true })).toBeVisible();
         */
 
