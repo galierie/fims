@@ -100,52 +100,6 @@ export async function deleteFacultyRecords(makerid: string, ids: number[]) {
     return { success: true };
 }
 
-//made this to easily test faculty record selection and deletion
-//only difference is that the last where is removed
-//as the lack of changelogs removes everything
-export async function getDummyFacultyRecordList() {
-    /*
-    const [currentSemester] = await db
-        .select({
-            acadsemesterid: semester.acadsemesterid,
-        })
-        .from(semester)
-        .orderBy(desc(semester.academicyear))
-        .limit(1);
-
-    const shownFields = await db
-        .select({
-            facultyid: faculty.facultyid,
-            lastname: faculty.lastname,
-            firstname: faculty.firstname,
-            status: faculty.status,
-            ranktitle: rank.ranktitle,
-            adminposition: adminposition.name,
-            logTimestamp: changelog.timestamp,
-            logMaker: appuser.email,
-            logOperation: changelog.operation,
-        })
-        .from(rank)
-        .rightJoin(facultyrank, eq(facultyrank.rankid, rank.rankid))
-        .rightJoin(facultysemester, eq(facultysemester.currentrankid, facultyrank.facultyrankid))
-        .rightJoin(faculty, eq(faculty.facultyid, facultysemester.facultyid))
-        .leftJoin(
-            facultyadminposition,
-            eq(facultyadminposition.facultysemesterid, facultysemester.facultysemesterid),
-        )
-        .leftJoin(
-            adminposition,
-            eq(adminposition.adminpositionid, facultyadminposition.adminpositionid),
-        )
-        .leftJoin(changelog, eq(changelog.logid, faculty.latestchangelogid))
-        .leftJoin(appuser, eq(appuser.id, changelog.userid))
-    
-
-    return shownFields;
-    */
-    return dummyRecordList;
-}
-
 // grabs an individual record
 // made this as the faculty record list only gets display information
 export async function getFacultyRecord(facultyID:number) {
