@@ -1,4 +1,6 @@
 import { expect, test } from "@playwright/test";
+import { expectedRankPrefixes } from "../test-consts";
+import { expectedStatuses } from "../test-consts";
 
 const facultyRecordTableHeaders = [
   'Full Name',
@@ -62,5 +64,24 @@ test.describe('view faculty records as it', async () => {
     // Check faculty record change logs by checking the table header alone
     const changeLogCell = await page.getByText('Change Logs', { exact: true });
     await expect(changeLogCell).toBeVisible();
+  });
+});
+
+test.describe('view faculty records common', async () => {
+  test.use({ storageState: 'playwright/.auth/it.json'});
+
+  test('check filter displays', async ({page}) => {
+    const statusFilter = page.getByRole("button", {name: 'Status:'});
+    const rankFilter = page.getByRole("button", {name: 'Rank:'});
+
+    await statusFilter.click()
+    for (let status of expectedStatuses) {
+      await expect(page.getByText(status)).toBeVisible();
+    }
+
+    await rankFilter.click()
+    for (let prefix of expectedRankPrefixes) {
+      await expect(page.getByText(`${prefix} 1`)).toBeVisible();
+    }
   });
 });

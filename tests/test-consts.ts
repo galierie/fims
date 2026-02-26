@@ -1,9 +1,27 @@
 //for the tests to work with different test accounts
-const ITAcc = "testacc@up.edu.ph"
-const AdminAcc = "testadmin@up.edu.ph"
+export const ITAcc = "testacc@up.edu.ph";
+export const AdminAcc = "testadmin@up.edu.ph";
 
-const ITPass = "password"
-const AdminPass = "adminpass"
+export const ITPass = "password";
+export const AdminPass = "adminpass";
+
+
+// in the case your sample data is different
+export const expectedFacultyName = "Dela Cruz, Juan";
+
+
+export const expectedStatuses = [
+    'Active',
+    'On Leave',
+    'Sabbatical',
+];
+
+export const expectedRankPrefixes = [
+    'Instructor',
+    'Assistant Professor',
+    'Associate Professor',
+    'Professor',
+];
 
 //specific db instance for the tests.
 //uses the same schema though since the schema has no runes.
