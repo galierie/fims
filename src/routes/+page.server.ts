@@ -4,8 +4,10 @@ import { deleteFacultyRecords } from '$lib/server/db-helpers';
 import { getFacultyRecordList } from '$lib/server/faculty-records-list-helpers';
 
 export async function load({ url }) {
-    // Extract 'search' from the URL (e.g., localhost:5173/?search=Zach)
-    const searchTerm = url.searchParams.get('search') || '';
+    // Extract queries
+
+    // Search
+    const searchTerm = url.searchParams.get('search');
 
     // Pass the term to your helper
     const facultyRecordList = await getFacultyRecordList(searchTerm);
