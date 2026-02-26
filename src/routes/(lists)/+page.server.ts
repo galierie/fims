@@ -8,6 +8,7 @@ import {
     getAllRankTitles,
     getAllStatuses,
     getFacultyRecordList,
+    refreshFacultyRecordSearchView,
 } from '$lib/server/faculty-records-list-helpers';
 
 export async function load({ url }) {
@@ -92,6 +93,7 @@ export const actions = {
         try {
             const ids = JSON.parse(idsString);
             const response = await deleteFacultyRecords(locals.user.id, ids);
+            await refreshFacultyRecordSearchView();
             return {
                 ...response,
                 message: response.success ? 'Deleted records.' : 'Failed to delete records.',

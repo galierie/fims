@@ -1,9 +1,9 @@
 import { expect, test } from '@playwright/test';
 
-test.describe('log-out as admin', () => {
+test.describe('log-out as admin', async () => {
     test.use({ storageState: 'playwright/.auth/admin.json' });
 
-    test('admin', async ({ page }) => {
+    await test('admin', async ({ page }) => {
         // No redirection since user is logged-in
         await page.goto('/');
         await expect(page).toHaveURL('/');
@@ -17,10 +17,10 @@ test.describe('log-out as admin', () => {
     });
 });
 
-test.describe('log-out as it', () => {
+test.describe('log-out as it', async () => {
     test.use({ storageState: 'playwright/.auth/it.json' });
 
-    test('it', async ({ page }) => {
+    await test('it', async ({ page }) => {
         // No redirection since user is logged-in
         await page.goto('/');
         await expect(page).toHaveURL('/');

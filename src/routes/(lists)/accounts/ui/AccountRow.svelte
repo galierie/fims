@@ -1,7 +1,5 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
-    import { goto } from '$app/navigation';
-    import { page } from '$app/state';
     import type { AccountDTO } from '$lib/server/account-list-helpers';
     import RedButton from '$lib/ui/RedButton.svelte';
     import Icon from '@iconify/svelte';
@@ -72,7 +70,6 @@
                         isDeleting = true;
                         return async ({ update }) => {
                             await update();
-                            await goto(page.url.pathname);
                             isDeleting = false;
                         };
                     }
