@@ -118,7 +118,6 @@ export async function getFacultyRecordList(
     let hasPrev = !initLoad;
     let hasNext = true;
 
-    console.log(await db.select().from(facultyRecordCountSq))
     const facultyRecordCount = (await db.select().from(facultyRecordCountSq)).length;
 
     if (isNext) hasNext = facultyRecordCount > pageSize;
