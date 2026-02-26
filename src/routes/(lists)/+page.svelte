@@ -125,8 +125,7 @@
                     <RedButton onclick={() => (willBatchDelete = true)}>
                         <Icon icon="tabler:trash" class="mr-2 h-6 w-6" />
                         <span
-                            >Delete {selectedIds.length}
-                            {selectedIds.length > 1 ? 'Records' : 'Record'}</span
+                            >Delete {selectedIds.length > 1 ? 'Records' : 'Record'}</span
                         >
                     </RedButton>
                 </div>
