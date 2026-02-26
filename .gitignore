@@ -38,3 +38,6 @@ drizzle
 
 # Vitest
 /vitest-results
+
+# Dummy Data Scripts
+/scripts

@@ -6,14 +6,16 @@
     import NavBar from './(ui)/NavBar.svelte';
 
     const { data, children } = $props();
-    const { isLoggedIn, canViewAccounts, accountColor, email } = $derived(data);
+    const { isLoggedIn, isViewingRecord, canViewAccounts, accountColor, email } = $derived(data);
 </script>
 
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
 
 {#if isLoggedIn}
     <Header {accountColor} {email} />
-    <NavBar {canViewAccounts} {accountColor} />
+    {#if !isViewingRecord}
+        <NavBar {canViewAccounts} {accountColor} />
+    {/if}
     <main class="min-h-screen bg-[#e9e9e9]">
         {@render children()}
     </main>

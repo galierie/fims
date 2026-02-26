@@ -1,33 +1,68 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
+    import { goto } from '$app/navigation';
+    import { page } from '$app/state';
     import Icon from '@iconify/svelte';
     import FacultyRecordRow from './(ui)/FacultyRecordRow.svelte';
     import GreenButton from '$lib/ui/GreenButton.svelte';
     import RedButton from '$lib/ui/RedButton.svelte';
     import DeleteConfirmation from '$lib/ui/DeleteConfirmation.svelte';
+    import FilterButton from '$lib/ui/FilterButton.svelte';
     import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
+    import SearchBar from '$lib/ui/SearchBar.svelte';
 
-    type FacultyRecord = { facultyid: number };
     const { data, form } = $props();
-    const { facultyRecordList, canViewChangeLogs } = $derived(data);
+    const {
+        facultyRecordList,
+        canViewChangeLogs,
+        prevCursor,
+        nextCursor,
+        hasPrev,
+        hasNext,
+        filters,
+        searchTerm,
+    } = $derived(data);
 
-    let selectedIds = $state<number[]>([]);
+    let selectedIds: Array<number | null> = $state([]);
 
-    let isModalOpen = $state(false);
+    let willBatchDelete = $state(false);
     let isLoading = $state(false);
     let deleteForm: HTMLFormElement | null = $state(null);
 
-    function toggleSelection(id: number) {
+    function toggleSelection(id: number | null) {
         if (selectedIds.includes(id)) selectedIds = selectedIds.filter((i) => i !== id);
         else selectedIds = [...selectedIds, id];
     }
 
     function selectAll() {
-        selectedIds = facultyRecordList.map((f: FacultyRecord) => f.facultyid);
+        selectedIds = facultyRecordList.map(({ facultyid }) => facultyid);
+        selectedIds = selectedIds.filter((elem) => elem !== null);
     }
 
     function deselectAll() {
         selectedIds = [];
+    }
+
+    async function goToPage(isNext: boolean = true) {
+        isLoading = true;
+        const cursor = isNext ? nextCursor : prevCursor;
+        const url = new URL(page.url);
+        if (cursor) url.searchParams.set('cursor', cursor.toString());
+        url.searchParams.set('isNext', isNext ? '1' : '0');
+        await goto(url.toString());
+        isLoading = false;
+    }
+    
+    async function onRecordClick(id:number) {
+        const res = await fetch('/view-record', {
+            method: "POST",
+            body: JSON.stringify({requested:id}),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+
+        goto('/record');
     }
 </script>
 
@@ -60,52 +95,65 @@
     {/if}
 {/if}
 
-<div class="mx-auto mt-20 w-full max-w-4xl px-6">
-    <form method="GET" action="/" class="flex items-center gap-4">
-        <div class="relative w-full">
-            <input
-                type="text"
-                name="search"
-                value={data.searchTerm}
-                placeholder="Search faculty by name..."
-                class="h-12 w-full rounded-full border-2 border-fims-green bg-white px-6 py-2 outline-none focus:ring-2 focus:ring-fims-green"
-            />
-        </div>
-        <button
-            type="submit"
-            class="hover:bg-opacity-90 h-12 rounded-full bg-fims-green px-8 font-semibold text-white"
-        >
-            Search
-        </button>
-        {#if data.searchTerm}
-            <a href="/" class="font-medium text-fims-red underline">Clear</a>
-        {/if}
-    </form>
-</div>
-
 <div>
-    <div class="mt-15 flex justify-center">
-        <div class="flex h-20 w-315 items-end justify-between 2xl:w-432">
-            {#if selectedIds.length > 0}
+    <!-- Search Bar -->
+    <div class="mt-25 flex justify-center">
+        <div class="flex w-315 items-center 2xl:w-432">
+            <SearchBar bind:isSearching={isLoading} {searchTerm} />
+        </div>
+    </div>
+
+    <!-- Filter Buttons -->
+    <div class="mt-1 flex justify-center">
+        <div class="flex w-315 items-center 2xl:w-432">
+            <span class="mr-1">Show:</span>
+            {#each filters as { name, filter, opts, selectedOpts } (name)}
+                <div class="mr-1">
+                    <FilterButton
+                        {name}
+                        {filter}
+                        {opts}
+                        {selectedOpts}
+                        bind:isFiltering={isLoading}
+                    />
+                </div>
+            {/each}
+        </div>
+    </div>
+
+    <!-- Show on Row Select -->
+    <div class="flex justify-center">
+        {#if selectedIds.length > 0}
+            <div class="mt-6 flex w-315 justify-between 2xl:w-432">
                 <div class="flex gap-2">
                     <GreenButton onclick={selectAll}>Select All</GreenButton>
                     <RedButton onclick={deselectAll}>Deselect Selection</RedButton>
+                    <GreenButton>
+                        <Icon icon="tabler:file-export" class="mr-2 h-5 w-5" />
+                        <span>Export Reports</span>
+                    </GreenButton>
                 </div>
                 <div>
-                    <RedButton onclick={() => (isModalOpen = true)}>
+                    <RedButton onclick={() => (willBatchDelete = true)}>
                         <Icon icon="tabler:trash" class="mr-2 h-6 w-6" />
-                        <span>Delete ({selectedIds.length})</span>
+                        <span
+                            >Delete {selectedIds.length}
+                            {selectedIds.length > 1 ? 'Records' : 'Record'}</span
+                        >
                     </RedButton>
                 </div>
-            {/if}
-        </div>
+            </div>
+        {:else}
+            <div class="mt-15"></div>
+        {/if}
     </div>
+
+    <!-- Faculty Record List Table -->
     <div class="mt-2.5">
-        <!-- Faculty Record List Table -->
+        <!-- Header -->
         <div
             class="flex justify-center [&>*>span]:text-center [&>*>span]:font-semibold [&>*>span]:text-white [&>div]:flex [&>div]:h-12 [&>div]:items-center [&>div]:bg-fims-green [&>div]:px-6"
         >
-            <!-- Header -->
             <div class="w-25 justify-center"><span>Select</span></div>
             <div class={canViewChangeLogs ? 'w-66 2xl:w-132' : 'w-91 2xl:w-182'}>
                 <span>Full Name</span>
@@ -135,8 +183,23 @@
                 {canViewChangeLogs}
                 isSelected={selectedIds.includes(facultyRecord.facultyid)}
                 onToggle={() => toggleSelection(facultyRecord.facultyid)}
+                clickCallback={onRecordClick}
             />
         {/each}
+
+        <!-- Pagination Controls -->
+        <div class="mt-2 flex justify-center">
+            <div class="flex w-315 items-center justify-between 2xl:w-432">
+                <GreenButton onclick={() => goToPage(false)} type="button" disabled={!hasPrev}>
+                    <Icon icon="line-md:arrow-left-circle" class="mr-2 h-5 w-5" />
+                    <span>Previous</span>
+                </GreenButton>
+                <GreenButton onclick={() => goToPage(true)} type="button" disabled={!hasNext}>
+                    <span>Next</span>
+                    <Icon icon="line-md:arrow-right-circle" class="ml-2 h-5 w-5" />
+                </GreenButton>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -144,15 +207,14 @@
     <LoadingScreen />
 {/if}
 
-{#if isModalOpen && !isLoading}
+{#if willBatchDelete}
     <form
         bind:this={deleteForm}
         method="POST"
         action="?/delete"
         use:enhance={() => {
-            isModalOpen = false;
+            willBatchDelete = false;
             isLoading = true;
-
             return async ({ update }) => {
                 selectedIds = [];
                 await update();
@@ -163,8 +225,8 @@
         <input type="hidden" name="ids" value={JSON.stringify(selectedIds)} />
 
         <DeleteConfirmation
-            text={`Are you sure you want to delete ${selectedIds.length} faculty record(s)?`}
-            onCancel={() => (isModalOpen = false)}
+            text={`Are you sure you want to delete ${selectedIds.length} faculty ${selectedIds.length > 1 ? 'records' : 'record'}?`}
+            onCancel={() => (willBatchDelete = false)}
             onDelete={() => {
                 if (deleteForm) deleteForm.requestSubmit();
             }}

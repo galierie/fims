@@ -1,6 +1,7 @@
 import { redirect } from '@sveltejs/kit';
 
 import { getPermissions, getRole } from '$lib/server/db-helpers.js';
+import { seedDatabase } from '$lib/server/db/seed-db.js';
 
 export async function load({ locals, url }) {
     if (
@@ -21,10 +22,13 @@ export async function load({ locals, url }) {
         accountColorMap.set('IT', 'fims-red');
         accountColorMap.set('Admin', 'fims-green');
 
+        await seedDatabase();
+
         return {
             isLoggedIn: true, // if it's not, then this line shouldn't have been reached
             email: locals.user.email,
             canViewAccounts: canaddaccount || canmodifyaccount,
+            isViewingRecord: url.pathname.startsWith('/record'),
             canViewChangeLogs,
             accountColor: accountColorMap.get(userRole),
         };
@@ -32,6 +36,7 @@ export async function load({ locals, url }) {
 
     return {
         isLoggedIn: false,
+        isViewingRecord: false,
         email: '',
         canViewAccounts: false,
         canViewChangeLogs: false,

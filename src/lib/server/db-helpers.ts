@@ -1,20 +1,57 @@
-import { and, desc, eq, ilike, inArray, or } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 
 import { db } from './db';
 
-import {
-    adminposition,
-    appuser,
-    changelog,
-    faculty,
-    facultyadminposition,
-    facultyrank,
-    facultysemester,
-    rank,
-    role,
-    semester,
-    userinfo,
-} from './db/schema';
+import { appuser, changelog, faculty, role, userinfo } from './db/schema';
+
+// got tired of constantly fixing the ddl script
+// so i made this.
+// should only initialize once since it's in the backend
+let dummyRecordList:{
+    facultyid:number,
+    lastname:string,
+    firstname:string,
+    status:string,
+    ranktitle:string|null,
+    adminposition:string|null,
+    logTimestamp:Date|null,
+    logMaker:string|null,
+    logOperation:string|null
+}[] = [
+    {
+        facultyid: 1,
+        lastname: "Dela Cruz",
+        firstname: "John",
+        status: "Active",
+        ranktitle: "Professor 7",
+        adminposition: "Department Chair",
+        logTimestamp: null,
+        logMaker: null,
+        logOperation: null
+    },
+    {
+        facultyid: 2,
+        lastname: "Doe",
+        firstname: "John",
+        status: "Active",
+        ranktitle: "Assistant Prof. 2",
+        adminposition: "Department Head",
+        logTimestamp: null,
+        logMaker: null,
+        logOperation: null
+    },
+    {
+        facultyid: 3,
+        lastname: "Doe",
+        firstname: "Jane",
+        status: "On Leave",
+        ranktitle: null,
+        adminposition: null,
+        logTimestamp: null,
+        logMaker: null,
+        logOperation: null
+    },
+]
 
 export async function logChange(makerid: string, tupleid: number, operation: string) {
     const logids = await db
@@ -90,70 +127,6 @@ export async function getPermissions(userRole: string) {
     return fetchedRole;
 }
 
-export async function getFacultyRecordList(searchQuery: string = '') {
-    // find the absolute latest semester
-    const [latestSemester] = await db
-        .select({
-            acadsemesterid: semester.acadsemesterid,
-        })
-        .from(semester)
-        .orderBy(desc(semester.academicyear), desc(semester.semester))
-        .limit(1);
-
-    // fallback ID in case the semester table is completely empty
-    const latestSemesterId = latestSemester?.acadsemesterid ?? -1;
-
-    // 3. Define the Search Condition
-    // We search across First Name, Last Name, and Status
-    const searchCondition = searchQuery
-        ? or(
-              ilike(faculty.firstname, `%${searchQuery}%`),
-              ilike(faculty.lastname, `%${searchQuery}%`),
-              ilike(faculty.status, `%${searchQuery}%`),
-          )
-        : // eslint-disable-next-line no-undefined -- can't use null in Drizzle WHERE queries
-          undefined;
-
-    const shownFields = await db
-        .select({
-            facultyid: faculty.facultyid,
-            lastname: faculty.lastname,
-            firstname: faculty.firstname,
-            status: faculty.status,
-            ranktitle: rank.ranktitle,
-            adminposition: adminposition.name,
-            logTimestamp: changelog.timestamp,
-            logMaker: appuser.email,
-            logOperation: changelog.operation,
-        })
-        .from(faculty)
-        .leftJoin(
-            facultysemester,
-            and(
-                eq(facultysemester.facultyid, faculty.facultyid),
-                eq(facultysemester.acadsemesterid, latestSemesterId), // Match only the latest semester
-            ),
-        )
-        .leftJoin(facultyrank, eq(facultyrank.facultyrankid, facultysemester.currentrankid))
-        .leftJoin(rank, eq(rank.rankid, facultyrank.rankid))
-        .leftJoin(
-            facultyadminposition,
-            eq(facultyadminposition.facultysemesterid, facultysemester.facultysemesterid),
-        )
-        .leftJoin(
-            adminposition,
-            eq(adminposition.adminpositionid, facultyadminposition.adminpositionid),
-        )
-        .leftJoin(changelog, eq(changelog.logid, faculty.latestchangelogid))
-        .leftJoin(appuser, eq(appuser.id, changelog.userid))
-        .where(
-            // 4. Combine the Semester check AND the Search condition
-            and(eq(facultysemester.acadsemesterid, latestSemester.acadsemesterid), searchCondition),
-        );
-
-    return shownFields;
-}
-
 export async function areYouHere(email: string) {
     const you = await db.select().from(appuser).where(eq(appuser.email, email));
 
@@ -174,4 +147,72 @@ export async function deleteFacultyRecords(makerid: string, ids: number[]) {
     });
 
     return { success: true };
+}
+
+//made this to easily test faculty record selection and deletion
+//only difference is that the last where is removed
+//as the lack of changelogs removes everything
+export async function getDummyFacultyRecordList() {
+    /*
+    const [currentSemester] = await db
+        .select({
+            acadsemesterid: semester.acadsemesterid,
+        })
+        .from(semester)
+        .orderBy(desc(semester.academicyear))
+        .limit(1);
+
+    const shownFields = await db
+        .select({
+            facultyid: faculty.facultyid,
+            lastname: faculty.lastname,
+            firstname: faculty.firstname,
+            status: faculty.status,
+            ranktitle: rank.ranktitle,
+            adminposition: adminposition.name,
+            logTimestamp: changelog.timestamp,
+            logMaker: appuser.email,
+            logOperation: changelog.operation,
+        })
+        .from(rank)
+        .rightJoin(facultyrank, eq(facultyrank.rankid, rank.rankid))
+        .rightJoin(facultysemester, eq(facultysemester.currentrankid, facultyrank.facultyrankid))
+        .rightJoin(faculty, eq(faculty.facultyid, facultysemester.facultyid))
+        .leftJoin(
+            facultyadminposition,
+            eq(facultyadminposition.facultysemesterid, facultysemester.facultysemesterid),
+        )
+        .leftJoin(
+            adminposition,
+            eq(adminposition.adminpositionid, facultyadminposition.adminpositionid),
+        )
+        .leftJoin(changelog, eq(changelog.logid, faculty.latestchangelogid))
+        .leftJoin(appuser, eq(appuser.id, changelog.userid))
+    
+
+    return shownFields;
+    */
+    return dummyRecordList;
+}
+
+// grabs an individual record
+// made this as the faculty record list only gets display information
+export async function getFacultyRecord(facultyID:number) {
+    const query = await db
+        .select()
+        .from(faculty)
+        .where(eq(faculty.facultyid, facultyID));
+
+    return query[0];
+}
+
+// deletes a faculty record by id
+export async function deleteFacultyRecord(facultyID:number) {
+    /*
+    await db
+        .delete(faculty)
+        .where(eq(faculty.facultyid, facultyID));
+    */
+
+    dummyRecordList = dummyRecordList.filter((rec) => rec.facultyid !== facultyID);
 }

@@ -1,8 +1,8 @@
 import { drizzle as neonDrizzle } from 'drizzle-orm/neon-http';
-import { drizzle as localDrizzle } from 'drizzle-orm/node-postgres';
+import { drizzle as pgDrizzle } from 'drizzle-orm/node-postgres';
+import { error } from '@sveltejs/kit';
 import { neon } from '@neondatabase/serverless';
-import { Pool } from 'pg';
-import { sql } from 'drizzle-orm';
+import { Pool as PgPool } from 'pg';
 
 import { DATABASE_URL, MODE } from '$env/static/private';
 
@@ -14,19 +14,17 @@ import * as schema from './schema';
 // also switch MODE to schema
 // you can get the port using psql and doing \conninfo
 
-// there has to be a cleaner way to do this
-export const db =
-    MODE === 'NEON'
-        ? neonDrizzle(neon(DATABASE_URL), { schema })
-        : MODE === 'LOCAL'
-          ? localDrizzle(
-                new Pool({
-                    connectionString: DATABASE_URL,
-                }),
-                { schema },
-            )
-          : (() => {
-                throw new Error('INVALID MODE');
-            })();
+function initializeDbClient() {
+    switch (MODE) {
+        case 'LOCAL': {
+            return pgDrizzle(new PgPool({ connectionString: DATABASE_URL }), { schema });
+        }
+        case 'NEON': {
+            return neonDrizzle(neon(DATABASE_URL), { schema });
+        }
+        default:
+            throw error(500, { message: 'Cannot initialize database client.' });
+    }
+}
 
-await db.execute(sql`CREATE EXTENSION IF NOT EXISTS pg_trgm;`);
+export const db = initializeDbClient();
