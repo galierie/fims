@@ -1,7 +1,9 @@
 import { fail } from '@sveltejs/kit';
 
 import { deleteFacultyRecords } from '$lib/server/db-helpers';
-import { getFacultyRecordList } from '$lib/server/faculty-records-list-helpers';
+import type { FilterColumn, FilterObject } from '$lib/types/filter';
+import { getAllAdminPositions, getAllRankTitles, getAllStatuses, getFacultyRecordList } from '$lib/server/faculty-records-list-helpers';
+import { adminposition, faculty, rank } from '$lib/server/db/schema';
 
 export async function load({ url }) {
     // Extract queries
@@ -13,6 +15,44 @@ export async function load({ url }) {
     // eslint-disable-next-line no-undefined -- can't use null in Drizzle WHERE queries
     const newCursor = newCursorStr ? parseInt(newCursorStr, 10) : undefined;
     const isNext = isNextStr ? parseInt(isNextStr, 10) === 1 : true;
+
+    // Filter
+
+    const filters: FilterObject[] = [
+        {
+            name: 'Status',
+            filter: 'status',
+            opts: await getAllStatuses(),
+            selectedOpts: url.searchParams.getAll('status'),
+        },
+        {
+            name: 'Rank',
+            filter: 'rank',
+            opts: await getAllRankTitles(),
+            selectedOpts: url.searchParams.getAll('rank'),
+        },
+        {
+            name: 'Administrative Position',
+            filter: 'adminposition',
+            opts: await getAllAdminPositions(),
+            selectedOpts: url.searchParams.getAll('adminposition'),
+        },
+    ];
+
+    const filterMap: FilterColumn[] = [
+        {
+            obj: filters[0],
+            column: faculty.status,
+        },
+        {
+            obj: filters[1],
+            column: rank.ranktitle,
+        },
+        {
+            obj: filters[2],
+            column: adminposition.name,
+        },
+    ];
 
     // Search
     const searchTerm = url.searchParams.get('search');
@@ -31,6 +71,7 @@ export async function load({ url }) {
         nextCursor,
         hasPrev,
         hasNext,
+        filters,
         searchTerm, // We send this back to the UI
     };
 }
