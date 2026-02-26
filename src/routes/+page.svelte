@@ -116,6 +116,10 @@
                 <div class="flex gap-2">
                     <GreenButton onclick={selectAll}>Select All</GreenButton>
                     <RedButton onclick={deselectAll}>Deselect Selection</RedButton>
+                    <GreenButton>
+                        <Icon icon="tabler:file-export" class="h-5 w-5 mr-2" />
+                        <span>Export Reports</span>
+                    </GreenButton>
                 </div>
                 <div>
                     <RedButton onclick={() => (willBatchDelete = true)}>
