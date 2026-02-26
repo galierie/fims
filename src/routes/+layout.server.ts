@@ -28,6 +28,7 @@ export async function load({ locals, url }) {
             isLoggedIn: true, // if it's not, then this line shouldn't have been reached
             email: locals.user.email,
             canViewAccounts: canaddaccount || canmodifyaccount,
+            isViewingRecord: url.pathname.startsWith('/record'),
             canViewChangeLogs,
             accountColor: accountColorMap.get(userRole),
         };
@@ -35,6 +36,7 @@ export async function load({ locals, url }) {
 
     return {
         isLoggedIn: false,
+        isViewingRecord: false,
         email: '',
         canViewAccounts: false,
         canViewChangeLogs: false,

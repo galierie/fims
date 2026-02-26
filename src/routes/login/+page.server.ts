@@ -40,6 +40,7 @@ export const actions = {
 
             if (response.url) responseUrl = response.url;
         } catch (error) {
+            console.log(error);
             return fail(500, {
                 error: error instanceof APIError ? error.message : 'Auth failed.',
             });

@@ -52,6 +52,18 @@
         await goto(url.toString());
         isLoading = false;
     }
+    
+    async function onRecordClick(id:number) {
+        const res = await fetch('/view-record', {
+            method: "POST",
+            body: JSON.stringify({requested:id}),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+
+        goto('/record');
+    }
 </script>
 
 {#if form?.error}
@@ -171,6 +183,7 @@
                 {canViewChangeLogs}
                 isSelected={selectedIds.includes(facultyRecord.facultyid)}
                 onToggle={() => toggleSelection(facultyRecord.facultyid)}
+                clickCallback={onRecordClick}
             />
         {/each}
 

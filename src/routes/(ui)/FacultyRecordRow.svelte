@@ -6,10 +6,12 @@
         canViewChangeLogs: boolean;
         isSelected: boolean;
         onToggle: () => void;
+        clickCallback: (id:number) => void;
     }
 
     const { facultyRecord, canViewChangeLogs, isSelected, onToggle }: Props = $props();
     const {
+        facultyid,
         lastname,
         firstname,
         status,
@@ -19,6 +21,10 @@
         logMaker,
         logOperation,
     }: FacultyRecordDTO = $derived(facultyRecord);
+
+    function onClick() {
+        clickCallback(facultyid);
+    }
 </script>
 
 <div
@@ -33,7 +39,7 @@
         />
     </div>
     <div class={canViewChangeLogs ? 'w-66 2xl:w-132' : 'w-91 2xl:w-182'}>
-        <span>{lastname}, {firstname}</span>
+        <span><button class="hover:cursor-pointer" onclick={onClick}>{lastname}, {firstname}</button></span>
     </div>
     <div class="w-50 justify-center 2xl:w-75"><span>{status}</span></div>
     <div class="w-62.5 justify-center 2xl:w-75"><span>{ranktitle}</span></div>
