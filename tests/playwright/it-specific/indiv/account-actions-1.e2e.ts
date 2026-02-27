@@ -182,7 +182,7 @@ test.describe('delete account', () => {
             .click();
         */
         const correctRow = page.getByTestId('account-row').filter({hasText: dummyEmail});
-        await correctRow.getByRole('button', { name: 'Delete', exact: true }).first().click() //apparently it returns both first and
+        await correctRow.getByRole('button', { name: 'Delete', exact: true }).first().click()
 
         // Confirm
         // keeps on failing, so i just made use of the fact there's only one cancel button during this state
