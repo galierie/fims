@@ -45,10 +45,7 @@ export default defineConfig({
             testDir: 'tests/playwright/destructive',
             testMatch: /.e2e.(?:js|ts)/u,
         },
-
-        // i am not exacly sure how to parallelize them without some race condition ocurring
-        // so i just made them two separate files and used test.describe to specifically say which ones
-        // are parallel
+        
         {
             name: 'it-specific-tests-indiv',
             dependencies: ['common-tests', 'common-destructive-tests', 'it-auth'],
