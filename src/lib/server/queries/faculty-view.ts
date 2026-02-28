@@ -75,6 +75,17 @@ export async function getFacultyPromotionHistory(facultyid: number) {
         .where(eq(facultyrank.facultyid, facultyid));
 }
 
+export async function getFacultyHomeAddresses(facultyid: number) {
+    return (
+        await db
+            .select({
+                homeAddress: facultyhomeaddress.homeaddress,
+            })
+            .from(facultyhomeaddress)
+            .where(eq(facultyhomeaddress.facultyid, facultyid))
+    ).map(({ homeAddress }) => homeAddress);
+}
+
 export async function getFacultyProfile(facultyid: number) {
     const response = await db.select().from(faculty).where(eq(faculty.facultyid, facultyid));
     if (response.length === 0) return null;
@@ -93,14 +104,7 @@ export async function getFacultyProfile(facultyid: number) {
     const promotionHistory = getFacultyPromotionHistory(facultyid);
 
     // Home Addresses
-    const homeAddresses = (
-        await db
-            .select({
-                homeAddress: facultyhomeaddress.homeaddress,
-            })
-            .from(facultyhomeaddress)
-            .where(eq(facultyhomeaddress.facultyid, facultyid))
-    ).map(({ homeAddress }) => homeAddress);
+    const homeAddresses = getFacultyHomeAddresses(facultyid);
 
     // Emails
     const emails = (
