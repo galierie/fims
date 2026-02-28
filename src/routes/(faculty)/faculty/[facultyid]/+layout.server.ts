@@ -12,7 +12,7 @@ export async function load({ params }) {
     const record = await getFacultyName(facultyid);
 
     // Validate output
-    if (record === null) throw error(400, { message: 'Invalid record identifier.' });
+    if (record === null) throw error(400, { message: 'No record found.' });
 
     const { lastname, firstname } = record;
 
