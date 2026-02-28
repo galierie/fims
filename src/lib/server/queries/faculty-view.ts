@@ -20,6 +20,7 @@ import {
     facultyrank,
     facultyresearch,
     facultysemester,
+    facultystudyload,
     fieldofinterest,
     office,
     rank,
@@ -266,6 +267,20 @@ export async function getFacultyExtension(facultysemesterid: number) {
         })
         .from(facultyextension)
         .where(eq(facultyextension.facultysemesterid, facultysemesterid));
+}
+
+export async function getFacultyStudyLoad(facultysemesterid: number) {
+    return await db
+        .select({
+            degreeProgram: facultystudyload.degreeprogram,
+            university: facultystudyload.university,
+            studyLoadUnits: facultystudyload.studyloadunits,
+            onFullTimeLeaveWithPay: facultystudyload.onfulltimeleavewithpay,
+            isFacultyFellowshipRecipient: facultystudyload.isfacultyfellowshiprecipient,
+            studyLoadCredit: facultystudyload.studyloadcredit,
+        })
+        .from(facultystudyload)
+        .where(eq(facultystudyload.facultysemesterid, facultysemesterid));
 }
 
 export async function getFacultyProfile(facultyid: number) {
