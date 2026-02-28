@@ -10,8 +10,10 @@ import {
     facultyfieldofinterest,
     facultyhomeaddress,
     facultyrank,
+    facultysemester,
     fieldofinterest,
     rank,
+    semester,
 } from '../db/schema';
 
 export async function getFacultyName(facultyid: number) {
@@ -95,6 +97,63 @@ export async function getFacultyEmailAddresses(facultyid: number) {
             .from(facultyemail)
             .where(eq(facultyemail.facultyid, facultyid))
     ).map(({ email }) => email);
+}
+
+export async function getFacultySemester(facultyid: number, acadYear: number, semNum: number) {
+    const currentSemesterArr = await db
+        .select({
+            acadsemesterid: semester.acadsemesterid,
+        })
+        .from(semester)
+        .where(
+            and(
+                eq(semester.academicyear, acadYear),
+                eq(semester.semester, semNum),
+            )
+        );
+
+    if (currentSemesterArr.length !== 1) return null;
+    const [currentSemester] = currentSemesterArr;
+
+    const currentFacultySemesterSq = await db
+        .select({
+            facultysemesterid: facultysemester.facultysemesterid,
+            currentrankid: facultysemester.currentrankid,
+            currenthighesteducationalattainmentid: facultysemester.currenthighesteducationalattainmentid,
+        })
+        .from(facultysemester)
+        .where(
+            and(
+                eq(facultysemester.facultyid, facultyid),
+                eq(facultysemester.acadsemesterid, currentSemester.acadsemesterid),
+            )
+        )
+        .as('current_faculty_semester_sq');
+
+    const currentFacultySemesterArr = await db.select().from(currentFacultySemesterSq);
+    if (currentFacultySemesterArr.length !== 1) return null;
+
+    const currentFacultySemester = await db
+        .select({
+            facultysemesterid: currentFacultySemesterSq.facultysemesterid,
+            currentRankTitle: rank.ranktitle,
+            currentHighestDegree: facultyeducationalattainment.degree,
+        })
+        .from(currentFacultySemesterSq)
+        .leftJoin(facultyrank, eq(facultyrank.facultyrankid, facultysemester.currentrankid))
+        .leftJoin(rank, eq(rank.rankid, facultyrank.rankid))
+        .leftJoin(
+            facultyeducationalattainment,
+            eq(
+                facultyeducationalattainment.facultyeducationalattainmentid,
+                facultysemester.currenthighesteducationalattainmentid
+            ),
+        );
+
+    if (currentFacultySemester.length !== 1) return null;
+    const [facultySemester] = currentFacultySemester;
+
+    return facultySemester;
 }
 
 export async function getFacultyProfile(facultyid: number) {
