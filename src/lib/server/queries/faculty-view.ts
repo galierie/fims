@@ -15,12 +15,14 @@ import {
     facultyemail,
     facultyfieldofinterest,
     facultyhomeaddress,
+    facultymentoring,
     facultyrank,
     facultysemester,
     fieldofinterest,
     office,
     rank,
     semester,
+    student,
 } from '../db/schema';
 
 export async function getFacultyName(facultyid: number) {
@@ -217,6 +219,22 @@ export async function getFacultyCoursesTaught(facultysemesterid: number) {
         .from(facultycourse)
         .leftJoin(course, eq(course.courseid, facultycourse.courseid))
         .where(eq(facultycourse.facultysemesterid, facultysemesterid));
+}
+
+export async function getFacultyMentees(facultysemesterid: number) {
+    return await db
+        .select({
+            lastName: student.lastname,
+            middleName: student.middlename,
+            firstName: student.firstname,
+            category: facultymentoring.category,
+            startDate: facultymentoring.startdate,
+            endDate: facultymentoring.enddate,
+            teachingLoadCredit: facultymentoring.teachingloadcredit,
+        })
+        .from(facultymentoring)
+            .leftJoin(student, eq(student.studentnumber, facultymentoring.studentnumber))
+        .where(eq(facultymentoring.facultysemesterid, facultysemesterid));
 }
 
 export async function getFacultyProfile(facultyid: number) {
