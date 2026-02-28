@@ -4,11 +4,13 @@ import { db } from '../db';
 
 import {
     adminposition,
+    course,
     faculty,
     facultyadminposition,
     facultyadminwork,
     facultycommmembership,
     facultycontactnumber,
+    facultycourse,
     facultyeducationalattainment,
     facultyemail,
     facultyfieldofinterest,
@@ -200,6 +202,21 @@ export async function getFacultyAdminWorks(facultysemesterid: number) {
         })
         .from(facultyadminwork)
         .where(eq(facultyadminwork.facultysemesterid, facultysemesterid));
+}
+
+export async function getFacultyCoursesTaught(facultysemesterid: number) {
+    return await db
+        .select({
+            title: course.coursename,
+            units: course.units,
+            section: facultycourse.section,
+            numberOfStudents: facultycourse.numberofstudents,
+            teachingLoadCredit: facultycourse.teachingloadcredit,
+            sectionSET: facultycourse.sectionset,
+        })
+        .from(facultycourse)
+        .leftJoin(course, eq(course.courseid, facultycourse.courseid))
+        .where(eq(facultycourse.facultysemesterid, facultysemesterid));
 }
 
 export async function getFacultyProfile(facultyid: number) {
