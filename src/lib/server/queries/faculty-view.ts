@@ -86,6 +86,17 @@ export async function getFacultyHomeAddresses(facultyid: number) {
     ).map(({ homeAddress }) => homeAddress);
 }
 
+export async function getFacultyEmailAddresses(facultyid: number) {
+    return (
+        await db
+            .select({
+                email: facultyemail.email,
+            })
+            .from(facultyemail)
+            .where(eq(facultyemail.facultyid, facultyid))
+    ).map(({ email }) => email);
+}
+
 export async function getFacultyProfile(facultyid: number) {
     const response = await db.select().from(faculty).where(eq(faculty.facultyid, facultyid));
     if (response.length === 0) return null;
@@ -107,14 +118,7 @@ export async function getFacultyProfile(facultyid: number) {
     const homeAddresses = getFacultyHomeAddresses(facultyid);
 
     // Emails
-    const emails = (
-        await db
-            .select({
-                email: facultyemail.email,
-            })
-            .from(facultyemail)
-            .where(eq(facultyemail.facultyid, facultyid))
-    ).map(({ email }) => email);
+    const emailAddresses = getFacultyEmailAddresses(facultyid);
 
     return {
         ...record,
@@ -123,6 +127,6 @@ export async function getFacultyProfile(facultyid: number) {
         fieldsOfInterest,
         promotionHistory,
         homeAddresses,
-        emails,
+        emailAddresses,
     };
 }
