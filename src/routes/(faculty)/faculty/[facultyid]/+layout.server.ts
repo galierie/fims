@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 
-import { getFacultyName } from '$lib/server/queries/db-helpers';
+import { getFacultyName } from '$lib/server/queries/faculty-view';
 
 export async function load({ params }) {
     const { facultyid: facultyidStr } = params;

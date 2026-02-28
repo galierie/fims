@@ -114,21 +114,6 @@ export async function deleteFacultyRecords(makerid: string, ids: number[]) {
     return { success: true };
 }
 
-export async function getFacultyName(facultyid: number) {
-    const response = await db
-        .select({
-            lastName: faculty.lastname,
-            firstName: faculty.firstname,
-        })
-        .from(faculty)
-        .where(eq(faculty.facultyid, facultyid));
-
-    if (response.length === 0) return null;
-
-    const [record] = response;
-    return record;
-}
-
 export async function getFacultyProfile(facultyid: number) {
     const response = await db.select().from(faculty).where(eq(faculty.facultyid, facultyid));
     if (response.length === 0) return null;
