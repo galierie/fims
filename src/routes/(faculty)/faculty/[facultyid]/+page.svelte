@@ -8,7 +8,8 @@
     import { enhance } from '$app/forms';
     import { page } from '$app/state';
 
-    const { form } = $props();
+    const { data, form } = $props();
+    const { profile } = $derived(data);
 
     let willDelete = $state(false);
     let isLoading = $state(false);
