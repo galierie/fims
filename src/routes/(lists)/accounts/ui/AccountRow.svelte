@@ -31,6 +31,7 @@
 
 {#if email}
     <div
+        data-testid='account-row'
         class="flex justify-center [&>div]:flex [&>div]:h-12 [&>div]:items-center [&>div]:border-b [&>div]:border-fims-gray [&>div]:bg-white [&>div]:px-6"
     >
         <div class="w-25 justify-center">

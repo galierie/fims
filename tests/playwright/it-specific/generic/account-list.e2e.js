@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import * as consts from '../../test-consts';
+import * as consts from '../../../test-consts';
 
 test.use({ storageState: 'playwright/.auth/it.json' });
 
@@ -24,7 +24,6 @@ test('view account list', async ({ page }) => {
     await expect(cell).toBeVisible();
   });
   */
-
     for (const field of accountTable)
         await expect(page.getByText(field, { exact: true })).toBeVisible();
 });

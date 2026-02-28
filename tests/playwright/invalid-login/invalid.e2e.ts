@@ -19,14 +19,8 @@ const validAcc = consts.ITAcc;
 const emailFail = 'Invalid email.';
 const genericFail = 'Invalid email or password'; //for some reason this lacks a period
 
-//seeds dummy data
-//put this here as it's the first test run
-test.beforeAll(async () => {
-    await consts.seed();
-});
-
 test.describe('invalid login cases', async () => {
-    await test('non up email', async ({ page }) => {
+    test('non up email', async ({ page }) => {
         // Goto
         await page.goto('/');
         await expect(page).toHaveURL('/login');
@@ -50,7 +44,7 @@ test.describe('invalid login cases', async () => {
         await expect(page).toHaveURL('/login');
     });
 
-    await test('generic fail case', async ({ page }) => {
+    test('generic fail case', async ({ page }) => {
         // Goto
         await page.goto('/');
         await expect(page).toHaveURL('/login');
@@ -74,7 +68,7 @@ test.describe('invalid login cases', async () => {
         await expect(page).toHaveURL('/login');
     });
 
-    await test('already existing acc with invalid password', async ({ page }) => {
+    test('already existing acc with invalid password', async ({ page }) => {
         // Goto
         await page.goto('/');
         await expect(page).toHaveURL('/login');
