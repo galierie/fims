@@ -4,6 +4,7 @@
     import RedButton from '$lib/ui/RedButton.svelte';
     import DeleteConfirmation from '$lib/ui/DeleteConfirmation.svelte';
     import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
+    import Tab from './ui/Tab.svelte';
 
     import { enhance } from '$app/forms';
     import { page } from '$app/state';
@@ -50,6 +51,13 @@
                 <Icon icon="tabler:trash" class="mr-2 h-6 w-6" />
                 <span>Delete Record</span>
             </RedButton>
+        </div>
+
+        <!-- Tabs -->
+        <div class="mb-1 mt-5 w-full flex items-end justify-start">
+            <Tab href="/faculty/{facultyid}" name="Profile" />
+            <Tab href="/faculty/{facultyid}/{$acadYearStore}/{$semNumStore}" name="Semestral Records" />
+            <div class="border-b-2 border-fims-green w-full"></div>
         </div>
 
         {@render children()}
