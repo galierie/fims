@@ -9,15 +9,10 @@ export async function load({ params }) {
     // Validate parameter
     if (Number.isNaN(facultyid)) throw error(400, { message: 'Invalid record identifier.' });
 
-    const record = await getFacultyName(facultyid);
+    const name = await getFacultyName(facultyid);
 
     // Validate output
-    if (record === null) throw error(400, { message: 'No record found.' });
+    if (name === null) throw error(400, { message: 'No record found.' });
 
-    const { lastname, firstname } = record;
-
-    return {
-        lastname,
-        firstname,
-    };
+    return { ...name };
 }

@@ -2,7 +2,7 @@
     import Icon from '@iconify/svelte';
 
     const { data, children } = $props();
-    const { lastname, firstname } = $derived(data);
+    const { lastName, firstName } = $derived(data);
 </script>
 
 <main class="bg-[#e9e9e9]">
@@ -13,7 +13,7 @@
                 <span class="underline">Back to List of Faculty Records</span>
             </a>
             <h1 class="mt-8 text-3xl font-semibold text-fims-green" id="name-display">
-                {lastname}, {firstname}
+                {lastName}, {firstName}
             </h1>
         </div>
         {@render children()}
