@@ -238,7 +238,7 @@ export async function getFacultyMentees(facultysemesterid: number) {
             teachingLoadCredit: facultymentoring.teachingloadcredit,
         })
         .from(facultymentoring)
-            .leftJoin(student, eq(student.studentnumber, facultymentoring.studentnumber))
+        .leftJoin(student, eq(student.studentnumber, facultymentoring.studentnumber))
         .where(eq(facultymentoring.facultysemesterid, facultysemesterid));
 }
 
@@ -253,7 +253,7 @@ export async function getFacultyResearch(facultysemesterid: number) {
             remarks: facultyresearch.remarks,
         })
         .from(facultyresearch)
-            .leftJoin(research, eq(research.researchid, facultyresearch.researchid))
+        .leftJoin(research, eq(research.researchid, facultyresearch.researchid))
         .where(eq(facultyresearch.facultysemesterid, facultysemesterid));
 }
 
