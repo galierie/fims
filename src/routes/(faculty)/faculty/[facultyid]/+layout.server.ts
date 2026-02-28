@@ -14,5 +14,5 @@ export async function load({ params }) {
     // Validate output
     if (name === null) throw error(400, { message: 'No record found.' });
 
-    return { ...name };
+    return { facultyid, ...name };
 }

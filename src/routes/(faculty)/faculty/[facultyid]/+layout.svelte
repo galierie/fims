@@ -11,7 +11,7 @@
     import { writable } from 'svelte/store';
 
     const { data, children } = $props();
-    const { lastName, firstName } = $derived(data);
+    const { facultyid, lastName, firstName } = $derived(data);
 
     const currentAcadYear = (new Date).getFullYear();
     const currentSemNum = 2; // TODO: Find a better way to know current semester
