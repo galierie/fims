@@ -207,6 +207,7 @@ export async function getFacultyAdminWorks(facultysemesterid: number) {
             admininstrativeLoadCredit: facultyadminwork.administrativeloadcredit,
         })
         .from(facultyadminwork)
+        .leftJoin(office, eq(office.officeid, facultyadminwork.officeid))
         .where(eq(facultyadminwork.facultysemesterid, facultysemesterid));
 }
 
