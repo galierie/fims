@@ -1,7 +1,9 @@
 <script lang="ts">
+    import { enhance } from '$app/forms';
     import Icon from '@iconify/svelte';
 
     import GreenButton from '$lib/ui/GreenButton.svelte';
+    import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
     import RedButton from '$lib/ui/RedButton.svelte';
 
     import { viewState, setToEdit, resetViewState } from './states/view-state.svelte.js';
@@ -11,6 +13,11 @@
 
     // Ensure view isn't set to editing state on load
     resetViewState();
+
+    let isLoading = $state(false);
+
+    let profileForm: HTMLFormElement | null = null;
+    const profileFormId = 'profile-form';
 </script>
 
 {#if form?.error}
@@ -24,7 +31,9 @@
 
 <div class="flex items-center gap-2">
     {#if viewState.isEditing}
-        <GreenButton>
+        <GreenButton onclick={() => {
+            if (profileForm) profileForm.requestSubmit();
+        }}>
             <Icon icon="tabler:device-floppy" class="h-5 w-5 mr-2" />
             <span>Save Record</span>
         </GreenButton>
@@ -39,3 +48,22 @@
         </GreenButton>
     {/if}
 </div>
+
+<form
+    method="POST"
+    action="?/update"
+    id={profileFormId}
+    bind:this={profileForm}
+    use:enhance={() => {
+        resetViewState();
+        isLoading = true;
+        return async ({ update }) => {
+            await update();
+            isLoading = false;
+        };
+    }}
+></form>
+
+{#if isLoading}
+    <LoadingScreen />
+{/if}
