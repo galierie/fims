@@ -2,12 +2,15 @@
     import Icon from '@iconify/svelte';
 
     import GreenButton from '$lib/ui/GreenButton.svelte';
+    import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
     import RedButton from '$lib/ui/RedButton.svelte';
 
     import { viewState, setToEdit } from '../../../states/view-state.svelte.js';
 
     // Ensure editing state on navigation here
     setToEdit();
+
+    let isLoading = $state(false);
 </script>
 
 {#if viewState.isEditing}
@@ -21,4 +24,8 @@
             <span>Discard Changes</span>
         </RedButton>
     </div>
+
+    {#if isLoading}
+        <LoadingScreen />
+    {/if}
 {/if}
