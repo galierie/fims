@@ -6,7 +6,7 @@
     import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
     import RedButton from '$lib/ui/RedButton.svelte';
 
-    import { viewState, setToEdit, resetViewState } from './states/view-state.svelte.js';
+    import { viewState, setToEdit, resetViewState } from '../states/view-state.svelte.js';
     
     const { data, form } = $props();
     const { profile } = $derived(data);

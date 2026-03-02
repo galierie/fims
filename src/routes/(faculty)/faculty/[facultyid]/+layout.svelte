@@ -45,7 +45,7 @@
 
         <!-- Tabs -->
         <div class="mb-1 mt-5 w-full flex items-end justify-start">
-            <Tab href="/faculty/{facultyid}" name="Profile" />
+            <Tab href="/faculty/{facultyid}/profile" name="Profile" />
             <Tab
                 href="/faculty/{facultyid}/{chosenSemestralRecord.acadYear}/{chosenSemestralRecord.semNum}"
                 name="Semestral Records"
