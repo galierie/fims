@@ -363,3 +363,8 @@ export async function getAllFacultySemesters(facultyid: number) {
         .leftJoin(semester, eq(semester.acadsemesterid, facultysemester.acadsemesterid))
         .where(eq(facultysemester.facultyid, facultyid));
 }
+
+// TODO: Limit semester.semester values
+export function getAllSemesterms() {
+    return ['Midyear', '1st Semester', '2nd Semester'];
+}
