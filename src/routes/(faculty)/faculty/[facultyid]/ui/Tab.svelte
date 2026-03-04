@@ -3,7 +3,7 @@
     import { viewState } from "../states/view-state.svelte";
     const { href, name } = $props();
 
-    let disabled = $derived(page.url.pathname.includes(href) && viewState.isEditing);
+    let disabled = $derived(!page.url.pathname.includes(href) && viewState.isEditing);
 </script>
 
 {#if page.url.pathname.includes(href)}
