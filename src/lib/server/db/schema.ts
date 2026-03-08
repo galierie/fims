@@ -49,6 +49,7 @@ export const faculty = pgTable(
         middlename: varchar({ length: 100 }).notNull(),
         firstname: varchar({ length: 100 }).notNull(),
         suffix: varchar({ length: 50 }),
+        maidenname: varchar({ length: 100 }),
         birthdate: date().notNull(),
         status: varchar({ length: 50 }).notNull(),
         dateoforiginalappointment: date().notNull(),
