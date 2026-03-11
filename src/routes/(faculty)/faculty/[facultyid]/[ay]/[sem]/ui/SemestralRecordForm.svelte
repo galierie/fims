@@ -1,0 +1,143 @@
+<script lang="ts">
+    import { enhance } from '$app/forms';
+    import Icon from '@iconify/svelte';
+
+    import AcadYearSemSelect from './AcadYearSemSelect.svelte';
+    import FieldDropdown from './FieldDropdown.svelte';
+    import GreenButton from '$lib/ui/GreenButton.svelte';
+    import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
+    import RedButton from '$lib/ui/RedButton.svelte';
+    import AdminSection from './sections/AdminSection.svelte';
+    import TeachingSection from './sections/TeachingSection.svelte';
+    import ResearchSection from './sections/ResearchSection.svelte';
+    import ExtensionSection from './sections/ExtensionSection.svelte';
+    import StudyLoadSection from './sections/StudyLoadSection.svelte';
+
+    import { viewState, setToEdit, resetViewState } from '../../../states/view-state.svelte.js';
+    import type { FacultySemestralRecordDTO } from '$lib/server/queries/faculty-view.js';
+
+    interface AcadYearSemOpts {
+        acadYear: number | null;
+        semNum: number | null;
+    }
+
+    interface Props {
+        acadYearOpts: number[];
+        allSemStrs: string[];
+        existingOpts: AcadYearSemOpts[];
+        facultyid: number;
+        semestralRecord?: FacultySemestralRecordDTO;
+        opts?: Map<string, Array<any>>;
+        dependencyMaps?: Map<string, Map<string, string>>;
+    }
+
+    const { acadYearOpts, allSemStrs, existingOpts, facultyid, semestralRecord, opts, dependencyMaps }: Props = $props();
+
+    let isLoading = $state(false);
+
+    let semestralRecordForm: HTMLFormElement | null = null;
+    const semestralRecordFormId = 'semestral-record-form';
+
+    let administrativeLoadCredit = $state(0);
+    let teachingLoadCredit = $state(0);
+    let researchLoadCredit = $state(0);
+    let extensionLoadCredit = $state(0);
+    let studyLoadCredit = $state(0);
+
+    let totalCredit = $derived(administrativeLoadCredit + teachingLoadCredit + researchLoadCredit + extensionLoadCredit + studyLoadCredit);
+</script>
+
+<form
+    method="POST"
+    action="?/update"
+    onreset={resetViewState}
+    id={semestralRecordFormId}
+    bind:this={semestralRecordForm}
+    use:enhance={() => {
+        resetViewState();
+        isLoading = true;
+        return async ({ update }) => {
+            await update();
+            isLoading = false;
+        };
+    }}
+>
+    <div class="flex items-center gap-2">
+        {#if viewState.isEditing}
+            <GreenButton onclick={() => {
+                if (semestralRecordForm) semestralRecordForm.requestSubmit();
+            }}>
+                <Icon icon="tabler:device-floppy" class="h-5 w-5 mr-2" />
+                <span>Save Record</span>
+            </GreenButton>
+            <RedButton type="reset">
+                <Icon icon="tabler:database-off" class="h-5 w-5 mr-2" />
+                <span>Discard Changes</span>
+            </RedButton>
+        {:else}
+            <GreenButton onclick={setToEdit}>
+                <Icon icon="tabler:edit" class="h-5 w-5 mr-2" />
+                <span>Edit</span>
+            </GreenButton>
+        {/if}
+        <AcadYearSemSelect {acadYearOpts} {allSemStrs} {existingOpts} {facultyid} />
+    </div>
+
+    <div>
+        <div class="w-full grid grid-cols-8"><div class="col-span-8"></div></div>
+        <div class="w-full grid grid-cols-8 mt-4">
+            <p class="flex items-center w-full">
+                <span class="w-fit text-align-right mr-2">Total Credit:</span>
+                <span>{totalCredit}</span>
+            </p>
+            <FieldDropdown label="Current Rank" name="current-rank" opts={opts?.get('rankTitles') ?? []} selectedOpt={semestralRecord?.currentRankTitle ?? ''} colSpan={3} />
+        </div>
+        <div class="w-full grid grid-cols-8 mt-4">
+            <p class="flex items-center w-full">
+                <span class="w-fit text-align-right mr-2">Load Status:</span>
+                <span>{totalCredit}</span>
+            </p>
+            <FieldDropdown label="Current Highest Educational Attainment" name="current-highest-educational-attainment" opts={opts?.get('degrees') ?? []} selectedOpt={semestralRecord?.currentHighestDegree ?? ''} colSpan={3} />
+        </div>
+        <div class="mt-8.5">
+            <label for="remarks">
+                <span>Remarks</span>
+            </label>
+            <textarea name="remarks" id="remarks" class="min-h-90 mt-4 h-fit w-full rounded-2xl border-0 bg-white p-1.5 placeholder-fims-gray focus:ring-0" disabled={!viewState.isEditing}></textarea>
+        </div>
+    </div>
+
+    <div class="[&>div]:mt-8.5">
+        <AdminSection
+            bind:administrativeLoadCredit
+            adminPositions={semestralRecord?.adminPositions ?? []}
+            committees={semestralRecord?.committees ?? []}
+            adminWorks={semestralRecord?.adminWorks ?? []}
+            {opts}
+            {dependencyMaps}
+        />
+        <TeachingSection
+            bind:teachingLoadCredit
+            coursesTaught={semestralRecord?.coursesTaught ?? []}
+            mentees={semestralRecord?.mentees ?? []}
+            {opts}
+            {dependencyMaps}
+        />
+        <ResearchSection
+            bind:researchLoadCredit
+            researchWork={semestralRecord?.researchWork ?? []}
+        />
+        <ExtensionSection
+            bind:extensionLoadCredit
+            extensionWork={semestralRecord?.extensionWork ?? []}
+        />
+        <StudyLoadSection
+            bind:studyLoadCredit
+            studyLoad={semestralRecord?.studyLoad ?? []}
+        />
+    </div>
+</form>
+
+{#if isLoading}
+    <LoadingScreen />
+{/if}
