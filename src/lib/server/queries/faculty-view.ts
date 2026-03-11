@@ -341,6 +341,8 @@ export async function getFacultyProfile(facultyid: number) {
     };
 }
 
+export type FacultyProfileRecordDTO = Awaited<ReturnType<typeof getFacultyProfile>>;
+
 export async function getFacultySemestralRecords(facultyid: number, acadYear: number, semNum: number) {
     // Semestral Details
     const facultySemester = await getFacultySemester(facultyid, acadYear, semNum);
