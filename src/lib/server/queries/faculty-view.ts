@@ -272,6 +272,7 @@ export async function getFacultyResearch(facultysemesterid: number) {
 export async function getFacultyExtension(facultysemesterid: number) {
     return await db
         .select({
+            tupleid: facultyextension.facultyextensionid,
             natureOfExtension: facultyextension.natureofextension,
             agency: facultyextension.agency,
             startDate: facultyextension.startdate,
