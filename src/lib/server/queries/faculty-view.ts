@@ -98,6 +98,7 @@ export async function getFacultyHomeAddresses(facultyid: number) {
     return (
         await db
             .select({
+                tupleid: facultyhomeaddress.facultyhomeaddressid,
                 homeAddress: facultyhomeaddress.homeaddress,
             })
             .from(facultyhomeaddress)
