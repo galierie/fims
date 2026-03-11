@@ -385,6 +385,8 @@ export async function getFacultySemestralRecords(facultyid: number, acadYear: nu
     }
 }
 
+export type FacultySemestralRecordDTO = Awaited<ReturnType<typeof getFacultySemestralRecords>>;
+
 export async function getAllFacultySemesters(facultyid: number) {
     return await db
         .select({
