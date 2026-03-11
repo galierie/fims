@@ -27,11 +27,11 @@
             <span>{selectedOpt ? selectedOpt : defaultSelectedOpt}</span>
             <Icon
                 icon={isDropdownOpen ? 'tabler:chevron-up' : 'tabler:chevron-down'}
-                class="absolute right-1 h-full top-0 w-4"
+                class="absolute top-0 right-1 h-full w-4"
             />
         </button>
     {:else}
-        <div class="flex items-center justify-center h-full">
+        <div class="flex h-full items-center justify-center">
             <span>{selectedOpt ? selectedOpt : defaultSelectedOpt}</span>
         </div>
     {/if}

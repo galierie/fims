@@ -4,7 +4,7 @@
     import ProfileForm from '../ui/ProfileForm.svelte';
 
     import { resetViewState } from '../states/view-state.svelte.js';
-    
+
     const { data, form } = $props();
     const { profile, opts, dependencyMaps } = $derived(data);
 

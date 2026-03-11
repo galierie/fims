@@ -2,8 +2,6 @@ import { and, asc, desc, eq, gt, ilike, lt, or, type SQL, type SQLWrapper } from
 
 import type { FilterColumn } from '$lib/types/filter';
 
-import { db } from '../db';
-
 import {
     adminposition,
     appuser,
@@ -17,6 +15,7 @@ import {
     semester,
     status,
 } from '../db/schema';
+import { db } from '../db';
 
 const pageSize = 50;
 

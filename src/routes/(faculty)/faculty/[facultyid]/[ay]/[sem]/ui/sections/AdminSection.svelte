@@ -1,20 +1,32 @@
 <script lang="ts">
-    import Icon from "@iconify/svelte";
-    import InputTable from "../../../../ui/InputTable.svelte";
-    import type { InputColumnType, InputRowValue } from "$lib/types/input-table";
-    import type { FacultyAdminPositionDTO, FacultyCommitteesDTO, FacultyAdminWorksDTO } from "$lib/server/queries/faculty-view";
+    import Icon from '@iconify/svelte';
+    import InputTable from '../../../../ui/InputTable.svelte';
+    import type { InputColumnType, InputRowValue } from '$lib/types/input-table';
+    import type {
+        FacultyAdminPositionDTO,
+        FacultyCommitteesDTO,
+        FacultyAdminWorksDTO,
+    } from '$lib/server/queries/faculty-view';
 
     interface Props {
         administrativeLoadCredit: number;
         adminPositions: FacultyAdminPositionDTO;
         committees: FacultyCommitteesDTO;
         adminWorks: FacultyAdminWorksDTO;
-        opts?: Map<string, Array<any>>;
-        dependencyMaps?: Map<string, Map<string, string>>;
+        opts?: Map<string, Array<string>>;
     }
 
-    // eslint-disable-next-line prefer-const -- bindable variable
-    let { administrativeLoadCredit = $bindable(), adminPositions, committees, adminWorks, opts, dependencyMaps }: Props = $props();
+    let {
+        administrativeLoadCredit = $bindable(),
+        // eslint-disable-next-line prefer-const -- bindable variable
+        adminPositions,
+        // eslint-disable-next-line prefer-const -- bindable variable
+        committees,
+        // eslint-disable-next-line prefer-const -- bindable variable
+        adminWorks,
+        // eslint-disable-next-line prefer-const -- bindable variable
+        opts,
+    }: Props = $props();
 
     // Input Table Columns
     const adminPositionOpts = $derived(opts?.get('adminPositions'));
@@ -55,17 +67,22 @@
     ]);
 
     const administrativePositionValues: InputRowValue[] = $derived(
-        adminPositions.map(({ tupleid, adminPosition, office, startDate, endDate, administrativeLoadCredit }, index) => ({
-            rowNum: index,
-            row: [
-                { columnNum: 0, defaultValue: adminPosition ?? undefined },
-                { columnNum: 1, defaultValue: office ?? undefined },
-                { columnNum: 2, defaultValue: startDate },
-                { columnNum: 3, defaultValue: endDate },
-                { columnNum: 4, defaultValue: administrativeLoadCredit },
-            ],
-            tupleid: tupleid,
-        }))
+        adminPositions.map(
+            (
+                { tupleid, adminPosition, office, startDate, endDate, administrativeLoadCredit },
+                index,
+            ) => ({
+                rowNum: index,
+                row: [
+                    { columnNum: 0, defaultValue: adminPosition ?? undefined },
+                    { columnNum: 1, defaultValue: office ?? undefined },
+                    { columnNum: 2, defaultValue: startDate },
+                    { columnNum: 3, defaultValue: endDate },
+                    { columnNum: 4, defaultValue: administrativeLoadCredit },
+                ],
+                tupleid,
+            }),
+        ),
     );
 
     const committeeMembershipColumns: InputColumnType[] = [
@@ -102,17 +119,22 @@
     ];
 
     const committeeMembershipValues: InputRowValue[] = $derived(
-        committees.map(({ tupleid, membership, committee, startDate, endDate, administrativeLoadCredit }, index) => ({
-            rowNum: index,
-            row: [
-                { columnNum: 0, defaultValue: membership },
-                { columnNum: 1, defaultValue: committee },
-                { columnNum: 2, defaultValue: startDate },
-                { columnNum: 3, defaultValue: endDate },
-                { columnNum: 4, defaultValue: administrativeLoadCredit },
-            ],
-            tupleid: tupleid,
-        }))
+        committees.map(
+            (
+                { tupleid, membership, committee, startDate, endDate, administrativeLoadCredit },
+                index,
+            ) => ({
+                rowNum: index,
+                row: [
+                    { columnNum: 0, defaultValue: membership },
+                    { columnNum: 1, defaultValue: committee },
+                    { columnNum: 2, defaultValue: startDate },
+                    { columnNum: 3, defaultValue: endDate },
+                    { columnNum: 4, defaultValue: administrativeLoadCredit },
+                ],
+                tupleid,
+            }),
+        ),
     );
 
     const administrativeWorkColumns: InputColumnType[] = $derived([
@@ -150,17 +172,22 @@
     ]);
 
     const administrativeWorkValues: InputRowValue[] = $derived(
-        adminWorks.map(({ tupleid, natureOfWork, office, startDate, endDate, administrativeLoadCredit }, index) => ({
-            rowNum: index,
-            row: [
-                { columnNum: 0, defaultValue: natureOfWork },
-                { columnNum: 1, defaultValue: office ?? undefined },
-                { columnNum: 2, defaultValue: startDate },
-                { columnNum: 3, defaultValue: endDate },
-                { columnNum: 4, defaultValue: administrativeLoadCredit },
-            ],
-            tupleid: tupleid,
-        }))
+        adminWorks.map(
+            (
+                { tupleid, natureOfWork, office, startDate, endDate, administrativeLoadCredit },
+                index,
+            ) => ({
+                rowNum: index,
+                row: [
+                    { columnNum: 0, defaultValue: natureOfWork },
+                    { columnNum: 1, defaultValue: office ?? undefined },
+                    { columnNum: 2, defaultValue: startDate },
+                    { columnNum: 3, defaultValue: endDate },
+                    { columnNum: 4, defaultValue: administrativeLoadCredit },
+                ],
+                tupleid,
+            }),
+        ),
     );
 
     let isVisible = $state(true);
@@ -171,11 +198,15 @@
 
 <div>
     <!-- Section Header -->
-    <button type="button" class="flex items-center w-full h-7.5 border-b-2 border-black/50 px-3 py-2.5" onclick={() => (isVisible = !isVisible)}>
+    <button
+        type="button"
+        class="flex h-7.5 w-full items-center border-b-2 border-black/50 px-3 py-2.5"
+        onclick={() => (isVisible = !isVisible)}
+    >
         {#if isVisible}
-            <Icon icon="tabler:chevron-up" class="h-5 w-5 mr-2" />
+            <Icon icon="tabler:chevron-up" class="mr-2 h-5 w-5" />
         {:else}
-            <Icon icon="tabler:chevron-right" class="h-5 w-5 mr-2" />
+            <Icon icon="tabler:chevron-right" class="mr-2 h-5 w-5" />
         {/if}
         <span>Admin</span>
     </button>
@@ -184,20 +215,40 @@
         <div class="my-7 pl-3.5">
             <div>
                 <span class="pl-4">Administrative Positions</span>
-                <InputTable tableName="adminstrative-positions" rowLabel="Position" columns={administrativePositionColumns} rows={administrativePositionValues} numOfColumns={27} />
+                <InputTable
+                    tableName="adminstrative-positions"
+                    rowLabel="Position"
+                    columns={administrativePositionColumns}
+                    rows={administrativePositionValues}
+                    numOfColumns={27}
+                />
             </div>
 
             <div class="mt-4">
                 <span class="pl-4">Committee Memberships</span>
-                <InputTable tableName="committee-memberships" rowLabel="Committee Membership" columns={committeeMembershipColumns} rows={committeeMembershipValues} numOfColumns={27} />
+                <InputTable
+                    tableName="committee-memberships"
+                    rowLabel="Committee Membership"
+                    columns={committeeMembershipColumns}
+                    rows={committeeMembershipValues}
+                    numOfColumns={27}
+                />
             </div>
 
             <div class="mt-4">
                 <span class="pl-4">Other Administrative Work</span>
-                <InputTable tableName="administrative-works" rowLabel="Administrative Work" columns={administrativeWorkColumns} rows={administrativeWorkValues} numOfColumns={27} />
+                <InputTable
+                    tableName="administrative-works"
+                    rowLabel="Administrative Work"
+                    columns={administrativeWorkColumns}
+                    rows={administrativeWorkValues}
+                    numOfColumns={27}
+                />
             </div>
 
-            <p class="mt-4 pl-3.5">Total Semester Administrative Load Credit: {administrativeLoadCredit}</p>
+            <p class="mt-4 pl-3.5">
+                Total Semester Administrative Load Credit: {administrativeLoadCredit}
+            </p>
         </div>
     {/if}
 </div>

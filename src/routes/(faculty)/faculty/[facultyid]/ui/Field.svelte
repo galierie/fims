@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { onMount } from "svelte";
+    import { onMount } from 'svelte';
 
-    import { viewState } from "../states/view-state.svelte";
+    import { viewState } from '../states/view-state.svelte';
 
     interface Props {
         label: string;
@@ -15,8 +15,8 @@
 
     const { label, name, type, defaultValue, colStart, colSpan, immutable }: Props = $props();
 
-    let colStartClass = $derived(colStart === undefined ? '' : `col-start-${colStart}`);
-    let colSpanClass = $derived(colSpan === undefined ? '' : `col-span-${colSpan}`);
+    const colStartClass = $derived(colStart === undefined ? '' : `col-start-${colStart}`);
+    const colSpanClass = $derived(colSpan === undefined ? '' : `col-span-${colSpan}`);
 
     // Hacky way of preventing FOUC
     let domContainer: HTMLLabelElement | null = $state(null);
@@ -36,13 +36,18 @@
     // col-span-10
 </script>
 
-<label class="flex items-center justify-end w-full {colStartClass} {colSpanClass} hidden" bind:this={domContainer}>
-    <span class="w-fit text-right mr-2">{label}</span>
+<label
+    class="flex w-full items-center justify-end {colStartClass} {colSpanClass} hidden"
+    bind:this={domContainer}
+>
+    <span class="mr-2 w-fit text-right">{label}</span>
     <input
-        type={type ?? "text"} {name}
-        class="h-8 w-45 2xl:w-75 rounded-sm border-0 bg-white p-1 placeholder-fims-gray focus:ring-0"
+        type={type ?? 'text'}
+        {name}
+        class="h-8 w-45 rounded-sm border-0 bg-white p-1 placeholder-fims-gray focus:ring-0 2xl:w-75"
         placeholder="-"
         defaultValue={defaultValue ?? ''}
-        disabled={!viewState.isEditing || (viewState.isEditing && immutable && defaultValue !== undefined && defaultValue !== '')}
+        disabled={!viewState.isEditing ||
+            (viewState.isEditing && immutable && defaultValue !== undefined && defaultValue !== '')}
     />
 </label>

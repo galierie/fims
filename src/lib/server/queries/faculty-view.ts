@@ -1,7 +1,5 @@
 import { and, eq } from 'drizzle-orm';
 
-import { db } from '../db';
-
 import {
     adminposition,
     appointmentstatus,
@@ -29,6 +27,7 @@ import {
     semester,
     student,
 } from '../db/schema';
+import { db } from '../db';
 
 export async function getFacultyName(facultyid: number) {
     const response = await db
@@ -74,7 +73,10 @@ export async function getFacultyFieldsOfInterest(facultyid: number) {
             field: fieldofinterest.field,
         })
         .from(facultyfieldofinterest)
-        .leftJoin(fieldofinterest, eq(fieldofinterest.fieldofinterestid, facultyfieldofinterest.fieldofinterestid))
+        .leftJoin(
+            fieldofinterest,
+            eq(fieldofinterest.fieldofinterestid, facultyfieldofinterest.fieldofinterestid),
+        )
         .where(eq(facultyfieldofinterest.facultyid, facultyid));
 }
 
@@ -84,7 +86,7 @@ export async function getFacultyPromotionHistory(facultyid: number) {
             tupleid: facultyrank.facultyrankid,
             rankTitle: rank.ranktitle,
             appointmentStatus: facultyrank.appointmentstatus,
-            dateOfTenureOrRenewal: facultyrank.dateoftenureorrenewal
+            dateOfTenureOrRenewal: facultyrank.dateoftenureorrenewal,
         })
         .from(facultyrank)
         .leftJoin(rank, eq(rank.rankid, facultyrank.rankid))
@@ -117,12 +119,7 @@ export async function getFacultySemester(facultyid: number, acadYear: number, se
             acadsemesterid: semester.acadsemesterid,
         })
         .from(semester)
-        .where(
-            and(
-                eq(semester.academicyear, acadYear),
-                eq(semester.semester, semNum),
-            )
-        );
+        .where(and(eq(semester.academicyear, acadYear), eq(semester.semester, semNum)));
 
     if (currentSemesterArr.length !== 1) return null;
     const [currentSemester] = currentSemesterArr;
@@ -131,14 +128,15 @@ export async function getFacultySemester(facultyid: number, acadYear: number, se
         .select({
             facultysemesterid: facultysemester.facultysemesterid,
             currentrankid: facultysemester.currentrankid,
-            currenthighesteducationalattainmentid: facultysemester.currenthighesteducationalattainmentid,
+            currenthighesteducationalattainmentid:
+                facultysemester.currenthighesteducationalattainmentid,
         })
         .from(facultysemester)
         .where(
             and(
                 eq(facultysemester.facultyid, facultyid),
                 eq(facultysemester.acadsemesterid, currentSemester.acadsemesterid),
-            )
+            ),
         )
         .as('current_faculty_semester_sq');
 
@@ -152,13 +150,16 @@ export async function getFacultySemester(facultyid: number, acadYear: number, se
             currentHighestDegree: facultyeducationalattainment.degree,
         })
         .from(currentFacultySemesterSq)
-        .leftJoin(facultyrank, eq(facultyrank.facultyrankid, currentFacultySemesterSq.currentrankid))
+        .leftJoin(
+            facultyrank,
+            eq(facultyrank.facultyrankid, currentFacultySemesterSq.currentrankid),
+        )
         .leftJoin(rank, eq(rank.rankid, facultyrank.rankid))
         .leftJoin(
             facultyeducationalattainment,
             eq(
                 facultyeducationalattainment.facultyeducationalattainmentid,
-                currentFacultySemesterSq.currenthighesteducationalattainmentid
+                currentFacultySemesterSq.currenthighesteducationalattainmentid,
             ),
         );
 
@@ -179,7 +180,10 @@ export async function getFacultyAdminPositions(facultysemesterid: number) {
             administrativeLoadCredit: facultyadminposition.administrativeloadcredit,
         })
         .from(facultyadminposition)
-        .leftJoin(adminposition, eq(adminposition.adminpositionid, facultyadminposition.adminpositionid))
+        .leftJoin(
+            adminposition,
+            eq(adminposition.adminpositionid, facultyadminposition.adminpositionid),
+        )
         .leftJoin(office, eq(office.officeid, facultyadminposition.officeid))
         .where(eq(facultyadminposition.facultysemesterid, facultysemesterid));
 }
@@ -336,7 +340,11 @@ export async function getFacultyProfile(facultyid: number) {
 
 export type FacultyProfileRecordDTO = Awaited<ReturnType<typeof getFacultyProfile>>;
 
-export async function getFacultySemestralRecords(facultyid: number, acadYear: number, semNum: number) {
+export async function getFacultySemestralRecords(
+    facultyid: number,
+    acadYear: number,
+    semNum: number,
+) {
     // Semestral Details
     const facultySemester = await getFacultySemester(facultyid, acadYear, semNum);
     if (facultySemester === null) return null;
@@ -375,7 +383,7 @@ export async function getFacultySemestralRecords(facultyid: number, acadYear: nu
         extensionWork: relatedInfo[6],
 
         studyLoad: relatedInfo[7],
-    }
+    };
 }
 
 export type FacultySemestralRecordDTO = Awaited<ReturnType<typeof getFacultySemestralRecords>>;
@@ -402,7 +410,7 @@ export async function getAllFieldsOfInterest() {
             field: fieldofinterest.field,
         })
         .from(fieldofinterest);
-    
+
     return fields.map(({ field }) => field);
 }
 
@@ -422,7 +430,7 @@ export async function getAllAppointmentStatuses() {
             appointmentstatus: appointmentstatus.appointmentstatus,
         })
         .from(appointmentstatus);
-    
+
     return appointmentStatuses.map(({ appointmentstatus }) => appointmentstatus);
 }
 
@@ -442,7 +450,7 @@ export async function getAllOffices() {
             officeName: office.name,
         })
         .from(office);
-    
+
     return offices.map(({ officeName }) => officeName);
 }
 

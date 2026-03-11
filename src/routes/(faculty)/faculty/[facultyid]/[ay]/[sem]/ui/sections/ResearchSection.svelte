@@ -1,13 +1,13 @@
 <script lang="ts">
-    import Icon from "@iconify/svelte";
-    import InputTable from "../../../../ui/InputTable.svelte";
-    import type { InputColumnType, InputRowValue } from "$lib/types/input-table";
-    import type { FacultyResearchDTO } from "$lib/server/queries/faculty-view";
+    import Icon from '@iconify/svelte';
+    import InputTable from '../../../../ui/InputTable.svelte';
+    import type { InputColumnType, InputRowValue } from '$lib/types/input-table';
+    import type { FacultyResearchDTO } from '$lib/server/queries/faculty-view';
 
     interface Props {
         researchLoadCredit: number;
         researchWork: FacultyResearchDTO;
-        opts?: Map<string, Array<any>>;
+        opts?: Map<string, Array<string>>;
         dependencyMaps?: Map<string, Map<string, string>>;
     }
 
@@ -16,9 +16,15 @@
 
     // Input Table Columns
     const researchTitles = $derived(opts?.get('researchTitles'));
-    const researchTitlesToResearchStartDates = $derived(dependencyMaps?.get('researchTitlesToResearchStartDates'));
-    const researchTitlesToResearchEndDates = $derived(dependencyMaps?.get('researchTitlesToResearchEndDates'));
-    const researchTitlesToResearchFunding = $derived(dependencyMaps?.get('researchTitlesToResearchFunding'));
+    const researchTitlesToResearchStartDates = $derived(
+        dependencyMaps?.get('researchTitlesToResearchStartDates'),
+    );
+    const researchTitlesToResearchEndDates = $derived(
+        dependencyMaps?.get('researchTitlesToResearchEndDates'),
+    );
+    const researchTitlesToResearchFunding = $derived(
+        dependencyMaps?.get('researchTitlesToResearchFunding'),
+    );
     const researchColumns: InputColumnType[] = $derived([
         {
             label: 'Title',
@@ -62,22 +68,27 @@
             name: 'research-remarks',
             colSpan: 9,
             type: 'expandable',
-        }
+        },
     ]);
 
     const researchValues: InputRowValue[] = $derived(
-        researchWork.map(({ tupleid, title, startDate, endDate, funding, researchLoadCredit, remarks }, index) => ({
-            rowNum: index,
-            row: [
-                { columnNum: 0, defaultValue: title ?? undefined },
-                { columnNum: 1, defaultValue: startDate ?? undefined },
-                { columnNum: 2, defaultValue: endDate ?? undefined },
-                { columnNum: 3, defaultValue: funding ?? undefined },
-                { columnNum: 4, defaultValue: researchLoadCredit },
-                { columnNum: 5, defaultValue: remarks ?? undefined },
-            ],
-            tupleid: tupleid,
-        }))
+        researchWork.map(
+            (
+                { tupleid, title, startDate, endDate, funding, researchLoadCredit, remarks },
+                index,
+            ) => ({
+                rowNum: index,
+                row: [
+                    { columnNum: 0, defaultValue: title ?? undefined },
+                    { columnNum: 1, defaultValue: startDate ?? undefined },
+                    { columnNum: 2, defaultValue: endDate ?? undefined },
+                    { columnNum: 3, defaultValue: funding ?? undefined },
+                    { columnNum: 4, defaultValue: researchLoadCredit },
+                    { columnNum: 5, defaultValue: remarks ?? undefined },
+                ],
+                tupleid,
+            }),
+        ),
     );
 
     let isVisible = $state(true);
@@ -88,18 +99,28 @@
 
 <div>
     <!-- Section Header -->
-    <button type="button" class="flex items-center w-full h-7.5 border-b-2 border-black/50 px-3 py-2.5" onclick={() => (isVisible = !isVisible)}>
+    <button
+        type="button"
+        class="flex h-7.5 w-full items-center border-b-2 border-black/50 px-3 py-2.5"
+        onclick={() => (isVisible = !isVisible)}
+    >
         {#if isVisible}
-            <Icon icon="tabler:chevron-up" class="h-5 w-5 mr-2" />
+            <Icon icon="tabler:chevron-up" class="mr-2 h-5 w-5" />
         {:else}
-            <Icon icon="tabler:chevron-right" class="h-5 w-5 mr-2" />
+            <Icon icon="tabler:chevron-right" class="mr-2 h-5 w-5" />
         {/if}
         <span>Research/Textbook Writing/Creative Work</span>
     </button>
 
     {#if isVisible}
         <div class="my-7 pl-3.5">
-            <InputTable tableName="research" rowLabel="Research/Textbook Writing/Creative Work" columns={researchColumns} rows={researchValues} numOfColumns={35} />
+            <InputTable
+                tableName="research"
+                rowLabel="Research/Textbook Writing/Creative Work"
+                columns={researchColumns}
+                rows={researchValues}
+                numOfColumns={35}
+            />
 
             <p class="mt-4 pl-3.5">Total Semester Research Load Credit: {researchLoadCredit}</p>
         </div>

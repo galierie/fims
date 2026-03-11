@@ -4,13 +4,16 @@
 
     import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
 
-    import { chooseSemestralRecord, chosenSemestralRecord } from '../../../states/chosen-semestral-record.svelte';
+    import {
+        chooseSemestralRecord,
+        chosenSemestralRecord,
+    } from '../../../states/chosen-semestral-record.svelte';
     import { viewState } from '../../../states/view-state.svelte';
 
     interface Props {
         acadYearOpts: number[];
         allSemStrs: string[];
-        existingOpts: Array<{ acadYear: number | null, semNum: number | null }>;
+        existingOpts: Array<{ acadYear: number | null; semNum: number | null }>;
         facultyid: number;
     }
 
@@ -20,11 +23,11 @@
     let isSemNumDropdownOpen = $state(false);
     let isLoading = $state(false);
 
-    let semOpts = $derived(
+    const semOpts = $derived(
         existingOpts
             .filter(({ acadYear }) => acadYear === chosenSemestralRecord.acadYear)
-            .map(({ semNum }) => semNum)
-    )
+            .map(({ semNum }) => semNum),
+    );
 
     async function goToPage(ay: number, sem: number) {
         isLoading = true;
@@ -33,11 +36,7 @@
     }
 
     const borderColor = $derived(viewState.isEditing ? 'border-fims-gray' : 'border-fims-green');
-    const textColor = $derived(
-        viewState.isEditing
-            ? 'text-fims-gray'
-            : 'text-fims-green'
-    );
+    const textColor = $derived(viewState.isEditing ? 'text-fims-gray' : 'text-fims-green');
     const selectedColor = $derived(viewState.isEditing ? 'text-fims-gray' : 'text-fims-green');
 
     let isMakingSemestralRecord = $state(false);
@@ -56,7 +55,9 @@
         >
             <span class="mr-1 {textColor}">Academic Year:</span>
 
-            <span class={selectedColor}>{chosenSemestralRecord.acadYear} - {chosenSemestralRecord.acadYear + 1}</span>
+            <span class={selectedColor}
+                >{chosenSemestralRecord.acadYear} - {chosenSemestralRecord.acadYear + 1}</span
+            >
 
             <Icon
                 icon={isAcadYearDropdownOpen ? 'tabler:chevron-up' : 'tabler:chevron-down'}
@@ -73,20 +74,24 @@
                 <!-- Make new semestral record for faculty member -->
                 {#if isMakingSemestralRecord}
                     <div class="flex w-full items-center rounded-sm p-3">
-                        <input type="text" bind:value={newAcadYear} class="w-20 rounded-lg bg-white border-fims-green border-2 mr-1 focus:ring-0" />
+                        <input
+                            type="text"
+                            bind:value={newAcadYear}
+                            class="mr-1 w-20 rounded-lg border-2 border-fims-green bg-white focus:ring-0"
+                        />
                         <span>- {newAcadYear + 1}</span>
                     </div>
                 {:else}
                     <button
                         type="button"
-                        class="flex w-full rounded-sm p-3 hover:bg-[#e9e9e9] text-fims-green"
+                        class="flex w-full rounded-sm p-3 text-fims-green hover:bg-[#e9e9e9]"
                         onclick={() => (isMakingSemestralRecord = true)}
                     >
                         <span class="w-8 pr-2">+</span>
                         <span>Add Academic Year</span>
                     </button>
                 {/if}
-                
+
                 <!-- Academic Years with Existing Faculty Records -->
                 {#key chosenSemestralRecord.acadYear}
                     {#each acadYearOpts as opt (opt)}
@@ -128,7 +133,9 @@
             <span class={selectedColor}>{allSemStrs[chosenSemestralRecord.semNum]}</span>
 
             <Icon
-                icon={isSemNumDropdownOpen || isMakingSemestralRecord ? 'tabler:chevron-up' : 'tabler:chevron-down'}
+                icon={isSemNumDropdownOpen || isMakingSemestralRecord
+                    ? 'tabler:chevron-up'
+                    : 'tabler:chevron-down'}
                 class="h-5 w-5 {textColor}"
             />
         </button>
@@ -143,7 +150,7 @@
                     {#each allSemStrs as opt (opt)}
                         <button
                             type="button"
-                            class="flex w-full rounded-sm p-3 hover:bg-[#e9e9e9] text-fims-green"
+                            class="flex w-full rounded-sm p-3 text-fims-green hover:bg-[#e9e9e9]"
                             onclick={async () => {
                                 chooseSemestralRecord(newAcadYear, allSemStrs.indexOf(opt));
                                 await goToPage(newAcadYear, allSemStrs.indexOf(opt));
@@ -158,7 +165,10 @@
                         {#each allSemStrs as opt (opt)}
                             {#if allSemStrs.indexOf(opt) === chosenSemestralRecord.semNum}
                                 <p class="flex w-full rounded-sm p-3 hover:bg-[#e9e9e9]">
-                                    <Icon icon="tabler:check" class="h-6 w-8 pr-2 text-fims-green" />
+                                    <Icon
+                                        icon="tabler:check"
+                                        class="h-6 w-8 pr-2 text-fims-green"
+                                    />
                                     <span>{opt}</span>
                                 </p>
                             {:else if semOpts.includes(allSemStrs.indexOf(opt))}
@@ -166,8 +176,14 @@
                                     type="button"
                                     class="flex w-full rounded-sm p-3 hover:bg-[#e9e9e9]"
                                     onclick={async () => {
-                                        chooseSemestralRecord(chosenSemestralRecord.acadYear, allSemStrs.indexOf(opt));
-                                        await goToPage(chosenSemestralRecord.acadYear, allSemStrs.indexOf(opt));
+                                        chooseSemestralRecord(
+                                            chosenSemestralRecord.acadYear,
+                                            allSemStrs.indexOf(opt),
+                                        );
+                                        await goToPage(
+                                            chosenSemestralRecord.acadYear,
+                                            allSemStrs.indexOf(opt),
+                                        );
                                     }}
                                 >
                                     <div class="w-8 pr-2"></div>
@@ -176,10 +192,16 @@
                             {:else}
                                 <button
                                     type="button"
-                                    class="flex w-full rounded-sm p-3 hover:bg-[#e9e9e9] text-fims-green"
+                                    class="flex w-full rounded-sm p-3 text-fims-green hover:bg-[#e9e9e9]"
                                     onclick={async () => {
-                                        chooseSemestralRecord(chosenSemestralRecord.acadYear, allSemStrs.indexOf(opt));
-                                        await goToPage(chosenSemestralRecord.acadYear, allSemStrs.indexOf(opt));
+                                        chooseSemestralRecord(
+                                            chosenSemestralRecord.acadYear,
+                                            allSemStrs.indexOf(opt),
+                                        );
+                                        await goToPage(
+                                            chosenSemestralRecord.acadYear,
+                                            allSemStrs.indexOf(opt),
+                                        );
                                     }}
                                 >
                                     <span class="w-8 pr-2">+</span>

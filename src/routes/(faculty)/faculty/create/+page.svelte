@@ -1,5 +1,5 @@
 <script>
-    import ProfileForm from "../[facultyid]/ui/ProfileForm.svelte";
+    import ProfileForm from '../[facultyid]/ui/ProfileForm.svelte';
 
     const { data } = $props();
     const { opts, dependencyMaps } = $derived(data);

@@ -1,14 +1,15 @@
 <script lang="ts">
-    import Icon from "@iconify/svelte";
-    import InputTable from "../../../../ui/InputTable.svelte";
-    import type { InputColumnType, InputRowValue } from "$lib/types/input-table";
-    import type { FacultyExtensionDTO } from "$lib/server/queries/faculty-view";
+    import Icon from '@iconify/svelte';
+    import InputTable from '../../../../ui/InputTable.svelte';
+    import type { InputColumnType, InputRowValue } from '$lib/types/input-table';
+    import type { FacultyExtensionDTO } from '$lib/server/queries/faculty-view';
 
     interface Props {
         extensionLoadCredit: number;
         extensionWork: FacultyExtensionDTO;
     }
 
+    // eslint-disable-next-line prefer-const -- bindable variable
     let { extensionLoadCredit = $bindable(), extensionWork }: Props = $props();
 
     // Input Table Columns
@@ -46,17 +47,22 @@
     ];
 
     const extensionValues: InputRowValue[] = $derived(
-        extensionWork.map(({ tupleid, natureOfExtension, agency, startDate, endDate, extensionLoadCredit }, index) => ({
-            rowNum: index,
-            row: [
-                { columnNum: 0, defaultValue: natureOfExtension },
-                { columnNum: 1, defaultValue: agency },
-                { columnNum: 2, defaultValue: startDate },
-                { columnNum: 3, defaultValue: endDate },
-                { columnNum: 4, defaultValue: extensionLoadCredit },
-            ],
-            tupleid: tupleid,
-        }))
+        extensionWork.map(
+            (
+                { tupleid, natureOfExtension, agency, startDate, endDate, extensionLoadCredit },
+                index,
+            ) => ({
+                rowNum: index,
+                row: [
+                    { columnNum: 0, defaultValue: natureOfExtension },
+                    { columnNum: 1, defaultValue: agency },
+                    { columnNum: 2, defaultValue: startDate },
+                    { columnNum: 3, defaultValue: endDate },
+                    { columnNum: 4, defaultValue: extensionLoadCredit },
+                ],
+                tupleid,
+            }),
+        ),
     );
 
     let isVisible = $state(true);
@@ -67,18 +73,28 @@
 
 <div>
     <!-- Section Header -->
-    <button type="button" class="flex items-center w-full h-7.5 border-b-2 border-black/50 px-3 py-2.5" onclick={() => (isVisible = !isVisible)}>
+    <button
+        type="button"
+        class="flex h-7.5 w-full items-center border-b-2 border-black/50 px-3 py-2.5"
+        onclick={() => (isVisible = !isVisible)}
+    >
         {#if isVisible}
-            <Icon icon="tabler:chevron-up" class="h-5 w-5 mr-2" />
+            <Icon icon="tabler:chevron-up" class="mr-2 h-5 w-5" />
         {:else}
-            <Icon icon="tabler:chevron-right" class="h-5 w-5 mr-2" />
+            <Icon icon="tabler:chevron-right" class="mr-2 h-5 w-5" />
         {/if}
         <span>Extension and Community Service</span>
     </button>
 
     {#if isVisible}
         <div class="my-7 pl-3.5">
-            <InputTable tableName="extension" rowLabel="Extension Work/Community Service" columns={extensionColumns} rows={extensionValues} numOfColumns={27} />
+            <InputTable
+                tableName="extension"
+                rowLabel="Extension Work/Community Service"
+                columns={extensionColumns}
+                rows={extensionValues}
+                numOfColumns={27}
+            />
 
             <p class="mt-4 pl-3.5">Total Semester Extension Load Credit: {extensionLoadCredit}</p>
         </div>

@@ -52,13 +52,13 @@
         </div>
 
         <!-- Tabs -->
-        <div class="mb-1 mt-5 w-full flex items-end justify-start">
+        <div class="mt-5 mb-1 flex w-full items-end justify-start">
             <Tab href="/faculty/{facultyid}/profile" name="Profile" />
             <Tab
                 href="/faculty/{facultyid}/{chosenSemestralRecord.acadYear}/{chosenSemestralRecord.semNum}"
                 name="Semestral Records"
             />
-            <div class="border-b-2 border-fims-green w-full"></div>
+            <div class="w-full border-b-2 border-fims-green"></div>
         </div>
 
         {@render children()}

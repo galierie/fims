@@ -24,17 +24,23 @@
 
 {#if viewState.isEditing}
     <div class="flex items-center gap-2">
-        <GreenButton onclick={() => {
-            if (makeForm) makeForm.requestSubmit();
-        }}>
-            <Icon icon="tabler:device-floppy" class="h-5 w-5 mr-2" />
+        <GreenButton
+            onclick={() => {
+                if (makeForm) makeForm.requestSubmit();
+            }}
+        >
+            <Icon icon="tabler:device-floppy" class="mr-2 h-5 w-5" />
             <span>Save Record</span>
         </GreenButton>
-        <RedButton onclick={async () => {
-            await invalidateAll();
-            await goto(`/faculty/${facultyid}/${chosenSemestralRecord.acadYear}/${chosenSemestralRecord.semNum}`);
-        }}>
-            <Icon icon="tabler:database-off" class="h-5 w-5 mr-2" />
+        <RedButton
+            onclick={async () => {
+                await invalidateAll();
+                await goto(
+                    `/faculty/${facultyid}/${chosenSemestralRecord.acadYear}/${chosenSemestralRecord.semNum}`,
+                );
+            }}
+        >
+            <Icon icon="tabler:database-off" class="mr-2 h-5 w-5" />
             <span>Discard Changes</span>
         </RedButton>
     </div>

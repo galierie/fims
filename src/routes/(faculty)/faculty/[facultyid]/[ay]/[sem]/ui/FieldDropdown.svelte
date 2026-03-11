@@ -18,17 +18,17 @@
 
     let isDropdownOpen = $state(false);
 
-    let colStartClass = $derived(colStart === undefined ? '' : `col-start-${colStart}`);
-    let colSpanClass = $derived(colSpan === undefined ? '' : `col-span-${colSpan}`);
+    const colStartClass = $derived(colStart === undefined ? '' : `col-start-${colStart}`);
+    const colSpanClass = $derived(colSpan === undefined ? '' : `col-span-${colSpan}`);
 </script>
 
 <div class="relative w-full {colStartClass} {colSpanClass}">
-    <div class="flex items-center justify-end w-full">
-        <span class="w-fit text-right mr-2">{label}</span>
+    <div class="flex w-full items-center justify-end">
+        <span class="mr-2 w-fit text-right">{label}</span>
         {#if viewState.isEditing && (!immutable || (immutable && selectedOpt === null))}
             <button
                 type="button"
-                class="relative w-45 px-1.5 2xl:w-75 text-left h-8 rounded-sm bg-white"
+                class="relative h-8 w-45 rounded-sm bg-white px-1.5 text-left 2xl:w-75"
                 onclick={() => {
                     isDropdownOpen = !isDropdownOpen;
                 }}
@@ -40,7 +40,9 @@
                 />
             </button>
         {:else}
-            <span class="w-45 px-1.5 2xl:w-75 content-center text-left h-8 rounded-sm bg-white">{selectedOpt ?? '-'}</span>
+            <span class="h-8 w-45 content-center rounded-sm bg-white px-1.5 text-left 2xl:w-75"
+                >{selectedOpt ?? '-'}</span
+            >
         {/if}
     </div>
 

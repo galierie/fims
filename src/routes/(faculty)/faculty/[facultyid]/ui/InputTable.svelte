@@ -1,11 +1,11 @@
 <script lang="ts">
-    import { onMount } from "svelte";
+    import { onMount } from 'svelte';
 
-    import type { InputColumnType, InputCellValue, InputRowValue } from "$lib/types/input-table";
-    import InputTableRow from "./InputTableRow.svelte";
-    import { viewState } from "../states/view-state.svelte";
-    import GreenButton from "$lib/ui/GreenButton.svelte";
- 
+    import type { InputColumnType, InputCellValue, InputRowValue } from '$lib/types/input-table';
+    import InputTableRow from './InputTableRow.svelte';
+    import { viewState } from '../states/view-state.svelte';
+    import GreenButton from '$lib/ui/GreenButton.svelte';
+
     interface Props {
         tableName: string;
         rowLabel: string;
@@ -18,9 +18,9 @@
 
     // eslint-disable-next-line prefer-const -- changing value
     let { tableName, rowLabel, columns, rows, numOfColumns, colStart, colSpan }: Props = $props();
-    
+
     let nextRowNum = $derived(rows.length);
-    let haveValues: boolean[] = $derived(Array(nextRowNum).fill(true));
+    const haveValues: boolean[] = $derived(Array(nextRowNum).fill(true));
 
     let actualRows: InputRowValue[] = $derived(rows);
     let deletedRows: number[] = $state([]);
@@ -28,24 +28,23 @@
     function toggleRowDeletion(rowNum: number) {
         const [row] = actualRows.filter((r) => r.rowNum === rowNum);
         if (deletedRows.includes(rowNum)) deletedRows = deletedRows.filter((r) => r !== rowNum);
-        else if (haveValues[rowNum] || row.tupleid !== undefined) deletedRows = [...deletedRows, rowNum];
-        else actualRows = actualRows.filter((r) => (r.rowNum !== rowNum));
+        else if (haveValues[rowNum] || row.tupleid !== undefined)
+            deletedRows = [...deletedRows, rowNum];
+        else actualRows = actualRows.filter((r) => r.rowNum !== rowNum);
     }
 
     function addRow() {
         const newRow: InputCellValue[] = [];
-        for (let c = 0; c < columns.length; c++) {
-            newRow.push({ columnNum: c });
-        }
+        for (let c = 0; c < columns.length; c++) newRow.push({ columnNum: c });
 
         actualRows = [...actualRows, { rowNum: nextRowNum, row: newRow }];
         nextRowNum++;
     }
 
-    let gridTemplateColumns = $derived(`grid-cols-${numOfColumns}`);
-    let colStartClass = $derived(colStart === undefined ? '' : `col-start-${colStart}`);
-    let colSpanClass = $derived(colSpan === undefined ? '' : `col-span-${colSpan}`);
-    let buttonDivColSpanClass = $derived(`col-span-${numOfColumns}`);
+    const gridTemplateColumns = $derived(`grid-cols-${numOfColumns}`);
+    const colStartClass = $derived(colStart === undefined ? '' : `col-start-${colStart}`);
+    const colSpanClass = $derived(colSpan === undefined ? '' : `col-span-${colSpan}`);
+    const buttonDivColSpanClass = $derived(`col-span-${numOfColumns}`);
 
     // Hacky way of preventing FOUC
     let domContainer: HTMLDivElement | null = $state(null);
@@ -58,7 +57,7 @@
             deletedRows = [];
             actualRows = rows;
         }
-    })
+    });
 
     // Safelist Tailwind classes
 
@@ -87,15 +86,26 @@
     <div class="grid {gridTemplateColumns}">
         {#each columns as { label, colSpan: cellColSpan } (label)}
             {@const cellColSpanClass = `col-span-${cellColSpan}`}
-            <div class="bg-fims-green text-white h-8 {cellColSpanClass} flex items-center justify-center">
-                <span class="font-semibold text-center">{label}</span>
+            <div
+                class="h-8 bg-fims-green text-white {cellColSpanClass} flex items-center justify-center"
+            >
+                <span class="text-center font-semibold">{label}</span>
             </div>
         {/each}
     </div>
 
     {#each actualRows as { rowNum, row, tupleid } (rowNum)}
         <div class="relative">
-            <InputTableRow {columns} {row} {numOfColumns} {rowNum} {tupleid} toggleRowDeletion={() => (toggleRowDeletion(rowNum))} isDeleted={deletedRows.includes(rowNum)} bind:hasValue={haveValues[rowNum]} />
+            <InputTableRow
+                {columns}
+                {row}
+                {numOfColumns}
+                {rowNum}
+                {tupleid}
+                toggleRowDeletion={() => toggleRowDeletion(rowNum)}
+                isDeleted={deletedRows.includes(rowNum)}
+                bind:hasValue={haveValues[rowNum]}
+            />
         </div>
     {/each}
 

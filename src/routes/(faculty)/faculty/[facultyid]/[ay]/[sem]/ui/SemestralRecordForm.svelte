@@ -27,11 +27,19 @@
         existingOpts: AcadYearSemOpts[];
         facultyid: number;
         semestralRecord?: FacultySemestralRecordDTO;
-        opts?: Map<string, Array<any>>;
+        opts?: Map<string, Array<string>>;
         dependencyMaps?: Map<string, Map<string, string>>;
     }
 
-    const { acadYearOpts, allSemStrs, existingOpts, facultyid, semestralRecord, opts, dependencyMaps }: Props = $props();
+    const {
+        acadYearOpts,
+        allSemStrs,
+        existingOpts,
+        facultyid,
+        semestralRecord,
+        opts,
+        dependencyMaps,
+    }: Props = $props();
 
     let isLoading = $state(false);
 
@@ -44,7 +52,13 @@
     let extensionLoadCredit = $state(0);
     let studyLoadCredit = $state(0);
 
-    let totalCredit = $derived(administrativeLoadCredit + teachingLoadCredit + researchLoadCredit + extensionLoadCredit + studyLoadCredit);
+    const totalCredit = $derived(
+        administrativeLoadCredit +
+            teachingLoadCredit +
+            researchLoadCredit +
+            extensionLoadCredit +
+            studyLoadCredit,
+    );
 </script>
 
 <form
@@ -64,19 +78,21 @@
 >
     <div class="flex items-center gap-2">
         {#if viewState.isEditing}
-            <GreenButton onclick={() => {
-                if (semestralRecordForm) semestralRecordForm.requestSubmit();
-            }}>
-                <Icon icon="tabler:device-floppy" class="h-5 w-5 mr-2" />
+            <GreenButton
+                onclick={() => {
+                    if (semestralRecordForm) semestralRecordForm.requestSubmit();
+                }}
+            >
+                <Icon icon="tabler:device-floppy" class="mr-2 h-5 w-5" />
                 <span>Save Record</span>
             </GreenButton>
             <RedButton type="reset">
-                <Icon icon="tabler:database-off" class="h-5 w-5 mr-2" />
+                <Icon icon="tabler:database-off" class="mr-2 h-5 w-5" />
                 <span>Discard Changes</span>
             </RedButton>
         {:else}
             <GreenButton onclick={setToEdit}>
-                <Icon icon="tabler:edit" class="h-5 w-5 mr-2" />
+                <Icon icon="tabler:edit" class="mr-2 h-5 w-5" />
                 <span>Edit</span>
             </GreenButton>
         {/if}
@@ -84,26 +100,43 @@
     </div>
 
     <div>
-        <div class="w-full grid grid-cols-8"><div class="col-span-8"></div></div>
-        <div class="w-full grid grid-cols-8 mt-4">
-            <p class="flex items-center w-full">
-                <span class="w-fit text-align-right mr-2">Total Credit:</span>
+        <div class="grid w-full grid-cols-8"><div class="col-span-8"></div></div>
+        <div class="mt-4 grid w-full grid-cols-8">
+            <p class="flex w-full items-center">
+                <span class="text-align-right mr-2 w-fit">Total Credit:</span>
                 <span>{totalCredit}</span>
             </p>
-            <FieldDropdown label="Current Rank" name="current-rank" opts={opts?.get('rankTitles') ?? []} selectedOpt={semestralRecord?.currentRankTitle ?? ''} colSpan={3} />
+            <FieldDropdown
+                label="Current Rank"
+                name="current-rank"
+                opts={opts?.get('rankTitles') ?? []}
+                selectedOpt={semestralRecord?.currentRankTitle ?? ''}
+                colSpan={3}
+            />
         </div>
-        <div class="w-full grid grid-cols-8 mt-4">
-            <p class="flex items-center w-full">
-                <span class="w-fit text-align-right mr-2">Load Status:</span>
+        <div class="mt-4 grid w-full grid-cols-8">
+            <p class="flex w-full items-center">
+                <span class="text-align-right mr-2 w-fit">Load Status:</span>
                 <span>{totalCredit}</span>
             </p>
-            <FieldDropdown label="Current Highest Educational Attainment" name="current-highest-educational-attainment" opts={opts?.get('degrees') ?? []} selectedOpt={semestralRecord?.currentHighestDegree ?? ''} colSpan={3} />
+            <FieldDropdown
+                label="Current Highest Educational Attainment"
+                name="current-highest-educational-attainment"
+                opts={opts?.get('degrees') ?? []}
+                selectedOpt={semestralRecord?.currentHighestDegree ?? ''}
+                colSpan={3}
+            />
         </div>
         <div class="mt-8.5">
             <label for="remarks">
                 <span>Remarks</span>
             </label>
-            <textarea name="remarks" id="remarks" class="min-h-90 mt-4 h-fit w-full rounded-2xl border-0 bg-white p-1.5 placeholder-fims-gray focus:ring-0" disabled={!viewState.isEditing}></textarea>
+            <textarea
+                name="remarks"
+                id="remarks"
+                class="mt-4 h-fit min-h-90 w-full rounded-2xl border-0 bg-white p-1.5 placeholder-fims-gray focus:ring-0"
+                disabled={!viewState.isEditing}
+            ></textarea>
         </div>
     </div>
 
@@ -114,7 +147,6 @@
             committees={semestralRecord?.committees ?? []}
             adminWorks={semestralRecord?.adminWorks ?? []}
             {opts}
-            {dependencyMaps}
         />
         <TeachingSection
             bind:teachingLoadCredit
@@ -131,10 +163,7 @@
             bind:extensionLoadCredit
             extensionWork={semestralRecord?.extensionWork ?? []}
         />
-        <StudyLoadSection
-            bind:studyLoadCredit
-            studyLoad={semestralRecord?.studyLoad ?? []}
-        />
+        <StudyLoadSection bind:studyLoadCredit studyLoad={semestralRecord?.studyLoad ?? []} />
     </div>
 </form>
 

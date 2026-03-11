@@ -1,19 +1,31 @@
 <script lang="ts">
-    import Icon from "@iconify/svelte";
-    import InputTable from "../../../../ui/InputTable.svelte";
-    import type { InputColumnType, InputRowValue } from "$lib/types/input-table";
-    import type { FacultyCoursesTaughtDTO, FacultyMenteesDTO } from "$lib/server/queries/faculty-view";
+    import Icon from '@iconify/svelte';
+    import InputTable from '../../../../ui/InputTable.svelte';
+    import type { InputColumnType, InputRowValue } from '$lib/types/input-table';
+    import type {
+        FacultyCoursesTaughtDTO,
+        FacultyMenteesDTO,
+    } from '$lib/server/queries/faculty-view';
 
     interface Props {
         teachingLoadCredit: number;
         coursesTaught: FacultyCoursesTaughtDTO;
         mentees: FacultyMenteesDTO;
-        opts?: Map<string, Array<any>>;
+        opts?: Map<string, Array<string>>;
         dependencyMaps?: Map<string, Map<string, string>>;
     }
 
-    // eslint-disable-next-line prefer-const -- bindable variable
-    let { teachingLoadCredit = $bindable(), coursesTaught, mentees, opts, dependencyMaps }: Props = $props();
+    let {
+        teachingLoadCredit = $bindable(),
+        // eslint-disable-next-line prefer-const -- bindable variable
+        coursesTaught,
+        // eslint-disable-next-line prefer-const -- bindable variable
+        mentees,
+        // eslint-disable-next-line prefer-const -- bindable variable
+        opts,
+        // eslint-disable-next-line prefer-const -- bindable variable
+        dependencyMaps,
+    }: Props = $props();
 
     // Input Table Columns
     const courseTitles = $derived(opts?.get('courseTitles'));
@@ -61,18 +73,31 @@
     ]);
 
     const courseValues: InputRowValue[] = $derived(
-        coursesTaught.map(({ tupleid, title, units, section, numberOfStudents, teachingLoadCredit, sectionSET }, index) => ({
-            rowNum: index,
-            row: [
-                { columnNum: 0, defaultValue: title ?? undefined },
-                { columnNum: 1, defaultValue: units?.toString() ?? undefined },
-                { columnNum: 2, defaultValue: section ?? undefined },
-                { columnNum: 3, defaultValue: numberOfStudents?.toString() ?? undefined },
-                { columnNum: 4, defaultValue: teachingLoadCredit },
-                { columnNum: 5, defaultValue: sectionSET ?? undefined },
-            ],
-            tupleid: tupleid,
-        }))
+        coursesTaught.map(
+            (
+                {
+                    tupleid,
+                    title,
+                    units,
+                    section,
+                    numberOfStudents,
+                    teachingLoadCredit,
+                    sectionSET,
+                },
+                index,
+            ) => ({
+                rowNum: index,
+                row: [
+                    { columnNum: 0, defaultValue: title ?? undefined },
+                    { columnNum: 1, defaultValue: units?.toString() ?? undefined },
+                    { columnNum: 2, defaultValue: section ?? undefined },
+                    { columnNum: 3, defaultValue: numberOfStudents?.toString() ?? undefined },
+                    { columnNum: 4, defaultValue: teachingLoadCredit },
+                    { columnNum: 5, defaultValue: sectionSET ?? undefined },
+                ],
+                tupleid,
+            }),
+        ),
     );
 
     const menteeColumns: InputColumnType[] = [
@@ -121,19 +146,33 @@
     ];
 
     const menteeValues: InputRowValue[] = $derived(
-        mentees.map(({ tupleid, lastName, middleName, firstName, category, startDate, endDate, teachingLoadCredit }, index) => ({
-            rowNum: index,
-            row: [
-                { columnNum: 0, defaultValue: lastName ?? undefined },
-                { columnNum: 1, defaultValue: firstName ?? undefined },
-                { columnNum: 2, defaultValue: middleName ?? undefined },
-                { columnNum: 3, defaultValue: category ?? undefined },
-                { columnNum: 4, defaultValue: startDate },
-                { columnNum: 5, defaultValue: endDate },
-                { columnNum: 6, defaultValue: teachingLoadCredit },
-            ],
-            tupleid: tupleid,
-        }))
+        mentees.map(
+            (
+                {
+                    tupleid,
+                    lastName,
+                    middleName,
+                    firstName,
+                    category,
+                    startDate,
+                    endDate,
+                    teachingLoadCredit,
+                },
+                index,
+            ) => ({
+                rowNum: index,
+                row: [
+                    { columnNum: 0, defaultValue: lastName ?? undefined },
+                    { columnNum: 1, defaultValue: firstName ?? undefined },
+                    { columnNum: 2, defaultValue: middleName ?? undefined },
+                    { columnNum: 3, defaultValue: category ?? undefined },
+                    { columnNum: 4, defaultValue: startDate },
+                    { columnNum: 5, defaultValue: endDate },
+                    { columnNum: 6, defaultValue: teachingLoadCredit },
+                ],
+                tupleid,
+            }),
+        ),
     );
 
     let isVisible = $state(true);
@@ -145,11 +184,15 @@
 
 <div>
     <!-- Section Header -->
-    <button type="button" class="flex items-center w-full h-7.5 border-b-2 border-black/50 px-3 py-2.5" onclick={() => (isVisible = !isVisible)}>
+    <button
+        type="button"
+        class="flex h-7.5 w-full items-center border-b-2 border-black/50 px-3 py-2.5"
+        onclick={() => (isVisible = !isVisible)}
+    >
         {#if isVisible}
-            <Icon icon="tabler:chevron-up" class="h-5 w-5 mr-2" />
+            <Icon icon="tabler:chevron-up" class="mr-2 h-5 w-5" />
         {:else}
-            <Icon icon="tabler:chevron-right" class="h-5 w-5 mr-2" />
+            <Icon icon="tabler:chevron-right" class="mr-2 h-5 w-5" />
         {/if}
         <span>Teaching</span>
     </button>
@@ -158,12 +201,24 @@
         <div class="my-7 pl-3.5">
             <div>
                 <span class="pl-4">Classes Taught</span>
-                <InputTable tableName="courses" rowLabel="Class" columns={courseColumns} rows={courseValues} numOfColumns={22} />
+                <InputTable
+                    tableName="courses"
+                    rowLabel="Class"
+                    columns={courseColumns}
+                    rows={courseValues}
+                    numOfColumns={22}
+                />
             </div>
 
             <div class="mt-4">
                 <span class="pl-4">Mentoring</span>
-                <InputTable tableName="mentees" rowLabel="Mentee" columns={menteeColumns} rows={menteeValues} numOfColumns={31} />
+                <InputTable
+                    tableName="mentees"
+                    rowLabel="Mentee"
+                    columns={menteeColumns}
+                    rows={menteeValues}
+                    numOfColumns={31}
+                />
             </div>
 
             <p class="mt-4 pl-3.5">Total Semester Teaching Load Credit: {teachingLoadCredit}</p>

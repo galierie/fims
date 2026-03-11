@@ -1,21 +1,21 @@
 <script lang="ts">
-    import { enhance } from "$app/forms";
-    import Icon from "@iconify/svelte";
+    import { enhance } from '$app/forms';
+    import Icon from '@iconify/svelte';
 
-    import Field from "./Field.svelte";
-    import GreenButton from "$lib/ui/GreenButton.svelte";
-    import InputTable from "./InputTable.svelte";
-    import LoadingScreen from "$lib/ui/LoadingScreen.svelte";
-    import RedButton from "$lib/ui/RedButton.svelte";
+    import Field from './Field.svelte';
+    import GreenButton from '$lib/ui/GreenButton.svelte';
+    import InputTable from './InputTable.svelte';
+    import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
+    import RedButton from '$lib/ui/RedButton.svelte';
 
-    import type { FacultyProfileRecordDTO } from "$lib/server/queries/faculty-view.js";
-    import type { InputColumnType, InputRowValue } from "$lib/types/input-table.js";
+    import type { FacultyProfileRecordDTO } from '$lib/server/queries/faculty-view.js';
+    import type { InputColumnType, InputRowValue } from '$lib/types/input-table.js';
 
     import { viewState, setToEdit, resetViewState } from '../states/view-state.svelte.js';
 
     interface Props {
         profile?: FacultyProfileRecordDTO;
-        opts?: Map<string, Array<any>>;
+        opts?: Map<string, Array<string>>;
         dependencyMaps?: Map<string, Map<string, string>>;
         isCreating?: boolean;
     }
@@ -42,7 +42,7 @@
             rowNum: index,
             row: [{ columnNum: 0, defaultValue: email }],
             tupleid,
-        }))
+        })),
     );
 
     const contactNumColumns: InputColumnType[] = [
@@ -59,7 +59,7 @@
             rowNum: index,
             row: [{ columnNum: 0, defaultValue: contactNum }],
             tupleid,
-        }))
+        })),
     );
 
     const homeAddressColumns: InputColumnType[] = [
@@ -76,7 +76,7 @@
             rowNum: index,
             row: [{ columnNum: 0, defaultValue: homeAddress }],
             tupleid,
-        }))
+        })),
     );
 
     const educationalAttainmentColumns: InputColumnType[] = [
@@ -101,15 +101,17 @@
     ];
 
     const educationalAttainmentValues: InputRowValue[] | undefined = $derived(
-        profile?.educationalAttainments.map(({ tupleid, degree, institution, graduationYear }, index) => ({
-            rowNum: index,
-            row: [
-                { columnNum: 0, defaultValue: degree },
-                { columnNum: 1, defaultValue: institution },
-                { columnNum: 2, defaultValue: graduationYear?.toString() ?? undefined },
-            ],
-            tupleid,
-        }))
+        profile?.educationalAttainments.map(
+            ({ tupleid, degree, institution, graduationYear }, index) => ({
+                rowNum: index,
+                row: [
+                    { columnNum: 0, defaultValue: degree },
+                    { columnNum: 1, defaultValue: institution },
+                    { columnNum: 2, defaultValue: graduationYear?.toString() ?? undefined },
+                ],
+                tupleid,
+            }),
+        ),
     );
 
     const fieldsOfInterest = $derived(opts?.get('fieldsOfInterest'));
@@ -128,7 +130,7 @@
             rowNum: index,
             row: [{ columnNum: 0, defaultValue: field ?? undefined }],
             tupleid,
-        }))
+        })),
     );
 
     const rankTitles = $derived(opts?.get('rankTitles'));
@@ -175,17 +177,19 @@
     ]);
 
     const promotionHistoryValues: InputRowValue[] | undefined = $derived(
-        profile?.promotionHistory.map(({ tupleid, rankTitle, appointmentStatus, dateOfTenureOrRenewal }, index) => ({
-            rowNum: index,
-            row: [
-                { columnNum: 0, defaultValue: rankTitle ?? undefined },
-                { columnNum: 1 },
-                { columnNum: 2 },
-                { columnNum: 3, defaultValue: appointmentStatus },
-                { columnNum: 4, defaultValue: dateOfTenureOrRenewal },
-            ],
-            tupleid,
-        }))
+        profile?.promotionHistory.map(
+            ({ tupleid, rankTitle, appointmentStatus, dateOfTenureOrRenewal }, index) => ({
+                rowNum: index,
+                row: [
+                    { columnNum: 0, defaultValue: rankTitle ?? undefined },
+                    { columnNum: 1 },
+                    { columnNum: 2 },
+                    { columnNum: 3, defaultValue: appointmentStatus },
+                    { columnNum: 4, defaultValue: dateOfTenureOrRenewal },
+                ],
+                tupleid,
+            }),
+        ),
     );
 
     let isLoading = $state(false);
@@ -211,77 +215,157 @@
 >
     <div class="flex items-center gap-2">
         {#if viewState.isEditing}
-            <GreenButton onclick={() => {
-                if (profileForm) profileForm.requestSubmit();
-            }}>
-                <Icon icon="tabler:device-floppy" class="h-5 w-5 mr-2" />
+            <GreenButton
+                onclick={() => {
+                    if (profileForm) profileForm.requestSubmit();
+                }}
+            >
+                <Icon icon="tabler:device-floppy" class="mr-2 h-5 w-5" />
                 <span>Save Record</span>
             </GreenButton>
             {#if !isCreating}
                 <RedButton type="reset">
-                    <Icon icon="tabler:database-off" class="h-5 w-5 mr-2" />
+                    <Icon icon="tabler:database-off" class="mr-2 h-5 w-5" />
                     <span>Discard Changes</span>
                 </RedButton>
             {/if}
-        {:else}
-            {#if !isCreating}
-                <GreenButton onclick={setToEdit}>
-                    <Icon icon="tabler:edit" class="h-5 w-5 mr-2" />
-                    <span>Edit</span>
-                </GreenButton>
-            {/if}
+        {:else if !isCreating}
+            <GreenButton onclick={setToEdit}>
+                <Icon icon="tabler:edit" class="mr-2 h-5 w-5" />
+                <span>Edit</span>
+            </GreenButton>
         {/if}
     </div>
 
     <div>
-        <div class="w-full grid grid-cols-4 mt-4">
+        <div class="mt-4 grid w-full grid-cols-4">
             <Field label="Last Name" name="last-name" defaultValue={profile?.lastname} />
             <Field label="First Name" name="first-name" defaultValue={profile?.firstname} />
             <Field label="Middle Name" name="middle-name" defaultValue={profile?.middlename} />
             <Field label="Suffix" name="suffix" defaultValue={profile?.suffix ?? undefined} />
         </div>
-        <div class="w-full grid grid-cols-4 mt-4">
-            <Field label="Birth Date" name="birth-date" type="date" defaultValue={profile?.birthdate} />
-            <Field label="Maiden Name" name="maiden-name" defaultValue={profile?.maidenname ?? undefined} />
+        <div class="mt-4 grid w-full grid-cols-4">
+            <Field
+                label="Birth Date"
+                name="birth-date"
+                type="date"
+                defaultValue={profile?.birthdate}
+            />
+            <Field
+                label="Maiden Name"
+                name="maiden-name"
+                defaultValue={profile?.maidenname ?? undefined}
+            />
         </div>
 
-        <div class="w-full grid grid-cols-4 mt-4">
-            <InputTable tableName="emails" rowLabel="Email" columns={emailColumns} rows={emailValues ?? []} numOfColumns={1} />
-            <InputTable tableName="contact-numbers" rowLabel="Contact Number" columns={contactNumColumns} rows={contactNumValues ?? []} numOfColumns={1} />
-            <InputTable tableName="home-addresses" rowLabel="Home Address" columns={homeAddressColumns} rows={homeAddressValues ?? []} numOfColumns={1} colSpan={2} />
+        <div class="mt-4 grid w-full grid-cols-4">
+            <InputTable
+                tableName="emails"
+                rowLabel="Email"
+                columns={emailColumns}
+                rows={emailValues ?? []}
+                numOfColumns={1}
+            />
+            <InputTable
+                tableName="contact-numbers"
+                rowLabel="Contact Number"
+                columns={contactNumColumns}
+                rows={contactNumValues ?? []}
+                numOfColumns={1}
+            />
+            <InputTable
+                tableName="home-addresses"
+                rowLabel="Home Address"
+                columns={homeAddressColumns}
+                rows={homeAddressValues ?? []}
+                numOfColumns={1}
+                colSpan={2}
+            />
         </div>
 
-        <p class="font-semibold mt-4 px-4">Educational Attainment</p>
-        <div class="w-full grid grid-cols-4 mt-4">
-            <InputTable tableName="educational-attainments" rowLabel="Educational Attainment" columns={educationalAttainmentColumns} rows={educationalAttainmentValues ?? []} numOfColumns={5} colSpan={2} />
-            <InputTable tableName="fields-of-interest" rowLabel="Fields of Interest" columns={fieldOfInterestColumns} rows={fieldOfInterestValues ?? []} numOfColumns={1} />
+        <p class="mt-4 px-4 font-semibold">Educational Attainment</p>
+        <div class="mt-4 grid w-full grid-cols-4">
+            <InputTable
+                tableName="educational-attainments"
+                rowLabel="Educational Attainment"
+                columns={educationalAttainmentColumns}
+                rows={educationalAttainmentValues ?? []}
+                numOfColumns={5}
+                colSpan={2}
+            />
+            <InputTable
+                tableName="fields-of-interest"
+                rowLabel="Fields of Interest"
+                columns={fieldOfInterestColumns}
+                rows={fieldOfInterestValues ?? []}
+                numOfColumns={1}
+            />
         </div>
 
-        <div class="w-full grid grid-cols-4 mt-4">
-            <Field label="PhilHealth No." name="philhealth" immutable={true} defaultValue={profile?.philhealth} />
-            <Field label="Pag-IBIG No." name="pagibig" immutable={true} defaultValue={profile?.pagibig} />
-            <Field label="PSI Item No." name="psi-item" immutable={true} defaultValue={profile?.psiitem} />
+        <div class="mt-4 grid w-full grid-cols-4">
+            <Field
+                label="PhilHealth No."
+                name="philhealth"
+                immutable={true}
+                defaultValue={profile?.philhealth}
+            />
+            <Field
+                label="Pag-IBIG No."
+                name="pagibig"
+                immutable={true}
+                defaultValue={profile?.pagibig}
+            />
+            <Field
+                label="PSI Item No."
+                name="psi-item"
+                immutable={true}
+                defaultValue={profile?.psiitem}
+            />
         </div>
-        <div class="w-full grid grid-cols-4 mt-4">
+        <div class="mt-4 grid w-full grid-cols-4">
             <Field label="TIN" name="tin" immutable={true} defaultValue={profile?.tin} />
             <Field label="GSIS BP No." name="gsis" immutable={true} defaultValue={profile?.gsis} />
-            <Field label="Employee No." name="employee-number" immutable={true} defaultValue={profile?.employeenumber} />
+            <Field
+                label="Employee No."
+                name="employee-number"
+                immutable={true}
+                defaultValue={profile?.employeenumber}
+            />
         </div>
-        <div class="w-full grid grid-cols-4 mt-4">
+        <div class="mt-4 grid w-full grid-cols-4">
             <Field label="Status" name="status" defaultValue={profile?.status} />
-            <Field label="Date of Original Appointment" name="date-of-original-appointment" type="date" colSpan={2} defaultValue={profile?.dateoforiginalappointment} />
+            <Field
+                label="Date of Original Appointment"
+                name="date-of-original-appointment"
+                type="date"
+                colSpan={2}
+                defaultValue={profile?.dateoforiginalappointment}
+            />
         </div>
 
-        <p class="font-semibold mt-6 px-4">Promotion History</p>
-        <div class="w-full grid grid-cols-11 mt-4">
-            <InputTable tableName="promotion-history" rowLabel="Promotion" columns={promotionHistoryColumns} rows={promotionHistoryValues ?? []} numOfColumns={9} colSpan={9} />
+        <p class="mt-6 px-4 font-semibold">Promotion History</p>
+        <div class="mt-4 grid w-full grid-cols-11">
+            <InputTable
+                tableName="promotion-history"
+                rowLabel="Promotion"
+                columns={promotionHistoryColumns}
+                rows={promotionHistoryValues ?? []}
+                numOfColumns={9}
+                colSpan={9}
+            />
         </div>
 
         <div class="mt-8.5">
             <label for="remarks">
                 <span>Remarks</span>
             </label>
-            <textarea name="remarks" id="remarks" class="min-h-90 mt-4 h-fit w-full rounded-2xl border-0 bg-white p-1.5 placeholder-fims-gray focus:ring-0" disabled={!viewState.isEditing} defaultValue={profile?.remarks ?? ''}></textarea>
+            <textarea
+                name="remarks"
+                id="remarks"
+                class="mt-4 h-fit min-h-90 w-full rounded-2xl border-0 bg-white p-1.5 placeholder-fims-gray focus:ring-0"
+                disabled={!viewState.isEditing}
+                defaultValue={profile?.remarks ?? ''}
+            ></textarea>
         </div>
     </div>
 </form>
