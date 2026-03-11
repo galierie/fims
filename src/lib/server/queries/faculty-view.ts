@@ -93,15 +93,13 @@ export async function getFacultyPromotionHistory(facultyid: number) {
 }
 
 export async function getFacultyHomeAddresses(facultyid: number) {
-    return (
-        await db
-            .select({
-                tupleid: facultyhomeaddress.facultyhomeaddressid,
-                homeAddress: facultyhomeaddress.homeaddress,
-            })
-            .from(facultyhomeaddress)
-            .where(eq(facultyhomeaddress.facultyid, facultyid))
-    ).map(({ homeAddress }) => homeAddress);
+    return await db
+        .select({
+            tupleid: facultyhomeaddress.facultyhomeaddressid,
+            homeAddress: facultyhomeaddress.homeaddress,
+        })
+        .from(facultyhomeaddress)
+        .where(eq(facultyhomeaddress.facultyid, facultyid));
 }
 
 export async function getFacultyEmailAddresses(facultyid: number) {
