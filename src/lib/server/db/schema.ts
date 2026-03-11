@@ -580,6 +580,10 @@ export const rankRelations = relations(rank, ({ many }) => ({
     facultyranks: many(facultyrank),
 }));
 
+export const appointmentstatusRelations = relations(appointmentstatus, ({ many }) => ({
+    facultyranks: many(facultyrank),
+}));
+
 export const facultyrankRelations = relations(facultyrank, ({ many, one }) => ({
     faculty: one(faculty, {
         fields: [facultyrank.facultyid],
