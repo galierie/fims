@@ -256,6 +256,7 @@ export async function getFacultyMentees(facultysemesterid: number) {
 export async function getFacultyResearch(facultysemesterid: number) {
     return await db
         .select({
+            tupleid: facultyresearch.facultyresearchid,
             title: research.title,
             startDate: research.startdate,
             endDate: research.enddate,
