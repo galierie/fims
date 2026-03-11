@@ -1,6 +1,6 @@
 import { error, redirect } from '@sveltejs/kit';
 
-import { getAllAdminPositions, getAllFacultySemesters, getAllSemesterms, getFacultyEducationalAttainments, getFacultyPromotionHistory, getFacultySemestralRecords } from '$lib/server/queries/faculty-view';
+import { getAllAdminPositions, getAllFacultySemesters, getAllOffices, getAllSemesterms, getFacultyEducationalAttainments, getFacultyPromotionHistory, getFacultySemestralRecords } from '$lib/server/queries/faculty-view';
 
 export async function load({ params }) {
     const {
@@ -41,6 +41,7 @@ export async function load({ params }) {
     opts.set('degrees', educationalAttainments.map(({ degree }) => degree));
 
     opts.set('adminPositions', await getAllAdminPositions());
+    opts.set('offices', await getAllOffices());
 
     return {
         acadYearOpts,
