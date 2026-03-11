@@ -59,6 +59,7 @@ export async function getFacultyContactNumbers(facultyid: number) {
 export async function getFacultyEducationalAttainments(facultyid: number) {
     return await db
         .select({
+            tupleid: facultyeducationalattainment.facultyeducationalattainmentid,
             degree: facultyeducationalattainment.degree,
             institution: facultyeducationalattainment.institution,
             graduationYear: facultyeducationalattainment.graduationyear,
