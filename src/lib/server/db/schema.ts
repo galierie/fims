@@ -147,6 +147,10 @@ export const rank = pgTable('rank', {
     salaryrate: numeric({ precision: 10, scale: 2 }).notNull(),
 });
 
+export const appointmentstatus = pgTable('appointmentstatus', {
+    appointmentstatus: varchar({ length: 50 }).primaryKey().notNull(),
+});
+
 export const facultyrank = pgTable(
     'facultyrank',
     {
