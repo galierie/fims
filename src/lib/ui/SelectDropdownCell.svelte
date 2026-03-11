@@ -2,9 +2,9 @@
     import Icon from '@iconify/svelte';
 
     interface Props {
-        name: string;
+        name?: string;
         opts: string[];
-        selectedOpt: string | null;
+        selectedOpt?: string | null;
     }
 
     // eslint-disable-next-line prefer-const -- bindable variable
