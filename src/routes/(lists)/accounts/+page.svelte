@@ -8,7 +8,7 @@
     import SaveConfirmation from '$lib/ui/SaveConfirmation.svelte';
     import DeleteConfirmation from '$lib/ui/DeleteConfirmation.svelte';
     import SearchBar from '$lib/ui/SearchBar.svelte';
-    import SelectDropdown from '$lib/ui/SelectDropdown.svelte';
+    import SelectDropdownCell from '$lib/ui/SelectDropdownCell.svelte';
     import { enhance } from '$app/forms';
     import { goto } from '$app/navigation';
     import { page } from '$app/state';
@@ -209,7 +209,12 @@
                     />
                 </div>
                 <div class="w-40">
-                    <SelectDropdown name="role" opts={userRoles} selectedOpt={userRoles[0]} />
+                    <SelectDropdownCell
+                        name="role"
+                        opts={userRoles}
+                        defaultSelectedOpt={userRoles[0]}
+                        isEditable={true}
+                    />
                 </div>
                 <div class="w-85 2xl:w-100"></div>
                 <div class="w-50 justify-center">

@@ -1,11 +1,11 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
-    import type { AccountDTO } from '$lib/server/account-list-helpers';
+    import type { AccountDTO } from '$lib/server/queries/account-list';
     import RedButton from '$lib/ui/RedButton.svelte';
     import Icon from '@iconify/svelte';
     import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
     import DeleteConfirmation from '$lib/ui/DeleteConfirmation.svelte';
-    import SelectDropdown from '$lib/ui/SelectDropdown.svelte';
+    import SelectDropdownCell from '$lib/ui/SelectDropdownCell.svelte';
 
     interface Props {
         account: AccountDTO;
@@ -31,6 +31,7 @@
 
 {#if email}
     <div
+        data-testid='account-row'
         class="flex justify-center [&>div]:flex [&>div]:h-12 [&>div]:items-center [&>div]:border-b [&>div]:border-fims-gray [&>div]:bg-white [&>div]:px-6"
     >
         <div class="w-25 justify-center">
@@ -52,7 +53,12 @@
         </div>
         <div class="w-40">
             <form method="POST" action="" class="w-full">
-                <SelectDropdown name="role" opts={userRoles} selectedOpt={role} />
+                <SelectDropdownCell
+                    name="role"
+                    opts={userRoles}
+                    defaultSelectedOpt={role}
+                    isEditable={true}
+                />
             </form>
         </div>
         <div class="w-85 2xl:w-100">

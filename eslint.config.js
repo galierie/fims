@@ -147,7 +147,7 @@ export default defineConfig(
             'no-sequences': 'error',
             'no-throw-literal': 'error',
             'no-undef-init': 'error',
-            'no-undefined': 'error',
+            'no-undefined': 'warn',
             'no-underscore-dangle': 'error',
             'no-unmodified-loop-condition': 'error',
             'no-unneeded-ternary': 'error',

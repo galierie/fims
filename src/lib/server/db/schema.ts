@@ -49,6 +49,7 @@ export const faculty = pgTable(
         middlename: varchar({ length: 100 }).notNull(),
         firstname: varchar({ length: 100 }).notNull(),
         suffix: varchar({ length: 50 }),
+        maidenname: varchar({ length: 100 }),
         birthdate: date().notNull(),
         status: varchar({ length: 50 }).notNull(),
         dateoforiginalappointment: date().notNull(),
@@ -146,6 +147,10 @@ export const rank = pgTable('rank', {
     salaryrate: numeric({ precision: 10, scale: 2 }).notNull(),
 });
 
+export const appointmentstatus = pgTable('appointmentstatus', {
+    appointmentstatus: varchar({ length: 50 }).primaryKey().notNull(),
+});
+
 export const facultyrank = pgTable(
     'facultyrank',
     {
@@ -165,6 +170,11 @@ export const facultyrank = pgTable(
             columns: [table.rankid],
             foreignColumns: [rank.rankid],
             name: 'facultyrank_rankid_fkey',
+        }),
+        foreignKey({
+            columns: [table.appointmentstatus],
+            foreignColumns: [appointmentstatus.appointmentstatus],
+            name: 'facultyrank_appointmentstatus_fkey',
         }),
     ],
 );
@@ -570,6 +580,10 @@ export const rankRelations = relations(rank, ({ many }) => ({
     facultyranks: many(facultyrank),
 }));
 
+export const appointmentstatusRelations = relations(appointmentstatus, ({ many }) => ({
+    facultyranks: many(facultyrank),
+}));
+
 export const facultyrankRelations = relations(facultyrank, ({ many, one }) => ({
     faculty: one(faculty, {
         fields: [facultyrank.facultyid],
@@ -578,6 +592,10 @@ export const facultyrankRelations = relations(facultyrank, ({ many, one }) => ({
     rank: one(rank, {
         fields: [facultyrank.rankid],
         references: [rank.rankid],
+    }),
+    appointmentstatus: one(appointmentstatus, {
+        fields: [facultyrank.appointmentstatus],
+        references: [appointmentstatus.appointmentstatus],
     }),
     facultysemesters: many(facultysemester),
 }));

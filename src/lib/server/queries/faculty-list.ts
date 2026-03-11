@@ -2,8 +2,6 @@ import { and, asc, desc, eq, gt, ilike, lt, or, type SQL, type SQLWrapper } from
 
 import type { FilterColumn } from '$lib/types/filter';
 
-import { db } from './db';
-
 import {
     adminposition,
     appuser,
@@ -16,7 +14,8 @@ import {
     rank,
     semester,
     status,
-} from './db/schema';
+} from '../db/schema';
+import { db } from '../db';
 
 const pageSize = 50;
 
@@ -187,7 +186,7 @@ export async function getFacultyRecordList(
     };
 }
 
-export interface FacultyRecordDTO {
+export interface FacultyListDTO {
     facultyid: number | null;
     lastname: string | null;
     firstname: string | null;
