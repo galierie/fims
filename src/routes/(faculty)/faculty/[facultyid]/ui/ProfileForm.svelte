@@ -22,6 +22,11 @@
 
     const { profile, opts, dependencyMaps, isCreating }: Props = $props();
 
+    // Set to edit agad if isCreating
+    $effect(() => {
+        if (isCreating) setToEdit();
+    });
+
     // Input Table Columns
     const emailColumns: InputColumnType[] = [
         {
