@@ -17,9 +17,10 @@
         profile?: FacultyProfileRecordDTO;
         opts?: Map<string, Array<any>>;
         dependencyMaps?: Map<string, Map<string, string>>;
+        isCreating?: boolean;
     }
 
-    const { profile, opts, dependencyMaps }: Props = $props();
+    const { profile, opts, dependencyMaps, isCreating }: Props = $props();
 
     // Input Table Columns
     const emailColumns: InputColumnType[] = [
