@@ -45,15 +45,13 @@ export async function getFacultyName(facultyid: number) {
 }
 
 export async function getFacultyContactNumbers(facultyid: number) {
-    return (
-        await db
-            .select({
-                tupleid: facultycontactnumber.facultycontactnumberid,
-                contactnumber: facultycontactnumber.contactnumber,
-            })
-            .from(facultycontactnumber)
-            .where(eq(facultycontactnumber.facultyid, facultyid))
-    ).map(({ contactnumber }) => contactnumber);
+    return await db
+        .select({
+            tupleid: facultycontactnumber.facultycontactnumberid,
+            contactnumber: facultycontactnumber.contactnumber,
+        })
+        .from(facultycontactnumber)
+        .where(eq(facultycontactnumber.facultyid, facultyid));
 }
 
 export async function getFacultyEducationalAttainments(facultyid: number) {
