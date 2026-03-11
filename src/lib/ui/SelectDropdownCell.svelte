@@ -6,10 +6,11 @@
         opts: string[];
         selectedOpt?: string | null;
         defaultSelectedOpt: string | null;
+        isEditable: boolean;
     }
 
     // eslint-disable-next-line prefer-const -- changing value and bindable variable
-    let { name, opts, selectedOpt = $bindable(), defaultSelectedOpt }: Props = $props();
+    let { name, opts, selectedOpt = $bindable(), defaultSelectedOpt, isEditable }: Props = $props();
 
     let isDropdownOpen = $state(false);
 </script>
