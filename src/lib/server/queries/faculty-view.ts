@@ -84,6 +84,7 @@ export async function getFacultyFieldsOfInterest(facultyid: number) {
 export async function getFacultyPromotionHistory(facultyid: number) {
     return await db
         .select({
+            tupleid: facultyrank.facultyrankid,
             rankTitle: rank.ranktitle,
             appointmentStatus: facultyrank.appointmentstatus,
             dateOfTenureOrRenewal: facultyrank.dateoftenureorrenewal
