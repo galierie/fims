@@ -1,6 +1,6 @@
 import { error, redirect } from '@sveltejs/kit';
 
-import { getAllFacultySemesters, getAllSemesterms, getFacultySemestralRecords } from '$lib/server/queries/faculty-view';
+import { getAllFacultySemesters, getAllSemesterms, getFacultyPromotionHistory, getFacultySemestralRecords } from '$lib/server/queries/faculty-view';
 
 export async function load({ params }) {
     const {
@@ -31,11 +31,19 @@ export async function load({ params }) {
     const acadYearOpts = [...new Set(existingOpts.map(({ acadYear }) => (acadYear)).filter((elem) => (elem !== null)))]
     if (!acadYearOpts.includes(acadYear)) throw error(400, { message: 'Invalid academic year.' });
 
+    // Get input dropdown options and dependency mappings
+    const opts: Map<string, Array<any>> = new Map();
+
+    const ranks = await getFacultyPromotionHistory(facultyid);
+
+    opts.set('rankTitles', ranks.map(({ rankTitle }) => rankTitle));
+    
     return {
         acadYearOpts,
         allSemStrs,
         existingOpts,
         facultyid,
         semestralRecord,
+        opts,
     };
 }
