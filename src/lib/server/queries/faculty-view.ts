@@ -72,6 +72,7 @@ export async function getFacultyFieldsOfInterest(facultyid: number) {
     return (
         await db
             .select({
+                tupleid: facultyfieldofinterest.facultyfieldofinterestid,
                 field: fieldofinterest.field,
             })
             .from(facultyfieldofinterest)
