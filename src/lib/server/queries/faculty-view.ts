@@ -312,6 +312,8 @@ export async function getFacultyStudyLoad(facultysemesterid: number) {
         .where(eq(facultystudyload.facultysemesterid, facultysemesterid));
 }
 
+export type FacultyStudyLoadDTO = Awaited<ReturnType<typeof getFacultyStudyLoad>>;
+
 export async function getFacultyProfile(facultyid: number) {
     // Personal Information
     const personalInfoArr = await db.select().from(faculty).where(eq(faculty.facultyid, facultyid));
