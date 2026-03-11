@@ -1,8 +1,8 @@
 <script lang="ts">
-    import type { FacultyRecordDTO } from '$lib/server/faculty-records-list-helpers';
+    import type { FacultyListDTO } from '$lib/server/queries/faculty-list';
 
     interface Props {
-        facultyRecord: FacultyRecordDTO;
+        facultyRecord: FacultyListDTO;
         canViewChangeLogs: boolean;
         isSelected: boolean;
         onToggle: () => void;
@@ -19,7 +19,7 @@
         logTimestamp,
         logMaker,
         logOperation,
-    }: FacultyRecordDTO = $derived(facultyRecord);
+    }: FacultyListDTO = $derived(facultyRecord);
 </script>
 
 {#if facultyid !== null}

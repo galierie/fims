@@ -1,7 +1,7 @@
 import { fail } from '@sveltejs/kit';
 
 import { adminposition, faculty, rank } from '$lib/server/db/schema';
-import { deleteFacultyRecords } from '$lib/server/db-helpers';
+import { deleteFacultyRecords } from '$lib/server/queries/db-helpers';
 import type { FilterColumn, FilterObject } from '$lib/types/filter';
 import {
     getAllAdminPositions,
@@ -9,7 +9,7 @@ import {
     getAllStatuses,
     getFacultyRecordList,
     refreshFacultyRecordSearchView,
-} from '$lib/server/faculty-records-list-helpers';
+} from '$lib/server/queries/faculty-list';
 
 export async function load({ url }) {
     // Extract queries

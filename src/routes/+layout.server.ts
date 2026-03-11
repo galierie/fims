@@ -1,6 +1,6 @@
 import { redirect } from '@sveltejs/kit';
 
-import { getPermissions, getRole } from '$lib/server/db-helpers.js';
+import { getPermissions, getRole } from '$lib/server/queries/db-helpers';
 import { seedDatabase } from '$lib/server/db/seed-db.js';
 
 export async function load({ locals, url }) {

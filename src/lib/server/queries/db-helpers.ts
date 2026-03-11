@@ -1,8 +1,7 @@
 import { eq, inArray } from 'drizzle-orm';
 
-import { db } from './db';
-
-import { appuser, changelog, faculty, role, userinfo } from './db/schema';
+import { appuser, changelog, faculty, role, userinfo } from '../db/schema';
+import { db } from '../db';
 
 export async function logChange(makerid: string, tupleid: number, operation: string) {
     const logids = await db
@@ -98,15 +97,4 @@ export async function deleteFacultyRecords(makerid: string, ids: number[]) {
     });
 
     return { success: true };
-}
-
-// grabs an individual record
-// made this as the faculty record list only gets display information
-export async function getFacultyRecord(facultyid: number) {
-    const response = await db.select().from(faculty).where(eq(faculty.facultyid, facultyid));
-
-    if (response.length === 0) return null;
-
-    const [record] = response;
-    return record;
 }
