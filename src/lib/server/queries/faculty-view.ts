@@ -394,3 +394,13 @@ export async function getAllFacultySemesters(facultyid: number) {
 export function getAllSemesterms() {
     return ['Midyear', '1st Semester', '2nd Semester'];
 }
+
+export async function getAllFieldsOfInterest() {
+    const fields = await db
+        .select({
+            field: fieldofinterest.field,
+        })
+        .from(fieldofinterest);
+    
+    return fields.map(({ field }) => field);
+}
