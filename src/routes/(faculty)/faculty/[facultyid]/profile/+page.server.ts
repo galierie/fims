@@ -1,5 +1,7 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 
+import { type ChangelogRecordStructure } from '$lib/ui/ChangelogList.svelte';
+
 import { deleteFacultyRecords } from '$lib/server/queries/db-helpers';
 import {
     getAllAppointmentStatuses,
@@ -7,11 +9,14 @@ import {
     getAllRanks,
     getFacultyProfile,
 } from '$lib/server/queries/faculty-view';
-import { refreshFacultyRecordSearchView } from '$lib/server/queries/faculty-list';
+import { refreshFacultyRecordSearchView, getFacultyRecordChangelogs } from '$lib/server/queries/faculty-list';
 
-export async function load({ params }) {
+export async function load({ params, parent }) {
+    const layoutData = await parent();
     const { facultyid: facultyidStr } = params;
     const facultyid = parseInt(facultyidStr, 10);
+    
+    let fetchedChangelogs:ChangelogRecordStructure[]|null = null
 
     // Validate parameter
     if (Number.isNaN(facultyid)) throw error(400, { message: 'Invalid record identifier.' });
@@ -20,6 +25,12 @@ export async function load({ params }) {
 
     // Validate output
     if (profile === null) throw error(400, { message: 'No record found.' });
+
+    //get changelogs if possible
+    if (layoutData.canViewChangeLogs) {
+        fetchedChangelogs = await getFacultyRecordChangelogs(facultyid, 3, 0)
+        console.log(fetchedChangelogs)
+    }
 
     // Get input dropdown options and dependency mappings
     const opts: Map<string, Array<string>> = new Map();
@@ -44,7 +55,7 @@ export async function load({ params }) {
     );
     dependencyMaps.set('rankTitlesToSalaryRates', rankTitlesToSalaryRates);
 
-    return { profile, opts, dependencyMaps };
+    return { profile, opts, dependencyMaps, fetchedChangelogs};
 }
 
 export const actions = {

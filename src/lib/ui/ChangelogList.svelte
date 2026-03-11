@@ -2,8 +2,10 @@
     import type { Snippet } from "svelte";
 	import ChangelogEntry from '$lib/ui/ChanglogEntry.svelte'
 
-	type ChangelogRecordStructure = {
-			
+	export type ChangelogRecordStructure = {
+		timestamp:Date,
+		email:string,
+		info:string,	
 	}
 
 	type Props={
@@ -23,8 +25,8 @@
 
 	<!-- Entries -->
 	<div>
-		<ChangelogEntry timestamp={new Date()} email="test@up.edu.ph" info="Added test"/>
-		<ChangelogEntry timestamp={new Date()} email="test@up.edu.ph" info="Added test"/>
-		<ChangelogEntry timestamp={new Date()} email="test@up.edu.ph" info="Added test"/>
+		{#each changelogFetcher() as log}
+		<ChangelogEntry timestamp={log.timestamp} email={log.email} info={log.info}/>
+		{/each}
 	</div>
 </div>

@@ -240,12 +240,16 @@ export async function getAllAdminPositions() {
 export async function getFacultyRecordChangelogs(facultyid: number, limit: number, offset:number) {
     const changelogs = await db
         .select({
-            logOperaion: changelog.operation,
+            timestamp: changelog.timestamp,
+            email: appuser.email,
+            info: changelog.operation,
         })
         .from(changelog)
         .where(eq(changelog.tupleid, facultyid))
+        .innerJoin(appuser, eq(appuser.id, changelog.userid))
         .limit(limit)
         .offset(offset) // for pages if needed.
+        .orderBy(desc(changelog.timestamp))
 
     return changelogs
 }
