@@ -178,6 +178,7 @@ export async function getFacultySemester(facultyid: number, acadYear: number, se
 export async function getFacultyAdminPositions(facultysemesterid: number) {
     return await db
         .select({
+            tupleid: facultyadminposition.facultyadminpositionid,
             adminPosition: adminposition.name,
             office: office.name,
             startDate: facultyadminposition.startdate,
