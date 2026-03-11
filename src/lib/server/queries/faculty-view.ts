@@ -239,6 +239,7 @@ export async function getFacultyCoursesTaught(facultysemesterid: number) {
 export async function getFacultyMentees(facultysemesterid: number) {
     return await db
         .select({
+            tupleid: facultymentoring.facultymentoringid,
             lastName: student.lastname,
             middleName: student.middlename,
             firstName: student.firstname,
