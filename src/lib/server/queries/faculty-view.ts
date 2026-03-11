@@ -404,3 +404,13 @@ export async function getAllFieldsOfInterest() {
     
     return fields.map(({ field }) => field);
 }
+
+export async function getAllRanks() {
+    return await db
+        .select({
+            rankTitle: rank.ranktitle,
+            salaryGrade: rank.salarygrade,
+            salaryRate: rank.salaryrate,
+        })
+        .from(rank);
+}
