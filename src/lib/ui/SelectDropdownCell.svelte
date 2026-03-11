@@ -22,7 +22,7 @@
             isDropdownOpen = !isDropdownOpen;
         }}
     >
-        <span>{selectedOpt ? selectedOpt : 'No option selected'}</span>
+        <span>{selectedOpt ? selectedOpt : defaultSelectedOpt}</span>
         <Icon
             icon={isDropdownOpen ? 'tabler:chevron-up' : 'tabler:chevron-down'}
             class="absolute top-1 right-0 h-4 w-4"
@@ -40,7 +40,7 @@
                     type="button"
                     class="flex w-full rounded-sm p-3 hover:bg-[#e9e9e9]"
                     onclick={() => {
-                        selectedOpt = null;
+                        selectedOpt = defaultSelectedOpt;
                     }}
                 >
                     <Icon icon="tabler:check" class="h-6 w-8 pr-2 text-fims-green" />
@@ -61,5 +61,5 @@
         {/each}
     </div>
 
-    <input type="hidden" {name} value={selectedOpt} />
+    <input type="hidden" {name} bind:value={selectedOpt} defaultValue={defaultSelectedOpt} />
 </div>
