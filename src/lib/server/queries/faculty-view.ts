@@ -194,6 +194,7 @@ export async function getFacultyAdminPositions(facultysemesterid: number) {
 export async function getFacultyCommittees(facultysemesterid: number) {
     return await db
         .select({
+            tupleid: facultycommmembership.facultycommmembershipid,
             membership: facultycommmembership.membership,
             committee: facultycommmembership.committee,
             startDate: facultycommmembership.startdate,
