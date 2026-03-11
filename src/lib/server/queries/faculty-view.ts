@@ -103,15 +103,13 @@ export async function getFacultyHomeAddresses(facultyid: number) {
 }
 
 export async function getFacultyEmailAddresses(facultyid: number) {
-    return (
-        await db
-            .select({
-                tupleid: facultyemail.facultyemailid,
-                email: facultyemail.email,
-            })
-            .from(facultyemail)
-            .where(eq(facultyemail.facultyid, facultyid))
-    ).map(({ email }) => email);
+    return await db
+        .select({
+            tupleid: facultyemail.facultyemailid,
+            email: facultyemail.email,
+        })
+        .from(facultyemail)
+        .where(eq(facultyemail.facultyid, facultyid));
 }
 
 export async function getFacultySemester(facultyid: number, acadYear: number, semNum: number) {
