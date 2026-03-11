@@ -1,6 +1,6 @@
 import { error, redirect } from '@sveltejs/kit';
 
-import { getAllFacultySemesters, getAllSemesterms, getFacultyPromotionHistory, getFacultySemestralRecords } from '$lib/server/queries/faculty-view';
+import { getAllFacultySemesters, getAllSemesterms, getFacultyEducationalAttainments, getFacultyPromotionHistory, getFacultySemestralRecords } from '$lib/server/queries/faculty-view';
 
 export async function load({ params }) {
     const {
@@ -35,8 +35,10 @@ export async function load({ params }) {
     const opts: Map<string, Array<any>> = new Map();
 
     const ranks = await getFacultyPromotionHistory(facultyid);
+    const educationalAttainments = await getFacultyEducationalAttainments(facultyid);
 
     opts.set('rankTitles', ranks.map(({ rankTitle }) => rankTitle));
+    opts.set('degrees', educationalAttainments.map(({ degree }) => degree));
     
     return {
         acadYearOpts,
