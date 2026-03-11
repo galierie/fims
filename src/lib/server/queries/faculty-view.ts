@@ -208,6 +208,7 @@ export async function getFacultyCommittees(facultysemesterid: number) {
 export async function getFacultyAdminWorks(facultysemesterid: number) {
     return await db
         .select({
+            tupleid: facultyadminwork.facultyadminworkid,
             natureOfWork: facultyadminwork.natureofwork,
             office: office.name,
             startDate: facultyadminwork.startdate,
