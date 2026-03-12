@@ -47,7 +47,9 @@ export async function getFacultyRecordList(
     const currentSemesterId = latestSemester?.acadsemesterid ?? -1;
 
     // eslint-disable-next-line no-undefined
-    const searchFilter = searchTerm ? ilike(facultyRecordSearchView.searchcontent, `%${searchTerm}%`) : undefined;
+    const searchFilter = searchTerm
+        ? ilike(facultyRecordSearchView.searchcontent, `%${searchTerm}%`)
+        : undefined;
 
     const searchSq = await db
         .selectDistinct({
@@ -118,12 +120,7 @@ export async function getFacultyRecordList(
             adminPositionSq,
             eq(adminPositionSq.facultysemesterid, facultysemester.facultysemesterid),
         )
-        .where(
-            and(
-                cursorFilter,
-                and(...filterQueries),
-            ),
-        )
+        .where(and(cursorFilter, and(...filterQueries)))
         .orderBy(isNext ? asc(faculty.facultyid) : desc(faculty.facultyid))
         .limit(pageSize + 1)
         .as('faculty_record_count_sq');

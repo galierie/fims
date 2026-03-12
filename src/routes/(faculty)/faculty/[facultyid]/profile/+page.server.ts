@@ -165,9 +165,7 @@ export const actions = {
             dynamicTables,
         );
 
-        if (!success) 
-            return fail(500, { error: 'Failed to update faculty record.' });
-        
+        if (!success) return fail(500, { error: 'Failed to update faculty record.' });
 
         await refreshFacultyRecordSearchView();
 

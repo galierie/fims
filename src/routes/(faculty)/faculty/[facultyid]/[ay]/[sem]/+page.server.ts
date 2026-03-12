@@ -1,6 +1,16 @@
 import { error, fail } from '@sveltejs/kit';
 
-import { getAllAdminPositions, getAllCourses, getAllFacultySemesters, getAllOffices, getAllResearches, getAllSemesterms, getFacultyEducationalAttainments, getFacultyPromotionHistory, getFacultySemestralRecords } from '$lib/server/queries/faculty-view';
+import {
+    getAllAdminPositions,
+    getAllCourses,
+    getAllFacultySemesters,
+    getAllOffices,
+    getAllResearches,
+    getAllSemesterms,
+    getFacultyEducationalAttainments,
+    getFacultyPromotionHistory,
+    getFacultySemestralRecords,
+} from '$lib/server/queries/faculty-view';
 import { updateSemestralRecords } from '$lib/server/queries/db-helpers';
 
 export async function load({ params }) {
@@ -107,15 +117,15 @@ export const actions = {
 
         // Extract fields (Current Rank, Degree, Remarks)
         function getVal(key: string) {
-            if (!formData.has(key)) return null; 
+            if (!formData.has(key)) return null;
             const val = formData.get(key) as string;
-            return (val === '' || val === '-') ? null : val;
+            return val === '' || val === '-' ? null : val;
         }
 
         const basicSemestralData = {
             currentRankTitle: getVal('current-rank'),
             currentHighestDegree: getVal('current-highest-educational-attainment'),
-            remarks: getVal('remarks')
+            remarks: getVal('remarks'),
         };
 
         // Helper function to parse dynamic tables
@@ -129,7 +139,7 @@ export const actions = {
             const parsedRecords = {
                 create: [] as Record<string, unknown>[],
                 update: [] as Record<string, unknown>[],
-                delete: [] as number[]
+                delete: [] as number[],
             };
 
             for (let i = 0; i < numOfRows; i++) {
@@ -142,15 +152,15 @@ export const actions = {
                 }
 
                 const rowData: Record<string, unknown> = {};
-                colNames.forEach(col => {
+                colNames.forEach((col) => {
                     let val: unknown = formData.get(`${i}[${col}]`);
-                    
+
                     if (val === 'on' || val === 'true') {
-                         val = true;
+                        val = true;
                     } else if (val === 'false' || val === null) {
-                         val = false;
+                        val = false;
                     }
-                    
+
                     if (val === '' || val === '-') val = null;
                     rowData[col] = val;
                 });
@@ -158,7 +168,9 @@ export const actions = {
                 if (tupleid) {
                     parsedRecords.update.push({ tupleid, ...rowData });
                 } else {
-                    const hasData = Object.values(rowData).some(val => val !== null && val !== false);
+                    const hasData = Object.values(rowData).some(
+                        (val) => val !== null && val !== false,
+                    );
                     if (hasData) parsedRecords.create.push(rowData);
                 }
             }
@@ -169,44 +181,70 @@ export const actions = {
         const dynamicTables = {
             // Admin
             adminPositions: parseTable('administrative-positions', [
-                'administrative-position-title', 'administrative-position-office',
-                'administrative-position-start-date', 'administrative-position-end-date',
-                'administrative-position-load-credit'
+                'administrative-position-title',
+                'administrative-position-office',
+                'administrative-position-start-date',
+                'administrative-position-end-date',
+                'administrative-position-load-credit',
             ]),
             committees: parseTable('committee-memberships', [
-                'committee-membership-nature', 'committee-membership-committee',
-                'committee-membership-start-date', 'committee-membership-end-date',
-                'committee-membership-load-credit'
+                'committee-membership-nature',
+                'committee-membership-committee',
+                'committee-membership-start-date',
+                'committee-membership-end-date',
+                'committee-membership-load-credit',
             ]),
             adminWorks: parseTable('administrative-works', [
-                'administrative-work-nature', 'administrative-work-committee',
-                'administrative-work-start-date', 'administrative-work-end-date',
-                'administrative-work-load-credit'
+                'administrative-work-nature',
+                'administrative-work-committee',
+                'administrative-work-start-date',
+                'administrative-work-end-date',
+                'administrative-work-load-credit',
             ]),
 
             // Teaching
             courses: parseTable('courses', [
-                'course-title', 'course-units', 'course-section', 
-                'course-num-of-students', 'course-load-credit', 'course-section-set'
+                'course-title',
+                'course-units',
+                'course-section',
+                'course-num-of-students',
+                'course-load-credit',
+                'course-section-set',
             ]),
             mentees: parseTable('mentees', [
-                'mentee-lastname', 'mentee-firstname', 'mentee-middlename',
-                'mentee-category', 'mentee-start-date', 'mentee-end-date', 'mentee-load-credit'
+                'mentee-lastname',
+                'mentee-firstname',
+                'mentee-middlename',
+                'mentee-category',
+                'mentee-start-date',
+                'mentee-end-date',
+                'mentee-load-credit',
             ]),
 
             // Research, extension, study
             research: parseTable('research', [
-                'research-title', 'research-start-date', 'research-end-date',
-                'research-funding', 'research-load-credit', 'research-remarks'
+                'research-title',
+                'research-start-date',
+                'research-end-date',
+                'research-funding',
+                'research-load-credit',
+                'research-remarks',
             ]),
             extension: parseTable('extension', [
-                'extension-nature', 'extension-agency', 'extension-start-date',
-                'extension-end-date', 'extension-load-credit'
+                'extension-nature',
+                'extension-agency',
+                'extension-start-date',
+                'extension-end-date',
+                'extension-load-credit',
             ]),
             studyLoad: parseTable('study-load', [
-                'study-load-degree', 'study-load-university', 'study-load-units',
-                'study-load-on-leave-with-pay', 'study-load-fellowship-recipient', 'study-load-credit'
-            ])
+                'study-load-degree',
+                'study-load-university',
+                'study-load-units',
+                'study-load-on-leave-with-pay',
+                'study-load-fellowship-recipient',
+                'study-load-credit',
+            ]),
         };
 
         // Database update calls
@@ -215,7 +253,7 @@ export const actions = {
             acadYear,
             semNum,
             basicSemestralData,
-            dynamicTables
+            dynamicTables,
         );
 
         if (!success) {
@@ -223,5 +261,5 @@ export const actions = {
         }
 
         return { success: true };
-    }
+    },
 };

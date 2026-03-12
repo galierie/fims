@@ -1,6 +1,35 @@
 import { and, eq, inArray } from 'drizzle-orm';
 
-import { adminposition, appuser, changelog, course, faculty, facultyadminposition, facultyadminwork, facultycommmembership, facultycontactnumber, facultycourse, facultyeducationalattainment, facultyemail, facultyextension, facultyfieldofinterest, facultyhomeaddress, facultymentoring, facultyrank, facultyresearch, facultysemester, facultystudyload, fieldofinterest, office, rank, research, role, semester, student, userinfo } from '../db/schema';
+import {
+    adminposition,
+    appuser,
+    changelog,
+    course,
+    faculty,
+    facultyadminposition,
+    facultyadminwork,
+    facultycommmembership,
+    facultycontactnumber,
+    facultycourse,
+    facultyeducationalattainment,
+    facultyemail,
+    facultyextension,
+    facultyfieldofinterest,
+    facultyhomeaddress,
+    facultymentoring,
+    facultyrank,
+    facultyresearch,
+    facultysemester,
+    facultystudyload,
+    fieldofinterest,
+    office,
+    rank,
+    research,
+    role,
+    semester,
+    student,
+    userinfo,
+} from '../db/schema';
 import { db } from '../db';
 
 export async function logChange(makerid: string, tupleid: number, operation: string) {
@@ -107,15 +136,12 @@ async function processDynamicTable(
     mapCreate: (item: any) => any,
     mapUpdate: (item: any) => any,
 ) {
-    if (data.delete.length > 0) 
-        await db.delete(tableRef).where(inArray(idColumn, data.delete));
-    
-    for (const item of data.update) 
+    if (data.delete.length > 0) await db.delete(tableRef).where(inArray(idColumn, data.delete));
+
+    for (const item of data.update)
         await db.update(tableRef).set(mapUpdate(item)).where(eq(idColumn, item.tupleid));
-    
-    if (data.create.length > 0) 
-        await db.insert(tableRef).values(data.create.map(mapCreate));
-    
+
+    if (data.create.length > 0) await db.insert(tableRef).values(data.create.map(mapCreate));
 }
 
 export async function updateFacultyProfileRecords(
@@ -349,13 +375,12 @@ export async function updateSemestralRecords(
         };
 
         // Prepare student IDs before processing the table
-        for (const item of [...dynamicTables.mentees.create, ...dynamicTables.mentees.update]) 
+        for (const item of [...dynamicTables.mentees.create, ...dynamicTables.mentees.update])
             item.resolvedStudentId = await resolveStudent(
                 item['mentee-lastname'],
                 item['mentee-firstname'],
                 item['mentee-middlename'],
             );
-        
 
         // Process dynamic tables
 

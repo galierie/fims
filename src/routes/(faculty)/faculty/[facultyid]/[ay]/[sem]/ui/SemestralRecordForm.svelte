@@ -78,11 +78,9 @@
             const { goto } = await import('$app/navigation');
 
             // If "discard changes" is clicked for a new sem record, go to prev URL
-            if (previousUrl) 
-                await goto(previousUrl);
-             else 
-                await goto(`/faculty/${facultyid}/profile`);
-            
+            if (previousUrl) await goto(previousUrl);
+            else await goto(`/faculty/${facultyid}/profile`);
+
             isLoading = false;
         } else {
             // If "discard changes" is clicked for an existing sem record, read-only state
