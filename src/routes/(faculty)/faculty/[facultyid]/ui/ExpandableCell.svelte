@@ -24,6 +24,7 @@
         defaultValue={defaultValue ?? ''}
         class="h-8 w-full truncate border-0 focus:ring-0 {isDeleted ? 'text-fims-gray' : ''}"
         disabled
+        {name}
         bind:value
     />
     <button
@@ -51,7 +52,6 @@
                     isDeleted}
                 defaultValue={defaultValue ?? ''}
                 bind:value
-                {name}
             ></textarea>
         </div>
     </div>
