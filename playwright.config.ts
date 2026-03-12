@@ -40,11 +40,21 @@ export default defineConfig({
         },
 
         // record editing tests
+        //preamble
         {
-            name: 'record-edits',
+            name: 'record-edits-preamble',
             dependencies: ['common-tests'],
             testDir: 'tests/playwright/record-editing',
-            testMatch: /.e2e.(?:js|ts)/u,
+            testMatch: /.preamble.e2e.(?:js|ts)/u,
+            fullyParallel: true,
+        },
+
+        //actual
+        {
+            name: 'record-edits',
+            dependencies: ['record-edits-preamble'],
+            testDir: 'tests/playwright/record-editing',
+            testMatch: /.main.e2e.(?:js|ts)/u,
             fullyParallel: true,
         },
 
