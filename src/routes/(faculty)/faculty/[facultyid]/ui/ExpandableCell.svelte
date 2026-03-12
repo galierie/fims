@@ -22,12 +22,14 @@
     <input
         type="text"
         defaultValue={defaultValue ?? ''}
-        class="h-8 w-[90%] truncate border-0 focus:ring-0 {isDeleted ? 'text-fims-gray' : ''}"
+        class="h-8 w-full truncate border-0 focus:ring-0 {isDeleted ? 'text-fims-gray' : ''}"
         disabled
+        {name}
+        bind:value
     />
     <button
         type="button"
-        class="h-8 w-[10%] bg-white text-fims-gray hover:text-black"
+        class="h-8 w-fit text-right bg-white text-fims-gray pr-2 hover:text-black"
         onclick={() => (isDialogOpen = true)}>Expand</button
     >
 </div>
@@ -50,7 +52,6 @@
                     isDeleted}
                 defaultValue={defaultValue ?? ''}
                 bind:value
-                {name}
             ></textarea>
         </div>
     </div>

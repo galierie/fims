@@ -158,6 +158,8 @@
         <ResearchSection
             bind:researchLoadCredit
             researchWork={semestralRecord?.researchWork ?? []}
+            {opts}
+            {dependencyMaps}
         />
         <ExtensionSection
             bind:extensionLoadCredit
