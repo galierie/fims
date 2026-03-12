@@ -24,6 +24,7 @@
         defaultValue={defaultValue ?? ''}
         class="h-8 w-full truncate border-0 focus:ring-0 {isDeleted ? 'text-fims-gray' : ''}"
         disabled
+        bind:value
     />
     <button
         type="button"
