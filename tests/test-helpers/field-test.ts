@@ -1,11 +1,18 @@
 import {test, expect, type Page, type Locator} from '@playwright/test'
 import * as consts from '../test-consts';
 
-export function profileTab(page:Page):Locator {
-	return page.locator('a').getByText('Profile')
+export async function profiletab(page:Page):Promise<Locator> {
+	let tab =  page.locator('a').getByText('Profile')
+	await expect(tab).toBeVisible();
+
+	return tab
 }
-export function semRecsTab(page:Page):Locator {
-	return page.locator('a').getByText('Semestral Records')
+
+export async function semrecstab(page:Page):Promise<Locator> {
+	let tab =  page.locator('a').getByText('Semestral Records')
+	await expect(tab).toBeVisible();
+
+	return tab
 }
 
 export async function inputField(field:string, input:string, page:Page) {
