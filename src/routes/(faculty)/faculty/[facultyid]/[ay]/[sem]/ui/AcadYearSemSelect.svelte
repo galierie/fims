@@ -69,7 +69,7 @@
             }}
         >
             <span class="mr-1 {textColor}">Academic Year:</span>
-            <span class={selectedColor}>{displayAcadYear} - {displayAcadYear + 1}</span>
+            <span class={selectedColor}>{displayAcadYear} - {Number(displayAcadYear) + 1}</span>
 
             <Icon
                 icon={isAcadYearDropdownOpen ? 'tabler:chevron-up' : 'tabler:chevron-down'}
@@ -88,11 +88,11 @@
                     <div class="flex w-full items-center justify-between rounded-sm p-3">
                         <div class="flex items-center">
                             <input
-                                type="text"
+                                type="number"
                                 bind:value={newAcadYear}
                                 class="mr-1 w-20 rounded-lg border-2 border-fims-green bg-white focus:ring-0"
                             />
-                            <span>- {newAcadYear + 1}</span>
+                            <span>- {Number(newAcadYear) + 1}</span>
                         </div>
                         <button
                             type="button"
