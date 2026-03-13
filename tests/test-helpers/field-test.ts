@@ -1,4 +1,4 @@
-import {test, expect, type Page, type Locator} from '@playwright/test'
+import {expect, type Page, type Locator} from '@playwright/test'
 import * as consts from '../test-consts';
 
 export async function profiletab(page:Page):Promise<Locator> {
@@ -70,16 +70,40 @@ export async function testList(listHeader:string, inputs:string[], inputTypes:co
 }
 
 //compares the last entry in the header
-export async function compareList(listHeader:string, compare:string[], page:Page) {
+export async function compareList(listHeader:string, compare:string[], page:Page) {	
 	let listDiv = page.getByTestId('list-table').filter({hasText:listHeader})
 	await expect(listDiv).toBeVisible();
 
-	let inputRow = listDiv.locator('div').last();
-	await expect(inputRow).toBeVisible();
+	let inputRow = listDiv.locator('div').filter({hasNotText: listHeader}).last();
+	//empty case
+	if (compare.length === 0) {
+		await expect(inputRow).not.toBeVisible()
+		return
+	}
 
+	await expect(inputRow).toBeVisible();
 	for (let idx = 0; idx < compare.length; idx++) {
-		let inputText = inputRow.locator('*').nth(idx);
+		let inputText = inputRow.locator('*').nth(idx); //get each column
 		await expect(inputText).toBeVisible();
 		await expect(inputText).toHaveText(compare[idx]);
 	}
+}
+
+//get the last entry of a list and return it as an array of strings
+export async function getLastEntry(listHeader:string, page:Page):Promise<string[]> {
+	let listDiv = page.getByTestId('list-table').filter({hasText:listHeader});
+	await expect(listDiv).toBeVisible();
+
+	let lastEntry = listDiv.locator('div').filter({hasNotText: listHeader}).last()
+	if (!lastEntry.isVisible()) {
+		return [] // empty case
+	}
+
+	let childElems = await lastEntry.evaluate(div => div.childNodes);	
+	let res:string[] = [];
+	for (let elem of childElems) {
+		expect(elem).not.toBe(null);
+		res.push(elem.textContent!);
+	}
+	return res;
 }

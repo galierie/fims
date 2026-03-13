@@ -1,5 +1,9 @@
 // external files
 import * as seedData from './seed-data/faculty-admin';
+export type possibleInputs = Array<'textbox'|'dropdown'|'numeric'|'date'|'remarks'|'checkbox'>;
+
+//[ header, add button text, inputs, type of input field ]
+export type testRowTuple = [string, string, string[], possibleInputs];
 
 //for the tests to work with different test accounts
 export const ITAcc = 'it@up.edu.ph';
@@ -108,7 +112,7 @@ export function sampleMentor() {
         'Test Category',
         new Date().toLocaleDateString('en-GB'),
         new Date().toLocaleDateString('en-GB'),
-        2
+        '2',
     ];
 }
 
@@ -266,7 +270,6 @@ export async function seed() {
 }
 
 // for list input
-export type possibleInputs = Array<'textbox'|'dropdown'|'numeric'|'date'|'remarks'|'checkbox'>;
 export const emailInputs:possibleInputs = ['textbox'];
 export const contactNumInputs:possibleInputs = ['textbox'];
 export const homeAddrsInputs:possibleInputs = ['textbox'];
@@ -282,6 +285,26 @@ export const mentorInputs:possibleInputs = ['textbox', 'textbox', 'textbox', 'te
 export const researchInputs:possibleInputs = ['textbox', 'numeric', 'remarks'];
 export const extInputs:possibleInputs = ['textbox', 'textbox', 'date', 'date', 'numeric'];
 export const studyInputs:possibleInputs = ['textbox', 'textbox', 'numeric', 'checkbox', 'checkbox', 'numeric'];
+
+export const profileLists = [
+    emailInputs,
+    contactNumInputs,
+    homeAddrsInputs,
+    eduAttainInputs,
+    fieldInterestInputs,
+    promHistInputs,
+]
+
+export const secRecLists = [
+    adminPosInputs,
+    membershipInputs,
+    adminWorkInputs,
+    classesInputs,
+    mentorInputs,
+    researchInputs,
+    extInputs,
+    studyInputs,
+]
 
 //for field input
 
@@ -311,11 +334,27 @@ export const semRecsFields = [
 ]
 
 // to spot the headers and stuff. basically gets a unique header from each list
-export const profileTabHeaders = [
-    'Emails',
-    'Contact Numbers',
-    'Home Addresses',
-    'Degree', //education attainment
-    'Fields of Interest',
-    'Rank of Renewal/Tenure' //promotion history
-]
+export function profileTabListSample():testRowTuple[] {
+    return [
+        ['Emails', '+ Add Email', sampleEmails(), emailInputs],
+        ['Contact Numbers', '+ Add Contact Number', sampleContactNums(), contactNumInputs],
+        ['Home Addresses', '+ Add Home Addresses', sampleHomeAddrs(), homeAddrsInputs],
+        ['Degree', ' Add Educational Attainment', sampleEduAttain(), eduAttainInputs],
+        ['Fields of Interest', '+ Add Fields of Interest', sampleFieldsInterest(), fieldInterestInputs],
+        ['Rank of Renewal/Tenure', '+ Add Promotion', samplePromHist(), promHistInputs],
+    ]
+}
+
+//same idea
+export function semRecsTabListSample():testRowTuple[] {
+    return [
+        ['Position', '+ Add Position', samplePosition(), adminPosInputs],
+        ['Nature of Membership', '+ Add Comittee Membership', sampleContactNums(), contactNumInputs],
+        ['Nature of Administrative Work', '+ Add Administrative Work', sampleAdminWork(), adminWorkInputs],
+        ['Course', '+ Add Class', sampleClass(), classesInputs],
+        ['Mentee Last Name', '+ Add Mentee', sampleMentor(), mentorInputs],
+        ['Title', '+ Add Research/TextbookWriting/Creative Work', sampleResearch(), researchInputs],
+        ['Nature of Extension Work/Community Service', '+ Add Extension Work/Community Service', sampleExt(), extInputs],
+        ['Degree', '+ Add Degree Program', sampleStudy(), studyInputs],
+    ]
+}
