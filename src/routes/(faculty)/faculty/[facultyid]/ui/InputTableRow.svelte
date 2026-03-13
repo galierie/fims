@@ -56,7 +56,7 @@
     // col-span-10
 </script>
 
-<div class="relative grid {gridTemplateColumns}">
+<div class="relative grid {gridTemplateColumns}" data-testid='list-table-input'>
     {#each row as { columnNum, defaultValue, defaultChecked } (columnNum)}
         {@const colSpanClass = `col-span-${columns[columnNum].colSpan}`}
         {@const { type } = columns[columnNum]}

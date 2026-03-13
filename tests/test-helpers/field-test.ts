@@ -30,14 +30,10 @@ export async function compareField(field:string, cmp:string, page:Page) {
 //inputs something to the list
 export async function testList(listHeader:string, inputs:string[], inputTypes:consts.possibleInputs, buttonText:string, page:Page) {
 	let addButton = page.getByRole('button', {name: buttonText, exact:true});
-	let header = page.locator('span').getByText(listHeader);
-
-	await expect(header).toBeVisible()
 	await expect(addButton).toBeVisible()
-
 	await addButton.click();
 
-	let listDiv = header.locator('..').locator('..');
+	let listDiv = page.getByTestId('list-table').filter({hasText: listHeader}).first();
 	await expect(listDiv).toBeVisible();
 
 	let inputRow = listDiv.locator('div').last();
@@ -75,10 +71,10 @@ export async function testList(listHeader:string, inputs:string[], inputTypes:co
 
 //compares the last entry in the header
 export async function compareList(listHeader:string, compare:string[], page:Page) {
-	let header = page.locator('span').getByText('listHeader');
-	await expect(header).toBeVisible();
+	let listDiv = page.getByTestId('list-table').filter({hasText:listHeader})
+	await expect(listDiv).toBeVisible();
 
-	let inputRow = header.locator('..').locator('div').last();
+	let inputRow = listDiv.locator('div').last();
 	await expect(inputRow).toBeVisible();
 
 	for (let idx = 0; idx < compare.length; idx++) {
