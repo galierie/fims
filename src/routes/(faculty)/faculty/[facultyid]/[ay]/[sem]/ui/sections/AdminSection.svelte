@@ -14,6 +14,7 @@
         committees: FacultyCommitteesDTO;
         adminWorks: FacultyAdminWorksDTO;
         opts?: Map<string, Array<string>>;
+        hasChange: boolean;
     }
 
     let {
@@ -26,7 +27,12 @@
         adminWorks,
         // eslint-disable-next-line prefer-const -- bindable variable
         opts,
+        hasChange = $bindable(),
     }: Props = $props();
+
+    // Check for changes
+    let haveChanges: boolean[] = $state(Array(3).fill(false));
+    $effect(() => { hasChange = haveChanges.some((e) => e === true) });
 
     // Input Table Columns
     const adminPositionOpts = $derived(opts?.get('adminPositions'));
@@ -221,6 +227,7 @@
                     columns={administrativePositionColumns}
                     rows={administrativePositionValues}
                     numOfColumns={27}
+                    bind:hasChange={haveChanges[0]}
                 />
             </div>
 
@@ -232,6 +239,7 @@
                     columns={committeeMembershipColumns}
                     rows={committeeMembershipValues}
                     numOfColumns={27}
+                    bind:hasChange={haveChanges[1]}
                 />
             </div>
 
@@ -243,6 +251,7 @@
                     columns={administrativeWorkColumns}
                     rows={administrativeWorkValues}
                     numOfColumns={27}
+                    bind:hasChange={haveChanges[2]}
                 />
             </div>
 
