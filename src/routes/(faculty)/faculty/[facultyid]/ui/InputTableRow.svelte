@@ -38,7 +38,7 @@
     }: Props = $props();
 
     // svelte-ignore state_referenced_locally
-    const values = $state(Array(row.length).fill(undefined));
+    let values = $state(Array(row.length).fill(undefined));
     $effect(() => {
         hasValue = values.some((v) => v !== undefined && v !== null && v !== '' && v !== false);
     });
