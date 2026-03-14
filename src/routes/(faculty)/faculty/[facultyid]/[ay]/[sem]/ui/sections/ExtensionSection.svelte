@@ -7,10 +7,11 @@
     interface Props {
         extensionLoadCredit: number;
         extensionWork: FacultyExtensionDTO;
+        hasChange: boolean;
     }
 
     // eslint-disable-next-line prefer-const -- bindable variable
-    let { extensionLoadCredit = $bindable(), extensionWork }: Props = $props();
+    let { extensionLoadCredit = $bindable(), extensionWork, hasChange = $bindable() }: Props = $props();
 
     // Input Table Columns
     const extensionColumns: InputColumnType[] = [
@@ -94,6 +95,7 @@
                 columns={extensionColumns}
                 rows={extensionValues}
                 numOfColumns={27}
+                bind:hasChange
             />
 
             <p class="mt-4 pl-3.5">Total Semester Extension Load Credit: {extensionLoadCredit}</p>
