@@ -1,5 +1,7 @@
 <script lang="ts">
     import SemestralRecordForm from './ui/SemestralRecordForm.svelte';
+    import ChangelogList from '$lib/ui/ChangelogList.svelte';
+
     import { resetViewState, setToEdit } from '../../states/view-state.svelte.js';
     import { page } from '$app/stores';
     import { chooseSemestralRecord } from '../../states/chosen-semestral-record.svelte.js';
@@ -14,6 +16,8 @@
         semestralRecord,
         opts,
         dependencyMaps,
+        canViewChangeLogs,
+        fetchedChangelogs,
     } = $derived(data);
 
     // Keep track of the last valid record URL
@@ -46,3 +50,7 @@
     {dependencyMaps}
     {previousUrl}
 />
+
+{#if canViewChangeLogs && fetchedChangelogs != null}
+<ChangelogList changelogFetcher={() => fetchedChangelogs}/>
+{/if}
