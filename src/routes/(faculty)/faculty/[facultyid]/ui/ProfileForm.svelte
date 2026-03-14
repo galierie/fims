@@ -236,6 +236,7 @@
     <div class="flex items-center gap-2">
         {#if viewState.isEditing}
             <GreenButton
+                type="button"
                 onclick={() => {
                     if (profileForm) profileForm.requestSubmit();
                 }}
@@ -250,7 +251,7 @@
                 </RedButton>
             {/if}
         {:else if !isCreating}
-            <GreenButton onclick={setToEdit}>
+            <GreenButton type="button" onclick={setToEdit}>
                 <Icon icon="tabler:edit" class="mr-2 h-5 w-5" />
                 <span>Edit</span>
             </GreenButton>
