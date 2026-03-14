@@ -29,6 +29,7 @@
         semestralRecord?: FacultySemestralRecordDTO;
         opts?: Map<string, Array<string>>;
         dependencyMaps?: Map<string, Map<string, string>>;
+        previousUrl?: string | null; // <-- Add this
     }
 
     const {
@@ -39,6 +40,7 @@
         semestralRecord,
         opts,
         dependencyMaps,
+        previousUrl,
     }: Props = $props();
 
     let isLoading = $state(false);
@@ -64,9 +66,27 @@
 <form
     method="POST"
     action="?/update"
-    onreset={resetViewState}
     id={semestralRecordFormId}
     bind:this={semestralRecordForm}
+    onreset={async (e) => {
+        if (semestralRecord === null) {
+            e.preventDefault();
+            isLoading = true;
+
+            semestralRecordForm?.reset();
+
+            const { goto } = await import('$app/navigation');
+
+            // If "discard changes" is clicked for a new sem record, go to prev URL
+            if (previousUrl) await goto(previousUrl);
+            else await goto(`/faculty/${facultyid}/profile`);
+
+            isLoading = false;
+        } else {
+            // If "discard changes" is clicked for an existing sem record, read-only state
+            resetViewState();
+        }
+    }}
     use:enhance={() => {
         resetViewState();
         isLoading = true;
@@ -136,6 +156,7 @@
                 id="remarks"
                 class="mt-4 h-fit min-h-90 w-full rounded-2xl border-0 bg-white p-1.5 placeholder-fims-gray focus:ring-0"
                 disabled={!viewState.isEditing}
+                value={semestralRecord?.remarks ?? ''}
             ></textarea>
         </div>
     </div>
@@ -158,6 +179,8 @@
         <ResearchSection
             bind:researchLoadCredit
             researchWork={semestralRecord?.researchWork ?? []}
+            {opts}
+            {dependencyMaps}
         />
         <ExtensionSection
             bind:extensionLoadCredit

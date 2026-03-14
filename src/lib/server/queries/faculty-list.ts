@@ -46,19 +46,17 @@ export async function getFacultyRecordList(
     // fallback ID in case there are no entries for current semester
     const currentSemesterId = latestSemester?.acadsemesterid ?? -1;
 
-    // Search in search table all faculty records affected
+    // eslint-disable-next-line no-undefined
+    const searchFilter = searchTerm
+        ? ilike(facultyRecordSearchView.searchcontent, `%${searchTerm}%`)
+        : undefined;
+
     const searchSq = await db
         .selectDistinct({
             id: facultyRecordSearchView.id,
         })
         .from(facultyRecordSearchView)
-
-        .where(
-            searchTerm
-                ? ilike(facultyRecordSearchView.searchcontent, `%${searchTerm}%`)
-                : // eslint-disable-next-line no-undefined -- can't use null in Drizzle WHERE queries
-                  undefined,
-        )
+        .where(searchFilter)
         .as('search_sq');
 
     // Process filter queries
@@ -73,6 +71,29 @@ export async function getFacultyRecordList(
         if (sameColumnQueries.length) filterQueries.push(or(...sameColumnQueries));
     });
 
+    // Get only the single most recent admin position per semester
+    const adminPositionSq = db
+        .selectDistinctOn([facultyadminposition.facultysemesterid], {
+            facultysemesterid: facultyadminposition.facultysemesterid,
+            positions: adminposition.name,
+        })
+        .from(facultyadminposition)
+        .leftJoin(
+            adminposition,
+            eq(adminposition.adminpositionid, facultyadminposition.adminpositionid),
+        )
+        .orderBy(
+            facultyadminposition.facultysemesterid,
+            desc(facultyadminposition.startdate), // Prioritize the latest start date
+            desc(facultyadminposition.facultyadminpositionid), // Tiebreaker: highest ID
+        )
+        .as('admin_position_sq');
+
+    // eslint-disable-next-line no-undefined
+    let cursorFilter: SQL | undefined = undefined;
+    if (cursor) {
+        cursorFilter = isNext ? gt(faculty.facultyid, cursor) : lt(faculty.facultyid, cursor);
+    }
     // Get faculty records from database
     const facultyRecordCountSq = await db
         .select({
@@ -81,7 +102,7 @@ export async function getFacultyRecordList(
             firstname: faculty.firstname,
             status: faculty.status,
             ranktitle: rank.ranktitle,
-            adminposition: adminposition.name,
+            adminposition: adminPositionSq.positions,
             latestchangelogid: faculty.latestchangelogid,
         })
         .from(faculty)
@@ -96,24 +117,10 @@ export async function getFacultyRecordList(
         .leftJoin(facultyrank, eq(facultyrank.facultyrankid, facultysemester.currentrankid))
         .leftJoin(rank, eq(rank.rankid, facultyrank.rankid))
         .leftJoin(
-            facultyadminposition,
-            eq(facultyadminposition.facultysemesterid, facultysemester.facultysemesterid),
+            adminPositionSq,
+            eq(adminPositionSq.facultysemesterid, facultysemester.facultysemesterid),
         )
-        .leftJoin(
-            adminposition,
-            eq(adminposition.adminpositionid, facultyadminposition.adminpositionid),
-        )
-        .where(
-            and(
-                cursor
-                    ? isNext
-                        ? gt(faculty.facultyid, cursor)
-                        : lt(faculty.facultyid, cursor)
-                    : // eslint-disable-next-line no-undefined -- can't use null in Drizzle WHERE queries
-                      undefined,
-                and(...filterQueries),
-            ),
-        )
+        .where(and(cursorFilter, and(...filterQueries)))
         .orderBy(isNext ? asc(faculty.facultyid) : desc(faculty.facultyid))
         .limit(pageSize + 1)
         .as('faculty_record_count_sq');

@@ -1,12 +1,13 @@
-import {expect, test} from '@playwright/test';
+import { expect, test } from '@playwright/test';
+
 import * as testConsts from '../../test-consts';
 
 //reset
 test('re-seed 1', testConsts.seed);
 
 test.describe('batch delete faculty records as it', () => {
-    test.use({ storageState: 'playwright/.auth/it.json' }); 
-    test.describe.configure({mode: 'serial'});
+    test.use({ storageState: 'playwright/.auth/it.json' });
+    test.describe.configure({ mode: 'serial' });
 
     test('cancelled viewed record deletion', async ({ page }) => {
         await page.goto('/');
@@ -50,7 +51,6 @@ test.describe('batch delete faculty records as it', () => {
         await expect(page).toHaveURL('/'); // redirected back
         await expect(page.getByText('Mandario, Maricris')).not.toBeVisible();
     });
-
 
     test('cancelled deletion', async ({ page }) => {
         // No redirection since user is logged-in
@@ -156,15 +156,14 @@ test.describe('batch delete faculty records as it', () => {
         await expect(cell1).not.toBeVisible();
         await expect(cell2).not.toBeVisible();
     });
-
 });
 
 //reset
 test('re-seed 2', testConsts.seed);
 
 test.describe('batch delete faculty records as admin', () => {
-    test.use({ storageState: 'playwright/.auth/admin.json' }); 
-    test.describe.configure({mode: 'serial'});
+    test.use({ storageState: 'playwright/.auth/admin.json' });
+    test.describe.configure({ mode: 'serial' });
 
     test('cancelled viewed record deletion', async ({ page }) => {
         await page.goto('/');

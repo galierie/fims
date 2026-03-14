@@ -225,6 +225,7 @@ export const facultysemester = pgTable(
         acadsemesterid: integer(),
         currentrankid: integer(),
         currenthighesteducationalattainmentid: integer(),
+        remarks: text(),
     },
     (table) => [
         foreignKey({

@@ -71,10 +71,6 @@
                   : values[columns[columnNum].dependentOn]}
         {@const { dependencyMap } = columns[columnNum]}
 
-        {#if tupleid !== undefined}
-            <input type="hidden" name={`${rowNum}-tupleid`} value={tupleid} />
-        {/if}
-
         {#if type === 'dropdown' && opts !== undefined}
             <div
                 class="{colSpanClass} h-8 bg-white {isDeleted

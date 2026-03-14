@@ -1,6 +1,6 @@
 import { sql } from 'drizzle-orm';
 
-import { course, rank, role, status } from './schema';
+import { appointmentstatus, course, fieldofinterest, rank, role, status } from './schema';
 import { db } from './index';
 
 // TODO: Check if tama
@@ -201,6 +201,23 @@ export const roles = [
     },
 ];
 
+// dummy, needs to be changed
+export const fieldsOfInterest = [
+    { field: 'Software Engineering' },
+    { field: 'Data Science' },
+    { field: 'Artificial Intelligence' },
+    { field: 'Cybersecurity' },
+    { field: 'Information Systems' },
+];
+
+// Final appointment status
+export const appointmentStatuses = [
+    { appointmentstatus: 'Permanent' },
+    { appointmentstatus: 'Full-Time' },
+    { appointmentstatus: 'Temporary' },
+    { appointmentstatus: 'Part-Time' },
+];
+
 async function seedStatusTable() {
     // Don't proceed if table is already seeded
     const rows = await db.select().from(status).limit(1);
@@ -245,6 +262,22 @@ async function seedRoleTable() {
     return { success: response.length === 3 };
 }
 
+async function seedFieldOfInterestTable() {
+    const rows = await db.select().from(fieldofinterest).limit(1);
+    if (rows.length > 0) return { success: true };
+
+    const response = await db.insert(fieldofinterest).values(fieldsOfInterest).returning();
+    return { success: response.length > 0 };
+}
+
+async function seedAppointmentStatusTable() {
+    const rows = await db.select().from(appointmentstatus).limit(1);
+    if (rows.length > 0) return { success: true };
+
+    const response = await db.insert(appointmentstatus).values(appointmentStatuses).returning();
+    return { success: response.length > 0 };
+}
+
 export async function seedDatabase() {
     // Enable pg_trgm extension
     await db.execute(sql`CREATE EXTENSION IF NOT EXISTS pg_trgm;`);
@@ -254,4 +287,6 @@ export async function seedDatabase() {
     await seedRankTable(); // rank
     await seedCourseTable(); // course
     await seedRoleTable(); // role
+    await seedFieldOfInterestTable(); // field of interest
+    await seedAppointmentStatusTable(); // appointment status
 }

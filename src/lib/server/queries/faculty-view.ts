@@ -130,6 +130,7 @@ export async function getFacultySemester(facultyid: number, acadYear: number, se
             currentrankid: facultysemester.currentrankid,
             currenthighesteducationalattainmentid:
                 facultysemester.currenthighesteducationalattainmentid,
+            remarks: facultysemester.remarks,
         })
         .from(facultysemester)
         .where(
@@ -148,6 +149,7 @@ export async function getFacultySemester(facultyid: number, acadYear: number, se
             facultysemesterid: currentFacultySemesterSq.facultysemesterid,
             currentRankTitle: rank.ranktitle,
             currentHighestDegree: facultyeducationalattainment.degree,
+            remarks: currentFacultySemesterSq.remarks,
         })
         .from(currentFacultySemesterSq)
         .leftJoin(

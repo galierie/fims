@@ -59,6 +59,7 @@
         "vitest-browser-svelte": "^2.0.2"
     },
     "dependencies": {
+        "@iconify-icons/tabler": "^1.2.95",
         "@iconify/svelte": "^5.2.1",
         "better-auth": "^1.4.18",
         "drizzle-orm": "^0.45.1",

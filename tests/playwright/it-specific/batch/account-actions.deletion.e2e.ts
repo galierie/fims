@@ -1,15 +1,16 @@
 // not sure how to separate this
 // so i just made it two files
 
-import {expect, test} from '@playwright/test';
-import * as testConsts from '../../../test-consts'
+import { expect, test } from '@playwright/test';
+
+import * as testConsts from '../../../test-consts';
 const dummyEmail = process.env.DUMMY_EMAIL!;
 const dummyEmail1 = process.env.DUMMY_EMAIL1!;
 const dummyEmail2 = process.env.DUMMY_EMAIL2!;
 const dummyPw = process.env.DUMMY_PASS!;
 
-test.describe('batch deletion', async() => {
-    test.use({storageState: testConsts.ITConfig})
+test.describe('batch deletion', async () => {
+    test.use({ storageState: testConsts.ITConfig });
     test('cancelled deletion', async ({ page }) => {
         // No redirection since user is logged-in
         page.goto('/accounts');

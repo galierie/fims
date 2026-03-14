@@ -144,7 +144,7 @@ export const adminRelations = [
 // Refresh faculty record search view
 await testDb.execute(sql`REFRESH MATERIALIZED VIEW faculty_record_search_view`);
 */
-    /*
+/*
         // delete all entries in the table muna
         await testDb.delete(schema.faculty);
         await testDb.delete(schema.facultyrank);

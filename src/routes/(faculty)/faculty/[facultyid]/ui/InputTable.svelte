@@ -94,8 +94,12 @@
         {/each}
     </div>
 
-    {#each actualRows as { rowNum, row, tupleid } (rowNum)}
+    {#each actualRows as { rowNum, row, tupleid } (tupleid !== undefined ? `db-${tupleid}` : `new-${rowNum}`)}
         <div class="relative">
+            {#if tupleid !== undefined}
+                <input type="hidden" name={`${tableName}-${rowNum}-tupleid`} value={tupleid} />
+            {/if}
+
             <InputTableRow
                 {columns}
                 {row}
