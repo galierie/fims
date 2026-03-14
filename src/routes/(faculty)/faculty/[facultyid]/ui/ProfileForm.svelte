@@ -9,6 +9,7 @@
     import InputTable from './InputTable.svelte';
     import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
     import RedButton from '$lib/ui/RedButton.svelte';
+    import DeleteConfirmation from '$lib/ui/DeleteConfirmation.svelte';
 
     import type { FacultyProfileRecordDTO } from '$lib/server/queries/faculty-view.js';
     import type { InputColumnType, InputRowValue } from '$lib/types/input-table.js';
@@ -200,6 +201,7 @@
     );
 
     let isLoading = $state(false);
+    let willDiscardChanges = $state(false);
 
     let profileForm: HTMLFormElement | null = null;
     const profileFormId = 'profile-form';
@@ -221,7 +223,10 @@
 <form
     method="POST"
     action="?/update"
-    onreset={resetViewState}
+    onreset={() => {
+        resetViewState()
+        willDiscardChanges = false;
+    }}
     id={profileFormId}
     bind:this={profileForm}
     use:enhance={() => {
@@ -245,7 +250,14 @@
                 <span>Save Record</span>
             </GreenButton>
             {#if !isCreating}
-                <RedButton type="reset">
+                <RedButton
+                    type="button"
+                    onclick={() => {
+                    if (profileForm) {
+                        if (hasChange) willDiscardChanges = true;
+                        else profileForm.reset();
+                    }
+                }}>
                     <Icon icon="tabler:database-off" class="mr-2 h-5 w-5" />
                     <span>Discard Changes</span>
                 </RedButton>
@@ -399,4 +411,12 @@
 
 {#if isLoading}
     <LoadingScreen />
+{/if}
+
+{#if willDiscardChanges}
+    <DeleteConfirmation
+        onDelete={() => { if (profileForm) profileForm.reset() }}
+        onCancel={() => { willDiscardChanges = false }}
+        text="You have unsaved changes. Do you want to discard them?"
+    />
 {/if}
