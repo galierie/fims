@@ -1,6 +1,8 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
     import Icon from '@iconify/svelte';
+    import { onMount } from 'svelte';
+    import { browser } from '$app/environment';
 
     import Field from './Field.svelte';
     import GreenButton from '$lib/ui/GreenButton.svelte';
@@ -21,6 +23,11 @@
     }
 
     const { profile, opts, dependencyMaps, isCreating }: Props = $props();
+
+    // Check for changes
+    let haveChanges: boolean[] = $state(Array(6).fill(false));
+    let hasChange = $derived(haveChanges.some((e) => e === true));
+    $effect(() => { console.log(`Ping from ProfileForm! hasChange = ${hasChange}`) })
 
     // Set to edit agad if isCreating
     $effect(() => {
@@ -196,6 +203,19 @@
 
     let profileForm: HTMLFormElement | null = null;
     const profileFormId = 'profile-form';
+
+    // Handle tab exit with unsaved changes
+    function beforeExit(event: BeforeUnloadEvent) {
+        if (viewState.isEditing && hasChange) {
+            event.preventDefault();
+        }
+    }
+
+    onMount(() => {
+        if (browser) window.addEventListener('beforeunload', beforeExit);
+
+        return () => { if (browser) window.removeEventListener('beforeunload', beforeExit) }
+    });
 </script>
 
 <form
@@ -265,6 +285,7 @@
                 columns={emailColumns}
                 rows={emailValues ?? []}
                 numOfColumns={1}
+                bind:hasChange={haveChanges[0]}
             />
             <InputTable
                 tableName="contact-numbers"
@@ -272,6 +293,7 @@
                 columns={contactNumColumns}
                 rows={contactNumValues ?? []}
                 numOfColumns={1}
+                bind:hasChange={haveChanges[1]}
             />
             <InputTable
                 tableName="home-addresses"
@@ -280,6 +302,7 @@
                 rows={homeAddressValues ?? []}
                 numOfColumns={1}
                 colSpan={2}
+                bind:hasChange={haveChanges[2]}
             />
         </div>
 
@@ -292,6 +315,7 @@
                 rows={educationalAttainmentValues ?? []}
                 numOfColumns={5}
                 colSpan={2}
+                bind:hasChange={haveChanges[3]}
             />
             <InputTable
                 tableName="fields-of-interest"
@@ -299,6 +323,7 @@
                 columns={fieldOfInterestColumns}
                 rows={fieldOfInterestValues ?? []}
                 numOfColumns={1}
+                bind:hasChange={haveChanges[4]}
             />
         </div>
 
@@ -352,6 +377,7 @@
                 rows={promotionHistoryValues ?? []}
                 numOfColumns={9}
                 colSpan={9}
+                bind:hasChange={haveChanges[5]}
             />
         </div>
 
