@@ -54,5 +54,6 @@
             defaultValue={defaultValue ?? ''}
             bind:value
         ></textarea
+        >
     </div>
 </div>
