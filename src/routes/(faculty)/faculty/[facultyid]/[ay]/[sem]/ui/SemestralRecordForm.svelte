@@ -1,6 +1,8 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
     import Icon from '@iconify/svelte';
+    import { onMount } from 'svelte';
+    import { browser } from '$app/environment';
 
     import AcadYearSemSelect from './AcadYearSemSelect.svelte';
     import FieldDropdown from './FieldDropdown.svelte';
@@ -43,6 +45,10 @@
         previousUrl,
     }: Props = $props();
 
+    // Check for changes
+    let haveChanges: boolean[] = $state(Array(5).fill(false));
+    let hasChange = $derived(haveChanges.some((e) => e === true));
+
     let isLoading = $state(false);
 
     let semestralRecordForm: HTMLFormElement | null = null;
@@ -61,6 +67,19 @@
             extensionLoadCredit +
             studyLoadCredit,
     );
+
+    // Handle tab exit with unsaved changes
+    function beforeExit(event: BeforeUnloadEvent) {
+        if (viewState.isEditing && hasChange) {
+            event.preventDefault();
+        }
+    }
+
+    onMount(() => {
+        if (browser) window.addEventListener('beforeunload', beforeExit);
+
+        return () => { if (browser) window.removeEventListener('beforeunload', beforeExit) }
+    });
 </script>
 
 <form
@@ -168,6 +187,7 @@
             committees={semestralRecord?.committees ?? []}
             adminWorks={semestralRecord?.adminWorks ?? []}
             {opts}
+            bind:hasChange={haveChanges[0]}
         />
         <TeachingSection
             bind:teachingLoadCredit
@@ -175,18 +195,21 @@
             mentees={semestralRecord?.mentees ?? []}
             {opts}
             {dependencyMaps}
+            bind:hasChange={haveChanges[1]}
         />
         <ResearchSection
             bind:researchLoadCredit
             researchWork={semestralRecord?.researchWork ?? []}
             {opts}
             {dependencyMaps}
+            bind:hasChange={haveChanges[2]}
         />
         <ExtensionSection
             bind:extensionLoadCredit
             extensionWork={semestralRecord?.extensionWork ?? []}
+            bind:hasChange={haveChanges[3]}
         />
-        <StudyLoadSection bind:studyLoadCredit studyLoad={semestralRecord?.studyLoad ?? []} />
+        <StudyLoadSection bind:studyLoadCredit studyLoad={semestralRecord?.studyLoad ?? []} bind:hasChange={haveChanges[4]} />
     </div>
 </form>
 
