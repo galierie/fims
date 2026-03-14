@@ -31,8 +31,10 @@
     }: Props = $props();
 
     // Check for changes
-    let haveChanges: boolean[] = $state(Array(3).fill(false));
-    $effect(() => { hasChange = haveChanges.some((e) => e === true) });
+    const haveChanges: boolean[] = $state(Array(3).fill(false));
+    $effect(() => {
+        hasChange = haveChanges.some((e) => e === true);
+    });
 
     // Input Table Columns
     const adminPositionOpts = $derived(opts?.get('adminPositions'));

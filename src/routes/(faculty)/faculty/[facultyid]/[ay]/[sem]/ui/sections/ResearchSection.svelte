@@ -12,8 +12,13 @@
         hasChange: boolean;
     }
 
-    // eslint-disable-next-line prefer-const -- bindable variable
-    let { researchLoadCredit = $bindable(), researchWork, opts, dependencyMaps, hasChange = $bindable() }: Props = $props();
+    let {
+        researchLoadCredit = $bindable(),
+        researchWork,
+        opts,
+        dependencyMaps,
+        hasChange = $bindable(),
+    }: Props = $props();
 
     // Input Table Columns
     const researchTitles = $derived(opts?.get('researchTitles'));

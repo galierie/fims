@@ -10,8 +10,11 @@
         hasChange: boolean;
     }
 
-    // eslint-disable-next-line prefer-const -- bindable variable
-    let { extensionLoadCredit = $bindable(), extensionWork, hasChange = $bindable() }: Props = $props();
+    let {
+        extensionLoadCredit = $bindable(),
+        extensionWork,
+        hasChange = $bindable(),
+    }: Props = $props();
 
     // Input Table Columns
     const extensionColumns: InputColumnType[] = [

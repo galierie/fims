@@ -50,7 +50,7 @@
         hasChange = haveChanges.some((e) => e === true);
         console.log(haveChanges);
         console.log(`Ping from InputTableRow! hasChange = ${hasChange}`);
-    })
+    });
 
     const gridTemplateColumns = $derived(`grid-cols-${numOfColumns}`);
 
@@ -101,7 +101,15 @@
             </div>
         {:else if type === 'expandable'}
             <div class={colSpanClass}>
-                <ExpandableCell {name} {defaultValue} {isDeleted} bind:value={values[columnNum]} onchange={() => { haveChanges[columnNum] = values[columnNum] !== defaultValue }} />
+                <ExpandableCell
+                    {name}
+                    {defaultValue}
+                    {isDeleted}
+                    bind:value={values[columnNum]}
+                    onchange={() => {
+                        haveChanges[columnNum] = values[columnNum] !== defaultValue;
+                    }}
+                />
             </div>
         {:else if type === 'dependent' && dependencyMap !== undefined}
             <div
@@ -126,7 +134,9 @@
                     class="h-5 w-5 rounded-sm checked:bg-fims-gray focus:ring-0"
                     bind:checked={values[columnNum]}
                     defaultChecked={defaultChecked ?? false}
-                    onchange={() => { haveChanges[columnNum] = values[columnNum] !== defaultChecked }}
+                    onchange={() => {
+                        haveChanges[columnNum] = values[columnNum] !== defaultChecked;
+                    }}
                 />
                 <input type="hidden" {name} defaultValue={false} />
             </div>
@@ -142,7 +152,9 @@
                     isDeleted}
                 defaultValue={defaultValue ?? ''}
                 bind:value={values[columnNum]}
-                onchange={() => { haveChanges[columnNum] = values[columnNum] !== defaultValue }}
+                onchange={() => {
+                    haveChanges[columnNum] = values[columnNum] !== defaultValue;
+                }}
             />
         {/if}
     {/each}

@@ -246,7 +246,7 @@ export async function createFacultyProfileRecords(basicProfile: any, dynamicTabl
         }
 
         const [newFaculty] = await db.insert(faculty).values(basicProfile).returning();
-        const facultyid = newFaculty.facultyid;
+        const { facultyid } = newFaculty;
 
         await processDynamicTable(
             facultyemail,
@@ -553,7 +553,7 @@ export async function updateSemestralRecords(
                 courseid: getCourseId(c['course-title']),
                 section: c['course-section'],
                 numberofstudents: c['course-num-of-students']
-                    ? parseInt(c['course-num-of-students'])
+                    ? parseInt(c['course-num-of-students'], 10)
                     : null,
                 teachingloadcredit: parseNum(c['course-load-credit']),
                 sectionset: parseNum(c['course-section-set']) || null,
@@ -562,7 +562,7 @@ export async function updateSemestralRecords(
                 courseid: getCourseId(c['course-title']),
                 section: c['course-section'],
                 numberofstudents: c['course-num-of-students']
-                    ? parseInt(c['course-num-of-students'])
+                    ? parseInt(c['course-num-of-students'], 10)
                     : null,
                 teachingloadcredit: parseNum(c['course-load-credit']),
                 sectionset: parseNum(c['course-section-set']) || null,

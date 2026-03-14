@@ -26,9 +26,11 @@
     const { profile, opts, dependencyMaps, isCreating }: Props = $props();
 
     // Check for changes
-    let haveChanges: boolean[] = $state(Array(6).fill(false));
-    let hasChange = $derived(haveChanges.some((e) => e === true));
-    $effect(() => { console.log(`Ping from ProfileForm! hasChange = ${hasChange}`) })
+    const haveChanges: boolean[] = $state(Array(6).fill(false));
+    const hasChange = $derived(haveChanges.some((e) => e === true));
+    $effect(() => {
+        console.log(`Ping from ProfileForm! hasChange = ${hasChange}`);
+    });
 
     // Set to edit agad if isCreating
     $effect(() => {
@@ -208,15 +210,15 @@
 
     // Handle tab exit with unsaved changes
     function beforeExit(event: BeforeUnloadEvent) {
-        if (viewState.isEditing && hasChange) {
-            event.preventDefault();
-        }
+        if (viewState.isEditing && hasChange) event.preventDefault();
     }
 
     onMount(() => {
         if (browser) window.addEventListener('beforeunload', beforeExit);
 
-        return () => { if (browser) window.removeEventListener('beforeunload', beforeExit) }
+        return () => {
+            if (browser) window.removeEventListener('beforeunload', beforeExit);
+        };
     });
 </script>
 
@@ -224,7 +226,7 @@
     method="POST"
     action="?/update"
     onreset={() => {
-        resetViewState()
+        resetViewState();
         willDiscardChanges = false;
     }}
     id={profileFormId}
@@ -253,11 +255,11 @@
                 <RedButton
                     type="button"
                     onclick={() => {
-                    if (profileForm) {
-                        if (hasChange) willDiscardChanges = true;
-                        else profileForm.reset();
-                    }
-                }}>
+                        if (profileForm)
+                            if (hasChange) willDiscardChanges = true;
+                            else profileForm.reset();
+                    }}
+                >
                     <Icon icon="tabler:database-off" class="mr-2 h-5 w-5" />
                     <span>Discard Changes</span>
                 </RedButton>
@@ -415,8 +417,12 @@
 
 {#if willDiscardChanges}
     <DeleteConfirmation
-        onDelete={() => { if (profileForm) profileForm.reset() }}
-        onCancel={() => { willDiscardChanges = false }}
+        onDelete={() => {
+            if (profileForm) profileForm.reset();
+        }}
+        onCancel={() => {
+            willDiscardChanges = false;
+        }}
         text="You have unsaved changes. Do you want to discard them?"
     />
 {/if}

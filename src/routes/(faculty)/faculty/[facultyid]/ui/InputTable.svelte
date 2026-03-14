@@ -17,8 +17,16 @@
         hasChange: boolean;
     }
 
-    // eslint-disable-next-line prefer-const -- changing value and bindable variable
-    let { tableName, rowLabel, columns, rows, numOfColumns, colStart, colSpan, hasChange = $bindable() }: Props = $props();
+    let {
+        tableName,
+        rowLabel,
+        columns,
+        rows,
+        numOfColumns,
+        colStart,
+        colSpan,
+        hasChange = $bindable(),
+    }: Props = $props();
 
     let nextRowNum = $derived(rows.length);
     // svelte-ignore state_referenced_locally

@@ -52,5 +52,5 @@
 />
 
 {#if canViewChangeLogs && fetchedChangelogs != null}
-<ChangelogList changelogFetcher={() => fetchedChangelogs}/>
+    <ChangelogList changelogFetcher={() => fetchedChangelogs} />
 {/if}

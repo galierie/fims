@@ -13,8 +13,14 @@
         onchange: () => void;
     }
 
-    // eslint-disable-next-line prefer-const -- changing value and bindable variable
-    let { name, defaultValue, immutable, isDeleted, value = $bindable(), onchange }: Props = $props();
+    let {
+        name,
+        defaultValue,
+        immutable,
+        isDeleted,
+        value = $bindable(),
+        onchange,
+    }: Props = $props();
 
     let isDialogOpen = $state(false);
 </script>
@@ -30,7 +36,7 @@
     />
     <button
         type="button"
-        class="h-8 w-fit text-right bg-white text-fims-gray pr-2 hover:text-black"
+        class="h-8 w-fit bg-white pr-2 text-right text-fims-gray hover:text-black"
         onclick={() => (isDialogOpen = true)}>Expand</button
     >
 </div>
@@ -55,7 +61,6 @@
             defaultValue={defaultValue ?? ''}
             bind:value
             {onchange}
-        ></textarea
-        >
+        ></textarea>
     </div>
 </div>

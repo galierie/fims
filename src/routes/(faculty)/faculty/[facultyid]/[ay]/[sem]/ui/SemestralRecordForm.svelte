@@ -47,8 +47,8 @@
     }: Props = $props();
 
     // Check for changes
-    let haveChanges: boolean[] = $state(Array(5).fill(false));
-    let hasChange = $derived(haveChanges.some((e) => e === true));
+    const haveChanges: boolean[] = $state(Array(5).fill(false));
+    const hasChange = $derived(haveChanges.some((e) => e === true));
 
     let isLoading = $state(false);
     let willDiscardChanges = $state(false);
@@ -72,15 +72,15 @@
 
     // Handle tab exit with unsaved changes
     function beforeExit(event: BeforeUnloadEvent) {
-        if (viewState.isEditing && hasChange) {
-            event.preventDefault();
-        }
+        if (viewState.isEditing && hasChange) event.preventDefault();
     }
 
     onMount(() => {
         if (browser) window.addEventListener('beforeunload', beforeExit);
 
-        return () => { if (browser) window.removeEventListener('beforeunload', beforeExit) }
+        return () => {
+            if (browser) window.removeEventListener('beforeunload', beforeExit);
+        };
     });
 </script>
 
@@ -132,10 +132,9 @@
             <RedButton
                 type="button"
                 onclick={() => {
-                    if (semestralRecordForm) {
+                    if (semestralRecordForm)
                         if (hasChange) willDiscardChanges = true;
                         else semestralRecordForm.reset();
-                    }
                 }}
             >
                 <Icon icon="tabler:database-off" class="mr-2 h-5 w-5" />
@@ -221,7 +220,11 @@
             extensionWork={semestralRecord?.extensionWork ?? []}
             bind:hasChange={haveChanges[3]}
         />
-        <StudyLoadSection bind:studyLoadCredit studyLoad={semestralRecord?.studyLoad ?? []} bind:hasChange={haveChanges[4]} />
+        <StudyLoadSection
+            bind:studyLoadCredit
+            studyLoad={semestralRecord?.studyLoad ?? []}
+            bind:hasChange={haveChanges[4]}
+        />
     </div>
 </form>
 
@@ -231,8 +234,12 @@
 
 {#if willDiscardChanges}
     <DeleteConfirmation
-        onDelete={() => { if (semestralRecordForm) semestralRecordForm.reset() }}
-        onCancel={() => { willDiscardChanges = false }}
+        onDelete={() => {
+            if (semestralRecordForm) semestralRecordForm.reset();
+        }}
+        onCancel={() => {
+            willDiscardChanges = false;
+        }}
         text="You have unsaved changes. Do you want to discard them?"
     />
 {/if}
