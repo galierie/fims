@@ -10,10 +10,11 @@
         immutable?: boolean;
         isDeleted?: boolean;
         value?: string;
+        onchange: () => void;
     }
 
     // eslint-disable-next-line prefer-const -- changing value and bindable variable
-    let { name, defaultValue, immutable, isDeleted, value = $bindable() }: Props = $props();
+    let { name, defaultValue, immutable, isDeleted, value = $bindable(), onchange }: Props = $props();
 
     let isDialogOpen = $state(false);
 </script>
@@ -53,6 +54,7 @@
                 isDeleted}
             defaultValue={defaultValue ?? ''}
             bind:value
+            {onchange}
         ></textarea
         >
     </div>
