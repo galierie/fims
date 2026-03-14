@@ -118,6 +118,7 @@
     <div class="flex items-center gap-2">
         {#if viewState.isEditing}
             <GreenButton
+                type="button"
                 onclick={() => {
                     if (semestralRecordForm) semestralRecordForm.requestSubmit();
                 }}
@@ -130,7 +131,7 @@
                 <span>Discard Changes</span>
             </RedButton>
         {:else}
-            <GreenButton onclick={setToEdit}>
+            <GreenButton type="button" onclick={setToEdit}>
                 <Icon icon="tabler:edit" class="mr-2 h-5 w-5" />
                 <span>Edit</span>
             </GreenButton>
