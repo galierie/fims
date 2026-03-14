@@ -1,12 +1,15 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
     import Icon from '@iconify/svelte';
+    import { onMount } from 'svelte';
+    import { browser } from '$app/environment';
 
     import Field from './Field.svelte';
     import GreenButton from '$lib/ui/GreenButton.svelte';
     import InputTable from './InputTable.svelte';
     import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
     import RedButton from '$lib/ui/RedButton.svelte';
+    import DeleteConfirmation from '$lib/ui/DeleteConfirmation.svelte';
 
     import type { FacultyProfileRecordDTO } from '$lib/server/queries/faculty-view.js';
     import type { InputColumnType, InputRowValue } from '$lib/types/input-table.js';
@@ -21,6 +24,13 @@
     }
 
     const { profile, opts, dependencyMaps, isCreating }: Props = $props();
+
+    // Check for changes
+    const haveChanges: boolean[] = $state(Array(6).fill(false));
+    const hasChange = $derived(haveChanges.some((e) => e === true));
+    $effect(() => {
+        console.log(`Ping from ProfileForm! hasChange = ${hasChange}`);
+    });
 
     // Set to edit agad if isCreating
     $effect(() => {
@@ -193,15 +203,32 @@
     );
 
     let isLoading = $state(false);
+    let willDiscardChanges = $state(false);
 
     let profileForm: HTMLFormElement | null = null;
     const profileFormId = 'profile-form';
+
+    // Handle tab exit with unsaved changes
+    function beforeExit(event: BeforeUnloadEvent) {
+        if (viewState.isEditing && hasChange) event.preventDefault();
+    }
+
+    onMount(() => {
+        if (browser) window.addEventListener('beforeunload', beforeExit);
+
+        return () => {
+            if (browser) window.removeEventListener('beforeunload', beforeExit);
+        };
+    });
 </script>
 
 <form
     method="POST"
     action="?/update"
-    onreset={resetViewState}
+    onreset={() => {
+        resetViewState();
+        willDiscardChanges = false;
+    }}
     id={profileFormId}
     bind:this={profileForm}
     use:enhance={() => {
@@ -216,6 +243,7 @@
     <div class="flex items-center gap-2">
         {#if viewState.isEditing}
             <GreenButton
+                type="button"
                 onclick={() => {
                     if (profileForm) profileForm.requestSubmit();
                 }}
@@ -224,13 +252,20 @@
                 <span>Save Record</span>
             </GreenButton>
             {#if !isCreating}
-                <RedButton type="reset">
+                <RedButton
+                    type="button"
+                    onclick={() => {
+                        if (profileForm)
+                            if (hasChange) willDiscardChanges = true;
+                            else profileForm.reset();
+                    }}
+                >
                     <Icon icon="tabler:database-off" class="mr-2 h-5 w-5" />
                     <span>Discard Changes</span>
                 </RedButton>
             {/if}
         {:else if !isCreating}
-            <GreenButton onclick={setToEdit}>
+            <GreenButton type="button" onclick={setToEdit}>
                 <Icon icon="tabler:edit" class="mr-2 h-5 w-5" />
                 <span>Edit</span>
             </GreenButton>
@@ -265,6 +300,7 @@
                 columns={emailColumns}
                 rows={emailValues ?? []}
                 numOfColumns={1}
+                bind:hasChange={haveChanges[0]}
             />
             <InputTable
                 tableName="contact-numbers"
@@ -272,6 +308,7 @@
                 columns={contactNumColumns}
                 rows={contactNumValues ?? []}
                 numOfColumns={1}
+                bind:hasChange={haveChanges[1]}
             />
             <InputTable
                 tableName="home-addresses"
@@ -280,6 +317,7 @@
                 rows={homeAddressValues ?? []}
                 numOfColumns={1}
                 colSpan={2}
+                bind:hasChange={haveChanges[2]}
             />
         </div>
 
@@ -292,6 +330,7 @@
                 rows={educationalAttainmentValues ?? []}
                 numOfColumns={5}
                 colSpan={2}
+                bind:hasChange={haveChanges[3]}
             />
             <InputTable
                 tableName="fields-of-interest"
@@ -299,6 +338,7 @@
                 columns={fieldOfInterestColumns}
                 rows={fieldOfInterestValues ?? []}
                 numOfColumns={1}
+                bind:hasChange={haveChanges[4]}
             />
         </div>
 
@@ -352,6 +392,7 @@
                 rows={promotionHistoryValues ?? []}
                 numOfColumns={9}
                 colSpan={9}
+                bind:hasChange={haveChanges[5]}
             />
         </div>
 
@@ -372,4 +413,16 @@
 
 {#if isLoading}
     <LoadingScreen />
+{/if}
+
+{#if willDiscardChanges}
+    <DeleteConfirmation
+        onDelete={() => {
+            if (profileForm) profileForm.reset();
+        }}
+        onCancel={() => {
+            willDiscardChanges = false;
+        }}
+        text="You have unsaved changes. Do you want to discard them?"
+    />
 {/if}

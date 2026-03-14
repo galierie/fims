@@ -2,20 +2,18 @@
     import Icon from '@iconify/svelte';
 
     import ProfileForm from '../ui/ProfileForm.svelte';
-    import ChangelogList, {type ChangelogRecordStructure} from '$lib/ui/ChangelogList.svelte';
+    import ChangelogList, { type ChangelogRecordStructure } from '$lib/ui/ChangelogList.svelte';
 
     import { resetViewState } from '../states/view-state.svelte.js';
 
     const { data, form } = $props();
     const { profile, opts, dependencyMaps, canViewChangeLogs, fetchedChangelogs } = $derived(data);
 
-    function fetchChangelogs():ChangelogRecordStructure[] {
-        if (canViewChangeLogs && (fetchedChangelogs != null)) {
-            return fetchedChangelogs!;
-        } else {
-            console.log("can't fetch logs");
-            return [];
-        }
+    function fetchChangelogs(): ChangelogRecordStructure[] {
+        if (canViewChangeLogs && fetchedChangelogs != null) return fetchedChangelogs!;
+
+        console.log("can't fetch logs");
+        return [];
     }
 
     // Ensure view isn't set to editing state on load
@@ -33,5 +31,5 @@
 
 <ProfileForm {profile} {opts} {dependencyMaps} />
 {#if canViewChangeLogs && fetchedChangelogs != null}
-    <ChangelogList changelogFetcher={fetchChangelogs}/>
+    <ChangelogList changelogFetcher={fetchChangelogs} />
 {/if}

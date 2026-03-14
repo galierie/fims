@@ -14,13 +14,31 @@
         numOfColumns: number;
         colStart?: number;
         colSpan?: number;
+        hasChange: boolean;
     }
 
-    // eslint-disable-next-line prefer-const -- changing value
-    let { tableName, rowLabel, columns, rows, numOfColumns, colStart, colSpan }: Props = $props();
+    let {
+        tableName,
+        rowLabel,
+        columns,
+        rows,
+        numOfColumns,
+        colStart,
+        colSpan,
+        hasChange = $bindable(),
+    }: Props = $props();
 
     let nextRowNum = $derived(rows.length);
-    const haveValues: boolean[] = $derived(Array(nextRowNum).fill(true));
+    // svelte-ignore state_referenced_locally
+    const haveValues: boolean[] = $state(Array(nextRowNum).fill(true));
+
+    // Check for changes
+    // svelte-ignore state_referenced_locally
+    const haveChanges: boolean[] = $state(Array(nextRowNum).fill(false));
+    $effect(() => {
+        hasChange = haveChanges.some((e) => e === true);
+        console.log(`Ping from InputTable! hasChange = ${hasChange}`);
+    });
 
     let actualRows: InputRowValue[] = $derived(rows);
     let deletedRows: number[] = $state([]);
@@ -109,6 +127,7 @@
                 toggleRowDeletion={() => toggleRowDeletion(rowNum)}
                 isDeleted={deletedRows.includes(rowNum)}
                 bind:hasValue={haveValues[rowNum]}
+                bind:hasChange={haveChanges[rowNum]}
             />
         </div>
     {/each}

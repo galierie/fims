@@ -1,4 +1,5 @@
 import { fail, redirect } from '@sveltejs/kit';
+
 import { createFacultyProfileRecords } from '$lib/server/queries/db-helpers';
 import {
     getAllAppointmentStatuses,
