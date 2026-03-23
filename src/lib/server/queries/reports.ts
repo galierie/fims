@@ -1,14 +1,16 @@
 import { db } from '../db/index'; 
 import { faculty, facultycourse, course, semester, facultysemester, facultyadminposition } from '../db/schema';
-import { eq, and, sql, avg } from 'drizzle-orm';
+import { eq, and, sql, avg, asc } from 'drizzle-orm';
 
-// TASK 5
+// TASK 5: Faculty Loading Report
 export async function getFacultyLoadingReport(acadYear: number, semNum: number) {
     return await db
         .select({
+            id: faculty.facultyid,
             name: sql<string>`${faculty.lastname} || ', ' || ${faculty.firstname}`,
             teachingLoad: sql<number>`COALESCE(sum(${facultycourse.teachingloadcredit}), 0)`,
-            adminLoad: sql<number>`COALESCE(sum(${facultyadminposition.administrativeloadcredit}), 0)`
+            adminLoad: sql<number>`COALESCE(sum(${facultyadminposition.administrativeloadcredit}), 0)`,
+            totalLoad: sql<number>`COALESCE(sum(${facultycourse.teachingloadcredit}), 0) + COALESCE(sum(${facultyadminposition.administrativeloadcredit}), 0)`
         })
         .from(faculty)
         .innerJoin(facultysemester, eq(faculty.facultyid, facultysemester.facultyid))
@@ -19,8 +21,26 @@ export async function getFacultyLoadingReport(acadYear: number, semNum: number) 
         .groupBy(faculty.facultyid, faculty.lastname, faculty.firstname);
 }
 
-// TASK 6 & 7
-export async function getSubjectsReport(acadYear: number, semNum: number) {
+// TASK 6: Subjects Taught (Grouped by Faculty - The "People" View)
+export async function getSubjectsByFacultyReport(acadYear: number, semNum: number) {
+    return await db
+        .select({
+            facultyName: sql<string>`${faculty.lastname} || ', ' || ${faculty.firstname}`,
+            courseCode: course.coursename,
+            section: facultycourse.section,
+            students: facultycourse.numberofstudents
+        })
+        .from(facultycourse)
+        .innerJoin(course, eq(facultycourse.courseid, course.courseid))
+        .innerJoin(facultysemester, eq(facultycourse.facultysemesterid, facultysemester.facultysemesterid))
+        .innerJoin(faculty, eq(facultysemester.facultyid, faculty.facultyid))
+        .innerJoin(semester, eq(facultysemester.acadsemesterid, semester.acadsemesterid))
+        .where(and(eq(semester.academicyear, acadYear), eq(semester.semester, semNum)))
+        .orderBy(faculty.lastname, faculty.firstname); // Sort by teacher name
+}
+
+// TASK 7: Faculty (By Subject Taught - The "Curriculum" View)
+export async function getFacultyBySubjectReport(acadYear: number, semNum: number) {
     return await db
         .select({
             courseCode: course.coursename,
@@ -33,10 +53,11 @@ export async function getSubjectsReport(acadYear: number, semNum: number) {
         .innerJoin(facultysemester, eq(facultycourse.facultysemesterid, facultysemester.facultysemesterid))
         .innerJoin(faculty, eq(facultysemester.facultyid, faculty.facultyid))
         .innerJoin(semester, eq(facultysemester.acadsemesterid, semester.acadsemesterid))
-        .where(and(eq(semester.academicyear, acadYear), eq(semester.semester, semNum)));
+        .where(and(eq(semester.academicyear, acadYear), eq(semester.semester, semNum)))
+        .orderBy(course.coursename, facultycourse.section); // Sort by subject/section
 }
 
-// TASK 8 - Match this name to the +server.ts file!
+// TASK 8: Faculty SET Average
 export async function getFacultySETReport(acadYear: number, semNum: number) {
     return await db
         .select({
