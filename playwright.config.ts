@@ -67,6 +67,7 @@ export default defineConfig({
         },
         
         // it-specifc (account handling) tests
+
         {
             name: 'it-specific-tests-indiv',
             dependencies: ['common-tests', 'common-destructive-tests', 'it-auth'],
@@ -85,7 +86,7 @@ export default defineConfig({
             dependencies: ['it-specific-tests-batch-creation', 'it-auth'],
             testDir: 'tests/playwright/it-specific/batch',
             testMatch: /.search.e2e.(?:js|ts)/u,
-            fullyParallel: true
+            fullyParallel: true,
         },
         {
             name: 'it-specific-tests-batch-deletion',
@@ -94,7 +95,7 @@ export default defineConfig({
             testMatch: /.deletion.e2e.(?:js|ts)/u,
             fullyParallel: false, //cancellation test inside; cancel first then delete
         },
- 
+
         {
             name: 'it-specific-tests-generic',
             dependencies: ['it-auth'],

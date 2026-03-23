@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+
 import * as testConsts from '../../../test-consts';
 
 test.use({ storageState: 'playwright/.auth/it.json' });
@@ -12,8 +13,8 @@ const dummyEmail1 = process.env.DUMMY_EMAIL1!;
 const dummyEmail2 = process.env.DUMMY_EMAIL2!;
 
 test.describe('unsuccessful adding of accounts', () => {
-    test.use({storageState: testConsts.ITConfig});
-    test.describe.configure({mode:'parallel'});
+    test.use({ storageState: testConsts.ITConfig });
+    test.describe.configure({ mode: 'parallel' });
 
     test('no email', async ({ page }) => {
         // No redirection since user is logged-in
@@ -101,9 +102,8 @@ test.describe('unsuccessful adding of accounts', () => {
 });
 
 test.describe('add account', () => {
-    test.use({storageState: testConsts.ITConfig});
-    test.describe('unsuccessful', () => {
-    });
+    test.use({ storageState: testConsts.ITConfig });
+    test.describe('unsuccessful', () => {});
 
     test('made', async ({ page }) => {
         // No redirection since user is logged-in
@@ -149,7 +149,7 @@ test.describe('add account', () => {
 });
 
 test.describe('delete account', () => {
-    test.use({storageState: testConsts.ITConfig});
+    test.use({ storageState: testConsts.ITConfig });
     test('cancelled', async ({ page }) => {
         // No redirection since user is logged-in
         page.goto('/accounts');
@@ -181,14 +181,16 @@ test.describe('delete account', () => {
             .nth(0) // admin@up.edu.ph is at the first row
             .click();
         */
-        const correctRow = page.getByTestId('account-row').filter({hasText: dummyEmail});
-        await correctRow.getByRole('button', { name: 'Delete', exact: true }).first().click()
+        const correctRow = page.getByTestId('account-row').filter({ hasText: dummyEmail });
+        await correctRow.getByRole('button', { name: 'Delete', exact: true }).first().click();
 
         // Confirm
         // keeps on failing, so i just made use of the fact there's only one cancel button during this state
-        await page.getByRole('button', { name: 'Cancel', exact: true })
+        await page
+            .getByRole('button', { name: 'Cancel', exact: true })
             .locator('..')
-            .getByRole('button', {name: 'Delete'}).click();
+            .getByRole('button', { name: 'Delete' })
+            .click();
 
         // Check message
         const afterDeleteMessage = await page.getByText('Deleted account.');

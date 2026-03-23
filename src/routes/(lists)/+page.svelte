@@ -129,7 +129,17 @@
                 </div>
             </div>
         {:else}
-            <div class="mt-15"></div>
+            <div class="mt-6 flex w-315 justify-end 2xl:w-432">
+                <GreenButton
+                    onclick={async () => {
+                        isLoading = true;
+                        await goto('/faculty/create');
+                    }}
+                >
+                    <Icon icon="tabler:user-plus" class="mr-2 h-5 w-5" />
+                    <span>Add record</span>
+                </GreenButton>
+            </div>
         {/if}
     </div>
 

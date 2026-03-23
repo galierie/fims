@@ -14,13 +14,31 @@
         numOfColumns: number;
         colStart?: number;
         colSpan?: number;
+        hasChange: boolean;
     }
 
-    // eslint-disable-next-line prefer-const -- changing value
-    let { tableName, rowLabel, columns, rows, numOfColumns, colStart, colSpan }: Props = $props();
+    let {
+        tableName,
+        rowLabel,
+        columns,
+        rows,
+        numOfColumns,
+        colStart,
+        colSpan,
+        hasChange = $bindable(),
+    }: Props = $props();
 
     let nextRowNum = $derived(rows.length);
-    const haveValues: boolean[] = $derived(Array(nextRowNum).fill(true));
+    // svelte-ignore state_referenced_locally
+    let haveValues: boolean[] = $state(Array(nextRowNum).fill(true));
+
+    // Check for changes
+    // svelte-ignore state_referenced_locally
+    let haveChanges: boolean[] = $state(Array(nextRowNum).fill(false));
+    $effect(() => {
+        hasChange = haveChanges.some((e) => e === true);
+        console.log(`Ping from InputTable! hasChange = ${hasChange}`);
+    });
 
     let actualRows: InputRowValue[] = $derived(rows);
     let deletedRows: number[] = $state([]);
@@ -94,8 +112,12 @@
         {/each}
     </div>
 
-    {#each actualRows as { rowNum, row, tupleid } (rowNum)}
+    {#each actualRows as { rowNum, row, tupleid } (tupleid !== undefined ? `db-${tupleid}` : `new-${rowNum}`)}
         <div class="relative">
+            {#if tupleid !== undefined}
+                <input type="hidden" name={`${tableName}-${rowNum}-tupleid`} value={tupleid} />
+            {/if}
+
             <InputTableRow
                 {columns}
                 {row}
@@ -105,6 +127,7 @@
                 toggleRowDeletion={() => toggleRowDeletion(rowNum)}
                 isDeleted={deletedRows.includes(rowNum)}
                 bind:hasValue={haveValues[rowNum]}
+                bind:hasChange={haveChanges[rowNum]}
             />
         </div>
     {/each}

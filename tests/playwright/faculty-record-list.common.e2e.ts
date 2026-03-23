@@ -7,6 +7,7 @@ import { Pool as PgPool } from 'pg';
 import { sql } from 'drizzle-orm';
 
 import * as schema from '$lib/server/db/schema';
+
 import * as testConsts from '../test-consts';
 import * as fieldHelp from '../test-helpers/field-test';
 
@@ -34,11 +35,11 @@ const facultyRecordTableHeaders = ['Status', 'Rank', 'Administrative Position'];
 
 test('seed', async () => {
     await testConsts.seed();
-})
+});
 
 test.describe('view faculty records as it', () => {
     test.use({ storageState: 'playwright/.auth/it.json' });
-    test.describe.configure({mode: 'parallel'});
+    test.describe.configure({ mode: 'parallel' });
 
     test('it', async ({ page }) => {
         // No redirection since user is logged-in
@@ -62,7 +63,7 @@ test.describe('view faculty records as it', () => {
 
 test.describe('view faculty records as admin', () => {
     test.use({ storageState: 'playwright/.auth/admin.json' });
-    test.describe.configure({mode: 'parallel'});
+    test.describe.configure({ mode: 'parallel' });
 
     test('admin', async ({ page }) => {
         // No redirection since user is logged-in
@@ -81,8 +82,8 @@ test.describe('view faculty records as admin', () => {
 });
 
 test.describe('viewing and searching records as it', () => {
-    test.use({ storageState: 'playwright/.auth/it.json' }); 
-    test.describe.configure({mode: 'parallel'});
+    test.use({ storageState: 'playwright/.auth/it.json' });
+    test.describe.configure({ mode: 'parallel' });
 
     test('partial search', async ({ page }) => {
         await page.goto('/');
@@ -220,11 +221,11 @@ test.describe('viewing and searching records as it', () => {
         await expect(deselectSelectionBtn).not.toBeVisible();
         await expect(deleteRecordsBtn).not.toBeVisible();
     });
-})
+});
 
-test.describe('viewing and searching records as admin', async() => {
-    test.use({ storageState: 'playwright/.auth/admin.json' }); 
-    test.describe.configure({mode: 'parallel'});
+test.describe('viewing and searching records as admin', async () => {
+    test.use({ storageState: 'playwright/.auth/admin.json' });
+    test.describe.configure({ mode: 'parallel' });
 
     test('partial search', async ({ page }) => {
         await page.goto('/');
@@ -362,5 +363,4 @@ test.describe('viewing and searching records as admin', async() => {
         await expect(deselectSelectionBtn).not.toBeVisible();
         await expect(deleteRecordsBtn).not.toBeVisible();
     });
-})
-
+});

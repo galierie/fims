@@ -1,7 +1,11 @@
 <script lang="ts">
     import SemestralRecordForm from './ui/SemestralRecordForm.svelte';
+    import ChangelogList from '$lib/ui/ChangelogList.svelte';
 
-    import { resetViewState } from '../../states/view-state.svelte.js';
+    import { resetViewState, setToEdit } from '../../states/view-state.svelte.js';
+    import { page } from '$app/stores';
+    import { chooseSemestralRecord } from '../../states/chosen-semestral-record.svelte.js';
+    import { afterNavigate } from '$app/navigation';
 
     const { data } = $props();
     const {
@@ -12,10 +16,28 @@
         semestralRecord,
         opts,
         dependencyMaps,
+        canViewChangeLogs,
+        fetchedChangelogs,
     } = $derived(data);
 
-    // Ensure view isn't set to editing state on load
-    resetViewState();
+    // Keep track of the last valid record URL
+    let previousUrl: string | null = $state(null);
+
+    afterNavigate(({ from }) => {
+        // Only save the previous URL if it was a valid faculty record page
+        if (from?.url.pathname.includes(`/faculty/${facultyid}/`)) previousUrl = from.url.pathname;
+    });
+
+    $effect(() => {
+        const currentAy = parseInt($page.params.ay ?? '', 10);
+        const currentSem = parseInt($page.params.sem ?? '', 10);
+
+        if (!Number.isNaN(currentAy) && !Number.isNaN(currentSem))
+            chooseSemestralRecord(currentAy, currentSem);
+
+        if (semestralRecord === null) setToEdit();
+        else resetViewState();
+    });
 </script>
 
 <SemestralRecordForm
@@ -26,4 +48,9 @@
     {semestralRecord}
     {opts}
     {dependencyMaps}
+    {previousUrl}
 />
+
+{#if canViewChangeLogs && fetchedChangelogs != null}
+    <ChangelogList changelogFetcher={() => fetchedChangelogs} />
+{/if}

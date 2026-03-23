@@ -183,7 +183,6 @@ export function getData(): string[] {
     return res;
 }
 
-
 //general seed function
 export async function seed() {
     // clear all tables
@@ -206,25 +205,16 @@ export async function seed() {
         });
 
     // push faculty
-    await testDB
-        .insert(schema.faculty)
-        .values(seedData.testFaculty);
+    await testDB.insert(schema.faculty).values(seedData.testFaculty);
 
     // push faculty ranks
-    await testDB
-        .insert(schema.facultyrank)
-        .values(seedData.rankRelations);
+    await testDB.insert(schema.facultyrank).values(seedData.rankRelations);
 
     // push faculty semesters
-    await testDB
-        .insert(schema.facultysemester)
-        .values(seedData.semesterRelations);
+    await testDB.insert(schema.facultysemester).values(seedData.semesterRelations);
 
     // push faculty adminpositions
-    await testDB
-        .insert(schema.facultyadminposition)
-        .values(seedData.adminRelations);
-
+    await testDB.insert(schema.facultyadminposition).values(seedData.adminRelations);
 
     // refresh views
     // TODO: restart serials

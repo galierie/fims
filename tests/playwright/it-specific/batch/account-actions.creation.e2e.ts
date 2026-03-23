@@ -1,14 +1,14 @@
-import {expect, test} from '@playwright/test';
+import { expect, test } from '@playwright/test';
+
 import * as testConsts from '../../../test-consts';
 const dummyEmail = process.env.DUMMY_EMAIL!;
 const dummyEmail1 = process.env.DUMMY_EMAIL1!;
 const dummyEmail2 = process.env.DUMMY_EMAIL2!;
 const dummyPw = process.env.DUMMY_PASS!;
 
-
 test.describe('batch creation of accounts', () => {
-    test.use({storageState: testConsts.ITConfig});
-    test.describe.configure({mode:'parallel'});
+    test.use({ storageState: testConsts.ITConfig });
+    test.describe.configure({ mode: 'parallel' });
 
     test('make zeroth account', async ({ page }) => {
         // No redirection since user is logged-in
