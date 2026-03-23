@@ -333,7 +333,8 @@ export const semRecsFields = [
     'Remarks',
 ]
 
-// to spot the headers and stuff. basically gets a unique header from each list
+// to spot the headers and stuff. basically gets a unique header from each list.
+// also acts as some helper data structure to fill in sample data in inputs of a specific type
 export function profileTabListSample():testRowTuple[] {
     return [
         ['Emails', '+ Add Email', sampleEmails(), emailInputs],
