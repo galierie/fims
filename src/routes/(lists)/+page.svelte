@@ -10,6 +10,7 @@
     import FilterButton from '$lib/ui/FilterButton.svelte';
     import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
     import SearchBar from '$lib/ui/SearchBar.svelte';
+    import ExportReportModal from '$lib/ui/ExportReportModal.svelte';
 
     const { data, form } = $props();
     const {
@@ -24,8 +25,8 @@
     } = $derived(data);
 
     let selectedIds: Array<number | null> = $state([]);
-
     let willBatchDelete = $state(false);
+    let isExportModalOpen = $state(false);
     let isLoading = $state(false);
     let deleteForm: HTMLFormElement | null = $state(null);
 
@@ -116,7 +117,7 @@
                 <div class="flex gap-2">
                     <GreenButton onclick={selectAll}>Select All</GreenButton>
                     <RedButton onclick={deselectAll}>Deselect Selection</RedButton>
-                    <GreenButton>
+                    <GreenButton onclick={() => (isExportModalOpen = true)}>
                         <Icon icon="tabler:file-export" class="mr-2 h-5 w-5" />
                         <span>Export Reports</span>
                     </GreenButton>
@@ -199,6 +200,10 @@
 
 {#if isLoading}
     <LoadingScreen />
+{/if}
+
+{#if isExportModalOpen}
+    <ExportReportModal onCancel={() => (isExportModalOpen = false)} />
 {/if}
 
 {#if willBatchDelete}

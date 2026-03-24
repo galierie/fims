@@ -1,0 +1,276 @@
+<script lang="ts">
+    import GreenButton from '$lib/ui/GreenButton.svelte';
+    import Icon from '@iconify/svelte';
+
+    interface Props {
+        onCancel: () => void;
+        acadYears?: number[];
+    }
+
+    const { onCancel, acadYears = [2023, 2024, 2025, 2026, 2027, 2028] }: Props = $props();
+
+    // Step 1: Settings, Step 2: Download Links
+    let step = $state<1 | 2>(1);
+
+    // Form states - Start and End ranges (Initialized to empty strings for placeholders)
+    let startAy = $state<number | ''>('');
+    let startSem = $state<number | ''>('');
+    let endAy = $state<number | ''>('');
+    let endSem = $state<number | ''>('');
+    
+    // Checkboxes - Per Faculty Member
+    let exportProfile = $state(false);
+    let exportServiceRecord = $state(false);
+    let exportLoading = $state(false);
+    let exportSetAvg = $state(false);
+    let aggregateFaculty = $state(false);
+    
+    // Checkboxes - Aggregated Course Information
+    let exportByFacSubj = $state(false);
+    let exportBySubjFac = $state(false);
+    let aggregateCourse = $state(false);
+    
+    let format = $state<'CSV' | 'XLSX'>('CSV');
+
+    const semesters = [
+        { id: 1, name: '1st Semester' },
+        { id: 2, name: '2nd Semester' },
+        { id: 3, name: 'Midyear' },
+    ];
+
+    const rangeStr = $derived(`AY${startAy || 'XXXX'}_${startSem || 'X'}Sem_to_AY${endAy || 'XXXX'}_${endSem || 'X'}Sem`);
+
+    // Dynamically generate the list of download links based on what is checked
+    const selectedDownloads = $derived.by(() => {
+        const links = [];
+
+        // Handle Faculty Reports
+        const hasFacultyReports = exportProfile || exportServiceRecord || exportLoading || exportSetAvg;
+        if (hasFacultyReports) {
+            if (aggregateFaculty) {
+                links.push({ name: `Aggregated_Faculty_Reports_${rangeStr}` });
+            } else {
+                if (exportProfile) links.push({ name: `Faculty_Profile_${rangeStr}` });
+                if (exportServiceRecord) links.push({ name: `Faculty_Service_Record_${rangeStr}` });
+                if (exportLoading) links.push({ name: `Faculty_Loading_${rangeStr}` });
+                if (exportSetAvg) links.push({ name: `Faculty_SET_Average_${rangeStr}` });
+            }
+        }
+
+        // Handle Course Reports
+        const hasCourseReports = exportByFacSubj || exportBySubjFac;
+        if (hasCourseReports) {
+            if (aggregateCourse) {
+                links.push({ name: `Aggregated_Course_Info_${rangeStr}` });
+            } else {
+                if (exportByFacSubj) links.push({ name: `Course_Info_By_Faculty_${rangeStr}` });
+                if (exportBySubjFac) links.push({ name: `Course_Info_By_Subject_${rangeStr}` });
+            }
+        }
+
+        return links;
+    });
+
+    function handleExport() {
+        step = 2;
+    }
+
+    function handleDownloadAll() {
+        // TODO: Tie this to backend to trigger downloads for all files in the `selectedDownloads` array
+        alert(`Triggering downloads for ${selectedDownloads.length} files...`);
+    }
+</script>
+
+<div class="fixed top-0 left-0 z-100 flex h-full w-full items-center justify-center bg-[rgba(0,0,0,0.9)] p-4">
+    <div class="w-[90%] max-w-3xl rounded-2xl bg-fims-beige px-10 py-10 shadow-xl max-h-[95vh] overflow-y-auto">
+        <div class="mb-2 flex items-center justify-between">
+            <h2 class="text-2xl font-bold text-fims-green">Export Reports</h2>
+            <button onclick={onCancel} class="text-fims-green transition-opacity hover:opacity-70">
+                <Icon icon="tabler:x" class="h-6 w-6" />
+            </button>
+        </div>
+
+        {#if step === 1}
+            <p class="mb-8 text-base text-black">Please select the options for the reports you wish to export.</p>
+
+            <div class="space-y-8">
+                <div class="space-y-4">
+                    <div class="flex items-center gap-4">
+                        <span class="w-12 text-base font-semibold text-black">From:</span>
+                        <div class="relative w-64">
+                            <select
+                                bind:value={startAy}
+                                class="w-full appearance-none rounded-xl border border-fims-green bg-white px-4 py-2.5 text-black outline-none focus:ring-1 focus:ring-fims-green {startAy === '' ? 'text-gray-500' : ''}"
+                            >
+                                <option value="" disabled selected>Choose Academic Year</option>
+                                {#each acadYears as ay}
+                                    <option value={ay} class="text-black">AY {ay}-{ay + 1}</option>
+                                {/each}
+                            </select>
+                            <Icon icon="tabler:chevron-down" class="pointer-events-none absolute right-3 top-3.5 h-5 w-5 text-fims-green" />
+                        </div>
+                        <div class="relative w-56">
+                            <select
+                                bind:value={startSem}
+                                class="w-full appearance-none rounded-xl border border-fims-green bg-white px-4 py-2.5 text-black outline-none focus:ring-1 focus:ring-fims-green {startSem === '' ? 'text-gray-500' : ''}"
+                            >
+                                <option value="" disabled selected>Choose Semester</option>
+                                {#each semesters as sem}
+                                    <option value={sem.id} class="text-black">{sem.name}</option>
+                                {/each}
+                            </select>
+                            <Icon icon="tabler:chevron-down" class="pointer-events-none absolute right-3 top-3.5 h-5 w-5 text-fims-green" />
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-4">
+                        <span class="w-12 text-base font-semibold text-black">To:</span>
+                        <div class="relative w-64">
+                            <select
+                                bind:value={endAy}
+                                class="w-full appearance-none rounded-xl border border-fims-green bg-white px-4 py-2.5 text-black outline-none focus:ring-1 focus:ring-fims-green {endAy === '' ? 'text-gray-500' : ''}"
+                            >
+                                <option value="" disabled selected>Choose Academic Year</option>
+                                {#each acadYears as ay}
+                                    <option value={ay} class="text-black">AY {ay}-{ay + 1}</option>
+                                {/each}
+                            </select>
+                            <Icon icon="tabler:chevron-down" class="pointer-events-none absolute right-3 top-3.5 h-5 w-5 text-fims-green" />
+                        </div>
+                        <div class="relative w-56">
+                            <select
+                                bind:value={endSem}
+                                class="w-full appearance-none rounded-xl border border-fims-green bg-white px-4 py-2.5 text-black outline-none focus:ring-1 focus:ring-fims-green {endSem === '' ? 'text-gray-500' : ''}"
+                            >
+                                <option value="" disabled selected>Choose Semester</option>
+                                {#each semesters as sem}
+                                    <option value={sem.id} class="text-black">{sem.name}</option>
+                                {/each}
+                            </select>
+                            <Icon icon="tabler:chevron-down" class="pointer-events-none absolute right-3 top-3.5 h-5 w-5 text-fims-green" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 gap-10 md:grid-cols-2">
+                    <div>
+                        <h3 class="mb-4 text-lg font-bold text-black">Per Faculty Member</h3>
+                        <div class="flex flex-col gap-3 pl-2">
+                            <label class="flex cursor-pointer items-start gap-3">
+                                <input type="checkbox" bind:checked={exportProfile} class="mt-0.5 h-5 w-5 rounded border-fims-green text-fims-green focus:ring-fims-green" />
+                                <span class="text-base text-black">Faculty Profile</span>
+                            </label>
+                            <label class="flex cursor-pointer items-start gap-3">
+                                <input type="checkbox" bind:checked={exportServiceRecord} class="mt-0.5 h-5 w-5 rounded border-fims-green text-fims-green focus:ring-fims-green" />
+                                <span class="text-base text-black">Faculty Service Record</span>
+                            </label>
+                            <label class="flex cursor-pointer items-start gap-3">
+                                <input type="checkbox" bind:checked={exportLoading} class="mt-0.5 h-5 w-5 rounded border-fims-green text-fims-green focus:ring-fims-green" />
+                                <span class="text-base text-black">Faculty Loading</span>
+                            </label>
+                            <label class="flex cursor-pointer items-start gap-3">
+                                <input type="checkbox" bind:checked={exportSetAvg} class="mt-0.5 h-5 w-5 rounded border-fims-green text-fims-green focus:ring-fims-green" />
+                                <span class="text-base text-black">Faculty SET Average</span>
+                            </label>
+                            
+                            <hr class="my-2 border-fims-green/20" />
+                            <label class="flex cursor-pointer items-start gap-3">
+                                <input type="checkbox" bind:checked={aggregateFaculty} class="mt-0.5 h-5 w-5 rounded border-fims-green text-fims-green focus:ring-fims-green" />
+                                <span class="text-base font-semibold text-fims-green">Aggregate Selected Reports into One File?</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-8">
+                        <div>
+                            <h3 class="mb-4 text-lg font-bold text-black">Aggregated Course Information</h3>
+                            <div class="flex flex-col gap-3 pl-2">
+                                <label class="flex cursor-pointer items-start gap-3">
+                                    <input type="checkbox" bind:checked={exportByFacSubj} class="mt-0.5 h-5 w-5 rounded border-fims-green text-fims-green focus:ring-fims-green" />
+                                    <span class="text-base text-black">By Faculty, Subject Taught</span>
+                                </label>
+                                <label class="flex cursor-pointer items-start gap-3">
+                                    <input type="checkbox" bind:checked={exportBySubjFac} class="mt-0.5 h-5 w-5 rounded border-fims-green text-fims-green focus:ring-fims-green" />
+                                    <span class="text-base text-black">By Subject Taught, Faculty</span>
+                                </label>
+
+                                <hr class="my-2 border-fims-green/20" />
+                                <label class="flex cursor-pointer items-start gap-3">
+                                    <input type="checkbox" bind:checked={aggregateCourse} class="mt-0.5 h-5 w-5 rounded border-fims-green text-fims-green focus:ring-fims-green" />
+                                    <span class="text-base font-semibold text-fims-green">Aggregate Selected Reports into One File?</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="mb-4 text-lg font-bold text-black">File format</h3>
+                            <div class="flex flex-col gap-3 pl-2">
+                                <label class="flex cursor-pointer items-center gap-3">
+                                    <input type="radio" name="format" value="CSV" bind:group={format} class="h-5 w-5 border-fims-green text-fims-green focus:ring-fims-green" />
+                                    <span class="text-base text-black">CSV</span>
+                                </label>
+                                <label class="flex cursor-pointer items-center gap-3">
+                                    <input type="radio" name="format" value="XLSX" bind:group={format} class="h-5 w-5 border-fims-green text-fims-green focus:ring-fims-green" />
+                                    <span class="text-base text-black">XLSX</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-10 flex justify-end gap-5">
+                <button
+                    class="cursor-pointer rounded-3xl border-2 border-solid border-fims-green px-7.5 py-2.5 text-base text-fims-green transition-opacity duration-200 hover:opacity-70"
+                    onclick={onCancel}
+                >
+                    Cancel
+                </button>
+                <GreenButton 
+                    onclick={handleExport} 
+                    disabled={!startAy || !startSem || !endAy || !endSem || selectedDownloads.length === 0}
+                >
+                    <Icon icon="tabler:file-export" class="mr-2 h-5 w-5" />
+                    <span>Export</span>
+                </GreenButton>
+            </div>
+            
+        {:else if step === 2}
+            <p class="mb-6 text-base text-black">Your reports are ready for download.</p>
+
+            <div class="space-y-3 max-h-96 overflow-y-auto pr-2 custom-scrollbar">
+                {#each selectedDownloads as download}
+                    <div class="flex items-center justify-between rounded-xl border border-fims-green bg-white p-4">
+                        <span class="font-medium text-black break-all">{download.name}.{format.toLowerCase()}</span>
+                        <button class="ml-4 flex shrink-0 items-center gap-2 font-semibold text-fims-green transition-opacity hover:opacity-70">
+                            <Icon icon="tabler:download" class="h-5 w-5" />
+                            <span>Download</span>
+                        </button>
+                    </div>
+                {/each}
+
+                {#if selectedDownloads.length === 0}
+                    <div class="p-4 text-center text-gray-500 italic">
+                        No reports selected.
+                    </div>
+                {/if}
+            </div>
+
+            <div class="mt-8 flex justify-end gap-5">
+                <button
+                    class="cursor-pointer rounded-3xl border-2 border-solid border-fims-green px-7.5 py-2.5 text-base text-fims-green transition-opacity duration-200 hover:opacity-70"
+                    onclick={onCancel}
+                >
+                    Close
+                </button>
+
+                {#if selectedDownloads.length > 1}
+                    <GreenButton onclick={handleDownloadAll}>
+                        <Icon icon="tabler:download" class="mr-2 h-5 w-5" />
+                        <span>Download All</span>
+                    </GreenButton>
+                {/if}
+            </div>
+        {/if}
+    </div>
+</div>
