@@ -246,7 +246,7 @@ export async function createFacultyProfileRecords(basicProfile: any, dynamicTabl
         }
 
         const [newFaculty] = await db.insert(faculty).values(basicProfile).returning();
-        const facultyid = newFaculty.facultyid;
+        const {facultyid} = newFaculty;
 
         await processDynamicTable(
             facultyemail,

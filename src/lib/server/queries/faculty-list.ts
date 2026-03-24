@@ -46,7 +46,7 @@ export async function getFacultyRecordList(
     // fallback ID in case there are no entries for current semester
     const currentSemesterId = latestSemester?.acadsemesterid ?? -1;
 
-    // eslint-disable-next-line no-undefined
+     
     const searchFilter = searchTerm
         ? ilike(facultyRecordSearchView.searchcontent, `%${searchTerm}%`)
         : undefined;
@@ -89,11 +89,11 @@ export async function getFacultyRecordList(
         )
         .as('admin_position_sq');
 
-    // eslint-disable-next-line no-undefined
-    let cursorFilter: SQL | undefined = undefined;
-    if (cursor) {
+     
+    let cursorFilter: SQL | undefined;
+    if (cursor) 
         cursorFilter = isNext ? gt(faculty.facultyid, cursor) : lt(faculty.facultyid, cursor);
-    }
+    
     // Get faculty records from database
     const facultyRecordCountSq = await db
         .select({

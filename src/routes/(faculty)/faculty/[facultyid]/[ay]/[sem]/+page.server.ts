@@ -111,9 +111,9 @@ export const actions = {
         const semNumStr = params.sem;
         const semNum = parseInt(semNumStr, 10);
 
-        if (Number.isNaN(facultyid) || Number.isNaN(acadYear) || Number.isNaN(semNum)) {
+        if (Number.isNaN(facultyid) || Number.isNaN(acadYear) || Number.isNaN(semNum)) 
             return fail(400, { error: 'Invalid URL parameters.' });
-        }
+        
 
         // Extract fields (Current Rank, Degree, Remarks)
         function getVal(key: string) {
@@ -155,11 +155,11 @@ export const actions = {
                 colNames.forEach((col) => {
                     let val: unknown = formData.get(`${i}[${col}]`);
 
-                    if (val === 'on' || val === 'true') {
+                    if (val === 'on' || val === 'true') 
                         val = true;
-                    } else if (val === 'false' || val === null) {
+                     else if (val === 'false' || val === null) 
                         val = false;
-                    }
+                    
 
                     if (val === '' || val === '-') val = null;
                     rowData[col] = val;
@@ -256,9 +256,9 @@ export const actions = {
             dynamicTables,
         );
 
-        if (!success) {
+        if (!success) 
             return fail(500, { error: 'Failed to update semestral records.' });
-        }
+        
 
         return { success: true };
     },
