@@ -22,64 +22,68 @@ const constantHeaderCellValues: SheetCellValue[] = [
     cellNum: 'A1',
   },
   {
-    value: 'Home Address/Contact Nos.',
+    value: 'Home Addresses',
     cellNum: 'B1',
   },
   {
-    value: 'Email Addresses',
+    value: 'Contact Nos.',
     cellNum: 'C1',
   },
   {
-    value: 'Birth Date',
+    value: 'Email Addresses',
     cellNum: 'D1',
   },
   {
-    value: 'Degree / Institution / Year',
+    value: 'Birth Date',
     cellNum: 'E1',
   },
   {
-    value: 'Field of Interest',
+    value: 'Degree / Institution / Year',
     cellNum: 'F1',
   },
   {
-    value: 'Designation / SG',
+    value: 'Field of Interest',
     cellNum: 'G1',
   },
   {
-    value: 'Salary Rate / annum',
+    value: 'Designation / SG',
     cellNum: 'H1',
   },
   {
-    value: 'Date of Original Appointment',
+    value: 'Salary Rate / annum',
     cellNum: 'I1',
   },
   {
-    value: 'PSI Item Number',
+    value: 'Date of Original Appointment',
     cellNum: 'J1',
   },
   {
-    value: 'Employee Number',
+    value: 'PSI Item Number',
     cellNum: 'K1',
   },
   {
-    value: 'TIN',
+    value: 'Employee Number',
     cellNum: 'L1',
   },
   {
-    value: 'GSIS BP#',
+    value: 'TIN',
     cellNum: 'M1',
   },
   {
-    value: 'Philhealth#',
+    value: 'GSIS BP#',
     cellNum: 'N1',
   },
   {
-    value: 'Pag-IBIG#',
+    value: 'Philhealth#',
     cellNum: 'O1',
   },
   {
-    value: 'Remarks (Tenure, promotion, etc.)',
+    value: 'Pag-IBIG#',
     cellNum: 'P1',
+  },
+  {
+    value: 'Remarks (Tenure, promotion, etc.)',
+    cellNum: 'Q1',
   },
 ];
 
@@ -142,10 +146,16 @@ export async function getFacultyProfileWorksheet(facultyIds: number[]) {
     nameCell.alignment = defaultCellAlignment;
     col++;
 
-    const homeAddressContactNumbersCell = sheet.getCell(row, col);
-    homeAddressContactNumbersCell.value = `${homeAddresses} \n${contactNumbers}`;
-    homeAddressContactNumbersCell.border = cellBorders;
-    homeAddressContactNumbersCell.alignment = defaultCellAlignment;
+    const homeAddressCell = sheet.getCell(row, col);
+    homeAddressCell.value = homeAddresses;
+    homeAddressCell.border = cellBorders;
+    homeAddressCell.alignment = defaultCellAlignment;
+    col++;
+
+    const contactNumbersCell = sheet.getCell(row, col);
+    contactNumbersCell.value = contactNumbers;
+    contactNumbersCell.border = cellBorders;
+    contactNumbersCell.alignment = defaultCellAlignment;
     col++;
 
     const birthDateCell = sheet.getCell(row, col);
