@@ -153,7 +153,7 @@
     }
 </script>
 
-<div class="fixed top-0 left-0 z-100 flex h-full w-full items-center justify-center bg-[rgba(0,0,0,0.9)] p-4">
+<div class="fixed top-0 left-0 z-100 flex h-full w-full items-center justify-center bg-black/40 p-4 backdrop-blur-sm transition-opacity">
     <div class="w-[90%] max-w-3xl rounded-2xl bg-fims-beige px-10 py-10 shadow-xl max-h-[95vh] overflow-y-auto">
         <div class="mb-2 flex items-center justify-between">
             <h2 class="text-2xl font-bold text-fims-green">Export Reports</h2>
