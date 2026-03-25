@@ -39,7 +39,7 @@ export async function getFacultyProfileReport(facultyid: number) {
         .groupBy(faculty.lastname, faculty.firstname, faculty.middlename, faculty.birthdate, faculty.dateoforiginalappointment, faculty.psiitem, faculty.employeenumber, faculty.tin, faculty.gsis, faculty.philhealth, faculty.pagibig, faculty.remarks, rank.ranktitle, rank.salarygrade, rank.salaryrate);
 }
 
-export async function getFacultyLoadingReport(facultyid: number, acadYear: number) {
+export async function getFacultyLoadingReport(facultyid: number, acadYear: number, semNum: number) {
     return await db
         .select({
             lastName: faculty.lastname,
@@ -67,7 +67,7 @@ export async function getFacultyLoadingReport(facultyid: number, acadYear: numbe
         .leftJoin(facultycommmembership, eq(facultysemester.facultysemesterid, facultycommmembership.facultysemesterid))
         .leftJoin(facultyadminwork, eq(facultysemester.facultysemesterid, facultyadminwork.facultysemesterid))
         .leftJoin(facultyresearch, eq(facultysemester.facultysemesterid, facultyresearch.facultysemesterid))
-        .where(and(eq(faculty.facultyid, facultyid), eq(semester.academicyear, acadYear)))
+        .where(and(eq(faculty.facultyid, facultyid), eq(semester.academicyear, acadYear), eq(semester.semester, semNum)))
         .groupBy(faculty.lastname, faculty.firstname, faculty.middlename, rank.ranktitle, facultyeducationalattainment.degree);
 }
 
