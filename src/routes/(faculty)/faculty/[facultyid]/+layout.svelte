@@ -5,6 +5,7 @@
     import DeleteConfirmation from '$lib/ui/DeleteConfirmation.svelte';
     import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
     import Tab from './ui/Tab.svelte';
+    import ExportReportModal from '$lib/ui/ExportReportModal.svelte';
 
     import { enhance } from '$app/forms';
     import { page } from '$app/state';
@@ -17,6 +18,7 @@
 
     let willDelete = $state(false);
     let isLoading = $state(false);
+    let isExportModalOpen = $state(false);
 
     let deleteForm: HTMLFormElement | null = $state(null);
 </script>
@@ -41,7 +43,7 @@
         </div>
 
         <div class="mt-4 flex justify-between">
-            <GreenButton>
+            <GreenButton onclick={() => (isExportModalOpen = true)}>
                 <Icon icon="tabler:file-export" class="mr-2 h-5 w-5" />
                 <span>Export Reports</span>
             </GreenButton>
@@ -89,6 +91,13 @@
             text="This will delete the current faculty record. Are you sure?"
         />
     </form>
+{/if}
+
+{#if isExportModalOpen}
+    <ExportReportModal
+        selectedFaculty={[{ facultyid: Number(facultyid), lastname: lastName, firstname: firstName }]}
+        onCancel={() => (isExportModalOpen = false)}
+    />
 {/if}
 
 {#if isLoading}
