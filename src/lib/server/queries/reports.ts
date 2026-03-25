@@ -51,7 +51,6 @@ export async function getSubjectsByFacultyReport(facultyid: number, acadYear: nu
         .groupBy(faculty.lastname, faculty.firstname, faculty.middlename);
 }
 
-// TASK 7: Faculty (By Subject Taught - The "Curriculum" View)
 export async function getFacultyBySubjectReport(acadYear: number, semNum: number) {
     return await db
         .select({
@@ -69,7 +68,6 @@ export async function getFacultyBySubjectReport(acadYear: number, semNum: number
         .orderBy(course.coursename, facultycourse.section); // Sort by subject/section
 }
 
-// TASK 8: Faculty SET Average
 export async function getFacultySETReport(acadYear: number, semNum: number) {
     return await db
         .select({
