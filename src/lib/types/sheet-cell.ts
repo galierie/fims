@@ -19,4 +19,6 @@ export const cellBorders: Partial<ExcelJS.Borders> = {
 export interface SheetCellValue {
   value: string;
   cellNum: string;
+  alignment?: Partial<ExcelJS.Alignment>;
+  font?: Partial<ExcelJS.Font>;
 }
