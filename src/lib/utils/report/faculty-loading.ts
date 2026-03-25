@@ -173,10 +173,12 @@ export async function getFacultyLoadingWorksheet(facultyIds: number[], acadYear:
 
     const earnedUndergrad = sheet.getCell(row, col);
     earnedUndergrad.border = cellBorders;
+    earnedUndergrad.alignment = { horizontal: 'right' }
     col++;
 
     const earnedGraduate = sheet.getCell(row, col);
     earnedGraduate.border = cellBorders;
+    earnedGraduate.alignment = { horizontal: 'right' };
     col++;
 
     const scheduleOfClassesCell = sheet.getCell(row, col);
@@ -192,18 +194,21 @@ export async function getFacultyLoadingWorksheet(facultyIds: number[], acadYear:
     teachingLoadCreditCell.value = teachingLoadCredit;
     teachingLoadCreditCell.numFmt = '0.00';
     teachingLoadCreditCell.border = cellBorders;
+    teachingLoadCreditCell.alignment = { horizontal: 'center' };
     col++;
 
     const researchLoadCreditCell = sheet.getCell(row, col);
     researchLoadCreditCell.value = researchLoadCredit;
     researchLoadCreditCell.numFmt = '0.00';
     researchLoadCreditCell.border = cellBorders;
+    researchLoadCreditCell.alignment = { horizontal: 'center' };
     col++;
 
     const administrativeLoadCreditCell = sheet.getCell(row, col);
     administrativeLoadCreditCell.value = administrativeLoadCredit;
     administrativeLoadCreditCell.numFmt = '0.00';
     administrativeLoadCreditCell.border = cellBorders;
+    administrativeLoadCreditCell.alignment = { horizontal: 'center' };
     col++;
 
     const totalLoadCreditCell = sheet.getCell(row, col);
@@ -211,18 +216,21 @@ export async function getFacultyLoadingWorksheet(facultyIds: number[], acadYear:
     totalLoadCreditCell.value = totalLoadCredit;
     totalLoadCreditCell.numFmt = '0.00';
     totalLoadCreditCell.border = cellBorders;
+    totalLoadCreditCell.alignment = { horizontal: 'right' };
     col++;
 
     const loadStatusCell = sheet.getCell(row, col);
     loadStatusCell.value = totalLoadCredit - 12;
     loadStatusCell.numFmt = '0.00';
     loadStatusCell.border = cellBorders;
+    loadStatusCell.alignment = { horizontal: 'right' };
     col++;
 
     const teachingLoadUnitsCell = sheet.getCell(row, col);
     teachingLoadUnitsCell.value = teachingLoadUnits;
     teachingLoadUnitsCell.numFmt = '0.00';
     teachingLoadUnitsCell.border = cellBorders;
+    teachingLoadUnitsCell.alignment = { horizontal: 'right' };
     col++;
   }
 
