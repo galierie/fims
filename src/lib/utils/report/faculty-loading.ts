@@ -131,8 +131,8 @@ export async function getFacultyLoadingWorksheet(facultyIds: number[], acadYear:
   });
 
   // Set data cells
-  for (let i = 0; i < data.length; i++) {
-    const row = i + dataStartRow;
+  let row = dataStartRow;
+  for (let i = 0; i < data.length; i++, row++) {
     let col = dataStartCol;
     const facultyMember = data[i];
 
