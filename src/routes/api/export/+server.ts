@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import ExcelJS from '@protobi/exceljs';
 import { getFacultyLoadingWorksheet } from '$lib/utils/report/faculty-loading';
+import { getSubjectsByFacultyWorksheet } from '$lib/utils/report/subjects-by-faculty.js';
 
 export async function GET({ url, locals }) {
     if (!locals.user) {
@@ -34,6 +35,8 @@ export async function GET({ url, locals }) {
                 switch (type) {
                     case 'loading':
                         return getFacultyLoadingWorksheet(facultyIds, fromAy);
+                    case 'subjects-by-faculty':
+                        return getSubjectsByFacultyWorksheet(facultyIds, fromAy, fromSem);
                 }
             })
         );
