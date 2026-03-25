@@ -1,6 +1,43 @@
 import { db } from '../db/index'; 
-import { faculty, facultycourse, course, semester, facultysemester, facultyadminposition, rank, facultyeducationalattainment, adminposition, facultycommmembership, facultyresearch, facultyadminwork, facultyrank } from '../db/schema';
-import { eq, and, sql, avg, asc } from 'drizzle-orm';
+import { faculty, facultycourse, course, semester, facultysemester, facultyadminposition, rank, facultyeducationalattainment, adminposition, facultycommmembership, facultyresearch, facultyadminwork, facultyrank, facultyhomeaddress, facultyemail, fieldofinterest, facultyfieldofinterest, facultycontactnumber } from '../db/schema';
+import { eq, and, sql, avg, asc, desc } from 'drizzle-orm';
+
+export async function getFacultyProfileReport(facultyid: number) {
+    return await db
+        .select({
+            lastName: faculty.lastname,
+            firstName: faculty.firstname,
+            middleName: faculty.middlename,
+            homeAddresses: sql<string>`STRING_AGG(${facultyhomeaddress.homeaddress}, E'\n')`,
+            contactNumbers: sql<string>`STRING_AGG(${facultycontactnumber.contactnumber}, E'\n')`,
+            emailAddresses: sql<string>`STRING_AGG(${facultyemail.email}, E'\n')`,
+            birthDate: faculty.birthdate,
+            educationalAttainments: sql<string>`STRING_AGG(${facultyeducationalattainment.degree} || ', ' || ${facultyeducationalattainment.institution} || ', ' || ${facultyeducationalattainment.graduationyear}, E'\n' ORDER BY ${desc(facultyeducationalattainment.graduationyear)})`,
+            fieldsOfInterest: sql<string>`STRING_AGG(${fieldofinterest.field}, ', ' ORDER BY ${asc(fieldofinterest.field)})`,
+            designation: rank.ranktitle,
+            salaryGrade: rank.salarygrade,
+            salaryRate: rank.salaryrate,
+            dateOfOriginalAppointment: faculty.dateoforiginalappointment,
+            psiItem: faculty.psiitem,
+            employeeNumber: faculty.employeenumber,
+            tin: faculty.tin,
+            gsis: faculty.gsis,
+            philhealth: faculty.philhealth,
+            pagIbig: faculty.pagibig,
+            remarks: faculty.remarks,
+        })
+        .from(faculty)
+        .leftJoin(facultyhomeaddress, eq(faculty.facultyid, facultyhomeaddress.facultyid))
+        .leftJoin(facultycontactnumber, eq(faculty.facultyid, facultycontactnumber.facultyid))
+        .leftJoin(facultyemail, eq(faculty.facultyid, facultyemail.facultyid))
+        .leftJoin(facultyeducationalattainment, eq(faculty.facultyid, facultyeducationalattainment.facultyid))
+        .leftJoin(facultyfieldofinterest, eq(faculty.facultyid, facultyfieldofinterest.facultyid))
+        .leftJoin(fieldofinterest, eq(facultyfieldofinterest.fieldofinterestid, fieldofinterest.fieldofinterestid))
+        .leftJoin(facultyrank, eq(faculty.facultyid, facultyrank.facultyid))
+        .leftJoin(rank, eq(facultyrank.rankid, rank.rankid))
+        .where(eq(faculty.facultyid, facultyid))
+        .groupBy(faculty.lastname, faculty.firstname, faculty.middlename, faculty.birthdate, faculty.dateoforiginalappointment, faculty.psiitem, faculty.employeenumber, faculty.tin, faculty.gsis, faculty.philhealth, faculty.pagibig, faculty.remarks, rank.ranktitle, rank.salarygrade, rank.salaryrate);
+}
 
 export async function getFacultyLoadingReport(facultyid: number, acadYear: number) {
     return await db
