@@ -34,22 +34,21 @@ export async function getFacultyLoadingReport(facultyid: number, acadYear: numbe
         .groupBy(faculty.lastname, faculty.firstname, faculty.middlename, rank.ranktitle, facultyeducationalattainment.degree);
 }
 
-// TASK 6: Subjects Taught (Grouped by Faculty - The "People" View)
-export async function getSubjectsByFacultyReport(acadYear: number, semNum: number) {
+export async function getSubjectsByFacultyReport(facultyid: number, acadYear: number, semNum: number) {
     return await db
         .select({
-            facultyName: sql<string>`${faculty.lastname} || ', ' || ${faculty.firstname}`,
-            courseCode: course.coursename,
-            section: facultycourse.section,
-            students: facultycourse.numberofstudents
+            lastName: faculty.lastname,
+            firstName: faculty.firstname,
+            middleName: faculty.middlename,
+            coursesTaught: sql<string>`STRING_AGG(${course.coursename}, ', ' ORDER BY ${course.coursename})`,
         })
         .from(facultycourse)
         .innerJoin(course, eq(facultycourse.courseid, course.courseid))
         .innerJoin(facultysemester, eq(facultycourse.facultysemesterid, facultysemester.facultysemesterid))
         .innerJoin(faculty, eq(facultysemester.facultyid, faculty.facultyid))
         .innerJoin(semester, eq(facultysemester.acadsemesterid, semester.acadsemesterid))
-        .where(and(eq(semester.academicyear, acadYear), eq(semester.semester, semNum)))
-        .orderBy(faculty.lastname, faculty.firstname); // Sort by teacher name
+        .where(and(eq(faculty.facultyid, facultyid), eq(semester.academicyear, acadYear), eq(semester.semester, semNum)))
+        .groupBy(faculty.lastname, faculty.firstname, faculty.middlename);
 }
 
 // TASK 7: Faculty (By Subject Taught - The "Curriculum" View)
