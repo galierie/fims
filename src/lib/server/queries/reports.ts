@@ -36,7 +36,8 @@ export async function getFacultyProfileReport(facultyid: number) {
         .leftJoin(facultyrank, eq(faculty.facultyid, facultyrank.facultyid))
         .leftJoin(rank, eq(facultyrank.rankid, rank.rankid))
         .where(eq(faculty.facultyid, facultyid))
-        .groupBy(faculty.lastname, faculty.firstname, faculty.middlename, faculty.birthdate, faculty.dateoforiginalappointment, faculty.psiitem, faculty.employeenumber, faculty.tin, faculty.gsis, faculty.philhealth, faculty.pagibig, faculty.remarks, rank.ranktitle, rank.salarygrade, rank.salaryrate);
+        .groupBy(faculty.lastname, faculty.firstname, faculty.middlename, faculty.birthdate, faculty.dateoforiginalappointment, faculty.psiitem, faculty.employeenumber, faculty.tin, faculty.gsis, faculty.philhealth, faculty.pagibig, faculty.remarks, facultyrank.dateoftenureorrenewal, rank.ranktitle, rank.salarygrade, rank.salaryrate)
+        .orderBy(desc(facultyrank.dateoftenureorrenewal));
 }
 
 export async function getFacultyLoadingReport(facultyid: number, acadYear: number, semNum: number) {
