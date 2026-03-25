@@ -1,26 +1,6 @@
 import ExcelJS from '@protobi/exceljs';
 import { getFacultyLoadingReport } from '$lib/server/queries/reports';
-
-const cellBorderColor: Partial<ExcelJS.Color> = {
-  argb: 'FF000000',
-};
-
-const cellBorderSide: Partial<ExcelJS.Border> = {
-  style: 'thin',
-  color: cellBorderColor,
-};
-
-const cellBorders: Partial<ExcelJS.Borders> = {
-  top: cellBorderSide,
-  left: cellBorderSide,
-  bottom: cellBorderSide,
-  right: cellBorderSide,
-};
-
-interface Cell {
-  value: string;
-  cellNum: string;
-}
+import { type Cell, cellBorders } from '$lib/types/sheet-cell';
 
 const constantHeaderCellValues: Cell[] = [
   {
