@@ -31,8 +31,7 @@ export async function getFacultyLoadingReport(facultyid: number, acadYear: numbe
         .leftJoin(facultyadminwork, eq(facultysemester.facultysemesterid, facultyadminwork.facultysemesterid))
         .leftJoin(facultyresearch, eq(facultysemester.facultysemesterid, facultyresearch.facultysemesterid))
         .where(and(eq(faculty.facultyid, facultyid), eq(semester.academicyear, acadYear)))
-        .groupBy(faculty.lastname, faculty.firstname, faculty.middlename, rank.ranktitle, facultyeducationalattainment.degree)
-        .orderBy(asc(faculty.lastname), asc(faculty.firstname), asc(faculty.middlename), asc(faculty.facultyid));
+        .groupBy(faculty.lastname, faculty.firstname, faculty.middlename, rank.ranktitle, facultyeducationalattainment.degree);
 }
 
 // TASK 6: Subjects Taught (Grouped by Faculty - The "People" View)
