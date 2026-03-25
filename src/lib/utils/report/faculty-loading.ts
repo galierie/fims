@@ -2,6 +2,11 @@ import ExcelJS from '@protobi/exceljs';
 import { getFacultyLoadingReport } from '$lib/server/queries/reports';
 import { type SheetCellValue, cellBorders } from '$lib/types/sheet-cell';
 
+const headerCellAlignment: Partial<ExcelJS.Alignment> = {
+  horizontal: 'center',
+  vertical: 'top',
+};
+
 const constantHeaderCellValues: SheetCellValue[] = [
   {
     value: 'Last Name/First Name/MI',
@@ -38,6 +43,10 @@ const constantHeaderCellValues: SheetCellValue[] = [
   {
     value: 'Regular Faculty',
     cellNum: 'A6',
+    alignment: {
+      horizontal: 'left',
+      vertical: 'top',
+    },
   },
   {
     value: 'Undergrad',
@@ -66,6 +75,9 @@ const constantHeaderCellValues: SheetCellValue[] = [
   {
     value: 'Underload / Overload',
     cellNum: 'M6',
+    font: {
+      color: { argb: 'FFFF0000' },
+    },
   },
   {
     value: 'Teaching load units',
@@ -95,12 +107,14 @@ export async function getFacultyLoadingWorksheet(facultyIds: number[], acadYear:
     },
   ];
 
-  headerCellValues.map(({ value, cellNum }) => {
+  headerCellValues.map(({ value, cellNum, alignment, font }) => {
     const cellNums = cellNum.split(':');
     const cell = sheet.getCell(cellNums[0]);
     cell.value = value;
     cell.font = { bold: true };
     cell.border = cellBorders;
+    cell.alignment = (typeof alignment === 'undefined') ? headerCellAlignment : alignment;
+    if (typeof font !== 'undefined') cell.font = font;
 
     if (cellNums.length > 1) sheet.mergeCells(cellNum);
   });
