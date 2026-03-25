@@ -10,17 +10,26 @@
     import { enhance } from '$app/forms';
     import { page } from '$app/state';
 
-    import { chosenSemestralRecord } from './states/chosen-semestral-record.svelte.js';
+    import { chosenSemestralRecord, chooseSemestralRecord } from './states/chosen-semestral-record.svelte.js';
     import { viewState } from './states/view-state.svelte.js';
 
     const { data, children } = $props();
-    const { facultyid, lastName, firstName } = $derived(data);
+    const { facultyid, lastName, firstName, latestAcadYear, latestSemNum } = $derived(data);
 
     let willDelete = $state(false);
     let isLoading = $state(false);
     let isExportModalOpen = $state(false);
 
     let deleteForm: HTMLFormElement | null = $state(null);
+
+    $effect(() => {
+        if (page.params.ay && page.params.sem) {
+            chooseSemestralRecord(parseInt(page.params.ay, 10), parseInt(page.params.sem, 10));
+        } else {
+            // If on Profile page, reset state to latest DB values
+            chooseSemestralRecord(latestAcadYear, latestSemNum);
+        }
+    });
 </script>
 
 <main class="bg-[#e9e9e9]">
