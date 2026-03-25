@@ -19,6 +19,21 @@
     let endAy = $state<number | ''>('');
     let endSem = $state<number | ''>('');
     
+    // Automatically adjust the "To" dates if they become chronologically backward!
+    $effect(() => {
+        // If "From Year" is pushed past "To Year", bump "To Year" up to match
+        if (startAy !== '' && endAy !== '' && startAy > endAy) {
+            endAy = startAy;
+        }
+        
+        // If the Years are the same, but "From Sem" is pushed past "To Sem", bump "To Sem" up to match
+        if (startAy !== '' && endAy !== '' && startAy === endAy) {
+            if (startSem !== '' && endSem !== '' && startSem > endSem) {
+                endSem = startSem;
+            }
+        }
+    });
+
     // Checkboxes - Per Faculty Member
     let exportProfile = $state(false);
     let exportServiceRecord = $state(false);
@@ -79,7 +94,7 @@
                 const fileName = isOnlyProfile ? 'Aggregated_Faculty_Profiles' : `Aggregated_Faculty_Reports${rangeSuffix}`;
                 links.push({
                     name: fileName,
-                    url: `/api/export?types=${types.join(',')}&facultyIds=${allFacIds}&${baseParams}`
+                    url: `/api/export?types=${types.join(',')}&facultyIds=${allFacIds}&${baseParams}&fileName=${fileName}`
                 });
             } else {
                 // One File per Faculty
@@ -87,7 +102,7 @@
                     const fileName = isOnlyProfile ? `${faculty.lastname}_Faculty_Profile` : `${faculty.lastname}_Reports${rangeSuffix}`;
                     links.push({
                         name: fileName,
-                        url: `/api/export?types=${types.join(',')}&facultyIds=${faculty.facultyid}&${baseParams}`
+                        url: `/api/export?types=${types.join(',')}&facultyIds=${faculty.facultyid}&${baseParams}&fileName=${fileName}`
                     });
                 }
             }
@@ -101,17 +116,20 @@
 
             if (aggregateCourse) {
                 // Aggregated Course Reports for selected course report types
+                const fileName = `Aggregated_Course_Info_${rangeStr}`;
                 links.push({
-                    name: `Aggregated_Course_Info_${rangeStr}`,
-                    url: `/api/export?types=${types.join(',')}&facultyIds=${allFacIds}&${baseParams}`
+                    name: fileName,
+                    url: `/api/export?types=${types.join(',')}&facultyIds=${allFacIds}&${baseParams}&fileName=${fileName}`
                 });
             } else {
                 // One File per Course Report Type
                 if (exportByFacSubj) {
-                    links.push({ name: `Subjects_Taught_by_Faculty_${rangeStr}`, url: `/api/export?types=subjects-by-faculty&facultyIds=${allFacIds}&${baseParams}` });
+                    const fileName = `Subjects_Taught_by_Faculty_${rangeStr}`;
+                    links.push({ name: fileName, url: `/api/export?types=subjects-by-faculty&facultyIds=${allFacIds}&${baseParams}&fileName=${fileName}` });
                 }
                 if (exportBySubjFac) {
-                    links.push({ name: `Faculty_by_Subject_Taught_${rangeStr}`, url: `/api/export?types=faculty-by-subject&facultyIds=${allFacIds}&${baseParams}` });
+                    const fileName = `Faculty_by_Subject_Taught_${rangeStr}`;
+                    links.push({ name: fileName, url: `/api/export?types=faculty-by-subject&facultyIds=${allFacIds}&${baseParams}&fileName=${fileName}` });
                 }
             }
         }
@@ -177,7 +195,7 @@
                             <select bind:value={endAy} class="w-full appearance-none rounded-xl border border-fims-green bg-white px-4 py-2.5 text-black outline-none focus:ring-1 focus:ring-fims-green {endAy === '' ? 'text-gray-500' : ''}">
                                 <option value="" disabled selected>Choose Academic Year</option>
                                 {#each acadYears as ay}
-                                    <option value={ay} class="text-black">AY {ay}-{ay + 1}</option>
+                                    <option value={ay} class={startAy !== '' && ay < startAy ? 'text-gray-400' : 'text-black'} disabled={startAy !== '' && ay < startAy}>AY {ay}-{ay + 1}</option>
                                 {/each}
                             </select>
                             <Icon icon="tabler:chevron-down" class="pointer-events-none absolute right-3 top-3.5 h-5 w-5 text-fims-green" />
@@ -186,7 +204,7 @@
                             <select bind:value={endSem} class="w-full appearance-none rounded-xl border border-fims-green bg-white px-4 py-2.5 text-black outline-none focus:ring-1 focus:ring-fims-green {endSem === '' ? 'text-gray-500' : ''}">
                                 <option value="" disabled selected>Choose Semester</option>
                                 {#each semesters as sem}
-                                    <option value={sem.id} class="text-black">{sem.name}</option>
+                                    <option value={sem.id} class={startAy !== '' && endAy === startAy && startSem !== '' && sem.id < startSem ? 'text-gray-400' : 'text-black'} disabled={startAy !== '' && endAy === startAy && startSem !== '' && sem.id < startSem}>{sem.name}</option>
                                 {/each}
                             </select>
                             <Icon icon="tabler:chevron-down" class="pointer-events-none absolute right-3 top-3.5 h-5 w-5 text-fims-green" />
