@@ -124,6 +124,7 @@ export async function getFacultyProfileWorksheet(facultyIds: number[]) {
       middleName,
       homeAddresses,
       contactNumbers,
+      emailAddresses,
       birthDate,
       educationalAttainments,
       fieldsOfInterest,
@@ -156,6 +157,12 @@ export async function getFacultyProfileWorksheet(facultyIds: number[]) {
     contactNumbersCell.value = contactNumbers;
     contactNumbersCell.border = cellBorders;
     contactNumbersCell.alignment = defaultCellAlignment;
+    col++;
+
+    const emailAddressesCell = sheet.getCell(row, col);
+    emailAddressesCell.value = emailAddresses;
+    emailAddressesCell.border = cellBorders;
+    emailAddressesCell.alignment = defaultCellAlignment;
     col++;
 
     const birthDateCell = sheet.getCell(row, col);
