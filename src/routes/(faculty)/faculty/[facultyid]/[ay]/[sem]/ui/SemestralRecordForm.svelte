@@ -1,12 +1,15 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
     import Icon from '@iconify/svelte';
+    import { onMount } from 'svelte';
+    import { browser } from '$app/environment';
 
     import AcadYearSemSelect from './AcadYearSemSelect.svelte';
     import FieldDropdown from './FieldDropdown.svelte';
     import GreenButton from '$lib/ui/GreenButton.svelte';
     import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
     import RedButton from '$lib/ui/RedButton.svelte';
+    import DeleteConfirmation from '$lib/ui/DeleteConfirmation.svelte';
     import AdminSection from './sections/AdminSection.svelte';
     import TeachingSection from './sections/TeachingSection.svelte';
     import ResearchSection from './sections/ResearchSection.svelte';
@@ -43,7 +46,12 @@
         previousUrl,
     }: Props = $props();
 
+    // Check for changes
+    const haveChanges: boolean[] = $state(Array(5).fill(false));
+    const hasChange = $derived(haveChanges.some((e) => e === true));
+
     let isLoading = $state(false);
+    let willDiscardChanges = $state(false);
 
     let semestralRecordForm: HTMLFormElement | null = null;
     const semestralRecordFormId = 'semestral-record-form';
@@ -61,6 +69,19 @@
             extensionLoadCredit +
             studyLoadCredit,
     );
+
+    // Handle tab exit with unsaved changes
+    function beforeExit(event: BeforeUnloadEvent) {
+        if (viewState.isEditing && hasChange) event.preventDefault();
+    }
+
+    onMount(() => {
+        if (browser) window.addEventListener('beforeunload', beforeExit);
+
+        return () => {
+            if (browser) window.removeEventListener('beforeunload', beforeExit);
+        };
+    });
 </script>
 
 <form
@@ -85,6 +106,7 @@
         } else {
             // If "discard changes" is clicked for an existing sem record, read-only state
             resetViewState();
+            willDiscardChanges = false;
         }
     }}
     use:enhance={() => {
@@ -99,6 +121,7 @@
     <div class="flex items-center gap-2">
         {#if viewState.isEditing}
             <GreenButton
+                type="button"
                 onclick={() => {
                     if (semestralRecordForm) semestralRecordForm.requestSubmit();
                 }}
@@ -106,12 +129,19 @@
                 <Icon icon="tabler:device-floppy" class="mr-2 h-5 w-5" />
                 <span>Save Record</span>
             </GreenButton>
-            <RedButton type="reset">
+            <RedButton
+                type="button"
+                onclick={() => {
+                    if (semestralRecordForm)
+                        if (hasChange) willDiscardChanges = true;
+                        else semestralRecordForm.reset();
+                }}
+            >
                 <Icon icon="tabler:database-off" class="mr-2 h-5 w-5" />
                 <span>Discard Changes</span>
             </RedButton>
         {:else}
-            <GreenButton onclick={setToEdit}>
+            <GreenButton type="button" onclick={setToEdit}>
                 <Icon icon="tabler:edit" class="mr-2 h-5 w-5" />
                 <span>Edit</span>
             </GreenButton>
@@ -168,6 +198,7 @@
             committees={semestralRecord?.committees ?? []}
             adminWorks={semestralRecord?.adminWorks ?? []}
             {opts}
+            bind:hasChange={haveChanges[0]}
         />
         <TeachingSection
             bind:teachingLoadCredit
@@ -175,21 +206,40 @@
             mentees={semestralRecord?.mentees ?? []}
             {opts}
             {dependencyMaps}
+            bind:hasChange={haveChanges[1]}
         />
         <ResearchSection
             bind:researchLoadCredit
             researchWork={semestralRecord?.researchWork ?? []}
             {opts}
             {dependencyMaps}
+            bind:hasChange={haveChanges[2]}
         />
         <ExtensionSection
             bind:extensionLoadCredit
             extensionWork={semestralRecord?.extensionWork ?? []}
+            bind:hasChange={haveChanges[3]}
         />
-        <StudyLoadSection bind:studyLoadCredit studyLoad={semestralRecord?.studyLoad ?? []} />
+        <StudyLoadSection
+            bind:studyLoadCredit
+            studyLoad={semestralRecord?.studyLoad ?? []}
+            bind:hasChange={haveChanges[4]}
+        />
     </div>
 </form>
 
 {#if isLoading}
     <LoadingScreen />
+{/if}
+
+{#if willDiscardChanges}
+    <DeleteConfirmation
+        onDelete={() => {
+            if (semestralRecordForm) semestralRecordForm.reset();
+        }}
+        onCancel={() => {
+            willDiscardChanges = false;
+        }}
+        text="You have unsaved changes. Do you want to discard them?"
+    />
 {/if}

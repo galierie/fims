@@ -7,10 +7,21 @@
         selectedOpt?: string | null;
         defaultSelectedOpt: string | null;
         isEditable: boolean;
+        hasChange?: boolean;
     }
 
-    // eslint-disable-next-line prefer-const -- changing value and bindable variable
-    let { name, opts, selectedOpt = $bindable(), defaultSelectedOpt, isEditable }: Props = $props();
+    let {
+        name,
+        opts,
+        selectedOpt = $bindable(),
+        defaultSelectedOpt,
+        isEditable,
+        hasChange = $bindable(),
+    }: Props = $props();
+
+    $effect(() => {
+        if (hasChange !== undefined) hasChange = selectedOpt !== defaultSelectedOpt;
+    });
 
     let isDropdownOpen = $state(false);
 </script>

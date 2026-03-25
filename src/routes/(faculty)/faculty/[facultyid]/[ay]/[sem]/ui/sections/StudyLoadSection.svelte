@@ -7,10 +7,11 @@
     interface Props {
         studyLoadCredit: number;
         studyLoad: FacultyStudyLoadDTO;
+        hasChange: boolean;
     }
 
     // eslint-disable-next-line prefer-const -- bindable variable
-    let { studyLoadCredit = $bindable(), studyLoad }: Props = $props();
+    let { studyLoadCredit = $bindable(), studyLoad, hasChange = $bindable() }: Props = $props();
 
     // Input Table Columns
     const studyLoadColumns: InputColumnType[] = [
@@ -109,6 +110,7 @@
                 columns={studyLoadColumns}
                 rows={studyLoadValues}
                 numOfColumns={36}
+                bind:hasChange
             />
 
             <p class="mt-4 pl-3.5">Total Semester Study Load Credit: {studyLoadCredit}</p>

@@ -14,6 +14,7 @@
         hasValue: boolean;
         rowNum: number;
         tupleid?: number;
+        hasChange: boolean;
     }
 
     let {
@@ -33,12 +34,22 @@
         rowNum,
         // eslint-disable-next-line prefer-const -- bindable variable
         tupleid,
+        hasChange = $bindable(),
     }: Props = $props();
 
     // svelte-ignore state_referenced_locally
-    const values = $state(Array(row.length).fill(undefined));
+    let values = $state(Array(row.length).fill(undefined));
     $effect(() => {
         hasValue = values.some((v) => v !== undefined && v !== null && v !== '' && v !== false);
+    });
+
+    // Check for changes
+    // svelte-ignore state_referenced_locally
+    const haveChanges: boolean[] = $state(Array(row.length).fill(false));
+    $effect(() => {
+        hasChange = haveChanges.some((e) => e === true);
+        console.log(haveChanges);
+        console.log(`Ping from InputTableRow! hasChange = ${hasChange}`);
     });
 
     const gridTemplateColumns = $derived(`grid-cols-${numOfColumns}`);
@@ -85,11 +96,20 @@
                     isEditable={viewState.isEditing &&
                         (!isImmutable || defaultValue === undefined || defaultValue === '') &&
                         !isDeleted}
+                    bind:hasChange={haveChanges[columnNum]}
                 />
             </div>
         {:else if type === 'expandable'}
             <div class={colSpanClass}>
-                <ExpandableCell {name} {defaultValue} {isDeleted} bind:value={values[columnNum]} />
+                <ExpandableCell
+                    {name}
+                    {defaultValue}
+                    {isDeleted}
+                    bind:value={values[columnNum]}
+                    onchange={() => {
+                        haveChanges[columnNum] = values[columnNum] !== defaultValue;
+                    }}
+                />
             </div>
         {:else if type === 'dependent' && dependencyMap !== undefined}
             <div
@@ -114,6 +134,9 @@
                     class="h-5 w-5 rounded-sm checked:bg-fims-gray focus:ring-0"
                     bind:checked={values[columnNum]}
                     defaultChecked={defaultChecked ?? false}
+                    onchange={() => {
+                        haveChanges[columnNum] = values[columnNum] !== defaultChecked;
+                    }}
                 />
                 <input type="hidden" {name} defaultValue={false} />
             </div>
@@ -129,6 +152,9 @@
                     isDeleted}
                 defaultValue={defaultValue ?? ''}
                 bind:value={values[columnNum]}
+                onchange={() => {
+                    haveChanges[columnNum] = values[columnNum] !== defaultValue;
+                }}
             />
         {/if}
     {/each}
