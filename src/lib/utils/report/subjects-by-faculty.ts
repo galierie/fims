@@ -22,9 +22,9 @@ const constantHeaderCellValues: SheetCellValue[] = [
 const dataStartRow = 5;
 const dataStartCol = 1;
 
-export async function getSubjectsByFacultyWorksheet(facultyIds: number[], acadYear: number, sem: number) {
+export async function getSubjectsByFacultyWorksheet(facultyIds: number[], acadYear: number, semNum: number) {
   const sheetName = 'By Faculty, Subjects Taught'
-  const data = await Promise.all(facultyIds.map((id) => (getSubjectsByFacultyReport(id, acadYear, sem))));
+  const data = await Promise.all(facultyIds.map((id) => (getSubjectsByFacultyReport(id, acadYear, semNum))));
 
   // Create Workbook
   const workbook = new ExcelJS.Workbook();
