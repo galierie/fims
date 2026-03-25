@@ -46,7 +46,6 @@ export async function getFacultyRecordList(
     // fallback ID in case there are no entries for current semester
     const currentSemesterId = latestSemester?.acadsemesterid ?? -1;
 
-     
     const searchFilter = searchTerm
         ? ilike(facultyRecordSearchView.searchcontent, `%${searchTerm}%`)
         : undefined;
@@ -89,11 +88,10 @@ export async function getFacultyRecordList(
         )
         .as('admin_position_sq');
 
-     
     let cursorFilter: SQL | undefined;
-    if (cursor) 
+    if (cursor)
         cursorFilter = isNext ? gt(faculty.facultyid, cursor) : lt(faculty.facultyid, cursor);
-    
+
     // Get faculty records from database
     const facultyRecordCountSq = await db
         .select({
@@ -241,4 +239,22 @@ export async function getAllAdminPositions() {
 
     const uniqueValues = uniqueRows.map(({ name }) => name);
     return uniqueValues;
+}
+
+// TODO: still need to differentiate between user and faculty id
+export async function getFacultyRecordChangelogs(facultyid: number, limit: number, offset: number) {
+    const changelogs = await db
+        .select({
+            timestamp: changelog.timestamp,
+            email: appuser.email,
+            info: changelog.operation,
+        })
+        .from(changelog)
+        .where(eq(changelog.tupleid, facultyid))
+        .innerJoin(appuser, eq(appuser.id, changelog.userid))
+        .limit(limit)
+        .offset(offset) // for pages if needed.
+        .orderBy(desc(changelog.timestamp));
+
+    return changelogs;
 }

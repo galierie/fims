@@ -9,10 +9,16 @@
         researchWork: FacultyResearchDTO;
         opts?: Map<string, Array<string>>;
         dependencyMaps?: Map<string, Map<string, string>>;
+        hasChange: boolean;
     }
 
-    // eslint-disable-next-line prefer-const -- bindable variable
-    let { researchLoadCredit = $bindable(), researchWork, opts, dependencyMaps }: Props = $props();
+    let {
+        researchLoadCredit = $bindable(),
+        researchWork,
+        opts,
+        dependencyMaps,
+        hasChange = $bindable(),
+    }: Props = $props();
 
     // Input Table Columns
     const researchTitles = $derived(opts?.get('researchTitles'));
@@ -120,6 +126,7 @@
                 columns={researchColumns}
                 rows={researchValues}
                 numOfColumns={35}
+                bind:hasChange
             />
 
             <p class="mt-4 pl-3.5">Total Semester Research Load Credit: {researchLoadCredit}</p>

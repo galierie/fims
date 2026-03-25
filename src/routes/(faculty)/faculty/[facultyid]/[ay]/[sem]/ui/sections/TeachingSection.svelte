@@ -13,6 +13,7 @@
         mentees: FacultyMenteesDTO;
         opts?: Map<string, Array<string>>;
         dependencyMaps?: Map<string, Map<string, string>>;
+        hasChange: boolean;
     }
 
     let {
@@ -25,7 +26,13 @@
         opts,
         // eslint-disable-next-line prefer-const -- bindable variable
         dependencyMaps,
+        hasChange = $bindable(),
     }: Props = $props();
+
+    const haveChanges: boolean[] = $state(Array(2).fill(false));
+    $effect(() => {
+        hasChange = haveChanges.some((e) => e === true);
+    });
 
     // Input Table Columns
     const courseTitles = $derived(opts?.get('courseTitles'));
@@ -207,6 +214,7 @@
                     columns={courseColumns}
                     rows={courseValues}
                     numOfColumns={22}
+                    bind:hasChange={haveChanges[0]}
                 />
             </div>
 
@@ -218,6 +226,7 @@
                     columns={menteeColumns}
                     rows={menteeValues}
                     numOfColumns={31}
+                    bind:hasChange={haveChanges[1]}
                 />
             </div>
 

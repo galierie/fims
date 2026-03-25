@@ -1,5 +1,6 @@
 import { error, fail } from '@sveltejs/kit';
 
+import type { ChangelogRecordStructure } from '$lib/ui/ChangelogList.svelte';
 import {
     getAllAdminPositions,
     getAllCourses,
@@ -11,14 +12,21 @@ import {
     getFacultyPromotionHistory,
     getFacultySemestralRecords,
 } from '$lib/server/queries/faculty-view';
+import { getFacultyRecordChangelogs } from '$lib/server/queries/faculty-list.js';
 import { updateSemestralRecords } from '$lib/server/queries/db-helpers';
 
-export async function load({ params }) {
+export async function load({ params, parent }) {
+    const layoutData = await parent();
     const { facultyid: facultyidStr, ay: acadYearStr, sem: semNumStr } = params;
 
     const facultyid = parseInt(facultyidStr, 10);
     const acadYear = parseInt(acadYearStr, 10);
     const semNum = parseInt(semNumStr, 10);
+
+    let fetchedChangelogs: ChangelogRecordStructure[] | null = null;
+
+    if (layoutData.canViewChangeLogs)
+        fetchedChangelogs = await getFacultyRecordChangelogs(facultyid, 3, 0);
 
     // Validate parameters
     if (Number.isNaN(facultyid)) throw error(400, { message: 'Invalid record identifier.' });
@@ -96,6 +104,7 @@ export async function load({ params }) {
         semestralRecord,
         opts,
         dependencyMaps,
+        fetchedChangelogs,
     };
 }
 
@@ -111,9 +120,8 @@ export const actions = {
         const semNumStr = params.sem;
         const semNum = parseInt(semNumStr, 10);
 
-        if (Number.isNaN(facultyid) || Number.isNaN(acadYear) || Number.isNaN(semNum)) 
+        if (Number.isNaN(facultyid) || Number.isNaN(acadYear) || Number.isNaN(semNum))
             return fail(400, { error: 'Invalid URL parameters.' });
-        
 
         // Extract fields (Current Rank, Degree, Remarks)
         function getVal(key: string) {
@@ -155,11 +163,8 @@ export const actions = {
                 colNames.forEach((col) => {
                     let val: unknown = formData.get(`${i}[${col}]`);
 
-                    if (val === 'on' || val === 'true') 
-                        val = true;
-                     else if (val === 'false' || val === null) 
-                        val = false;
-                    
+                    if (val === 'on' || val === 'true') val = true;
+                    else if (val === 'false' || val === null) val = false;
 
                     if (val === '' || val === '-') val = null;
                     rowData[col] = val;
@@ -256,9 +261,7 @@ export const actions = {
             dynamicTables,
         );
 
-        if (!success) 
-            return fail(500, { error: 'Failed to update semestral records.' });
-        
+        if (!success) return fail(500, { error: 'Failed to update semestral records.' });
 
         return { success: true };
     },
