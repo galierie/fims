@@ -16,7 +16,7 @@ export const cellBorders: Partial<ExcelJS.Borders> = {
   right: cellBorderSide,
 };
 
-export interface Cell {
+export interface SheetCellValue {
   value: string;
   cellNum: string;
 }

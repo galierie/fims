@@ -1,8 +1,8 @@
 import ExcelJS from '@protobi/exceljs';
 import { getFacultyLoadingReport } from '$lib/server/queries/reports';
-import { type Cell, cellBorders } from '$lib/types/sheet-cell';
+import { type SheetCellValue, cellBorders } from '$lib/types/sheet-cell';
 
-const constantHeaderCellValues: Cell[] = [
+const constantHeaderCellValues: SheetCellValue[] = [
   {
     value: 'Last Name/First Name/MI',
     cellNum: 'A5',
@@ -87,7 +87,7 @@ export async function getFacultyLoadingWorksheet(facultyIds: number[], acadYear:
   const sheet = workbook.addWorksheet(sheetName);
 
   // Set all header cells
-  const headerCellValues: Cell[] = [
+  const headerCellValues: SheetCellValue[] = [
     ...constantHeaderCellValues,
     {
       value: `Faculty loading AY ${acadYear}-${acadYear + 1}`,
