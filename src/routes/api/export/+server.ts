@@ -1,66 +1,60 @@
-import { json, type RequestHandler } from '@sveltejs/kit';
-import * as XLSX from 'xlsx';
-import { 
-    getFacultyLoadingReport, 
-    getSubjectsByFacultyReport, 
-    getFacultyBySubjectReport,
-    getFacultySETReport 
-} from '../../../lib/server/queries/reports';
+import { json } from '@sveltejs/kit';
+import ExcelJS from '@protobi/exceljs';
+import { getFacultyLoadingWorksheet } from '$lib/utils/report/faculty-loading';
 
-export const GET: RequestHandler = async ({ url, locals }) => {
-    // 1. SECURITY FIX: Check if user is authenticated via Better Auth
+export async function GET({ url, locals }) {
     if (!locals.user) {
         return json({ error: 'Unauthorized. Please log in to export.' }, { status: 401 });
     }
 
-    // 2. Extract and Validate Parameters
-    const type = url.searchParams.get('type');
-    const ay = parseInt(url.searchParams.get('ay') ?? '2026');
-    const sem = parseInt(url.searchParams.get('sem') ?? '2');
+    // Extract and Validate Parameters
+    const typesStr = url.searchParams.get('types');
+    if (typesStr === null) return json({ error: 'No report type specified' }, { status: 401 });
+    const types = typesStr.split(',');
 
+    const facultyIdsStr = url.searchParams.get('facultyIds');
+    if (facultyIdsStr === null) return json({ error: 'No faculty member specified' }, { status: 401 });
+    const facultyIds = facultyIdsStr.split(',').map(idStr => (parseInt(idStr, 10)));
+
+    const fromAyStr = url.searchParams.get('fromAy');
+    if (fromAyStr === null) return json({ error: 'No starting academic year specified' }, { status: 401 });
+    const fromAy = parseInt(fromAyStr, 10);
+
+    const fromSemStr = url.searchParams.get('fromSem');
+    if (fromSemStr === null) return json({ error: 'No starting semester specified' }, { status: 401 });
+    const fromSem = parseInt(fromSemStr, 10);
+
+    const toAy = parseInt(url.searchParams.get('toAy') ?? fromAyStr, 10);
+    const toSem = parseInt(url.searchParams.get('toSem') ?? fromSemStr, 10);
+
+    // Get worksheets
     try {
-        let data: any[] = [];
-        let sheetName = "Report";
+        const sheets = await Promise.all(
+            types.map(type => {
+                switch (type) {
+                    case 'loading':
+                        return getFacultyLoadingWorksheet(facultyIds, fromAy);
+                }
+            })
+        );
 
-        // 3. Selection Logic
-        if (type === 'loading') {
-            data = await getFacultyLoadingReport(ay, sem);
-            sheetName = "Faculty Loading";
-        } else if (type === 'subjects') {
-            data = await getSubjectsByFacultyReport(ay, sem);
-            sheetName = "Subjects by Faculty";
-        } else if (type === 'faculty-by-sub') {
-            data = await getFacultyBySubjectReport(ay, sem);
-            sheetName = "Faculty by Subject";
-        } else if (type === 'set') {
-            data = await getFacultySETReport(ay, sem);
-            sheetName = "SET Averages";
-        } else {
-            return json({ error: 'Invalid report type requested.' }, { status: 400 });
-        }
+        const workbook = new ExcelJS.Workbook();
+        sheets.forEach(sheet => {
+            if (typeof sheet === 'undefined') return;
 
-        // 4. DATA VALIDATION: Don't serve an empty file
-        if (!data || data.length === 0) {
-            return json({ 
-                error: `No data found for Academic Year ${ay} Semester ${sem}.` 
-            }, { status: 404 });
-        }
+            const { sheetName, model } = sheet;
+            const clone = workbook.addWorksheet(sheetName);
+            clone.model = model;
+        });
 
-        // 5. Excel Generation
-        const worksheet = XLSX.utils.json_to_sheet(data);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
-        
-        // Using 'buffer' type for SvelteKit Response
-        const buf = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+        const buf = await workbook.xlsx.writeBuffer();
 
         return new Response(buf, {
             headers: {
                 'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                'Content-Disposition': `attachment; filename="${type}_${ay}_S${sem}.xlsx"`
+                'Content-Disposition': `attachment; filename="${types.join('-')}-${fromAy}-S${fromSem}.xlsx"`
             }
         });
-
     } catch (e) {
         console.error('Export critical failure:', e);
         return json({ error: 'Internal Server Error during export generation.' }, { status: 500 });
