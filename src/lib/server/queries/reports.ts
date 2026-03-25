@@ -54,10 +54,8 @@ export async function getSubjectsByFacultyReport(facultyid: number, acadYear: nu
 export async function getFacultyBySubjectReport(acadYear: number, semNum: number) {
     return await db
         .select({
-            courseCode: course.coursename,
-            section: facultycourse.section,
-            facultyName: sql<string>`${faculty.lastname} || ', ' || ${faculty.firstname}`,
-            students: facultycourse.numberofstudents
+            courseTaught: course.coursename,
+            faculty: sql<string>`STRING_AGG(${faculty.firstname} || ' ' || ${faculty.lastname}, ', ' ORDER BY ${asc(faculty.lastname)}, ${asc(faculty.firstname)})`,
         })
         .from(facultycourse)
         .innerJoin(course, eq(facultycourse.courseid, course.courseid))
@@ -65,7 +63,7 @@ export async function getFacultyBySubjectReport(acadYear: number, semNum: number
         .innerJoin(faculty, eq(facultysemester.facultyid, faculty.facultyid))
         .innerJoin(semester, eq(facultysemester.acadsemesterid, semester.acadsemesterid))
         .where(and(eq(semester.academicyear, acadYear), eq(semester.semester, semNum)))
-        .orderBy(course.coursename, facultycourse.section); // Sort by subject/section
+        .groupBy(course.coursename);
 }
 
 export async function getFacultySETReport(acadYear: number, semNum: number) {
