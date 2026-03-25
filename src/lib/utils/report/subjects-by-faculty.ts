@@ -31,15 +31,7 @@ export async function getSubjectsByFacultyWorksheet(facultyIds: number[], acadYe
   const sheet = workbook.addWorksheet(sheetName);
 
   // Set all header cells
-  const headerCellValues: SheetCellValue[] = [
-    ...constantHeaderCellValues,
-    {
-      value: `Faculty loading AY ${acadYear}-${acadYear + 1}`,
-      cellNum: 'A2',
-    },
-  ];
-
-  headerCellValues.map(({ value, cellNum, alignment, font }) => {
+  constantHeaderCellValues.map(({ value, cellNum, alignment, font }) => {
     const cellNums = cellNum.split(':');
     const cell = sheet.getCell(cellNums[0]);
     cell.value = value;
@@ -49,6 +41,10 @@ export async function getSubjectsByFacultyWorksheet(facultyIds: number[], acadYe
 
     if (cellNums.length > 1) sheet.mergeCells(cellNum);
   });
+
+  const titleCell = sheet.getCell('A3');
+  titleCell.value = 'Faculty subject taught';
+  titleCell.font = { bold: true };
 
   // Set data cells
   for (let i = 0; i < data.length; i++) {
