@@ -66,16 +66,37 @@ export async function getFacultyBySubjectReport(acadYear: number, semNum: number
         .groupBy(course.coursename);
 }
 
-export async function getFacultySETReport(acadYear: number, semNum: number) {
-    return await db
+export async function getFacultySETReport(facultyid: number, acadYear: number) {
+    const facultyInfoQuery = db
         .select({
-            name: sql<string>`${faculty.lastname} || ', ' || ${faculty.firstname}`,
-            averageSET: avg(facultycourse.sectionset)
+            lastName: faculty.lastname,
+            firstName: faculty.firstname,
+            middleName: faculty.middlename,
+            status: faculty.status,
         })
         .from(faculty)
-        .innerJoin(facultysemester, eq(faculty.facultyid, facultysemester.facultyid))
-        .innerJoin(semester, eq(facultysemester.acadsemesterid, semester.acadsemesterid))
-        .innerJoin(facultycourse, eq(facultysemester.facultysemesterid, facultycourse.facultysemesterid))
-        .where(and(eq(semester.academicyear, acadYear), eq(semester.semester, semNum)))
-        .groupBy(faculty.facultyid, faculty.lastname, faculty.firstname);
+        .where(eq(faculty.facultyid, facultyid));
+
+    const [midyearCoursesQuery, firstSemCoursesQuery, secondSemCoursesQuery] = [0,1,2].map(semNum => {
+        return db
+            .select({
+                courseName: course.coursename,
+                section: facultycourse.section,
+                sectionSET: facultycourse.sectionset,
+            })
+            .from(facultycourse)
+            .innerJoin(course, eq(facultycourse.courseid, course.courseid))
+            .innerJoin(facultysemester, eq(facultycourse.facultysemesterid, facultysemester.facultysemesterid))
+            .innerJoin(semester, eq(facultysemester.acadsemesterid, semester.acadsemesterid))
+            .where(and(eq(facultysemester.facultyid, facultyid), eq(semester.academicyear, acadYear), eq(semester.semester, semNum)));
+    });
+
+    const [[facultyInfo,], firstSemCourses, secondSemCourses, midyearCourses] = await Promise.all([
+        facultyInfoQuery,
+        firstSemCoursesQuery,
+        secondSemCoursesQuery,
+        midyearCoursesQuery,
+    ]);
+
+    return { facultyInfo, semestralCoursesInfo: [firstSemCourses, secondSemCourses, midyearCourses] };
 }
