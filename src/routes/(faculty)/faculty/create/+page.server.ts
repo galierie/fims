@@ -1,11 +1,7 @@
 import { fail, redirect } from '@sveltejs/kit';
 
 import { createFacultyProfileRecords } from '$lib/server/queries/db-helpers';
-import {
-    getAllAppointmentStatuses,
-    getAllFieldsOfInterest,
-    getAllRanks,
-} from '$lib/server/queries/faculty-view';
+import { getAllAppointmentStatuses, getAllFieldsOfInterest, getAllRanks } from '$lib/server/queries/faculty-view';
 
 export async function load() {
     // Get input dropdown options and dependency mappings
