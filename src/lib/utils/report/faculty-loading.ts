@@ -2,10 +2,14 @@ import ExcelJS from '@protobi/exceljs';
 import { getFacultyLoadingReport } from '$lib/server/queries/reports';
 import { type SheetCellValue, cellBorders } from '$lib/types/sheet-cell';
 
-const headerCellAlignment: Partial<ExcelJS.Alignment> = {
+const defaultHeaderCellAlignment: Partial<ExcelJS.Alignment> = {
   horizontal: 'center',
   vertical: 'top',
 };
+
+const defaultHeaderCellFont: Partial<ExcelJS.Font> = {
+  bold: true,
+}
 
 const constantHeaderCellValues: SheetCellValue[] = [
   {
@@ -111,10 +115,9 @@ export async function getFacultyLoadingWorksheet(facultyIds: number[], acadYear:
     const cellNums = cellNum.split(':');
     const cell = sheet.getCell(cellNums[0]);
     cell.value = value;
-    cell.font = { bold: true };
     cell.border = cellBorders;
-    cell.alignment = (typeof alignment === 'undefined') ? headerCellAlignment : alignment;
-    if (typeof font !== 'undefined') cell.font = font;
+    cell.alignment = (typeof alignment === 'undefined') ? defaultHeaderCellAlignment : alignment;
+    cell.font = (typeof font === 'undefined') ? defaultHeaderCellFont : font;
 
     if (cellNums.length > 1) sheet.mergeCells(cellNum);
   });
