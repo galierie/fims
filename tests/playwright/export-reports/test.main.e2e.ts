@@ -11,6 +11,7 @@ async function waitDownload(page:Page, action:() => Promise<void>, path:string =
 	await download.saveAs(path);
 }
 
+// should hang here if failed
 async function downloadManually(page:Page, pathPrefix:string, buttons:Locator[], format:string) {	
 	for (let bi = 0; bi < buttons.length; bi++) {
 		let b = buttons[bi];
@@ -21,6 +22,11 @@ async function downloadManually(page:Page, pathPrefix:string, buttons:Locator[],
 async function tickBox(page:Page, text:string) {
 	let cb =  await exportHelp.getCheckbox(page, text);
 	await cb.click();
+}
+
+async function tickRadio(page:Page, text:string) {
+	let radio = await exportHelp.getRadio(page, text);
+	await radio.click();
 }
 
 async function setRanges(page:Page, startDate:string = 'AY 2025-2026', endDate:string = 'AY 2025-2026', startSem:string = '1st Semester', endSem:string = '2nd Semester') {
@@ -48,7 +54,6 @@ async function selectRecords(page:Page, recs:string[]) {
 		await expect(cb).toBeVisible();
 		await cb.click();
 	}
-
 }
 
 test.describe('ui validation', async () => {
@@ -91,7 +96,9 @@ test.describe('ui validation', async () => {
 	})
 });
 
-test.describe('file tests', async () => {
+// note: just downloads the files
+// checking file contents itself is too finnicky and tedious atm
+test.describe('faculty file tests', async () => {
 	test.use({storageState: testConsts.AdminConfig})
 
 	test('faculty profile', async ({page}) => {
@@ -157,13 +164,64 @@ test.describe('file tests', async () => {
 
 	test('aggregate downloads', async ({page}) => {
 		await page.goto('/')
-		await selectRecords(page, ['Dela Cruz, Gabrielle Zach']);
+		await selectRecords(page, ['Dela Cruz, Gabrielle Zach', 'Camingao, Ericsson Jake B.']);
 
 		let firstButton = await exportHelp.getExportRecords(page);
 		await firstButton.click()
+
+		await setRanges(page);
+		await tickBox(page, 'Faculty Profiles');
+		await tickBox(page, 'Faculty Service Record');
+		await tickBox(page, 'Faculty Loading');
+		await tickBox(page, 'Faculty SET Average');
+
+		let aggregateBox = page.getByLabel('Aggregate Selected Reports into One File?').getByRole('checkbox').first()
+		await expect(aggregateBox).toBeVisible()
+		await aggregateBox.click()
+
+		await (await exportHelp.getExportButton(page)).click()
+		let downloadButtons = await page.getByRole('button', {name: 'Download'}).all()
+		expect(downloadButtons.length).toBe(1) // aggregate, should only be one file
+		await downloadManually(page, pathPrefix, downloadButtons, '.xlsx');
 	});
 });
 
-test.describe('aggregate tests', async () => {
 
-})
+test.describe('course tests', async () => {
+	test.use({storageState: testConsts.AdminConfig});
+	test('by faculty - subject taught', async ({page}) => {
+		await page.goto('/')
+		await selectRecords(page, ['Maricris, Mandario', 'Galinato, Eriene']);
+
+		let firstButton = await exportHelp.getExportRecords(page);
+		await firstButton.click()
+
+		await setRanges(page);
+		await tickBox(page, 'By Faculty, Subject Taught');
+		await tickBox(page, 'By Subject Taught, Faculty');
+
+		await (await exportHelp.getExportButton(page)).click()
+		await downloadManually(page, pathPrefix, await page.getByRole('button', {name: 'Download'}).all(), '.xlsx')
+	});
+
+	test('aggregate test', async ({page}) => {
+		await page.goto('/')
+		await selectRecords(page, ['Maricris, Mandario', 'Galinato, Eriene']);
+
+		let firstButton = await exportHelp.getExportRecords(page);
+		await firstButton.click()
+
+		await setRanges(page);
+		await tickBox(page, 'By Faculty, Subject Taught');
+		await tickBox(page, 'By Subject Taught, Faculty');
+
+		let aggregateBox = page.getByLabel('Aggregate Selected Reports into One File?').getByRole('checkbox').last();
+		await expect(aggregateBox).toBeVisible()
+		await aggregateBox.click()
+
+		await (await exportHelp.getExportButton(page)).click()
+		let downloadButtons = await page.getByRole('button', {name: 'Download'}).all()
+		expect(downloadButtons.length).toBe(1) // aggregate, should only be one file
+		await downloadManually(page, pathPrefix, downloadButtons, '.xlsx');
+	});
+});
