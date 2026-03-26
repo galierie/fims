@@ -60,10 +60,10 @@ export async function GET({ url, locals }: RequestEvent) {
 
         for (const type of types) {
             if (type === 'loading') {
-                for (const ay of uniqueYears) {
+                for (const { ay, sem } of periods) {
                     sheetPromises.push(
-                        getFacultyLoadingWorksheet(facultyIds, ay).then(sheet => {
-                            if (sheet) sheet.sheetName = `Loading AY${ay}-${ay+1}`;
+                        getFacultyLoadingWorksheet(facultyIds, ay, sem).then(sheet => {
+                            if (sheet) sheet.sheetName = `Loading AY${ay}-${ay+1}-${sem}`;
                             return sheet;
                         })
                     );
