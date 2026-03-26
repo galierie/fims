@@ -225,3 +225,25 @@ test.describe('course tests', async () => {
 		await downloadManually(page, pathPrefix, downloadButtons, '.xlsx');
 	});
 });
+
+test.describe('csv download', async () => {
+	test.use({storageState: testConsts.AdminConfig});
+
+	// just check if you can download with csv
+	test('test', async ({page}) => {
+		await page.goto('/')
+		await selectRecords(page, ['Dela Cruz, Gabrielle Zach']);
+
+		let firstButton = await exportHelp.getExportRecords(page);
+		await firstButton.click()
+
+
+		await setRanges(page);
+		await tickBox(page, 'Faculty Profile');
+		
+		await tickRadio(page, 'CSV');
+		
+		await (await exportHelp.getExportButton(page)).click()
+		await downloadManually(page, pathPrefix, await page.getByRole('button', {name: 'Download'}).all(), '.xlsx');
+	});
+});
