@@ -1,30 +1,30 @@
 import ExcelJS from '@protobi/exceljs';
-import { getSubjectsByFacultyReport } from "$lib/server/queries/reports";
+import { getFacultyBySubjectReport } from '$lib/server/queries/reports';
 import { type SheetCellValue, cellBorders } from '$lib/types/sheet-cell';
 
 const constantHeaderCellValues: SheetCellValue[] = [
   {
-    value: 'Faculty',
-    cellNum: 'A4',
+    value: 'Subject',
+    cellNum: 'A3',
     font: {
       bold: true,
     },
   },
   {
-    value: 'Subject',
-    cellNum: 'B4:D4',
-    alignment: {
-      horizontal: 'center',
+    value: 'Faculty',
+    cellNum: 'B3',
+    font: {
+      bold: true,
     },
   },
 ];
 
-const dataStartRow = 5;
+const dataStartRow = 4;
 const dataStartCol = 1;
 
-export async function getSubjectsByFacultyWorksheet(facultyIds: number[], acadYear: number, semNum: number) {
-  const sheetName = 'By Faculty, Subjects Taught'
-  const data = await Promise.all(facultyIds.map((id) => (getSubjectsByFacultyReport(id, acadYear, semNum))));
+export async function getFacultyBySubjectWorksheet(acadYear: number, semNum: number) {
+  const sheetName = 'By Subject Taught, Faculty';
+  const data = await getFacultyBySubjectReport(acadYear, semNum);
 
   // Create Workbook
   const workbook = new ExcelJS.Workbook();
@@ -42,37 +42,29 @@ export async function getSubjectsByFacultyWorksheet(facultyIds: number[], acadYe
     if (cellNums.length > 1) sheet.mergeCells(cellNum);
   });
 
-  const titleCell = sheet.getCell('A3');
-  titleCell.value = 'Faculty subject taught';
+  const titleCell = sheet.getCell('A1');
+  titleCell.value = 'By subject taught, faculty';
   titleCell.font = { bold: true };
 
   // Set data cells
   let row = dataStartRow;
   for (let i = 0; i < data.length; i++, row++) {
     let col = dataStartCol;
-    const facultyMember = data[i];
 
-    if (facultyMember.length === 0) continue;
+    const {
+      courseTaught,
+      faculty,
+    } = data[i];
 
-    console.log(facultyMember);
-
-    const [{
-      lastName,
-      firstName,
-      middleName,
-      coursesTaught,
-    }] = facultyMember;
-
-    const nameCell = sheet.getCell(row, col);
-    nameCell.value = `${lastName}, ${firstName} ${middleName[0]}.`;
-    nameCell.border = cellBorders;
+    const subjectCell = sheet.getCell(row, col);
+    subjectCell.value = courseTaught;
+    subjectCell.border = cellBorders;
     col++;
 
-    const subjectsCell = sheet.getCell(row, col);
-    subjectsCell.value = coursesTaught;
-    subjectsCell.border = cellBorders;
-    sheet.mergeCells(row, col, row, col + 2);
-    col += 3;
+    const nameCell = sheet.getCell(row, col);
+    nameCell.value = faculty;
+    nameCell.border = cellBorders;
+    col++;
   }
 
   return { sheetName, model: sheet.model };
