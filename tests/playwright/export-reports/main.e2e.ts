@@ -23,16 +23,36 @@ test.describe('ui validation', async () => {
 				await expect(semBox.getByText(semOption)).toBeVisible();
 		}
 
-		for (let checkbox of exportHelp.checkboxOptions)
-			await exportHelp.getCheckbox(page, checkbox);
 
-		for (let radio of exportHelp.exportOptions)
-			await exportHelp.getRadio(page, radio);
+		let expButton = await exportHelp.getExportButton(page);
+		let downProm = page.waitForEvent('download');
+		await expButton.click();
+		let download = await downProm;
 
+		await download.saveAs('tests/temp/output.xlsx');
 
-		await exportHelp.getExportButton(page);
 
 		let cancel = await exportHelp.getCancel(page);
 		await cancel.click()
 	})
+});
+
+test.describe('export tests', async () => {
+	test('faculty export', async ({page}) => {
+
+		await page.goto('/')
+		let cb = page.locator('a', {hasText: "Dela Cruz, Gabrielle Zach"}).last().locator('..').getByRole('checkbox').first()
+		await expect(cb).toBeVisible();
+
+		await cb.click()
+		let firstButton = await exportHelp.getExportRecords(page);
+		await firstButton.click()
+
+		let fromYearBox = await exportHelp.getDateSelects(page, 'From:', 'Choose Academic Year');
+		let fromSemBox = await exportHelp.getDateSelects(page, 'From:', 'Choose Semester');
+		let toYearBox = await exportHelp.getDateSelects(page, 'To:', 'Choose Academic Year');
+		let toSemBox = await exportHelp.getDateSelects(page, 'To:', 'Choose Semester');
+
+		await fromYearBox.getByText('AY 2025-2026').click()
+	});
 });

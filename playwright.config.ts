@@ -58,6 +58,25 @@ export default defineConfig({
             fullyParallel: true,
         },
 
+        //export tests
+        //preamble
+        {
+            name: 'export-reports-preamble',
+            dependencies: ['record-edits'],
+            testDir: 'tests/playwright/export-reports',
+            testMatch: /.preamble.e2e.(?:js|ts)/u,
+            fullyParallel: true,
+        }
+
+        //main
+        {
+            name: 'export-reports-main',
+            dependencies: ['export-reports-preamble'],
+            testDir: 'tests/playwright/export-reports',
+            testMatch: /.preamble.e2e.(?:js|ts)/u,
+            fullyParallel: true,
+        }
+
         // common destructive tests, as they can't be easily parallelized due to deletions and stuff
         {
             name: 'common-destructive-tests',
