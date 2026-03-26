@@ -72,7 +72,7 @@ export const faculty = pgTable(
             columns: [table.status],
             foreignColumns: [status.status],
             name: 'faculty_status_fkey',
-        }),
+        }).onDelete('set null'),
     ],
 );
 
