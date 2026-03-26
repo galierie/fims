@@ -98,7 +98,7 @@ export default defineConfig({
             testDir: 'tests/playwright/destructive',
             testMatch: /.e2e.(?:js|ts)/u,
         },
-        
+
         // it-specifc (account handling) tests
 
         {

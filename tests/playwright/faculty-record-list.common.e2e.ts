@@ -130,10 +130,9 @@ test.describe('viewing and searching records as it', () => {
         await expect(page).toHaveURL(/faculty/u); //in faculty route
         await expect(page.getByText('Mandario, Maricris')).toBeVisible(); //correct record is shown
 
-
         //check for the required fields in the profile tab
         for (let field of testConsts.profileTabFields) {
-            await expect(page.getByText(field, {exact: true})).toBeVisible()
+            await expect(page.getByText(field, { exact: true })).toBeVisible();
         }
 
         //check for the required fields in the semestral records tab
@@ -143,9 +142,9 @@ test.describe('viewing and searching records as it', () => {
 
         //check for the required fields in the sem recs tab
         for (let field of testConsts.semRecsFields) {
-            await expect(page.getByText(field, {exact: true}).first()).toBeVisible()
+            await expect(page.getByText(field, { exact: true }).first()).toBeVisible();
         }
-        
+
         //check if you can go back to the profile tab
         let profileTab = await fieldHelp.profiletab(page);
         await profileTab.click();
@@ -272,10 +271,9 @@ test.describe('viewing and searching records as admin', async () => {
         await expect(page).toHaveURL(/faculty/u); //in faculty route
         await expect(page.getByText('Mandario, Maricris')).toBeVisible(); //correct record is shown
 
- 
         //check for the required fields in the profile tab
         for (let field of testConsts.profileTabFields) {
-            await expect(page.getByText(field, {exact: true})).toBeVisible()
+            await expect(page.getByText(field, { exact: true })).toBeVisible();
         }
 
         //check for the required fields in the semestral records tab
@@ -285,9 +283,9 @@ test.describe('viewing and searching records as admin', async () => {
 
         //check for the required fields in the sem recs tab
         for (let field of testConsts.semRecsFields) {
-            await expect(page.getByText(field, {exact: true}).first()).toBeVisible()
+            await expect(page.getByText(field, { exact: true }).first()).toBeVisible();
         }
-        
+
         //check if you can go back to the profile tab
         let profileTab = await fieldHelp.profiletab(page);
         await profileTab.click();

@@ -1,140 +1,162 @@
-import {type Locator, type Page, test, expect} from '@playwright/test';
+import { type Locator, type Page, test, expect } from '@playwright/test';
 import * as testConsts from '../../test-consts';
 import * as exportHelp from '../../test-helpers/export-test';
 
-const pathPrefix = 'tests/temp/output_'
+const pathPrefix = 'tests/temp/output_';
 
-async function waitDownload(page:Page, action:() => Promise<void>, path:string = 'tests/temp/output.xlsx') {
-	let downProm = page.waitForEvent('download');
-	await action();
-	let download = await downProm;
-	await download.saveAs(path);
+async function waitDownload(
+    page: Page,
+    action: () => Promise<void>,
+    path: string = 'tests/temp/output.xlsx',
+) {
+    let downProm = page.waitForEvent('download');
+    await action();
+    let download = await downProm;
+    await download.saveAs(path);
 }
 
 // should hang here if failed
-async function downloadManually(page:Page, pathPrefix:string, buttons:Locator[], format:string) {	
-	for (let bi = 0; bi < buttons.length; bi++) {
-		let b = buttons[bi];
-		await waitDownload(page, async() => {await b.click(), pathPrefix.concat(`${bi}`, format)});
-	}
+async function downloadManually(
+    page: Page,
+    pathPrefix: string,
+    buttons: Locator[],
+    format: string,
+) {
+    for (let bi = 0; bi < buttons.length; bi++) {
+        let b = buttons[bi];
+        await waitDownload(page, async () => {
+            (await b.click(), pathPrefix.concat(`${bi}`, format));
+        });
+    }
 }
 
-async function tickBox(page:Page, text:string) {
-	let cb =  await exportHelp.getCheckbox(page, text);
-	await cb.click();
+async function tickBox(page: Page, text: string) {
+    let cb = await exportHelp.getCheckbox(page, text);
+    await cb.click();
 }
 
-async function tickRadio(page:Page, text:string) {
-	let radio = await exportHelp.getRadio(page, text);
-	await radio.click();
+async function tickRadio(page: Page, text: string) {
+    let radio = await exportHelp.getRadio(page, text);
+    await radio.click();
 }
 
-async function setRanges(page:Page, startDate:string = 'AY 2025-2026', endDate:string = 'AY 2025-2026', startSem:string = '1st Semester', endSem:string = '2nd Semester') {
-	let fromYearBox = await exportHelp.getDateSelects(page, 'From:', 'Choose Academic Year');
-	let fromSemBox = await exportHelp.getDateSelects(page, 'From:', 'Choose Semester');
-	let toYearBox = await exportHelp.getDateSelects(page, 'To:', 'Choose Academic Year');
-	let toSemBox = await exportHelp.getDateSelects(page, 'To:', 'Choose Semester');
+async function setRanges(
+    page: Page,
+    startDate: string = 'AY 2025-2026',
+    endDate: string = 'AY 2025-2026',
+    startSem: string = '1st Semester',
+    endSem: string = '2nd Semester',
+) {
+    let fromYearBox = await exportHelp.getDateSelects(page, 'From:', 'Choose Academic Year');
+    let fromSemBox = await exportHelp.getDateSelects(page, 'From:', 'Choose Semester');
+    let toYearBox = await exportHelp.getDateSelects(page, 'To:', 'Choose Academic Year');
+    let toSemBox = await exportHelp.getDateSelects(page, 'To:', 'Choose Semester');
 
-	await fromYearBox.click()
-	await expect(fromYearBox.locator('> *').filter({hasText: endSem})).toBeVisible()
-	await fromYearBox.locator('> *').filter({hasText: startDate}).click()
+    await fromYearBox.click();
+    await expect(fromYearBox.locator('> *').filter({ hasText: endSem })).toBeVisible();
+    await fromYearBox.locator('> *').filter({ hasText: startDate }).click();
 
-	await toYearBox.click()
-	await expect(toYearBox.locator('> *').filter({hasText: endSem})).toBeVisible()
-	await toYearBox.locator('> *').filter({hasText: endDate}).click()
+    await toYearBox.click();
+    await expect(toYearBox.locator('> *').filter({ hasText: endSem })).toBeVisible();
+    await toYearBox.locator('> *').filter({ hasText: endDate }).click();
 
-	await fromSemBox.click()
-	await expect(fromSemBox.locator('> *').filter({hasText: endSem})).toBeVisible()
-	await fromSemBox.locator('> *').filter({hasText: startSem}).click()
+    await fromSemBox.click();
+    await expect(fromSemBox.locator('> *').filter({ hasText: endSem })).toBeVisible();
+    await fromSemBox.locator('> *').filter({ hasText: startSem }).click();
 
-	await toSemBox.click()
-	await expect(toSemBox.locator('> *').filter({hasText: endSem})).toBeVisible()
-	await toSemBox.locator('> *').filter({hasText: endSem}).click()
-};
+    await toSemBox.click();
+    await expect(toSemBox.locator('> *').filter({ hasText: endSem })).toBeVisible();
+    await toSemBox.locator('> *').filter({ hasText: endSem }).click();
+}
 
-async function selectRecords(page:Page, recs:string[]) {
-	for (let rec of recs) {
-		let cb = page.locator('a', {hasText: rec}).last().locator('..').getByRole('checkbox').first()
-		await expect(cb).toBeVisible();
-		await cb.click();
-	}
+async function selectRecords(page: Page, recs: string[]) {
+    for (let rec of recs) {
+        let cb = page
+            .locator('a', { hasText: rec })
+            .last()
+            .locator('..')
+            .getByRole('checkbox')
+            .first();
+        await expect(cb).toBeVisible();
+        await cb.click();
+    }
 }
 
 test.describe('ui validation', async () => {
-	test.use({storageState: testConsts.AdminConfig})
-	// check if ui elements are visible
-	test('checking ui', async ({page}) => {
-		await page.goto('/')
+    test.use({ storageState: testConsts.AdminConfig });
+    // check if ui elements are visible
+    test('checking ui', async ({ page }) => {
+        await page.goto('/');
 
-		await selectRecords(page, [
-			'Camingao, Ericsson Jake',
-			'Mandario, Maricris',
-		]);
+        await selectRecords(page, ['Camingao, Ericsson Jake', 'Mandario, Maricris']);
 
-		let firstButton = await exportHelp.getExportRecords(page);
-		await firstButton.click()
+        let firstButton = await exportHelp.getExportRecords(page);
+        await firstButton.click();
 
-		for (let option of exportHelp.dateRanges) {
-			let yearBox = await exportHelp.getDateSelects(page, option, 'Choose Academic Year');
-			let semBox = await exportHelp.getDateSelects(page, option, 'Choose Semester');
+        for (let option of exportHelp.dateRanges) {
+            let yearBox = await exportHelp.getDateSelects(page, option, 'Choose Academic Year');
+            let semBox = await exportHelp.getDateSelects(page, option, 'Choose Semester');
 
-			await yearBox.click()
-			for (let yearOption of exportHelp.acadYears)
-				await expect(yearBox.locator('> *').filter({hasText: yearOption})).toBeVisible();
-			await yearBox.click()
+            await yearBox.click();
+            for (let yearOption of exportHelp.acadYears)
+                await expect(yearBox.locator('> *').filter({ hasText: yearOption })).toBeVisible();
+            await yearBox.click();
 
-			await semBox.click()
-			for (let semOption of exportHelp.sems)
-				await expect(semBox.locator('> *').filter({hasText: semOption})).toBeVisible();
-			await semBox.click()
-		}
-		for (let option of exportHelp.checkboxOptions) {
-			await exportHelp.getCheckbox(page, option);
-		}
-		for (let option of exportHelp.exportOptions) {
-			await exportHelp.getRadio(page, option);
-		}
+            await semBox.click();
+            for (let semOption of exportHelp.sems)
+                await expect(semBox.locator('> *').filter({ hasText: semOption })).toBeVisible();
+            await semBox.click();
+        }
+        for (let option of exportHelp.checkboxOptions) {
+            await exportHelp.getCheckbox(page, option);
+        }
+        for (let option of exportHelp.exportOptions) {
+            await exportHelp.getRadio(page, option);
+        }
 
-		await tickBox(page, 'Faculty Profile');
+        await tickBox(page, 'Faculty Profile');
 
-		let exportButton = await exportHelp.getExportButton(page);
-		await exportHelp.getCancel(page);
-		await exportButton.click()
+        let exportButton = await exportHelp.getExportButton(page);
+        await exportHelp.getCancel(page);
+        await exportButton.click();
 
+        await expect(page.getByRole('button', { name: 'Download All' })).toBeVisible();
+        let downloadButtons = await page.getByRole('link', { name: 'Download' }).all();
+        expect(downloadButtons.length).toBe(2); // two records selected
 
-		await expect(page.getByRole('button', {name: 'Download All'})).toBeVisible()
-		let downloadButtons = await page.getByRole('link', {name: 'Download'}).all()
-		expect(downloadButtons.length).toBe(2); // two records selected
-
-		let closeButton = page.getByRole('button', {name: 'Close'});
-		await expect(closeButton).toBeVisible();
-		await closeButton.click();
-	})
+        let closeButton = page.getByRole('button', { name: 'Close' });
+        await expect(closeButton).toBeVisible();
+        await closeButton.click();
+    });
 });
 
 // note: just downloads the files
 // checking file contents itself is too finnicky and tedious atm
 test.describe('faculty file tests', async () => {
-	test.use({storageState: testConsts.AdminConfig})
+    test.use({ storageState: testConsts.AdminConfig });
 
-	test('faculty profile', async ({page}) => {
-		await page.goto('/')
-		await selectRecords(page, ['Dela Cruz, Gabrielle Zach']);
+    test('faculty profile', async ({ page }) => {
+        await page.goto('/');
+        await selectRecords(page, ['Dela Cruz, Gabrielle Zach']);
 
-		let firstButton = await exportHelp.getExportRecords(page);
-		await firstButton.click()
+        let firstButton = await exportHelp.getExportRecords(page);
+        await firstButton.click();
 
+        await setRanges(page);
+        await tickBox(page, 'Faculty Profile');
 
-		await setRanges(page);
-		await tickBox(page, 'Faculty Profile');
-		
-		let exportButton = await exportHelp.getExportButton(page);
-		expect(await exportButton.isDisabled()).toBeFalsy();
-		await (await exportHelp.getExportButton(page)).click()
-		await downloadManually(page, pathPrefix, await page.getByRole('button', {name: 'Download'}).all(), '.xlsx');
-	});
+        let exportButton = await exportHelp.getExportButton(page);
+        expect(await exportButton.isDisabled()).toBeFalsy();
+        await (await exportHelp.getExportButton(page)).click();
+        await downloadManually(
+            page,
+            pathPrefix,
+            await page.getByRole('button', { name: 'Download' }).all(),
+            '.xlsx',
+        );
+    });
 
-	/*
+    /*
 	test('fauclty service record', async ({page}) => {
 		await page.goto('/')
 		await selectRecords(page, ['Dela Cruz, Gabrielle Zach']);
@@ -213,7 +235,6 @@ test.describe('faculty file tests', async () => {
 	});
 	*/
 });
-
 
 /*
 test.describe('course tests', async () => {

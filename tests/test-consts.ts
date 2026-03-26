@@ -1,6 +1,8 @@
 // external files
 import * as seedData from './seed-data/faculty-admin';
-export type possibleInputs = Array<'textbox'|'dropdown'|'numeric'|'date'|'remarks'|'checkbox'|'none'>;
+export type possibleInputs = Array<
+    'textbox' | 'dropdown' | 'numeric' | 'date' | 'remarks' | 'checkbox' | 'none'
+>;
 
 //[ header, add button text, inputs, type of input field ]
 export type testRowTuple = [string, string, string[], possibleInputs];
@@ -17,38 +19,40 @@ export const AdminConfig = 'playwright/.auth/admin.json';
 
 // as of making this, the save confirmation hasn't yet been made
 // so i made this preemtively
-export const SaveConfirmText = 'Save'
+export const SaveConfirmText = 'Save';
 
 // for editing records
 export function getFieldTest() {
     return [
         'test-name', // Last name
-        'test=name2', // First name 
+        'test=name2', // First name
         'test-name3', // Middle name
         'mm.', // suffix
         new Date().toISOString().split('T')[0], // birth date
-        'maiden-name', // maiden name 
-        `${Math.floor(Math.random()*9999)}`, //philhealth
-        `${Math.floor(Math.random()*9999)}`, //pag-ibig
-        `${Math.floor(Math.random()*9999)}`, //psi item
-        `${Math.floor(Math.random()*9999)}`, //tin
-        `${Math.floor(Math.random()*9999)}`, //gsis
-        `${Math.floor(Math.random()*9999)}`, //employee
-        expectedStatuses[Math.floor(Math.random()*3)], // status
+        'maiden-name', // maiden name
+        `${Math.floor(Math.random() * 9999)}`, //philhealth
+        `${Math.floor(Math.random() * 9999)}`, //pag-ibig
+        `${Math.floor(Math.random() * 9999)}`, //psi item
+        `${Math.floor(Math.random() * 9999)}`, //tin
+        `${Math.floor(Math.random() * 9999)}`, //gsis
+        `${Math.floor(Math.random() * 9999)}`, //employee
+        expectedStatuses[Math.floor(Math.random() * 3)], // status
         new Date().toISOString().split('T')[0], // date of original appointment
         'test remarks', // remarks
     ];
-};
+}
 
-export function sampleEmails() { return ['test@up.edu.ph'];}
-export function sampleContactNums() {return ['123456'];}
-export function sampleHomeAddrs() {return ['up street'];}
+export function sampleEmails() {
+    return ['test@up.edu.ph'];
+}
+export function sampleContactNums() {
+    return ['123456'];
+}
+export function sampleHomeAddrs() {
+    return ['up street'];
+}
 export function sampleEduAttain() {
-    return [
-        'BS Test Degree',
-        'UP Diliman',
-        '3000',
-    ]
+    return ['BS Test Degree', 'UP Diliman', '3000'];
 }
 export function sampleFieldsInterest() {
     return ['Software Engineering'];
@@ -60,7 +64,7 @@ export function samplePromHist() {
         '100000.00',
         'Permanent',
         new Date().toISOString().split('T')[0],
-    ]
+    ];
 }
 
 export function samplePosition() {
@@ -69,7 +73,7 @@ export function samplePosition() {
         'Test Office',
         new Date().toISOString().split('T')[0],
         new Date().toISOString().split('T')[0],
-        '2'
+        '2',
     ];
 }
 
@@ -93,13 +97,7 @@ export function sampleAdminWork() {
 }
 
 export function sampleClass() {
-    return [
-        'Econ 11',
-        'Section ABC',
-        '11',
-        '2',
-        '5.0000',
-    ];
+    return ['Econ 11', 'Section ABC', '11', '2', '5.0000'];
 }
 
 export function sampleMentor() {
@@ -183,7 +181,7 @@ export function getData(): string[] {
 
 //general seed function
 export async function seed() {
-    console.log("seeding!!!");
+    console.log('seeding!!!');
     // clear all tables
     await testDB.delete(schema.faculty);
     await testDB.delete(schema.facultyrank);
@@ -196,12 +194,10 @@ export async function seed() {
     await testDB.execute(sql`REFRESH MATERIALIZED VIEW faculty_record_search_view`);
 
     //push office
-    await testDB
-        .insert(schema.office)
-        .values({
-            officeid: 1,
-            name: 'Test Office' 
-        });
+    await testDB.insert(schema.office).values({
+        officeid: 1,
+        name: 'Test Office',
+    });
 
     //push appointment statuses
     await testDB.insert(schema.appointmentstatus).values(seedData.apppointmentStatuses);
@@ -262,21 +258,42 @@ export async function seed() {
 }
 
 // for list input
-export const emailInputs:possibleInputs = ['textbox'];
-export const contactNumInputs:possibleInputs = ['textbox'];
-export const homeAddrsInputs:possibleInputs = ['textbox'];
-export const eduAttainInputs:possibleInputs = ['textbox', 'textbox', 'textbox'];
-export const fieldInterestInputs:possibleInputs = ['dropdown'];
-export const promHistInputs:possibleInputs = ['dropdown', 'none', 'none', 'dropdown', 'date'];
+export const emailInputs: possibleInputs = ['textbox'];
+export const contactNumInputs: possibleInputs = ['textbox'];
+export const homeAddrsInputs: possibleInputs = ['textbox'];
+export const eduAttainInputs: possibleInputs = ['textbox', 'textbox', 'textbox'];
+export const fieldInterestInputs: possibleInputs = ['dropdown'];
+export const promHistInputs: possibleInputs = ['dropdown', 'none', 'none', 'dropdown', 'date'];
 
-export const adminPosInputs:possibleInputs = ['dropdown', 'dropdown', 'date', 'date', 'numeric'];
-export const membershipInputs:possibleInputs = ['textbox', 'textbox', 'date', 'date', 'numeric'];
-export const adminWorkInputs:possibleInputs = ['textbox', 'dropdown', 'date', 'date', 'numeric'];
-export const classesInputs:possibleInputs = ['dropdown', 'textbox', 'numeric', 'numeric', 'numeric'];
-export const mentorInputs:possibleInputs = ['textbox', 'textbox', 'textbox', 'textbox', 'date', 'date', 'numeric'];
-export const researchInputs:possibleInputs = ['textbox', 'numeric', 'remarks'];
-export const extInputs:possibleInputs = ['textbox', 'textbox', 'date', 'date', 'numeric'];
-export const studyInputs:possibleInputs = ['textbox', 'textbox', 'numeric', 'checkbox', 'checkbox', 'numeric'];
+export const adminPosInputs: possibleInputs = ['dropdown', 'dropdown', 'date', 'date', 'numeric'];
+export const membershipInputs: possibleInputs = ['textbox', 'textbox', 'date', 'date', 'numeric'];
+export const adminWorkInputs: possibleInputs = ['textbox', 'dropdown', 'date', 'date', 'numeric'];
+export const classesInputs: possibleInputs = [
+    'dropdown',
+    'textbox',
+    'numeric',
+    'numeric',
+    'numeric',
+];
+export const mentorInputs: possibleInputs = [
+    'textbox',
+    'textbox',
+    'textbox',
+    'textbox',
+    'date',
+    'date',
+    'numeric',
+];
+export const researchInputs: possibleInputs = ['textbox', 'numeric', 'remarks'];
+export const extInputs: possibleInputs = ['textbox', 'textbox', 'date', 'date', 'numeric'];
+export const studyInputs: possibleInputs = [
+    'textbox',
+    'textbox',
+    'numeric',
+    'checkbox',
+    'checkbox',
+    'numeric',
+];
 
 export const profileLists = [
     emailInputs,
@@ -285,7 +302,7 @@ export const profileLists = [
     eduAttainInputs,
     fieldInterestInputs,
     promHistInputs,
-]
+];
 
 export const secRecLists = [
     adminPosInputs,
@@ -296,7 +313,7 @@ export const secRecLists = [
     researchInputs,
     extInputs,
     studyInputs,
-]
+];
 
 //for field input
 
@@ -316,38 +333,53 @@ export const profileTabFields = [
     'Status',
     'Date of Original Appointment',
     'Remarks',
-]
+];
 
-
-export const semRecsFields = [
-    'Current Rank',
-    'Current Highest Educational Attainment',
-    'Remarks',
-]
+export const semRecsFields = ['Current Rank', 'Current Highest Educational Attainment', 'Remarks'];
 
 // to spot the headers and stuff. basically gets a unique header from each list.
 // also acts as some helper data structure to fill in sample data in inputs of a specific type
-export function profileTabListSample():testRowTuple[] {
+export function profileTabListSample(): testRowTuple[] {
     return [
         ['Emails', '+ Add Email', sampleEmails(), emailInputs],
         ['Contact Numbers', '+ Add Contact Number', sampleContactNums(), contactNumInputs],
         ['Home Addresses', '+ Add Home Address', sampleHomeAddrs(), homeAddrsInputs],
         ['Degree', '+ Add Educational Attainment', sampleEduAttain(), eduAttainInputs],
-        ['Fields of Interest', '+ Add Fields of Interest', sampleFieldsInterest(), fieldInterestInputs],
+        [
+            'Fields of Interest',
+            '+ Add Fields of Interest',
+            sampleFieldsInterest(),
+            fieldInterestInputs,
+        ],
         ['Rank of Renewal/Tenure', '+ Add Promotion', samplePromHist(), promHistInputs],
-    ]
+    ];
 }
 
 //same idea
-export function semRecsTabListSample():testRowTuple[] {
+export function semRecsTabListSample(): testRowTuple[] {
     return [
         ['Position', '+ Add Position', samplePosition(), adminPosInputs],
-        ['Nature of Membership', '+ Add Comittee Membership', sampleContactNums(), contactNumInputs],
-        ['Nature of Administrative Work', '+ Add Administrative Work', sampleAdminWork(), adminWorkInputs],
+        [
+            'Nature of Membership',
+            '+ Add Comittee Membership',
+            sampleContactNums(),
+            contactNumInputs,
+        ],
+        [
+            'Nature of Administrative Work',
+            '+ Add Administrative Work',
+            sampleAdminWork(),
+            adminWorkInputs,
+        ],
         ['Course', '+ Add Class', sampleClass(), classesInputs],
         ['Mentee Last Name', '+ Add Mentee', sampleMentor(), mentorInputs],
         ['Title', '+ Add Research/TextbookWriting/Creative Work', sampleResearch(), researchInputs],
-        ['Nature of Extension Work/Community Service', '+ Add Extension Work/Community Service', sampleExt(), extInputs],
+        [
+            'Nature of Extension Work/Community Service',
+            '+ Add Extension Work/Community Service',
+            sampleExt(),
+            extInputs,
+        ],
         ['Degree', '+ Add Degree Program', sampleStudy(), studyInputs],
-    ]
+    ];
 }

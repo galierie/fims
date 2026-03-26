@@ -17,15 +17,15 @@ export const statusRelations = [
 
 export const apppointmentStatuses = [
     {
-        appointmentstatus: 'Permanent'
+        appointmentstatus: 'Permanent',
     },
     {
-        appointmentstatus: 'Part-Time'
+        appointmentstatus: 'Part-Time',
     },
     {
-        appointmentstatus: 'Full-Time'
+        appointmentstatus: 'Full-Time',
     },
-]
+];
 
 // faculty
 export const testFaculty = [
