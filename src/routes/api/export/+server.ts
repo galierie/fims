@@ -3,6 +3,10 @@ import ExcelJS from '@protobi/exceljs';
 
 import { getFacultyLoadingWorksheet } from '$lib/utils/report/faculty-loading';
 import { getSubjectsByFacultyWorksheet } from '$lib/utils/report/subjects-by-faculty';
+import { getFacultyProfileWorksheet } from '$lib/utils/report/faculty-profile';
+import { getFacultyServiceRecordWorksheet } from '$lib/utils/report/faculty-service-record';
+import { getFacultySETAverageWorksheet } from '$lib/utils/report/faculty-set-average';
+import { getFacultyBySubjectWorksheet } from '$lib/utils/report/faculty-by-subject';
 
 export async function GET({ url, locals }: RequestEvent) {
     if (!locals.user) {
@@ -59,11 +63,38 @@ export async function GET({ url, locals }: RequestEvent) {
         const uniqueYears = Array.from(new Set(periods.map(p => p.ay)));
 
         for (const type of types) {
-            if (type === 'loading') {
+            if (type === 'profile') {
+                sheetPromises.push(
+                    getFacultyProfileWorksheet(facultyIds).then(sheet => {
+                        if (sheet) sheet.sheetName = 'Faculty Profile';
+                        return sheet;
+                    })
+                );
+            } else if (type === 'service-record') {
+                // Service record queries by individual faculty ID over the whole date range
+                for (const id of facultyIds) {
+                    sheetPromises.push(
+                        getFacultyServiceRecordWorksheet(id, fromAy, fromSem, toAy, toSem).then(sheet => {
+                            if (sheet) sheet.sheetName = `Service Record ${id}`;
+                            return sheet;
+                        })
+                    );
+                }
+            } else if (type === 'loading') {
                 for (const { ay, sem } of periods) {
                     sheetPromises.push(
                         getFacultyLoadingWorksheet(facultyIds, ay, sem).then(sheet => {
                             if (sheet) sheet.sheetName = `Loading AY${ay}-${ay+1}-${sem}`;
+                            return sheet;
+                        })
+                    );
+                }
+            } else if (type === 'set-avg') {
+                // SET average is a yearly report
+                for (const ay of uniqueYears) {
+                    sheetPromises.push(
+                        getFacultySETAverageWorksheet(facultyIds, ay).then(sheet => {
+                            if (sheet) sheet.sheetName = `SET Avg AY${ay}-${ay+1}`;
                             return sheet;
                         })
                     );
@@ -77,9 +108,17 @@ export async function GET({ url, locals }: RequestEvent) {
                         })
                     );
                 }
-            // TODO: add more blocks here for other report types
+            } else if (type === 'faculty-by-subject') {
+                // Faculty by subject does not depend on facultyIds, only on the period
+                for (const { ay, sem } of periods) {
+                    sheetPromises.push(
+                        getFacultyBySubjectWorksheet(ay, sem).then(sheet => {
+                            if (sheet) sheet.sheetName = `Fac by Subj AY${ay} Sem${sem}`;
+                            return sheet;
+                        })
+                    );
+                }
             } else {
-                // Fallback for unimplemented reports
                 console.warn(`Report type '${type}' is not yet fully implemented.`);
             }
         }
