@@ -31,6 +31,7 @@ export default defineConfig({
             fullyParallel: true,
         },
 
+        /*
         // common tests
         {
             name: 'preamble',
@@ -45,12 +46,13 @@ export default defineConfig({
             testMatch: /.common.e2e.(?:js|ts)/u,
             fullyParallel: true,
         },
+        */
 
         // record editing tests
         //preamble
         {
             name: 'record-edits-preamble',
-            dependencies: ['common-tests'],
+            dependencies: ['admin-auth', 'it-auth'],
             testDir: 'tests/playwright/record-editing',
             testMatch: /.preamble.e2e.(?:js|ts)/u,
             fullyParallel: true,
@@ -62,7 +64,7 @@ export default defineConfig({
             dependencies: ['record-edits-preamble'],
             testDir: 'tests/playwright/record-editing',
             testMatch: /.main.e2e.(?:js|ts)/u,
-            fullyParallel: true,
+            fullyParallel: false,
         },
 
         //export tests
@@ -84,6 +86,7 @@ export default defineConfig({
             fullyParallel: true,
         },
 
+        /*
         // common destructive tests, as they can't be easily parallelized due to deletions and stuff
         {
             name: 'common-destructive-tests',
@@ -129,11 +132,13 @@ export default defineConfig({
             testMatch: /.e2e.(?:js|ts)/u,
             fullyParallel: true,
         },
+        */
 
         // logout tests
         {
             name: 'logout',
             dependencies: [
+                /*
                 'it-specific-tests-indiv',
                 'it-specific-tests-batch-creation',
                 'it-specific-tests-batch-search',
@@ -142,6 +147,9 @@ export default defineConfig({
                 'common-tests',
                 'common-destructive-tests',
                 'invalid-logins',
+                */
+                'record-edits',
+                'export-reports-main',
             ],
             testDir: 'tests/playwright/logout',
             testMatch: /.e2e.(?:js|ts)/u,

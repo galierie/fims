@@ -1,6 +1,6 @@
 // external files
 import * as seedData from './seed-data/faculty-admin';
-export type possibleInputs = Array<'textbox'|'dropdown'|'numeric'|'date'|'remarks'|'checkbox'>;
+export type possibleInputs = Array<'textbox'|'dropdown'|'numeric'|'date'|'remarks'|'checkbox'|'none'>;
 
 //[ header, add button text, inputs, type of input field ]
 export type testRowTuple = [string, string, string[], possibleInputs];
@@ -26,18 +26,16 @@ export function getFieldTest() {
         'test=name2', // First name 
         'test-name3', // Middle name
         'mm.', // suffix
-        new Date().toLocaleDateString('en-GB'), // birth date
-        new Date().toLocaleDateString('en-GB'), // date of original appointment
-        'maiden-name', // maiden name
-        //the numbers
-        `${Math.floor(Math.random()*9999)}`,
-        `${Math.floor(Math.random()*9999)}`,
-        `${Math.floor(Math.random()*9999)}`,
-        `${Math.floor(Math.random()*9999)}`,
-        `${Math.floor(Math.random()*9999)}`,
-        `${Math.floor(Math.random()*9999)}`,
+        new Date().toISOString().split('T')[0], // birth date
+        'maiden-name', // maiden name 
+        `${Math.floor(Math.random()*9999)}`, //philhealth
+        `${Math.floor(Math.random()*9999)}`, //pag-ibig
+        `${Math.floor(Math.random()*9999)}`, //psi item
+        `${Math.floor(Math.random()*9999)}`, //tin
+        `${Math.floor(Math.random()*9999)}`, //gsis
+        `${Math.floor(Math.random()*9999)}`, //employee
         expectedStatuses[Math.floor(Math.random()*3)], // status
-        new Date().toLocaleDateString('en-GB'), // date of original appointment
+        new Date().toISOString().split('T')[0], // date of original appointment
         'test remarks', // remarks
     ];
 };
@@ -53,15 +51,15 @@ export function sampleEduAttain() {
     ]
 }
 export function sampleFieldsInterest() {
-    return ['Test Interest'];
+    return ['Software Engineering'];
 }
 export function samplePromHist() {
     return [
         'Instructor 1', //todo: random picking of roles
         '10-2',
         '100000.00',
-        'Tenured',
-        new Date().toLocaleDateString('en-GB'),
+        'Permanent',
+        new Date().toISOString().split('T')[0],
     ]
 }
 
@@ -69,8 +67,8 @@ export function samplePosition() {
     return [
         'Department Head',
         'Test Office',
-        new Date().toLocaleDateString('en-GB'),
-        new Date().toLocaleDateString('en-GB'),
+        new Date().toISOString().split('T')[0],
+        new Date().toISOString().split('T')[0],
         '2'
     ];
 }
@@ -79,8 +77,8 @@ export function sampleMembership() {
     return [
         'membership-test',
         'test committee',
-        new Date().toLocaleDateString('en-GB'),
-        new Date().toLocaleDateString('en-GB'),
+        new Date().toISOString().split('T')[0],
+        new Date().toISOString().split('T')[0],
         '2',
     ];
 }
@@ -88,8 +86,8 @@ export function sampleMembership() {
 export function sampleAdminWork() {
     return [
         'admin-test',
-        new Date().toLocaleDateString('en-GB'),
-        new Date().toLocaleDateString('en-GB'),
+        new Date().toISOString().split('T')[0],
+        new Date().toISOString().split('T')[0],
         '2',
     ];
 }
@@ -110,8 +108,8 @@ export function sampleMentor() {
         'Firstname',
         'Middlename',
         'Test Category',
-        new Date().toLocaleDateString('en-GB'),
-        new Date().toLocaleDateString('en-GB'),
+        new Date().toISOString().split('T')[0],
+        new Date().toISOString().split('T')[0],
         '2',
     ];
 }
@@ -119,8 +117,8 @@ export function sampleMentor() {
 export function sampleResearch() {
     return [
         'Title Testing',
-        new Date().toLocaleDateString('en-GB'),
-        new Date().toLocaleDateString('en-GB'),
+        new Date().toISOString().split('T')[0],
+        new Date().toISOString().split('T')[0],
         '100000.00',
         '2',
         'testmark',
@@ -131,8 +129,8 @@ export function sampleExt() {
     return [
         'Test Extension',
         'Test Agency',
-        new Date().toLocaleDateString('en-GB'),
-        new Date().toLocaleDateString('en-GB'),
+        new Date().toISOString().split('T')[0],
+        new Date().toISOString().split('T')[0],
         '2',
     ];
 }
@@ -268,7 +266,7 @@ export const contactNumInputs:possibleInputs = ['textbox'];
 export const homeAddrsInputs:possibleInputs = ['textbox'];
 export const eduAttainInputs:possibleInputs = ['textbox', 'textbox', 'textbox'];
 export const fieldInterestInputs:possibleInputs = ['dropdown'];
-export const promHistInputs:possibleInputs = ['dropdown', 'dropdown', 'date'];
+export const promHistInputs:possibleInputs = ['dropdown', 'none', 'none', 'dropdown', 'date'];
 
 export const adminPosInputs:possibleInputs = ['dropdown', 'dropdown', 'date', 'date', 'numeric'];
 export const membershipInputs:possibleInputs = ['textbox', 'textbox', 'date', 'date', 'numeric'];
@@ -332,8 +330,8 @@ export function profileTabListSample():testRowTuple[] {
     return [
         ['Emails', '+ Add Email', sampleEmails(), emailInputs],
         ['Contact Numbers', '+ Add Contact Number', sampleContactNums(), contactNumInputs],
-        ['Home Addresses', '+ Add Home Addresses', sampleHomeAddrs(), homeAddrsInputs],
-        ['Degree', ' Add Educational Attainment', sampleEduAttain(), eduAttainInputs],
+        ['Home Addresses', '+ Add Home Address', sampleHomeAddrs(), homeAddrsInputs],
+        ['Degree', '+ Add Educational Attainment', sampleEduAttain(), eduAttainInputs],
         ['Fields of Interest', '+ Add Fields of Interest', sampleFieldsInterest(), fieldInterestInputs],
         ['Rank of Renewal/Tenure', '+ Add Promotion', samplePromHist(), promHistInputs],
     ]

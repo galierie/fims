@@ -5,7 +5,7 @@ import * as fieldHelp from '../../test-helpers/field-test';
 async function getFields(page:Page, fields:string[]) {
 	let res:string[] = []
 	for (let idx = 0; idx < fields.length; idx++) {
-		res.push(await page.getByRole('textbox', {name:fields[idx], exact:true}).innerText())
+		res.push(await page.getByRole('textbox', {name:fields[idx], exact:true}).inputValue())
 	}
 	return res
 }
@@ -62,7 +62,7 @@ test.describe('editing record under profile tab', () => {
 	test('cancelled editing fields', async ({page}) => {
 		//go to faculty record
 		await page.goto('/')
-		await page.getByText('Camingao, Ericsson Jake').click() // some random record
+		await page.getByText('Mandario, Maricris').click() // some random record
 
 		//get previous values for comparison
 		let prevInputs = await getFields(page, consts.profileTabFields);
@@ -101,9 +101,12 @@ test.describe('editing record under profile tab', () => {
 		await expect(saveButton).toBeVisible();
 		await saveButton.click();
 
-		let confirmButton = page.getByRole('button', {name: consts.SaveConfirmText, exact:true});
-		await expect(confirmButton).toBeVisible();
-		await confirmButton.click();
+		//wait for loading
+		await page.waitForTimeout(10); //in the case it loads very fast
+		let loading = page.getByText('Loading...');
+		if (await loading.isVisible()) {
+			await expect(loading).not.toBeVisible({timeout: 10000})
+		}
 
 		//check if changed
 		await verifyProfileFields(page, sampleInputs);
@@ -143,7 +146,7 @@ test.describe('editing record under profile tab', () => {
 
 		//go to faculty record
 		await page.goto('/')
-		await page.getByText('Dela Cruz, Gabrielle Zach').click() // some random unmodified record
+		await page.getByText('Galinato, Eriene').click() // some random unmodified record
 
 		//edit
 		let editButton = page.getByRole('button', {name: 'Edit'});
@@ -156,10 +159,6 @@ test.describe('editing record under profile tab', () => {
 		let saveButton = page.getByRole('button', {name:'Save Record', exact:true});
 		await expect(saveButton).toBeVisible();
 		await saveButton.click();
-
-		let confirmButton = page.getByRole('button', {name: consts.SaveConfirmText, exact:true});
-		await expect(confirmButton).toBeVisible();
-		await confirmButton.click();
 
 		//check if lists contain new results
 		await verifyLists(page, sampleListInputs);

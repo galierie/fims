@@ -16,6 +16,7 @@ export async function semrecstab(page:Page):Promise<Locator> {
 }
 
 export async function inputField(field:string, input:string, page:Page) {
+	console.log(`Filled ${field} with ${input}`);
 	let elem = page.getByRole('textbox', {name: field, exact:true});
 	await expect(elem).toBeVisible();
 	await elem.fill(input);
@@ -24,7 +25,8 @@ export async function inputField(field:string, input:string, page:Page) {
 export async function compareField(field:string, cmp:string, page:Page) {
 	let elem = page.getByRole('textbox', {name: field, exact:true});
 	await expect(elem).toBeVisible();
-	await expect(elem).toHaveText(cmp);
+	console.log(`comparing ${field}: ${await elem.inputValue()} with ${cmp}`)
+	expect(await elem.inputValue()).toBe(cmp);
 }
 
 //inputs something to the list
@@ -36,16 +38,19 @@ export async function testList(listHeader:string, inputs:string[], inputTypes:co
 	let listDiv = page.getByTestId('list-table').filter({hasText: listHeader}).first();
 	await expect(listDiv).toBeVisible();
 
-	let inputRow = listDiv.locator('div').last();
+	let inputRow = listDiv.getByTestId('list-table-input').last();
 	await expect(inputRow).toBeVisible();
 
 	for (let idx = 0; idx < inputs.length; idx++) {
-		let inputDiv = inputRow.locator('*').nth(idx);
+		// expects either input or div, hence name
+		let inputDiv = inputRow.locator('> *').nth(idx);
 		let curInput = inputs[idx];
+
+		await expect(inputDiv).toBeVisible();
 
 		switch (inputTypes[idx]) {
 			case 'textbox':
-				inputDiv.getByRole('textbox').fill(curInput)
+				await inputDiv.fill(curInput)
 				break;
 			case 'dropdown':
 				await inputDiv.getByRole('button').click();
@@ -61,10 +66,15 @@ export async function testList(listHeader:string, inputs:string[], inputTypes:co
 				break;
 			case 'checkbox':
 				await inputDiv.getByRole('checkbox').setChecked(curInput === 'true');
+				break;
 			case 'remarks':
 				await inputDiv.getByRole('button', {name: 'Expand', exact: true}).click();
 				await page.locator('textarea').last().fill(curInput); //get the frontmost text area that appears
 				await page.getByRole('button', {name:'Close', exact:true}).click();
+				break;
+			case 'none':
+				// automatic field
+				break;
 		} 
 	}
 }
@@ -95,15 +105,13 @@ export async function getLastEntry(listHeader:string, page:Page):Promise<string[
 	await expect(listDiv).toBeVisible();
 
 	let lastEntry = listDiv.locator('div').filter({hasNotText: listHeader}).last()
-	if (!lastEntry.isVisible()) {
+	if (!(await lastEntry.isVisible())) {
 		return [] // empty case
 	}
 
-	let childElems = await lastEntry.evaluate(div => div.childNodes);	
-	let res:string[] = [];
-	for (let elem of childElems) {
-		expect(elem).not.toBe(null);
-		res.push(elem.textContent!);
-	}
+	let res = await lastEntry.evaluate(div =>
+		Array.from(div.childNodes).map(node => node.textContent ?? '')
+	);
+
 	return res;
 }
