@@ -33,10 +33,6 @@ const testDb = initializeDbClient();
 
 const facultyRecordTableHeaders = ['Status', 'Rank', 'Administrative Position'];
 
-test('seed', async () => {
-    await testConsts.seed();
-});
-
 test.describe('view faculty records as it', () => {
     test.use({ storageState: 'playwright/.auth/it.json' });
     test.describe.configure({ mode: 'parallel' });

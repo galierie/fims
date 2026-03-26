@@ -11,9 +11,21 @@ export const statusRelations = [
         status: 'On Leave',
     },
     {
-        status: 'On Sabbatical',
+        status: 'Sabbatical',
     },
 ];
+
+export const apppointmentStatuses = [
+    {
+        appointmentstatus: 'Permanent'
+    },
+    {
+        appointmentstatus: 'Part-Time'
+    },
+    {
+        appointmentstatus: 'Full-Time'
+    },
+]
 
 // faculty
 export const testFaculty = [

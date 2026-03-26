@@ -33,10 +33,17 @@ export default defineConfig({
 
         // common tests
         {
-            name: 'common-tests',
+            name: 'preamble',
             dependencies: ['admin-auth', 'it-auth', 'invalid-logins'],
-            testMatch: /.common.e2e.(?:js|ts)/u,
+            testDir: 'tests/playwright/preamble',
+            testMatch: /.e2e.(?:js|ts)/u,
             fullyParallel: false,
+        },
+        {
+            name: 'common-tests',
+            dependencies: ['preamble'],
+            testMatch: /.common.e2e.(?:js|ts)/u,
+            fullyParallel: true,
         },
 
         // record editing tests

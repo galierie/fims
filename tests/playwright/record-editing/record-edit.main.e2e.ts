@@ -10,7 +10,7 @@ async function getFields(page:Page, fields:string[]) {
 	return res
 }
 async function getPrevLists(page:Page, expectedInputs:string[]) {
-
+	
 }
 
 async function editProfileFields(page:Page, inputs:string[]) {
@@ -27,8 +27,10 @@ async function verifyProfileFields(page:Page, inputs:string[]) {
 
 // just filler for now
 async function editSemRecFields(page:Page) {
+		
 }
 async function verifySemRecFields(page:Page) {
+
 }
 
 

@@ -172,13 +172,6 @@ import * as schema from '../src/lib/server/db/schema';
 
 dotenv.config({ path: '.env' });
 
-export const ITAcc = 'it@up.edu.ph';
-export const ITPass = 'password';
-export const AdminAcc = 'admin@up.edu.ph';
-export const AdminPass = 'password';
-export const ITConfig = 'playwright/.auth/it.json';
-export const AdminConfig = 'playwright/.auth/admin.json';
-
 export const testDB = drizzle(neon(process.env.DATABASE_URL!), { schema });
 
 //warning: this gets checks for records also deleted
@@ -197,7 +190,7 @@ export async function seed() {
     await testDB.delete(schema.facultyrank);
     await testDB.delete(schema.facultysemester);
     await testDB.delete(schema.facultyadminposition);
-    await testDB.delete(schema.office);
+    await testDB.delete(schema.appointmentstatus);
     await testDB.delete(schema.office);
 
     await testDB.execute(sql`REFRESH MATERIALIZED VIEW account_search_view`);
@@ -210,6 +203,9 @@ export async function seed() {
             officeid: 1,
             name: 'Test Office' 
         });
+
+    //push appointment statuses
+    await testDB.insert(schema.appointmentstatus).values(seedData.apppointmentStatuses);
 
     // push faculty
     await testDB.insert(schema.faculty).values(seedData.testFaculty);
