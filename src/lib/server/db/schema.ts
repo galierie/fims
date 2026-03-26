@@ -51,7 +51,7 @@ export const faculty = pgTable(
         suffix: varchar({ length: 50 }),
         maidenname: varchar({ length: 100 }),
         birthdate: date().notNull(),
-        status: varchar({ length: 50 }).notNull(),
+        status: varchar({ length: 50 }),
         dateoforiginalappointment: date().notNull(),
         psiitem: varchar({ length: 50 }).notNull(),
         employeenumber: varchar({ length: 50 }).notNull(),
@@ -72,7 +72,7 @@ export const faculty = pgTable(
             columns: [table.status],
             foreignColumns: [status.status],
             name: 'faculty_status_fkey',
-        }),
+        }).onDelete('set null'),
     ],
 );
 

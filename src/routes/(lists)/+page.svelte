@@ -203,9 +203,9 @@
 {/if}
 
 {#if isExportModalOpen}
-    <ExportReportModal 
-        onCancel={() => (isExportModalOpen = false)} 
-        selectedFaculty={facultyRecordList.filter(f => selectedIds.includes(f.facultyid))} 
+    <ExportReportModal
+        onCancel={() => (isExportModalOpen = false)}
+        selectedFaculty={facultyRecordList.filter((f) => selectedIds.includes(f.facultyid))}
     />
 {/if}
 

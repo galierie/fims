@@ -10,7 +10,10 @@
     import { enhance } from '$app/forms';
     import { page } from '$app/state';
 
-    import { chosenSemestralRecord, chooseSemestralRecord } from './states/chosen-semestral-record.svelte.js';
+    import {
+        chosenSemestralRecord,
+        chooseSemestralRecord,
+    } from './states/chosen-semestral-record.svelte.js';
     import { viewState } from './states/view-state.svelte.js';
 
     const { data, children } = $props();
@@ -104,7 +107,9 @@
 
 {#if isExportModalOpen}
     <ExportReportModal
-        selectedFaculty={[{ facultyid: Number(facultyid), lastname: lastName, firstname: firstName }]}
+        selectedFaculty={[
+            { facultyid: Number(facultyid), lastname: lastName, firstname: firstName },
+        ]}
         onCancel={() => (isExportModalOpen = false)}
     />
 {/if}
