@@ -141,7 +141,7 @@ export async function getFacultySETAverageWorksheet(facultyIds: number[], acadYe
         col++;
 
         row++;
-        col = dataStartCol;
+        col = dataStartCol + 1;
       }
     });
   }
