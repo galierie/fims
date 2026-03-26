@@ -10,6 +10,11 @@ import * as seedData from './seed-data/faculty-admin';
 
 dotenv.config({ path: '.env' });
 
+export const ITAcc = 'it@up.edu.ph';
+export const ITPass = 'password';
+export const AdminAcc = 'admin@up.edu.ph';
+export const AdminPass = 'password';
+
 export const testDB = drizzle(neon(process.env.DATABASE_URL!), { schema });
 
 //warning: this gets checks for records also deleted
