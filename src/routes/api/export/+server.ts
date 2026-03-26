@@ -29,26 +29,35 @@ export async function GET({ url, locals }: RequestEvent) {
     const rawToAy = parseInt(url.searchParams.get('toAy') ?? `${rawFromAy}`, 10);
     const rawToSem = parseInt(url.searchParams.get('toSem') ?? `${rawFromSem}`, 10);
 
-    if (!isOnlyProfile && (isNaN(rawFromAy) || isNaN(rawFromSem) || rawFromAy === 0 || rawFromSem === 0)) {
+    if (
+        !isOnlyProfile &&
+        (isNaN(rawFromAy) || isNaN(rawFromSem) || rawFromAy === 0 || rawFromSem === 0)
+    ) {
         return json({ error: 'Invalid academic year/semester range' }, { status: 400 });
     }
 
     // If ever the AY/sem are backwards (also added new feature for these in UI)
-    let fromAy = rawFromAy, fromSem = rawFromSem, toAy = rawToAy, toSem = rawToSem;
+    let fromAy = rawFromAy,
+        fromSem = rawFromSem,
+        toAy = rawToAy,
+        toSem = rawToSem;
     if (!isOnlyProfile && (fromAy > toAy || (fromAy === toAy && fromSem > toSem))) {
-        fromAy = rawToAy; fromSem = rawToSem; toAy = rawFromAy; toSem = rawFromSem;
+        fromAy = rawToAy;
+        fromSem = rawToSem;
+        toAy = rawFromAy;
+        toSem = rawFromSem;
     }
 
     const periods = [];
     if (isOnlyProfile) {
-        periods.push({ ay: 0, sem: 0 }); 
+        periods.push({ ay: 0, sem: 0 });
     } else {
         let currAy = fromAy;
         let currSem = fromSem;
         while (currAy < toAy || (currAy === toAy && currSem <= toSem)) {
             periods.push({ ay: currAy, sem: currSem });
             currSem++;
-            if (currSem > 3) { 
+            if (currSem > 3) {
                 currSem = 1;
                 currAy++;
             }
@@ -58,64 +67,66 @@ export async function GET({ url, locals }: RequestEvent) {
     // Fetch the requested reports for ALL periods
     try {
         const sheetPromises = [];
-        
+
         // Isolate unique years for yearly reports (for Faculty Loading)
-        const uniqueYears = Array.from(new Set(periods.map(p => p.ay)));
+        const uniqueYears = Array.from(new Set(periods.map((p) => p.ay)));
 
         for (const type of types) {
             if (type === 'profile') {
                 sheetPromises.push(
-                    getFacultyProfileWorksheet(facultyIds).then(sheet => {
+                    getFacultyProfileWorksheet(facultyIds).then((sheet) => {
                         if (sheet) sheet.sheetName = 'Faculty Profile';
                         return sheet;
-                    })
+                    }),
                 );
             } else if (type === 'service-record') {
                 // Service record queries by individual faculty ID over the whole date range
                 for (const id of facultyIds) {
                     sheetPromises.push(
-                        getFacultyServiceRecordWorksheet(id, fromAy, fromSem, toAy, toSem).then(sheet => {
-                            if (sheet) sheet.sheetName = `Service Record ${id}`;
-                            return sheet;
-                        })
+                        getFacultyServiceRecordWorksheet(id, fromAy, fromSem, toAy, toSem).then(
+                            (sheet) => {
+                                if (sheet) sheet.sheetName = `Service Record ${id}`;
+                                return sheet;
+                            },
+                        ),
                     );
                 }
             } else if (type === 'loading') {
                 for (const { ay, sem } of periods) {
                     sheetPromises.push(
-                        getFacultyLoadingWorksheet(facultyIds, ay, sem).then(sheet => {
-                            if (sheet) sheet.sheetName = `Loading AY${ay}-${ay+1}-${sem}`;
+                        getFacultyLoadingWorksheet(facultyIds, ay, sem).then((sheet) => {
+                            if (sheet) sheet.sheetName = `Loading AY${ay}-${ay + 1}-${sem}`;
                             return sheet;
-                        })
+                        }),
                     );
                 }
             } else if (type === 'set-avg') {
                 // SET average is a yearly report
                 for (const ay of uniqueYears) {
                     sheetPromises.push(
-                        getFacultySETAverageWorksheet(facultyIds, ay).then(sheet => {
-                            if (sheet) sheet.sheetName = `SET Avg AY${ay}-${ay+1}`;
+                        getFacultySETAverageWorksheet(facultyIds, ay).then((sheet) => {
+                            if (sheet) sheet.sheetName = `SET Avg AY${ay}-${ay + 1}`;
                             return sheet;
-                        })
+                        }),
                     );
                 }
             } else if (type === 'subjects-by-faculty') {
                 for (const { ay, sem } of periods) {
                     sheetPromises.push(
-                        getSubjectsByFacultyWorksheet(facultyIds, ay, sem).then(sheet => {
+                        getSubjectsByFacultyWorksheet(facultyIds, ay, sem).then((sheet) => {
                             if (sheet) sheet.sheetName = `Subjects AY${ay} Sem${sem}`;
                             return sheet;
-                        })
+                        }),
                     );
                 }
             } else if (type === 'faculty-by-subject') {
                 // Faculty by subject does not depend on facultyIds, only on the period
                 for (const { ay, sem } of periods) {
                     sheetPromises.push(
-                        getFacultyBySubjectWorksheet(ay, sem).then(sheet => {
+                        getFacultyBySubjectWorksheet(ay, sem).then((sheet) => {
                             if (sheet) sheet.sheetName = `Fac by Subj AY${ay} Sem${sem}`;
                             return sheet;
-                        })
+                        }),
                     );
                 }
             } else {
@@ -129,10 +140,10 @@ export async function GET({ url, locals }: RequestEvent) {
         const workbook = new ExcelJS.Workbook();
         let addedSheets = 0;
 
-        sheets.forEach(sheet => {
+        sheets.forEach((sheet) => {
             if (!sheet) return;
             const { sheetName, model } = sheet;
-            
+
             let finalSheetName = sheetName;
             let counter = 1;
             while (workbook.getWorksheet(finalSheetName)) {
@@ -142,7 +153,7 @@ export async function GET({ url, locals }: RequestEvent) {
 
             const clone = workbook.addWorksheet(finalSheetName);
             clone.model = model;
-            clone.name = finalSheetName; 
+            clone.name = finalSheetName;
             addedSheets++;
         });
 
@@ -151,17 +162,19 @@ export async function GET({ url, locals }: RequestEvent) {
         }
 
         const buf = await workbook.xlsx.writeBuffer();
-        
+
         const customFileName = url.searchParams.get('fileName');
-        const finalName = customFileName 
-            ? `${customFileName}.xlsx` 
-            : (isOnlyProfile ? 'Faculty_Profile.xlsx' : `Export-AY${fromAy}-S${fromSem}-to-AY${toAy}-S${toSem}.xlsx`);
+        const finalName = customFileName
+            ? `${customFileName}.xlsx`
+            : isOnlyProfile
+              ? 'Faculty_Profile.xlsx'
+              : `Export-AY${fromAy}-S${fromSem}-to-AY${toAy}-S${toSem}.xlsx`;
 
         return new Response(buf, {
             headers: {
                 'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                'Content-Disposition': `attachment; filename="${finalName}"`
-            }
+                'Content-Disposition': `attachment; filename="${finalName}"`,
+            },
         });
     } catch (e) {
         console.error('Export critical failure:', e);
