@@ -66,7 +66,7 @@ export default defineConfig({
             testDir: 'tests/playwright/export-reports',
             testMatch: /.preamble.e2e.(?:js|ts)/u,
             fullyParallel: true,
-        }
+        },
 
         //main
         {
@@ -75,7 +75,7 @@ export default defineConfig({
             testDir: 'tests/playwright/export-reports',
             testMatch: /.preamble.e2e.(?:js|ts)/u,
             fullyParallel: true,
-        }
+        },
 
         // common destructive tests, as they can't be easily parallelized due to deletions and stuff
         {

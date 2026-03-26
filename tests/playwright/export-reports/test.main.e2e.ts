@@ -1,5 +1,12 @@
-import {test, expect} from '@playwright/test';
+import {type Page, test, expect} from '@playwright/test';
 import * as exportHelp from '../../test-helpers/export-test';
+
+async function waitDownload(page:Page, action:() => Promise<void>) {
+	let downProm = page.waitForEvent('download');
+	await action();
+	let download = await downProm;
+	await download.saveAs('tests/temp/output.xlsx');
+}
 
 test.describe('ui validation', async () => {
 	// check if ui elements are visible
@@ -25,12 +32,8 @@ test.describe('ui validation', async () => {
 
 
 		let expButton = await exportHelp.getExportButton(page);
-		let downProm = page.waitForEvent('download');
 		await expButton.click();
-		let download = await downProm;
-
-		await download.saveAs('tests/temp/output.xlsx');
-
+		await waitDownload(page, async () => {await expButton.click()});
 
 		let cancel = await exportHelp.getCancel(page);
 		await cancel.click()
@@ -38,7 +41,7 @@ test.describe('ui validation', async () => {
 });
 
 test.describe('export tests', async () => {
-	test('faculty export', async ({page}) => {
+	test('faculty profile', async ({page}) => {
 
 		await page.goto('/')
 		let cb = page.locator('a', {hasText: "Dela Cruz, Gabrielle Zach"}).last().locator('..').getByRole('checkbox').first()
@@ -53,6 +56,25 @@ test.describe('export tests', async () => {
 		let toYearBox = await exportHelp.getDateSelects(page, 'To:', 'Choose Academic Year');
 		let toSemBox = await exportHelp.getDateSelects(page, 'To:', 'Choose Semester');
 
+		await fromYearBox.click()
 		await fromYearBox.getByText('AY 2025-2026').click()
+
+		await toYearBox.click()
+		await toYearBox.getByText('AY 2025-2026').click()
+
+		await fromSemBox.click()
+		await fromSemBox.getByText('1st Semester').click()
+
+		await toSemBox.click()
+		await toSemBox.getByText('2nd Semester').click()		
+
+
+
 	});
+
+	test('fauclty service record', async ({page}) => {
+
+	})
+
+	test('')
 });
