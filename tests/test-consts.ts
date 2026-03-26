@@ -14,6 +14,8 @@ export const ITAcc = 'it@up.edu.ph';
 export const ITPass = 'password';
 export const AdminAcc = 'admin@up.edu.ph';
 export const AdminPass = 'password';
+export const ITConfig = 'playwright/.auth/it.json';
+export const AdminConfig = 'playwright/.auth/admin.json';
 
 export const testDB = drizzle(neon(process.env.DATABASE_URL!), { schema });
 
