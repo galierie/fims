@@ -1,65 +1,131 @@
-import { json } from '@sveltejs/kit';
+import { json, type RequestEvent } from '@sveltejs/kit';
 import ExcelJS from '@protobi/exceljs';
-import { getFacultyLoadingWorksheet } from '$lib/utils/report/faculty-loading';
-import { getSubjectsByFacultyWorksheet } from '$lib/utils/report/subjects-by-faculty.js';
 
-export async function GET({ url, locals }) {
+import { getFacultyLoadingWorksheet } from '$lib/utils/report/faculty-loading';
+import { getSubjectsByFacultyWorksheet } from '$lib/utils/report/subjects-by-faculty';
+
+export async function GET({ url, locals }: RequestEvent) {
     if (!locals.user) {
         return json({ error: 'Unauthorized. Please log in to export.' }, { status: 401 });
     }
 
     // Extract and Validate Parameters
     const typesStr = url.searchParams.get('types');
-    if (typesStr === null) return json({ error: 'No report type specified' }, { status: 401 });
+    if (!typesStr) return json({ error: 'No report type specified' }, { status: 400 });
     const types = typesStr.split(',');
 
     const facultyIdsStr = url.searchParams.get('facultyIds');
-    if (facultyIdsStr === null) return json({ error: 'No faculty member specified' }, { status: 401 });
-    const facultyIds = facultyIdsStr.split(',').map(idStr => (parseInt(idStr, 10)));
+    if (!facultyIdsStr) return json({ error: 'No faculty member specified' }, { status: 400 });
+    const facultyIds = facultyIdsStr.split(',').map((idStr: string) => parseInt(idStr, 10));
 
-    const fromAyStr = url.searchParams.get('fromAy');
-    if (fromAyStr === null) return json({ error: 'No starting academic year specified' }, { status: 401 });
-    const fromAy = parseInt(fromAyStr, 10);
+    const isOnlyProfile = types.length === 1 && types[0] === 'profile';
 
-    const fromSemStr = url.searchParams.get('fromSem');
-    if (fromSemStr === null) return json({ error: 'No starting semester specified' }, { status: 401 });
-    const fromSem = parseInt(fromSemStr, 10);
+    const rawFromAy = parseInt(url.searchParams.get('fromAy') || '0', 10);
+    const rawFromSem = parseInt(url.searchParams.get('fromSem') || '0', 10);
+    const rawToAy = parseInt(url.searchParams.get('toAy') ?? `${rawFromAy}`, 10);
+    const rawToSem = parseInt(url.searchParams.get('toSem') ?? `${rawFromSem}`, 10);
 
-    const toAy = parseInt(url.searchParams.get('toAy') ?? fromAyStr, 10);
-    const toSem = parseInt(url.searchParams.get('toSem') ?? fromSemStr, 10);
+    if (!isOnlyProfile && (isNaN(rawFromAy) || isNaN(rawFromSem) || rawFromAy === 0 || rawFromSem === 0)) {
+        return json({ error: 'Invalid academic year/semester range' }, { status: 400 });
+    }
 
-    // Get worksheets
+    // If ever the AY/sem are backwards (also added new feature for these in UI)
+    let fromAy = rawFromAy, fromSem = rawFromSem, toAy = rawToAy, toSem = rawToSem;
+    if (!isOnlyProfile && (fromAy > toAy || (fromAy === toAy && fromSem > toSem))) {
+        fromAy = rawToAy; fromSem = rawToSem; toAy = rawFromAy; toSem = rawFromSem;
+    }
+
+    const periods = [];
+    if (isOnlyProfile) {
+        periods.push({ ay: 0, sem: 0 }); 
+    } else {
+        let currAy = fromAy;
+        let currSem = fromSem;
+        while (currAy < toAy || (currAy === toAy && currSem <= toSem)) {
+            periods.push({ ay: currAy, sem: currSem });
+            currSem++;
+            if (currSem > 3) { 
+                currSem = 1;
+                currAy++;
+            }
+        }
+    }
+
+    // Fetch the requested reports for ALL periods
     try {
-        const sheets = await Promise.all(
-            types.map(type => {
-                switch (type) {
-                    case 'loading':
-                        return getFacultyLoadingWorksheet(facultyIds, fromAy);
-                    case 'subjects-by-faculty':
-                        return getSubjectsByFacultyWorksheet(facultyIds, fromAy, fromSem);
+        const sheetPromises = [];
+        
+        // Isolate unique years for yearly reports (for Faculty Loading)
+        const uniqueYears = Array.from(new Set(periods.map(p => p.ay)));
+
+        for (const type of types) {
+            if (type === 'loading') {
+                for (const ay of uniqueYears) {
+                    sheetPromises.push(
+                        getFacultyLoadingWorksheet(facultyIds, ay).then(sheet => {
+                            if (sheet) sheet.sheetName = `Loading AY${ay}-${ay+1}`;
+                            return sheet;
+                        })
+                    );
                 }
-            })
-        );
+            } else if (type === 'subjects-by-faculty') {
+                for (const { ay, sem } of periods) {
+                    sheetPromises.push(
+                        getSubjectsByFacultyWorksheet(facultyIds, ay, sem).then(sheet => {
+                            if (sheet) sheet.sheetName = `Subjects AY${ay} Sem${sem}`;
+                            return sheet;
+                        })
+                    );
+                }
+            // TODO: add more blocks here for other report types
+            } else {
+                // Fallback for unimplemented reports
+                console.warn(`Report type '${type}' is not yet fully implemented.`);
+            }
+        }
 
+        const sheets = await Promise.all(sheetPromises);
+
+        // Compile everything into a single Excel Workbook
         const workbook = new ExcelJS.Workbook();
-        sheets.forEach(sheet => {
-            if (typeof sheet === 'undefined') return;
+        let addedSheets = 0;
 
+        sheets.forEach(sheet => {
+            if (!sheet) return;
             const { sheetName, model } = sheet;
-            const clone = workbook.addWorksheet(sheetName);
+            
+            let finalSheetName = sheetName;
+            let counter = 1;
+            while (workbook.getWorksheet(finalSheetName)) {
+                finalSheetName = `${sheetName} (${counter})`;
+                counter++;
+            }
+
+            const clone = workbook.addWorksheet(finalSheetName);
             clone.model = model;
+            clone.name = finalSheetName; 
+            addedSheets++;
         });
 
+        if (addedSheets === 0) {
+            workbook.addWorksheet('No Data Generated');
+        }
+
         const buf = await workbook.xlsx.writeBuffer();
+        
+        const customFileName = url.searchParams.get('fileName');
+        const finalName = customFileName 
+            ? `${customFileName}.xlsx` 
+            : (isOnlyProfile ? 'Faculty_Profile.xlsx' : `Export-AY${fromAy}-S${fromSem}-to-AY${toAy}-S${toSem}.xlsx`);
 
         return new Response(buf, {
             headers: {
                 'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                'Content-Disposition': `attachment; filename="${types.join('-')}-${fromAy}-S${fromSem}.xlsx"`
+                'Content-Disposition': `attachment; filename="${finalName}"`
             }
         });
     } catch (e) {
         console.error('Export critical failure:', e);
         return json({ error: 'Internal Server Error during export generation.' }, { status: 500 });
     }
-};
+}
