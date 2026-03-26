@@ -2,7 +2,6 @@ import {test, expect, type Page} from '@playwright/test';
 import * as consts from '../../test-consts';
 import * as fieldHelp from '../../test-helpers/field-test';
 
-
 async function getFields(page:Page, fields:string[]) {
 	let res:string[] = []
 	for (let idx = 0; idx < fields.length; idx++) {
