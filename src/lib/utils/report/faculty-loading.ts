@@ -94,9 +94,9 @@ const emptyHeaderCells: string[] = ['M5', 'N5', 'B6', 'C6', 'D6', 'G6', 'H6'];
 const dataStartCol = 1;
 const dataStartRow = 7;
 
-export async function getFacultyLoadingWorksheet(facultyIds: number[], acadYear: number) {
+export async function getFacultyLoadingWorksheet(facultyIds: number[], acadYear: number, semNum: number) {
   const sheetName = 'Faculty Loading'
-  const data = await Promise.all(facultyIds.map((id) => (getFacultyLoadingReport(id, acadYear))));
+  const data = await Promise.all(facultyIds.map((id) => (getFacultyLoadingReport(id, acadYear, semNum))));
 
   // Create Workbook
   const workbook = new ExcelJS.Workbook();
@@ -131,8 +131,8 @@ export async function getFacultyLoadingWorksheet(facultyIds: number[], acadYear:
   });
 
   // Set data cells
-  for (let i = 0; i < data.length; i++) {
-    const row = i + dataStartRow;
+  let row = dataStartRow;
+  for (let i = 0; i < data.length; i++, row++) {
     let col = dataStartCol;
     const facultyMember = data[i];
 
@@ -160,12 +160,12 @@ export async function getFacultyLoadingWorksheet(facultyIds: number[], acadYear:
     col++;
 
     const designationCell = sheet.getCell(row, col);
-    designationCell.value = designation;
+    designationCell.value = designation ?? '';
     designationCell.border = cellBorders;
     col++;
 
     const degreeCell = sheet.getCell(row, col);
-    degreeCell.value = degree;
+    degreeCell.value = degree ?? null;
     degreeCell.border = cellBorders;
     col++
 
