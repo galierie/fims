@@ -24,6 +24,7 @@ export function getData(): string[] {
 //general seed function
 export async function seed() {
     // clear all tables
+    await testDB.delete(schema.status);
     await testDB.delete(schema.faculty);
     await testDB.delete(schema.facultyrank);
     await testDB.delete(schema.facultysemester);
@@ -31,6 +32,9 @@ export async function seed() {
 
     await testDB.execute(sql`REFRESH MATERIALIZED VIEW account_search_view`);
     await testDB.execute(sql`REFRESH MATERIALIZED VIEW faculty_record_search_view`);
+
+    // push statuses
+    await testDB.insert(schema.status).values(seedData.statusRelations);
 
     // push faculty
     await testDB.insert(schema.faculty).values(seedData.testFaculty);
