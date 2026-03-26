@@ -31,7 +31,6 @@ export default defineConfig({
             fullyParallel: true,
         },
 
-        /*
         // common tests
         {
             name: 'preamble',
@@ -46,13 +45,12 @@ export default defineConfig({
             testMatch: /.common.e2e.(?:js|ts)/u,
             fullyParallel: true,
         },
-        */
 
         // record editing tests
         //preamble
         {
             name: 'record-edits-preamble',
-            dependencies: ['admin-auth', 'it-auth'],
+            dependencies: ['it-auth', 'admin-auth', 'common-tests'],
             testDir: 'tests/playwright/record-editing',
             testMatch: /.preamble.e2e.(?:js|ts)/u,
             fullyParallel: true,
@@ -82,15 +80,21 @@ export default defineConfig({
             name: 'export-reports-main',
             dependencies: ['export-reports-preamble'],
             testDir: 'tests/playwright/export-reports',
-            testMatch: /.preamble.e2e.(?:js|ts)/u,
-            fullyParallel: true,
+            testMatch: /.main.e2e.(?:js|ts)/u,
+            fullyParallel: false, //downloading file
+        },
+        {
+            name: 'export-reports-cleanup',
+            dependencies: ['export-reports-main'],
+            testDir: 'tests/playwright/export-reports',
+            testMatch: /.cleanup.e2e.(?:js|ts)/u,
+            fullyParallel: false, //downloading file
         },
 
-        /*
         // common destructive tests, as they can't be easily parallelized due to deletions and stuff
         {
             name: 'common-destructive-tests',
-            dependencies: ['record-edits'],
+            dependencies: ['export-reports-cleanup'],
             testDir: 'tests/playwright/destructive',
             testMatch: /.e2e.(?:js|ts)/u,
         },
@@ -127,18 +131,16 @@ export default defineConfig({
 
         {
             name: 'it-specific-tests-generic',
-            dependencies: ['it-auth'],
+            dependencies: ['it-auth', 'preamble'],
             testDir: 'tests/playwright/it-specific/generic',
             testMatch: /.e2e.(?:js|ts)/u,
             fullyParallel: true,
         },
-        */
 
         // logout tests
         {
             name: 'logout',
             dependencies: [
-                /*
                 'it-specific-tests-indiv',
                 'it-specific-tests-batch-creation',
                 'it-specific-tests-batch-search',
@@ -147,7 +149,6 @@ export default defineConfig({
                 'common-tests',
                 'common-destructive-tests',
                 'invalid-logins',
-                */
                 'record-edits',
                 'export-reports-main',
             ],

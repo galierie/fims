@@ -183,6 +183,7 @@ export function getData(): string[] {
 
 //general seed function
 export async function seed() {
+    console.log("seeding!!!");
     // clear all tables
     await testDB.delete(schema.faculty);
     await testDB.delete(schema.facultyrank);

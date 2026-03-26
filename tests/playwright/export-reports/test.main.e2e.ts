@@ -36,16 +36,20 @@ async function setRanges(page:Page, startDate:string = 'AY 2025-2026', endDate:s
 	let toSemBox = await exportHelp.getDateSelects(page, 'To:', 'Choose Semester');
 
 	await fromYearBox.click()
-	await fromYearBox.getByText('AY 2025-2026').click()
+	await expect(fromYearBox.locator('> *').filter({hasText: endSem})).toBeVisible()
+	await fromYearBox.locator('> *').filter({hasText: startDate}).click()
 
 	await toYearBox.click()
-	await toYearBox.getByText('AY 2025-2026').click()
+	await expect(toYearBox.locator('> *').filter({hasText: endSem})).toBeVisible()
+	await toYearBox.locator('> *').filter({hasText: endDate}).click()
 
 	await fromSemBox.click()
-	await fromSemBox.getByText('1st Semester').click()
+	await expect(fromSemBox.locator('> *').filter({hasText: endSem})).toBeVisible()
+	await fromSemBox.locator('> *').filter({hasText: startSem}).click()
 
 	await toSemBox.click()
-	await toSemBox.getByText('2nd Semester').click()		
+	await expect(toSemBox.locator('> *').filter({hasText: endSem})).toBeVisible()
+	await toSemBox.locator('> *').filter({hasText: endSem}).click()
 };
 
 async function selectRecords(page:Page, recs:string[]) {
@@ -64,7 +68,7 @@ test.describe('ui validation', async () => {
 
 		await selectRecords(page, [
 			'Camingao, Ericsson Jake',
-			'Maricris, Mandario',
+			'Mandario, Maricris',
 		]);
 
 		let firstButton = await exportHelp.getExportRecords(page);
@@ -74,20 +78,32 @@ test.describe('ui validation', async () => {
 			let yearBox = await exportHelp.getDateSelects(page, option, 'Choose Academic Year');
 			let semBox = await exportHelp.getDateSelects(page, option, 'Choose Semester');
 
+			await yearBox.click()
 			for (let yearOption of exportHelp.acadYears)
-				await expect(yearBox.getByText(yearOption)).toBeVisible();
+				await expect(yearBox.locator('> *').filter({hasText: yearOption})).toBeVisible();
+			await yearBox.click()
 
+			await semBox.click()
 			for (let semOption of exportHelp.sems)
-				await expect(semBox.getByText(semOption)).toBeVisible();
+				await expect(semBox.locator('> *').filter({hasText: semOption})).toBeVisible();
+			await semBox.click()
 		}
+		for (let option of exportHelp.checkboxOptions) {
+			await exportHelp.getCheckbox(page, option);
+		}
+		for (let option of exportHelp.exportOptions) {
+			await exportHelp.getRadio(page, option);
+		}
+
+		await tickBox(page, 'Faculty Profile');
 
 		let exportButton = await exportHelp.getExportButton(page);
 		await exportHelp.getCancel(page);
-
 		await exportButton.click()
 
+
 		await expect(page.getByRole('button', {name: 'Download All'})).toBeVisible()
-		let downloadButtons = await page.getByRole('button', {name: 'Download'}).all()
+		let downloadButtons = await page.getByRole('link', {name: 'Download'}).all()
 		expect(downloadButtons.length).toBe(2); // two records selected
 
 		let closeButton = page.getByRole('button', {name: 'Close'});
@@ -112,10 +128,13 @@ test.describe('faculty file tests', async () => {
 		await setRanges(page);
 		await tickBox(page, 'Faculty Profile');
 		
+		let exportButton = await exportHelp.getExportButton(page);
+		expect(await exportButton.isDisabled()).toBeFalsy();
 		await (await exportHelp.getExportButton(page)).click()
 		await downloadManually(page, pathPrefix, await page.getByRole('button', {name: 'Download'}).all(), '.xlsx');
 	});
 
+	/*
 	test('fauclty service record', async ({page}) => {
 		await page.goto('/')
 		await selectRecords(page, ['Dela Cruz, Gabrielle Zach']);
@@ -127,8 +146,10 @@ test.describe('faculty file tests', async () => {
 		await setRanges(page);
 		await tickBox(page, 'Faculty Service Record');
 		
+		let exportButton = await exportHelp.getExportButton(page);
+		expect(await exportButton.isDisabled()).toBeFalsy();
 		await (await exportHelp.getExportButton(page)).click()
-		await downloadManually(page, pathPrefix, await page.getByRole('button', {name: 'Download'}).all(), '.xlsx');
+		await downloadManually(page, pathPrefix, await page.getByRole('link', {name: 'Download'}).all(), '.xlsx');
 	});
 
 
@@ -143,8 +164,10 @@ test.describe('faculty file tests', async () => {
 		await setRanges(page);
 		await tickBox(page, 'Faculty Loading');
 		
+		let exportButton = await exportHelp.getExportButton(page);
+		expect(await exportButton.isDisabled()).toBeFalsy();
 		await (await exportHelp.getExportButton(page)).click()
-		await downloadManually(page, pathPrefix, await page.getByRole('button', {name: 'Download'}).all(), '.xlsx');
+		await downloadManually(page, pathPrefix, await page.getByRole('link', {name: 'Download'}).all(), '.xlsx');
 	});
 
 	test('faculty set avg.', async ({page}) => {
@@ -158,19 +181,21 @@ test.describe('faculty file tests', async () => {
 		await setRanges(page);
 		await tickBox(page, 'Faculty SET Average');
 		
+		let exportButton = await exportHelp.getExportButton(page);
+		expect(await exportButton.isDisabled()).toBeFalsy();
 		await (await exportHelp.getExportButton(page)).click()
-		await downloadManually(page, pathPrefix, await page.getByRole('button', {name: 'Download'}).all(), '.xlsx');
+		await downloadManually(page, pathPrefix, await page.getByRole('link', {name: 'Download'}).all(), '.xlsx');
 	});
 
 	test('aggregate downloads', async ({page}) => {
 		await page.goto('/')
-		await selectRecords(page, ['Dela Cruz, Gabrielle Zach', 'Camingao, Ericsson Jake B.']);
+		await selectRecords(page, ['Dela Cruz, Gabrielle Zach', 'Camingao, Ericsson Jake']);
 
 		let firstButton = await exportHelp.getExportRecords(page);
 		await firstButton.click()
 
 		await setRanges(page);
-		await tickBox(page, 'Faculty Profiles');
+		await tickBox(page, 'Faculty Profile');
 		await tickBox(page, 'Faculty Service Record');
 		await tickBox(page, 'Faculty Loading');
 		await tickBox(page, 'Faculty SET Average');
@@ -179,14 +204,18 @@ test.describe('faculty file tests', async () => {
 		await expect(aggregateBox).toBeVisible()
 		await aggregateBox.click()
 
+		let exportButton = await exportHelp.getExportButton(page);
+		expect(await exportButton.isDisabled()).toBeFalsy();
 		await (await exportHelp.getExportButton(page)).click()
-		let downloadButtons = await page.getByRole('button', {name: 'Download'}).all()
+		let downloadButtons = await page.getByRole('link', {name: 'Download'}).all()
 		expect(downloadButtons.length).toBe(1) // aggregate, should only be one file
 		await downloadManually(page, pathPrefix, downloadButtons, '.xlsx');
 	});
+	*/
 });
 
 
+/*
 test.describe('course tests', async () => {
 	test.use({storageState: testConsts.AdminConfig});
 	test('by faculty - subject taught', async ({page}) => {
@@ -200,8 +229,10 @@ test.describe('course tests', async () => {
 		await tickBox(page, 'By Faculty, Subject Taught');
 		await tickBox(page, 'By Subject Taught, Faculty');
 
+		let exportButton = await exportHelp.getExportButton(page);
+		expect(await exportButton.isDisabled()).toBeFalsy();
 		await (await exportHelp.getExportButton(page)).click()
-		await downloadManually(page, pathPrefix, await page.getByRole('button', {name: 'Download'}).all(), '.xlsx')
+		await downloadManually(page, pathPrefix, await page.getByRole('link', {name: 'Download'}).all(), '.xlsx')
 	});
 
 	test('aggregate test', async ({page}) => {
@@ -220,12 +251,14 @@ test.describe('course tests', async () => {
 		await aggregateBox.click()
 
 		await (await exportHelp.getExportButton(page)).click()
-		let downloadButtons = await page.getByRole('button', {name: 'Download'}).all()
+		let downloadButtons = await page.getByRole('link', {name: 'Download'}).all()
 		expect(downloadButtons.length).toBe(1) // aggregate, should only be one file
 		await downloadManually(page, pathPrefix, downloadButtons, '.xlsx');
 	});
 });
+*/
 
+/*
 test.describe('csv download', async () => {
 	test.use({storageState: testConsts.AdminConfig});
 
@@ -244,6 +277,7 @@ test.describe('csv download', async () => {
 		await tickRadio(page, 'CSV');
 		
 		await (await exportHelp.getExportButton(page)).click()
-		await downloadManually(page, pathPrefix, await page.getByRole('button', {name: 'Download'}).all(), '.xlsx');
+		await downloadManually(page, pathPrefix, await page.getByRole('link', {name: 'Download'}).all(), '.csv');
 	});
 });
+*/

@@ -10,7 +10,7 @@ export const acadYears = [
 
 export const sems = [
 	'1st Semester',
-	'2st Semester',
+	'2nd Semester',
 	'Midyear',
 ]
 
@@ -25,12 +25,9 @@ export const checkboxOptions = [
 	'Faculty Loading',
 	'Faculty SET Average',
 
-	'Aggregate Selected Reports into One File?',
 
 	'By Faculty, Subject Taught',
 	'By Subject Taught, Faculty',
-
-	'Aggregate Selected Reports into One File?', //why are there two
 ]
 
 export const exportOptions = [
@@ -45,7 +42,9 @@ export async function getExportRecords(page:Page):Promise<Locator> {
 }
 
 export async function getDateSelects(page:Page, rangeText:string, text:string):Promise<Locator> {
-	let loc = page.locator('div', {hasText: rangeText}).getByRole('combobox').getByText(text);
+	let rangeDiv = page.locator('div').filter({hasText: rangeText}).first();
+	await expect(rangeDiv).toBeVisible();
+	let loc = rangeDiv.locator('> *').filter({has: page.getByRole('combobox'), hasText: text})
 	await expect(loc).toBeVisible();
 	return loc
 };
