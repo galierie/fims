@@ -33,18 +33,73 @@ export default defineConfig({
 
         // common tests
         {
-            name: 'common-tests',
+            name: 'preamble',
             dependencies: ['admin-auth', 'it-auth', 'invalid-logins'],
-            testMatch: /.common.e2e.(?:js|ts)/u,
+            testDir: 'tests/playwright/preamble',
+            testMatch: /.e2e.(?:js|ts)/u,
             fullyParallel: false,
         },
+        {
+            name: 'common-tests',
+            dependencies: ['preamble'],
+            testMatch: /.common.e2e.(?:js|ts)/u,
+            fullyParallel: true,
+        },
+
+        // record editing tests
+        //preamble
+        {
+            name: 'record-edits-preamble',
+            dependencies: ['it-auth', 'admin-auth', 'common-tests'],
+            testDir: 'tests/playwright/record-editing',
+            testMatch: /.preamble.e2e.(?:js|ts)/u,
+            fullyParallel: true,
+        },
+
+        //actual
+        {
+            name: 'record-edits',
+            dependencies: ['record-edits-preamble'],
+            testDir: 'tests/playwright/record-editing',
+            testMatch: /.main.e2e.(?:js|ts)/u,
+            fullyParallel: false,
+        },
+
+        //export tests
+        //preamble
+        {
+            name: 'export-reports-preamble',
+            dependencies: ['record-edits'],
+            testDir: 'tests/playwright/export-reports',
+            testMatch: /.preamble.e2e.(?:js|ts)/u,
+            fullyParallel: true,
+        },
+
+        //main
+        {
+            name: 'export-reports-main',
+            dependencies: ['export-reports-preamble'],
+            testDir: 'tests/playwright/export-reports',
+            testMatch: /.main.e2e.(?:js|ts)/u,
+            fullyParallel: false, //downloading file
+        },
+        {
+            name: 'export-reports-cleanup',
+            dependencies: ['export-reports-main'],
+            testDir: 'tests/playwright/export-reports',
+            testMatch: /.cleanup.e2e.(?:js|ts)/u,
+            fullyParallel: false, //downloading file
+        },
+
         // common destructive tests, as they can't be easily parallelized due to deletions and stuff
         {
             name: 'common-destructive-tests',
-            dependencies: ['common-tests'],
+            dependencies: ['export-reports-cleanup'],
             testDir: 'tests/playwright/destructive',
             testMatch: /.e2e.(?:js|ts)/u,
         },
+
+        // it-specifc (account handling) tests
 
         {
             name: 'it-specific-tests-indiv',
@@ -76,7 +131,7 @@ export default defineConfig({
 
         {
             name: 'it-specific-tests-generic',
-            dependencies: ['it-auth'],
+            dependencies: ['it-auth', 'preamble'],
             testDir: 'tests/playwright/it-specific/generic',
             testMatch: /.e2e.(?:js|ts)/u,
             fullyParallel: true,
@@ -94,6 +149,8 @@ export default defineConfig({
                 'common-tests',
                 'common-destructive-tests',
                 'invalid-logins',
+                'record-edits',
+                'export-reports-main',
             ],
             testDir: 'tests/playwright/logout',
             testMatch: /.e2e.(?:js|ts)/u,

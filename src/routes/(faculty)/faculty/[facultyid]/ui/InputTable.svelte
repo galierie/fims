@@ -100,7 +100,11 @@
     // col-span-10
 </script>
 
-<div class="px-4 {colStartClass} {colSpanClass} hidden" bind:this={domContainer}>
+<div
+    class="px-4 {colStartClass} {colSpanClass} hidden"
+    bind:this={domContainer}
+    data-testid="list-table"
+>
     <div class="grid {gridTemplateColumns}">
         {#each columns as { label, colSpan: cellColSpan } (label)}
             {@const cellColSpanClass = `col-span-${cellColSpan}`}

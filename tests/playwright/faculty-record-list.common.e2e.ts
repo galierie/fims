@@ -9,6 +9,7 @@ import { sql } from 'drizzle-orm';
 import * as schema from '$lib/server/db/schema';
 
 import * as testConsts from '../test-consts';
+import * as fieldHelp from '../test-helpers/field-test';
 
 // Database stuff
 function initializeDbClient() {
@@ -31,10 +32,6 @@ const testDb = initializeDbClient();
 // Actual tests
 
 const facultyRecordTableHeaders = ['Status', 'Rank', 'Administrative Position'];
-
-test('seed', async () => {
-    await testConsts.seed();
-});
 
 test.describe('view faculty records as it', () => {
     test.use({ storageState: 'playwright/.auth/it.json' });
@@ -133,6 +130,27 @@ test.describe('viewing and searching records as it', () => {
         await expect(page).toHaveURL(/faculty/u); //in faculty route
         await expect(page.getByText('Mandario, Maricris')).toBeVisible(); //correct record is shown
 
+        //check for the required fields in the profile tab
+        for (let field of testConsts.profileTabFields) {
+            await expect(page.getByText(field, { exact: true })).toBeVisible();
+        }
+
+        //check for the required fields in the semestral records tab
+        let semrecsTab = await fieldHelp.semrecstab(page);
+        await semrecsTab.click();
+        await expect(page).not.toHaveURL(/profile/u); //it went somewhere
+
+        //check for the required fields in the sem recs tab
+        for (let field of testConsts.semRecsFields) {
+            await expect(page.getByText(field, { exact: true }).first()).toBeVisible();
+        }
+
+        //check if you can go back to the profile tab
+        let profileTab = await fieldHelp.profiletab(page);
+        await profileTab.click();
+        await expect(page).toHaveURL(/faculty/u); //in faculty route
+
+        //go back
         const backButton = page.getByRole('link', {
             name: 'Back to List of Faculty Records',
             exact: true,
@@ -253,6 +271,27 @@ test.describe('viewing and searching records as admin', async () => {
         await expect(page).toHaveURL(/faculty/u); //in faculty route
         await expect(page.getByText('Mandario, Maricris')).toBeVisible(); //correct record is shown
 
+        //check for the required fields in the profile tab
+        for (let field of testConsts.profileTabFields) {
+            await expect(page.getByText(field, { exact: true })).toBeVisible();
+        }
+
+        //check for the required fields in the semestral records tab
+        let semrecsTab = await fieldHelp.semrecstab(page);
+        await semrecsTab.click();
+        await expect(page).not.toHaveURL(/profile/u); //it went somewhere
+
+        //check for the required fields in the sem recs tab
+        for (let field of testConsts.semRecsFields) {
+            await expect(page.getByText(field, { exact: true }).first()).toBeVisible();
+        }
+
+        //check if you can go back to the profile tab
+        let profileTab = await fieldHelp.profiletab(page);
+        await profileTab.click();
+        await expect(page).toHaveURL(/faculty/u); //in faculty route
+
+        //go back
         const backButton = page.getByRole('link', {
             name: 'Back to List of Faculty Records',
             exact: true,

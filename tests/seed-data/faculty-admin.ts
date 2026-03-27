@@ -11,7 +11,19 @@ export const statusRelations = [
         status: 'On Leave',
     },
     {
-        status: 'On Sabbatical',
+        status: 'Sabbatical',
+    },
+];
+
+export const apppointmentStatuses = [
+    {
+        appointmentstatus: 'Permanent',
+    },
+    {
+        appointmentstatus: 'Part-Time',
+    },
+    {
+        appointmentstatus: 'Full-Time',
     },
 ];
 
@@ -25,6 +37,7 @@ export const testFaculty = [
         birthdate: new Date().toISOString(),
         status: 'Active',
         dateoforiginalappointment: new Date().toISOString(),
+        maidenname: '',
         psiitem: '',
         employeenumber: '',
         tin: '',
@@ -46,6 +59,7 @@ export const testFaculty = [
         gsis: '',
         philhealth: '',
         pagibig: '',
+        maidenname: '',
     },
     {
         facultyid: 3,
@@ -61,6 +75,7 @@ export const testFaculty = [
         gsis: '',
         philhealth: '',
         pagibig: '',
+        maidenname: '',
     },
     {
         facultyid: 4,
@@ -76,6 +91,7 @@ export const testFaculty = [
         gsis: '',
         philhealth: '',
         pagibig: '',
+        maidenname: '',
     },
 ];
 
