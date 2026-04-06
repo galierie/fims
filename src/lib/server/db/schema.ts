@@ -67,7 +67,7 @@ export const faculty = pgTable(
             columns: [table.latestChangelogId],
             foreignColumns: [changelog.id],
             name: 'faculty_latest_changelog_id_fkey',
-        }),
+        }).onDelete('set null'),
         foreignKey({
             columns: [table.status],
             foreignColumns: [status.status],
@@ -80,7 +80,7 @@ export const facultyContactNumber = pgTable(
     'faculty_contact_number',
     {
         id: serial('id').primaryKey().notNull(),
-        facultyId: integer('faculty_id'),
+        facultyId: integer('faculty_id').notNull(),
         contactNumber: varchar('contact_number', { length: 20 }).notNull(),
     },
     (table) => [
@@ -96,7 +96,7 @@ export const facultyEducationalAttainment = pgTable(
     'faculty_educational_attainment',
     {
         id: serial('id').primaryKey().notNull(),
-        facultyId: integer('faculty_id'),
+        facultyId: integer('faculty_id').notNull(),
         degree: varchar('degree', { length: 100 }).notNull(),
         institution: varchar('institution', { length: 200 }).notNull(),
         graduationYear: integer('graduation_year'),
@@ -123,8 +123,8 @@ export const facultyFieldOfInterest = pgTable(
     'faculty_field_of_interest',
     {
         id: serial('id').primaryKey().notNull(),
-        facultyId: integer('faculty_id'),
-        fieldOfInterestId: integer('field_of_interest_id'),
+        facultyId: integer('faculty_id').notNull(),
+        fieldOfInterestId: integer('field_of_interest_id').notNull(),
     },
     (table) => [
         foreignKey({
@@ -155,9 +155,9 @@ export const facultyRank = pgTable(
     'faculty_rank',
     {
         id: serial('id').primaryKey().notNull(),
-        facultyId: integer('faculty_id'),
+        facultyId: integer('faculty_id').notNull(),
         rankId: integer('rank_id'),
-        appointmentStatus: varchar('appointment_status', { length: 50 }).notNull(),
+        appointmentStatus: varchar('appointment_status', { length: 50 }),
         dateOfTenureOrRenewal: date('date_of_tenure_or_renewal', { mode: 'date' }).notNull(),
     },
     (table) => [
@@ -170,12 +170,12 @@ export const facultyRank = pgTable(
             columns: [table.rankId],
             foreignColumns: [rank.id],
             name: 'faculty_rank_rank_id_fkey',
-        }),
+        }).onDelete('set null'),
         foreignKey({
             columns: [table.appointmentStatus],
             foreignColumns: [appointmentStatus.appointmentStatus],
             name: 'faculty_rank_appointment_status_fkey',
-        }),
+        }).onDelete('set null'),
     ],
 );
 
@@ -183,7 +183,7 @@ export const facultyHomeAddress = pgTable(
     'faculty_home_address',
     {
         id: serial('id').primaryKey().notNull(),
-        facultyId: integer('faculty_id'),
+        facultyId: integer('faculty_id').notNull(),
         homeAddress: text('home_address').notNull(),
     },
     (table) => [
@@ -199,7 +199,7 @@ export const facultyEmail = pgTable(
     'faculty_email',
     {
         id: serial('id').primaryKey().notNull(),
-        facultyId: integer('faculty_id'),
+        facultyId: integer('faculty_id').notNull(),
         email: varchar('email', { length: 100 }).notNull(),
     },
     (table) => [
@@ -221,7 +221,7 @@ export const facultyAcademicSemester = pgTable(
     'faculty_academic_semester',
     {
         id: serial('id').primaryKey().notNull(),
-        facultyId: integer('faculty_id'),
+        facultyId: integer('faculty_id').notNull(),
         academicSemesterId: integer('academic_semester_id'),
         currentRankId: integer('current_rank_id'),
         currentHighestEducationalAttainmentId: integer('current_highest_educational_attainment_id'),
@@ -237,17 +237,17 @@ export const facultyAcademicSemester = pgTable(
             columns: [table.academicSemesterId],
             foreignColumns: [academicSemester.id],
             name: 'faculty_academic_semester_academic_semester_id_fkey',
-        }),
+        }).onDelete('set null'),
         foreignKey({
             columns: [table.currentRankId],
             foreignColumns: [facultyRank.id],
             name: 'faculty_academic_semester_current_rank_id_fkey',
-        }),
+        }).onDelete('set null'),
         foreignKey({
             columns: [table.currentHighestEducationalAttainmentId],
             foreignColumns: [facultyEducationalAttainment.id],
             name: 'faculty_academic_semester_current_highest_educational_attainment_id_fkey',
-        }),
+        }).onDelete('set null'),
     ],
 );
 
@@ -282,12 +282,12 @@ export const facultyAdminPosition = pgTable(
             columns: [table.adminPositionId],
             foreignColumns: [adminPosition.id],
             name: 'faculty_admin_position_admin_position_id_fkey',
-        }),
+        }).onDelete('set null'),
         foreignKey({
             columns: [table.officeId],
             foreignColumns: [office.id],
             name: 'faculty_admin_position_office_id_fkey',
-        }),
+        }).onDelete('set null'),
     ],
 );
 
@@ -332,7 +332,7 @@ export const facultyAdminWork = pgTable(
             columns: [table.officeId],
             foreignColumns: [office.id],
             name: 'faculty_admin_work_office_id_fkey',
-        }),
+        }).onDelete('set null'),
     ],
 );
 
@@ -363,7 +363,7 @@ export const facultyCourse = pgTable(
             columns: [table.courseId],
             foreignColumns: [course.id],
             name: 'faculty_course_course_id_fkey',
-        }),
+        }).onDelete('set null'),
     ],
 );
 
@@ -395,7 +395,7 @@ export const facultyMentoring = pgTable(
             columns: [table.studentId],
             foreignColumns: [student.id],
             name: 'faculty_mentoring_student_id_fkey',
-        }),
+        }).onDelete('set null'),
     ],
 );
 
@@ -426,7 +426,7 @@ export const facultyResearch = pgTable(
             columns: [table.researchId],
             foreignColumns: [research.id],
             name: 'faculty_research_research_id_fkey',
-        }),
+        }).onDelete('set null'),
     ],
 );
 
@@ -484,7 +484,7 @@ export const profileInfo = pgTable(
     'profile_info',
     {
         id: serial('id').primaryKey().notNull(),
-        profileId: text('profile_id'),
+        profileId: text('profile_id').notNull(),
         role: varchar('role', { length: 50 }).notNull(),
         latestChangelogId: integer('latest_changelog_id'),
     },
