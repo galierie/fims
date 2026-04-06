@@ -652,6 +652,7 @@ export const adminPositionRelations = relations(adminPosition, ({ many }) => ({
 
 export const officeRelations = relations(office, ({ many }) => ({
     facultyAdminPositions: many(facultyAdminPosition),
+    facultyAdminWorks: many(facultyAdminWork),
 }));
 
 export const facultyAdminPositionRelations = relations(facultyAdminPosition, ({ one }) => ({
