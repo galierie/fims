@@ -223,7 +223,7 @@ export async function getFacultyAdminWorks(facultyAcademicSemesterid: number) {
         .where(eq(facultyAdminWork.facultyAcademicSemesterId, facultyAcademicSemesterid));
 }
 
-export type facultyAdminWorksDTO = Awaited<ReturnType<typeof getFacultyAdminWorks>>;
+export type FacultyAdminWorksDTO = Awaited<ReturnType<typeof getFacultyAdminWorks>>;
 
 export async function getFacultyCoursesTaught(facultyAcademicSemesterid: number) {
     return await db
@@ -241,7 +241,7 @@ export async function getFacultyCoursesTaught(facultyAcademicSemesterid: number)
         .where(eq(facultyCourse.facultyAcademicSemesterId, facultyAcademicSemesterid));
 }
 
-export type facultyCoursesTaughtDTO = Awaited<ReturnType<typeof getFacultyCoursesTaught>>;
+export type FacultyCoursesTaughtDTO = Awaited<ReturnType<typeof getFacultyCoursesTaught>>;
 
 export async function getFacultyMentees(facultyAcademicSemesterid: number) {
     return await db
@@ -278,7 +278,7 @@ export async function getFacultyResearch(facultyAcademicSemesterid: number) {
         .where(eq(facultyResearch.facultyAcademicSemesterId, facultyAcademicSemesterid));
 }
 
-export type facultyResearchDTO = Awaited<ReturnType<typeof getFacultyResearch>>;
+export type FacultyResearchDTO = Awaited<ReturnType<typeof getFacultyResearch>>;
 
 export async function getFacultyExtension(facultyAcademicSemesterid: number) {
     return await db
@@ -294,7 +294,7 @@ export async function getFacultyExtension(facultyAcademicSemesterid: number) {
         .where(eq(facultyExtension.facultyAcademicSemesterId, facultyAcademicSemesterid));
 }
 
-export type facultyExtensionDTO = Awaited<ReturnType<typeof getFacultyExtension>>;
+export type FacultyExtensionDTO = Awaited<ReturnType<typeof getFacultyExtension>>;
 
 export async function getFacultyStudyLoad(facultyAcademicSemesterid: number) {
     return await db
@@ -311,7 +311,7 @@ export async function getFacultyStudyLoad(facultyAcademicSemesterid: number) {
         .where(eq(facultyStudyLoad.facultyAcademicSemesterId, facultyAcademicSemesterid));
 }
 
-export type facultyStudyLoadDTO = Awaited<ReturnType<typeof getFacultyStudyLoad>>;
+export type FacultyStudyLoadDTO = Awaited<ReturnType<typeof getFacultyStudyLoad>>;
 
 export async function getFacultyProfile(facultyid: number) {
     // Personal Information
