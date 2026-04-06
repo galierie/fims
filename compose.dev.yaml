@@ -1,0 +1,7 @@
+# Development-only!
+
+services:
+  db:
+    environment:
+      POSTGRES_USER: fims_dev
+      POSTGRES_PASSWORD: dev
