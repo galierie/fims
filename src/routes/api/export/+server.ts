@@ -121,14 +121,12 @@ export async function GET({ url, locals }: RequestEvent) {
                 }
             } else if (type === 'faculty-by-subject') {
                 // Faculty by subject does not depend on facultyIds, only on the period
-                for (const { ay, sem } of periods) {
                     sheetPromises.push(
-                        getFacultyBySubjectWorksheet(ay, sem).then((sheet) => {
-                            if (sheet) sheet.sheetName = `Fac by Subj AY${ay} Sem${sem}`;
-                            return sheet;
+                        getFacultyBySubjectWorksheet().then((sheet) => {
+                        if (sheet) sheet.sheetName = `Faculty by Subject Taught`;
+                        return sheet;
                         }),
                     );
-                }
             } else {
                 console.warn(`Report type '${type}' is not yet fully implemented.`);
             }
