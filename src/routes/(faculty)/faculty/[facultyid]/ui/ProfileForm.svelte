@@ -274,9 +274,9 @@
 
     <div>
         <div class="mt-4 grid w-full grid-cols-4">
-            <Field label="Last Name" name="last-name" defaultValue={profile?.lastname} />
-            <Field label="First Name" name="first-name" defaultValue={profile?.firstname} />
-            <Field label="Middle Name" name="middle-name" defaultValue={profile?.middlename} />
+            <Field label="Last Name" name="last-name" defaultValue={profile?.lastName} />
+            <Field label="First Name" name="first-name" defaultValue={profile?.firstName} />
+            <Field label="Middle Name" name="middle-name" defaultValue={profile?.middleName} />
             <Field label="Suffix" name="suffix" defaultValue={profile?.suffix ?? undefined} />
         </div>
         <div class="mt-4 grid w-full grid-cols-4">
@@ -284,12 +284,12 @@
                 label="Birth Date"
                 name="birth-date"
                 type="date"
-                defaultValue={profile?.birthdate}
+                defaultValue={profile?.birthDate}
             />
             <Field
                 label="Maiden Name"
                 name="maiden-name"
-                defaultValue={profile?.maidenname ?? undefined}
+                defaultValue={profile?.maidenName ?? undefined}
             />
         </div>
 
@@ -359,7 +359,7 @@
                 label="PSI Item No."
                 name="psi-item"
                 immutable={true}
-                defaultValue={profile?.psiitem}
+                defaultValue={profile?.psiItem}
             />
         </div>
         <div class="mt-4 grid w-full grid-cols-4">
@@ -369,17 +369,17 @@
                 label="Employee No."
                 name="employee-number"
                 immutable={true}
-                defaultValue={profile?.employeenumber}
+                defaultValue={profile?.employeeNumber}
             />
         </div>
         <div class="mt-4 grid w-full grid-cols-4">
-            <Field label="Status" name="status" defaultValue={profile?.status} />
+            <Field label="Status" name="status" defaultValue={profile?.status ?? ''} />
             <Field
                 label="Date of Original Appointment"
                 name="date-of-original-appointment"
                 type="date"
                 colSpan={2}
-                defaultValue={profile?.dateoforiginalappointment}
+                defaultValue={profile?.dateOfOriginalAppointment}
             />
         </div>
 

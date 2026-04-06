@@ -36,7 +36,7 @@
     }
 
     function selectAll() {
-        selectedIds = facultyRecordList.map(({ facultyid }) => facultyid);
+        selectedIds = facultyRecordList.map(({ id }) => id);
         selectedIds = selectedIds.filter((elem) => elem !== null);
     }
 
@@ -173,12 +173,12 @@
         </div>
 
         <!-- Rows -->
-        {#each facultyRecordList as facultyRecord (facultyRecord.facultyid)}
+        {#each facultyRecordList as facultyRecord (facultyRecord.id)}
             <FacultyRecordRow
                 {facultyRecord}
                 {canViewChangelogs}
-                isSelected={selectedIds.includes(facultyRecord.facultyid)}
-                onToggle={() => toggleSelection(facultyRecord.facultyid)}
+                isSelected={selectedIds.includes(facultyRecord.id)}
+                onToggle={() => toggleSelection(facultyRecord.id)}
             />
         {/each}
 
@@ -205,7 +205,7 @@
 {#if isExportModalOpen}
     <ExportReportModal
         onCancel={() => (isExportModalOpen = false)}
-        selectedFaculty={facultyRecordList.filter((f) => selectedIds.includes(f.facultyid))}
+        selectedFaculty={facultyRecordList.filter((f) => selectedIds.includes(f.id))}
     />
 {/if}
 

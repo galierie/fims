@@ -10,19 +10,19 @@
 
     const { facultyRecord, canViewChangelogs, isSelected, onToggle }: Props = $props();
     const {
-        facultyid,
-        lastname,
-        firstname,
+        id,
+        lastName,
+        firstName,
         status,
-        ranktitle,
-        adminposition,
+        rankTitle,
+        adminPosition,
         logTimestamp,
         logMaker,
         logOperation,
     }: FacultyListDTO = $derived(facultyRecord);
 </script>
 
-{#if facultyid !== null}
+{#if id !== null}
     <div
         class="flex justify-center [&>div]:flex [&>div]:h-12 [&>div]:items-center [&>div]:border-b [&>div]:border-fims-gray [&>div]:bg-white [&>div]:px-6"
     >
@@ -35,16 +35,16 @@
             />
         </div>
         <a
-            href="/faculty/{facultyid}"
+            href="/faculty/{id}"
             class="flex justify-center [&>div]:flex [&>div]:h-12 [&>div]:items-center [&>div]:border-b [&>div]:border-fims-gray [&>div]:bg-white [&>div]:px-6"
         >
             <div class={canViewChangelogs ? 'w-66 2xl:w-132' : 'w-116 2xl:w-182'}>
-                <span>{lastname}, {firstname}</span>
+                <span>{lastName}, {firstName}</span>
             </div>
             <div class="w-50 justify-center 2xl:w-75"><span>{status}</span></div>
-            <div class="w-62.5 justify-center 2xl:w-75"><span>{ranktitle}</span></div>
+            <div class="w-62.5 justify-center 2xl:w-75"><span>{rankTitle}</span></div>
             <div class="w-62.5 justify-center 2xl:w-75">
-                <span>{adminposition ? adminposition : '-'}</span>
+                <span>{adminPosition ? adminPosition : '-'}</span>
             </div>
         </a>
         {#if canViewChangelogs}
