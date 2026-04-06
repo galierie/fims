@@ -778,7 +778,7 @@ export const accountSearchView = pgMaterializedView('account_search_view').as((q
             operation: changelog.operation,
         })
         .from(changelog)
-        .leftJoin(profile, eq(profile.id, changelog.id))
+        .leftJoin(profile, eq(profile.id, changelog.operatorId))
         .as('changelog_sq');
 
     const searchcontentQuery = sql<string>`

@@ -26,9 +26,6 @@ vite.config.ts.timestamp-*
 # ESLint
 .eslintcache
 
-# Drizzle
-drizzle
-
 # VSCode
 /.vscode
 
