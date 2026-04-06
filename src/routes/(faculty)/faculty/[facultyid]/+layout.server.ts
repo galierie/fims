@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 
-import { getFacultyName, getAllFacultySemesters } from '$lib/server/queries/faculty-view';
+import { getFacultyName, getAllFacultyAcademicSemesters } from '$lib/server/queries/faculty-view';
 
 export async function load({ params }) {
     const { facultyid: facultyidStr } = params;
@@ -14,7 +14,7 @@ export async function load({ params }) {
     // Validate output
     if (name === null) throw error(400, { message: 'No record found.' });
 
-    const semesters = await getAllFacultySemesters(facultyid);
+    const semesters = await getAllFacultyAcademicSemesters(facultyid);
 
     // Fallback: Actual current Academic Year and Semester
     const now = new Date();

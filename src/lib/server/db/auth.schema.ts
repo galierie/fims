@@ -1,7 +1,7 @@
 import { boolean, index, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
-import { changelog, userinfo } from './schema';
+import { changelog, profileInfo } from './schema';
 
 export const appuser = pgTable('appuser', {
     id: text('id').primaryKey(),
@@ -83,13 +83,13 @@ export const verification = pgTable(
 export const appuserRelations = relations(appuser, ({ many, one }) => ({
     sessions: many(session),
     accounts: many(account),
-    userinfo: one(userinfo, {
+    profileInfo: one(profileInfo, {
         fields: [appuser.id],
-        references: [userinfo.userid],
+        references: [profileInfo.profileId],
     }),
     changelog: one(changelog, {
         fields: [appuser.id],
-        references: [changelog.userid],
+        references: [changelog.operatorId],
     }),
 }));
 

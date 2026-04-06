@@ -2,7 +2,7 @@ import { and, asc, desc, eq, gt, ilike, lt, ne, or, type SQL, type SQLWrapper } 
 
 import type { FilterColumn } from '$lib/types/filter';
 
-import { accountSearchView, appuser, changelog, role, userinfo } from '../db/schema';
+import { accountSearchView, appuser, changelog, role, profileInfo } from '../db/schema';
 import { db } from '../db';
 
 const pageSize = 50;
@@ -40,27 +40,27 @@ export async function getAccountList(
     const userCountSq = await db
         .select({
             userid: searchSq.id,
-            userinfoid: userinfo.userinfoid,
+            profileInfoId: profileInfo.id,
             email: appuser.email,
-            role: userinfo.role,
-            latestchangelogid: userinfo.latestchangelogid,
+            role: profileInfo.role,
+            latestChangelogId: profileInfo.latestChangelogId,
         })
         .from(appuser)
         .rightJoin(searchSq, eq(searchSq.id, appuser.id))
-        .leftJoin(userinfo, eq(userinfo.userid, appuser.id))
+        .leftJoin(profileInfo, eq(profileInfo.profileId, appuser.id))
         .where(
             and(
                 ne(appuser.id, currentUserId),
                 cursor
                     ? isNext
-                        ? gt(userinfo.userinfoid, cursor)
-                        : lt(userinfo.userinfoid, cursor)
+                        ? gt(profileInfo.id, cursor)
+                        : lt(profileInfo.id, cursor)
                     : // eslint-disable-next-line no-undefined -- can't use null in Drizzle WHERE queries
                       undefined,
                 and(...filterQueries),
             ),
         )
-        .orderBy(isNext ? asc(userinfo.userinfoid) : desc(userinfo.userinfoid))
+        .orderBy(isNext ? asc(profileInfo.id) : desc(profileInfo.id))
         .limit(pageSize + 1)
         .as('usercount_sq');
 
@@ -77,25 +77,25 @@ export async function getAccountList(
     const userSq = await db
         .select()
         .from(userCountSq)
-        .orderBy(isNext ? asc(userCountSq.userinfoid) : desc(userCountSq.userinfoid))
+        .orderBy(isNext ? asc(userCountSq.profileInfoId) : desc(userCountSq.profileInfoId))
         .limit(pageSize)
         .as('user_sq');
 
     // Get cursors
     let [firstId] = await db
         .select({
-            value: userSq.userinfoid,
+            value: userSq.profileInfoId,
         })
         .from(userSq)
-        .orderBy(asc(userSq.userinfoid))
+        .orderBy(asc(userSq.profileInfoId))
         .limit(1);
 
     let [lastId] = await db
         .select({
-            value: userSq.userinfoid,
+            value: userSq.profileInfoId,
         })
         .from(userSq)
-        .orderBy(desc(userSq.userinfoid))
+        .orderBy(desc(userSq.profileInfoId))
         .limit(1);
 
     // Get changelogs
@@ -109,8 +109,8 @@ export async function getAccountList(
             logOperation: changelog.operation,
         })
         .from(userSq)
-        .leftJoin(changelog, eq(changelog.logid, userSq.latestchangelogid))
-        .leftJoin(appuser, eq(appuser.id, changelog.userid));
+        .leftJoin(changelog, eq(changelog.id, userSq.latestChangelogId))
+        .leftJoin(appuser, eq(appuser.id, changelog.operatorId));
 
     // Reverse account list and cursors if previous page
     if (!isNext) {

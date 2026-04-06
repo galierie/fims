@@ -44,16 +44,16 @@ export async function load({ params, parent }) {
     const ranks = await getAllRanks();
     opts.set(
         'rankTitles',
-        ranks.map(({ rankTitle }) => rankTitle),
+        ranks.map(({ title }) => title),
     );
 
     const rankTitlesToSalaryGrades: Map<string, string> = new Map(
-        ranks.map(({ rankTitle, salaryGrade }) => [rankTitle, salaryGrade]),
+        ranks.map(({ title, salaryGrade }) => [title, salaryGrade]),
     );
     dependencyMaps.set('rankTitlesToSalaryGrades', rankTitlesToSalaryGrades);
 
     const rankTitlesToSalaryRates: Map<string, string> = new Map(
-        ranks.map(({ rankTitle, salaryRate }) => [rankTitle, salaryRate]),
+        ranks.map(({ title, salaryRate }) => [title, salaryRate]),
     );
     dependencyMaps.set('rankTitlesToSalaryRates', rankTitlesToSalaryRates);
 

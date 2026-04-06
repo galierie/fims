@@ -1,30 +1,30 @@
 import { and, eq } from 'drizzle-orm';
 
 import {
-    adminposition,
-    appointmentstatus,
+    adminPosition,
+    appointmentStatus,
     course,
     faculty,
-    facultyadminposition,
-    facultyadminwork,
-    facultycommmembership,
-    facultycontactnumber,
-    facultycourse,
-    facultyeducationalattainment,
-    facultyemail,
-    facultyextension,
-    facultyfieldofinterest,
-    facultyhomeaddress,
-    facultymentoring,
-    facultyrank,
-    facultyresearch,
-    facultysemester,
-    facultystudyload,
-    fieldofinterest,
+    facultyAdminPosition,
+    facultyAdminWork,
+    facultyCommMembership,
+    facultyContactNumber,
+    facultyCourse,
+    facultyEducationalAttainment,
+    facultyEmail,
+    facultyExtension,
+    facultyFieldOfInterest,
+    facultyHomeAddress,
+    facultyMentoring,
+    facultyRank,
+    facultyResearch,
+    facultyAcademicSemester,
+    facultyStudyLoad,
+    fieldOfInterest,
     office,
     rank,
     research,
-    semester,
+    academicSemester,
     student,
 } from '../db/schema';
 import { db } from '../db';
@@ -32,11 +32,11 @@ import { db } from '../db';
 export async function getFacultyName(facultyid: number) {
     const response = await db
         .select({
-            lastName: faculty.lastname,
-            firstName: faculty.firstname,
+            lastName: faculty.lastName,
+            firstName: faculty.firstName,
         })
         .from(faculty)
-        .where(eq(faculty.facultyid, facultyid));
+        .where(eq(faculty.id, facultyid));
 
     if (response.length === 0) return null;
 
@@ -47,275 +47,275 @@ export async function getFacultyName(facultyid: number) {
 export async function getFacultyContactNumbers(facultyid: number) {
     return await db
         .select({
-            tupleid: facultycontactnumber.facultycontactnumberid,
-            contactNum: facultycontactnumber.contactnumber,
+            tupleid: facultyContactNumber.id,
+            contactNum: facultyContactNumber.contactNumber,
         })
-        .from(facultycontactnumber)
-        .where(eq(facultycontactnumber.facultyid, facultyid));
+        .from(facultyContactNumber)
+        .where(eq(facultyContactNumber.facultyId, facultyid));
 }
 
 export async function getFacultyEducationalAttainments(facultyid: number) {
     return await db
         .select({
-            tupleid: facultyeducationalattainment.facultyeducationalattainmentid,
-            degree: facultyeducationalattainment.degree,
-            institution: facultyeducationalattainment.institution,
-            graduationYear: facultyeducationalattainment.graduationyear,
+            tupleid: facultyEducationalAttainment.id,
+            degree: facultyEducationalAttainment.degree,
+            institution: facultyEducationalAttainment.institution,
+            graduationYear: facultyEducationalAttainment.graduationYear,
         })
-        .from(facultyeducationalattainment)
-        .where(eq(facultyeducationalattainment.facultyid, facultyid));
+        .from(facultyEducationalAttainment)
+        .where(eq(facultyEducationalAttainment.facultyId, facultyid));
 }
 
 export async function getFacultyFieldsOfInterest(facultyid: number) {
     return await db
         .select({
-            tupleid: facultyfieldofinterest.facultyfieldofinterestid,
-            field: fieldofinterest.field,
+            tupleid: facultyFieldOfInterest.id,
+            field: fieldOfInterest.field,
         })
-        .from(facultyfieldofinterest)
+        .from(facultyFieldOfInterest)
         .leftJoin(
-            fieldofinterest,
-            eq(fieldofinterest.fieldofinterestid, facultyfieldofinterest.fieldofinterestid),
+            fieldOfInterest,
+            eq(fieldOfInterest.id, facultyFieldOfInterest.fieldOfInterestId),
         )
-        .where(eq(facultyfieldofinterest.facultyid, facultyid));
+        .where(eq(facultyFieldOfInterest.facultyId, facultyid));
 }
 
 export async function getFacultyPromotionHistory(facultyid: number) {
     return await db
         .select({
-            tupleid: facultyrank.facultyrankid,
-            rankTitle: rank.ranktitle,
-            appointmentStatus: facultyrank.appointmentstatus,
-            dateOfTenureOrRenewal: facultyrank.dateoftenureorrenewal,
+            tupleid: facultyRank.id,
+            rankTitle: rank.title,
+            appointmentStatus: facultyRank.appointmentStatus,
+            dateOfTenureOrRenewal: facultyRank.dateOfTenureOrRenewal,
         })
-        .from(facultyrank)
-        .leftJoin(rank, eq(rank.rankid, facultyrank.rankid))
-        .where(eq(facultyrank.facultyid, facultyid));
+        .from(facultyRank)
+        .leftJoin(rank, eq(rank.id, facultyRank.rankId))
+        .where(eq(facultyRank.facultyId, facultyid));
 }
 
 export async function getFacultyHomeAddresses(facultyid: number) {
     return await db
         .select({
-            tupleid: facultyhomeaddress.facultyhomeaddressid,
-            homeAddress: facultyhomeaddress.homeaddress,
+            tupleid: facultyHomeAddress.id,
+            homeAddress: facultyHomeAddress.homeAddress,
         })
-        .from(facultyhomeaddress)
-        .where(eq(facultyhomeaddress.facultyid, facultyid));
+        .from(facultyHomeAddress)
+        .where(eq(facultyHomeAddress.facultyId, facultyid));
 }
 
 export async function getFacultyEmailAddresses(facultyid: number) {
     return await db
         .select({
-            tupleid: facultyemail.facultyemailid,
-            email: facultyemail.email,
+            tupleid: facultyEmail.id,
+            email: facultyEmail.email,
         })
-        .from(facultyemail)
-        .where(eq(facultyemail.facultyid, facultyid));
+        .from(facultyEmail)
+        .where(eq(facultyEmail.facultyId, facultyid));
 }
 
-export async function getFacultySemester(facultyid: number, acadYear: number, semNum: number) {
+export async function getFacultyAcademicSemester(facultyid: number, acadYear: number, semNum: number) {
     const currentSemesterArr = await db
         .select({
-            acadsemesterid: semester.acadsemesterid,
+            id: academicSemester.id,
         })
-        .from(semester)
-        .where(and(eq(semester.academicyear, acadYear), eq(semester.semester, semNum)));
+        .from(academicSemester)
+        .where(and(eq(academicSemester.academicYear, acadYear), eq(academicSemester.semesterNumber, semNum)));
 
     if (currentSemesterArr.length !== 1) return null;
     const [currentSemester] = currentSemesterArr;
 
-    const currentFacultySemesterSq = await db
+    const currentFacultyAcademicSemesterSq = await db
         .select({
-            facultysemesterid: facultysemester.facultysemesterid,
-            currentrankid: facultysemester.currentrankid,
-            currenthighesteducationalattainmentid:
-                facultysemester.currenthighesteducationalattainmentid,
-            remarks: facultysemester.remarks,
+            id: facultyAcademicSemester.id,
+            currentRankId: facultyAcademicSemester.currentRankId,
+            currentHighestEducationalAttainmentId:
+                facultyAcademicSemester.currentHighestEducationalAttainmentId,
+            remarks: facultyAcademicSemester.remarks,
         })
-        .from(facultysemester)
+        .from(facultyAcademicSemester)
         .where(
             and(
-                eq(facultysemester.facultyid, facultyid),
-                eq(facultysemester.acadsemesterid, currentSemester.acadsemesterid),
+                eq(facultyAcademicSemester.facultyId, facultyid),
+                eq(facultyAcademicSemester.id, currentSemester.id),
             ),
         )
         .as('current_faculty_semester_sq');
 
-    const currentFacultySemesterArr = await db.select().from(currentFacultySemesterSq);
-    if (currentFacultySemesterArr.length !== 1) return null;
+    const tempCurrentFacultyAcademicSemesterArr = await db.select().from(currentFacultyAcademicSemesterSq);
+    if (tempCurrentFacultyAcademicSemesterArr.length !== 1) return null;
 
-    const currentFacultySemester = await db
+    const currentFacultyAcademicSemesterArr = await db
         .select({
-            facultysemesterid: currentFacultySemesterSq.facultysemesterid,
-            currentRankTitle: rank.ranktitle,
-            currentHighestDegree: facultyeducationalattainment.degree,
-            remarks: currentFacultySemesterSq.remarks,
+            id: currentFacultyAcademicSemesterSq.id,
+            currentRankTitle: rank.title,
+            currentHighestDegree: facultyEducationalAttainment.degree,
+            remarks: currentFacultyAcademicSemesterSq.remarks,
         })
-        .from(currentFacultySemesterSq)
+        .from(currentFacultyAcademicSemesterSq)
         .leftJoin(
-            facultyrank,
-            eq(facultyrank.facultyrankid, currentFacultySemesterSq.currentrankid),
+            facultyRank,
+            eq(facultyRank.id, currentFacultyAcademicSemesterSq.currentRankId),
         )
-        .leftJoin(rank, eq(rank.rankid, facultyrank.rankid))
+        .leftJoin(rank, eq(rank.id, facultyRank.rankId))
         .leftJoin(
-            facultyeducationalattainment,
+            facultyEducationalAttainment,
             eq(
-                facultyeducationalattainment.facultyeducationalattainmentid,
-                currentFacultySemesterSq.currenthighesteducationalattainmentid,
+                facultyEducationalAttainment.id,
+                currentFacultyAcademicSemesterSq.currentHighestEducationalAttainmentId,
             ),
         );
 
-    if (currentFacultySemester.length !== 1) return null;
-    const [facultySemester] = currentFacultySemester;
+    if (currentFacultyAcademicSemesterArr.length !== 1) return null;
+    const [currentFacultyAcademicSemester] = currentFacultyAcademicSemesterArr;
 
-    return facultySemester;
+    return currentFacultyAcademicSemester;
 }
 
-export async function getFacultyAdminPositions(facultysemesterid: number) {
+export async function getFacultyAdminPositions(facultyAcademicSemesterid: number) {
     return await db
         .select({
-            tupleid: facultyadminposition.facultyadminpositionid,
-            adminPosition: adminposition.name,
+            tupleid: facultyAdminPosition.id,
+            adminPosition: adminPosition.title,
             office: office.name,
-            startDate: facultyadminposition.startdate,
-            endDate: facultyadminposition.enddate,
-            administrativeLoadCredit: facultyadminposition.administrativeloadcredit,
+            startDate: facultyAdminPosition.startDate,
+            endDate: facultyAdminPosition.endDate,
+            administrativeLoadCredit: facultyAdminPosition.administrativeLoadCredit,
         })
-        .from(facultyadminposition)
+        .from(facultyAdminPosition)
         .leftJoin(
-            adminposition,
-            eq(adminposition.adminpositionid, facultyadminposition.adminpositionid),
+            adminPosition,
+            eq(adminPosition.id, facultyAdminPosition.adminPositionId),
         )
-        .leftJoin(office, eq(office.officeid, facultyadminposition.officeid))
-        .where(eq(facultyadminposition.facultysemesterid, facultysemesterid));
+        .leftJoin(office, eq(office.id, facultyAdminPosition.officeId))
+        .where(eq(facultyAdminPosition.facultyAcademicSemesterId, facultyAcademicSemesterid));
 }
 
 export type FacultyAdminPositionDTO = Awaited<ReturnType<typeof getFacultyAdminPositions>>;
 
-export async function getFacultyCommittees(facultysemesterid: number) {
+export async function getFacultyCommittees(facultyAcademicSemesterid: number) {
     return await db
         .select({
-            tupleid: facultycommmembership.facultycommmembershipid,
-            membership: facultycommmembership.membership,
-            committee: facultycommmembership.committee,
-            startDate: facultycommmembership.startdate,
-            endDate: facultycommmembership.enddate,
-            administrativeLoadCredit: facultycommmembership.administrativeloadcredit,
+            tupleid: facultyCommMembership.id,
+            membership: facultyCommMembership.membership,
+            committee: facultyCommMembership.committee,
+            startDate: facultyCommMembership.startDate,
+            endDate: facultyCommMembership.endDate,
+            administrativeLoadCredit: facultyCommMembership.administrativeLoadCredit,
         })
-        .from(facultycommmembership)
-        .where(eq(facultycommmembership.facultysemesterid, facultysemesterid));
+        .from(facultyCommMembership)
+        .where(eq(facultyCommMembership.facultyAcademicSemesterId, facultyAcademicSemesterid));
 }
 
 export type FacultyCommitteesDTO = Awaited<ReturnType<typeof getFacultyCommittees>>;
 
-export async function getFacultyAdminWorks(facultysemesterid: number) {
+export async function getFacultyAdminWorks(facultyAcademicSemesterid: number) {
     return await db
         .select({
-            tupleid: facultyadminwork.facultyadminworkid,
-            natureOfWork: facultyadminwork.natureofwork,
+            tupleid: facultyAdminWork.id,
+            natureOfWork: facultyAdminWork.natureOfWork,
             office: office.name,
-            startDate: facultyadminwork.startdate,
-            endDate: facultyadminwork.enddate,
-            administrativeLoadCredit: facultyadminwork.administrativeloadcredit,
+            startDate: facultyAdminWork.startDate,
+            endDate: facultyAdminWork.endDate,
+            administrativeLoadCredit: facultyAdminWork.administrativeLoadCredit,
         })
-        .from(facultyadminwork)
-        .leftJoin(office, eq(office.officeid, facultyadminwork.officeid))
-        .where(eq(facultyadminwork.facultysemesterid, facultysemesterid));
+        .from(facultyAdminWork)
+        .leftJoin(office, eq(office.id, facultyAdminWork.officeId))
+        .where(eq(facultyAdminWork.facultyAcademicSemesterId, facultyAcademicSemesterid));
 }
 
-export type FacultyAdminWorksDTO = Awaited<ReturnType<typeof getFacultyAdminWorks>>;
+export type facultyAdminWorksDTO = Awaited<ReturnType<typeof getFacultyAdminWorks>>;
 
-export async function getFacultyCoursesTaught(facultysemesterid: number) {
+export async function getFacultyCoursesTaught(facultyAcademicSemesterid: number) {
     return await db
         .select({
-            tupleid: facultycourse.facultycourseid,
-            title: course.coursename,
+            tupleid: facultyCourse.id,
+            title: course.name,
             units: course.units,
-            section: facultycourse.section,
-            numberOfStudents: facultycourse.numberofstudents,
-            teachingLoadCredit: facultycourse.teachingloadcredit,
-            sectionSET: facultycourse.sectionset,
+            section: facultyCourse.section,
+            numberOfStudents: facultyCourse.numberOfStudents,
+            teachingLoadCredit: facultyCourse.teachingLoadCredit,
+            sectionSET: facultyCourse.sectionSET,
         })
-        .from(facultycourse)
-        .leftJoin(course, eq(course.courseid, facultycourse.courseid))
-        .where(eq(facultycourse.facultysemesterid, facultysemesterid));
+        .from(facultyCourse)
+        .leftJoin(course, eq(course.id, facultyCourse.courseId))
+        .where(eq(facultyCourse.facultyAcademicSemesterId, facultyAcademicSemesterid));
 }
 
-export type FacultyCoursesTaughtDTO = Awaited<ReturnType<typeof getFacultyCoursesTaught>>;
+export type facultyCoursesTaughtDTO = Awaited<ReturnType<typeof getFacultyCoursesTaught>>;
 
-export async function getFacultyMentees(facultysemesterid: number) {
+export async function getFacultyMentees(facultyAcademicSemesterid: number) {
     return await db
         .select({
-            tupleid: facultymentoring.facultymentoringid,
-            lastName: student.lastname,
-            middleName: student.middlename,
-            firstName: student.firstname,
-            category: facultymentoring.category,
-            startDate: facultymentoring.startdate,
-            endDate: facultymentoring.enddate,
-            teachingLoadCredit: facultymentoring.teachingloadcredit,
+            tupleid: facultyMentoring.id,
+            lastName: student.lastName,
+            middleName: student.middleName,
+            firstName: student.firstName,
+            category: facultyMentoring.category,
+            startDate: facultyMentoring.startDate,
+            endDate: facultyMentoring.endDate,
+            teachingLoadCredit: facultyMentoring.teachingLoadCredit,
         })
-        .from(facultymentoring)
-        .leftJoin(student, eq(student.studentnumber, facultymentoring.studentnumber))
-        .where(eq(facultymentoring.facultysemesterid, facultysemesterid));
+        .from(facultyMentoring)
+        .leftJoin(student, eq(student.id, facultyMentoring.studentId))
+        .where(eq(facultyMentoring.facultyAcademicSemesterId, facultyAcademicSemesterid));
 }
 
 export type FacultyMenteesDTO = Awaited<ReturnType<typeof getFacultyMentees>>;
 
-export async function getFacultyResearch(facultysemesterid: number) {
+export async function getFacultyResearch(facultyAcademicSemesterid: number) {
     return await db
         .select({
-            tupleid: facultyresearch.facultyresearchid,
+            tupleid: facultyResearch.id,
             title: research.title,
-            startDate: research.startdate,
-            endDate: research.enddate,
+            startDate: research.startDate,
+            endDate: research.endDate,
             funding: research.funding,
-            researchLoadCredit: facultyresearch.researchloadcredit,
-            remarks: facultyresearch.remarks,
+            researchLoadCredit: facultyResearch.researchLoadCredit,
+            remarks: facultyResearch.remarks,
         })
-        .from(facultyresearch)
-        .leftJoin(research, eq(research.researchid, facultyresearch.researchid))
-        .where(eq(facultyresearch.facultysemesterid, facultysemesterid));
+        .from(facultyResearch)
+        .leftJoin(research, eq(research.id, facultyResearch.researchId))
+        .where(eq(facultyResearch.facultyAcademicSemesterId, facultyAcademicSemesterid));
 }
 
-export type FacultyResearchDTO = Awaited<ReturnType<typeof getFacultyResearch>>;
+export type facultyResearchDTO = Awaited<ReturnType<typeof getFacultyResearch>>;
 
-export async function getFacultyExtension(facultysemesterid: number) {
+export async function getFacultyExtension(facultyAcademicSemesterid: number) {
     return await db
         .select({
-            tupleid: facultyextension.facultyextensionid,
-            natureOfExtension: facultyextension.natureofextension,
-            agency: facultyextension.agency,
-            startDate: facultyextension.startdate,
-            endDate: facultyextension.enddate,
-            extensionLoadCredit: facultyextension.extensionloadcredit,
+            tupleid: facultyExtension.id,
+            natureOfExtension: facultyExtension.natureOfExtension,
+            agency: facultyExtension.agency,
+            startDate: facultyExtension.startDate,
+            endDate: facultyExtension.endDate,
+            extensionLoadCredit: facultyExtension.extensionLoadCredit,
         })
-        .from(facultyextension)
-        .where(eq(facultyextension.facultysemesterid, facultysemesterid));
+        .from(facultyExtension)
+        .where(eq(facultyExtension.facultyAcademicSemesterId, facultyAcademicSemesterid));
 }
 
-export type FacultyExtensionDTO = Awaited<ReturnType<typeof getFacultyExtension>>;
+export type facultyExtensionDTO = Awaited<ReturnType<typeof getFacultyExtension>>;
 
-export async function getFacultyStudyLoad(facultysemesterid: number) {
+export async function getFacultyStudyLoad(facultyAcademicSemesterid: number) {
     return await db
         .select({
-            tupleid: facultystudyload.facultystudyloadid,
-            degreeProgram: facultystudyload.degreeprogram,
-            university: facultystudyload.university,
-            studyLoadUnits: facultystudyload.studyloadunits,
-            onFullTimeLeaveWithPay: facultystudyload.onfulltimeleavewithpay,
-            isFacultyFellowshipRecipient: facultystudyload.isfacultyfellowshiprecipient,
-            studyLoadCredit: facultystudyload.studyloadcredit,
+            tupleid: facultyStudyLoad.id,
+            degreeProgram: facultyStudyLoad.degreeProgram,
+            university: facultyStudyLoad.university,
+            studyLoadUnits: facultyStudyLoad.studyLoadUnits,
+            onFullTimeLeaveWithPay: facultyStudyLoad.onFullTimeLeaveWithPay,
+            isFacultyFellowshipRecipient: facultyStudyLoad.isFacultyFellowshipRecipient,
+            studyLoadCredit: facultyStudyLoad.studyLoadCredit,
         })
-        .from(facultystudyload)
-        .where(eq(facultystudyload.facultysemesterid, facultysemesterid));
+        .from(facultyStudyLoad)
+        .where(eq(facultyStudyLoad.facultyAcademicSemesterId, facultyAcademicSemesterid));
 }
 
-export type FacultyStudyLoadDTO = Awaited<ReturnType<typeof getFacultyStudyLoad>>;
+export type facultyStudyLoadDTO = Awaited<ReturnType<typeof getFacultyStudyLoad>>;
 
 export async function getFacultyProfile(facultyid: number) {
     // Personal Information
-    const personalInfoArr = await db.select().from(faculty).where(eq(faculty.facultyid, facultyid));
+    const personalInfoArr = await db.select().from(faculty).where(eq(faculty.id, facultyid));
     if (personalInfoArr.length === 0) return null;
     const [personalInfo] = personalInfoArr;
 
@@ -348,31 +348,31 @@ export async function getFacultySemestralRecords(
     semNum: number,
 ) {
     // Semestral Details
-    const facultySemester = await getFacultySemester(facultyid, acadYear, semNum);
-    if (facultySemester === null) return null;
+    const facultyAcademicSemester = await getFacultyAcademicSemester(facultyid, acadYear, semNum);
+    if (facultyAcademicSemester === null) return null;
 
-    const { facultysemesterid } = facultySemester;
+    const { id } = facultyAcademicSemester;
 
     // Related Information
     const relatedInfo = await Promise.all([
         // Administrative
-        getFacultyAdminPositions(facultysemesterid), // Admin Positions
-        getFacultyCommittees(facultysemesterid), // Committee Memberships
-        getFacultyAdminWorks(facultysemesterid), // Admin Works
+        getFacultyAdminPositions(id), // Admin Positions
+        getFacultyCommittees(id), // Committee Memberships
+        getFacultyAdminWorks(id), // Admin Works
 
         // Teaching
-        getFacultyCoursesTaught(facultysemesterid), // Courses Taught
-        getFacultyMentees(facultysemesterid), // Mentees
+        getFacultyCoursesTaught(id), // Courses Taught
+        getFacultyMentees(id), // Mentees
 
-        getFacultyResearch(facultysemesterid), // Research
+        getFacultyResearch(id), // Research
 
-        getFacultyExtension(facultysemesterid), // Extension
+        getFacultyExtension(id), // Extension
 
-        getFacultyStudyLoad(facultysemesterid), // Study Load
+        getFacultyStudyLoad(id), // Study Load
     ]);
 
     return {
-        ...facultySemester,
+        ...facultyAcademicSemester,
         adminPositions: relatedInfo[0],
         committees: relatedInfo[1],
         adminWorks: relatedInfo[2],
@@ -390,15 +390,15 @@ export async function getFacultySemestralRecords(
 
 export type FacultySemestralRecordDTO = Awaited<ReturnType<typeof getFacultySemestralRecords>>;
 
-export async function getAllFacultySemesters(facultyid: number) {
+export async function getAllFacultyAcademicSemesters(facultyid: number) {
     return await db
         .select({
-            acadYear: semester.academicyear,
-            semNum: semester.semester,
+            acadYear: academicSemester.academicYear,
+            semNum: academicSemester.semesterNumber,
         })
-        .from(facultysemester)
-        .leftJoin(semester, eq(semester.acadsemesterid, facultysemester.acadsemesterid))
-        .where(eq(facultysemester.facultyid, facultyid));
+        .from(facultyAcademicSemester)
+        .leftJoin(academicSemester, eq(academicSemester.id, facultyAcademicSemester.academicSemesterId))
+        .where(eq(facultyAcademicSemester.facultyId, facultyid));
 }
 
 // TODO: Limit semester.semester values
@@ -409,9 +409,9 @@ export function getAllSemesterms() {
 export async function getAllFieldsOfInterest() {
     const fields = await db
         .select({
-            field: fieldofinterest.field,
+            field: fieldOfInterest.field,
         })
-        .from(fieldofinterest);
+        .from(fieldOfInterest);
 
     return fields.map(({ field }) => field);
 }
@@ -419,9 +419,9 @@ export async function getAllFieldsOfInterest() {
 export async function getAllRanks() {
     return await db
         .select({
-            rankTitle: rank.ranktitle,
-            salaryGrade: rank.salarygrade,
-            salaryRate: rank.salaryrate,
+            title: rank.title,
+            salaryGrade: rank.salaryGrade,
+            salaryRate: rank.salaryRate,
         })
         .from(rank);
 }
@@ -429,19 +429,19 @@ export async function getAllRanks() {
 export async function getAllAppointmentStatuses() {
     const appointmentStatuses = await db
         .select({
-            appointmentstatus: appointmentstatus.appointmentstatus,
+            appointmentStatus: appointmentStatus.appointmentStatus,
         })
-        .from(appointmentstatus);
+        .from(appointmentStatus);
 
-    return appointmentStatuses.map(({ appointmentstatus }) => appointmentstatus);
+    return appointmentStatuses.map(({ appointmentStatus }) => appointmentStatus);
 }
 
 export async function getAllAdminPositions() {
     const adminPositions = await db
         .select({
-            adminPosition: adminposition.name,
+            adminPosition: adminPosition.title,
         })
-        .from(adminposition);
+        .from(adminPosition);
 
     return adminPositions.map(({ adminPosition }) => adminPosition);
 }
@@ -460,8 +460,8 @@ export async function getAllResearches() {
     return await db
         .select({
             title: research.title,
-            startDate: research.startdate,
-            endDate: research.enddate,
+            startDate: research.startDate,
+            endDate: research.endDate,
             funding: research.funding,
         })
         .from(research);
@@ -470,7 +470,7 @@ export async function getAllResearches() {
 export async function getAllCourses() {
     return await db
         .select({
-            title: course.coursename,
+            title: course.name,
             units: course.units,
         })
         .from(course);

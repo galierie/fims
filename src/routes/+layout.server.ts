@@ -7,9 +7,9 @@ export async function load({ locals, url }) {
     if (locals.user) {
         const userRole = await getRole(locals.user.id);
         const {
-            canaddaccount,
-            canmodifyaccount,
-            canviewchangelogs: canViewChangeLogs,
+            canAddAccount,
+            canModifyAccount,
+            canViewChangelogs,
         } = await getPermissions(userRole);
 
         const accountColorMap = new Map();
@@ -21,9 +21,9 @@ export async function load({ locals, url }) {
         return {
             isLoggedIn: true, // if it's not, then this line shouldn't have been reached
             email: locals.user.email,
-            canViewAccounts: canaddaccount || canmodifyaccount,
+            canViewAccounts: canAddAccount || canModifyAccount,
             isViewingRecord: url.pathname.startsWith('/record'),
-            canViewChangeLogs,
+            canViewChangelogs,
             accountColor: accountColorMap.get(userRole),
         };
     }

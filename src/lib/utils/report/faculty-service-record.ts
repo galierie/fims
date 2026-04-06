@@ -231,14 +231,14 @@ export async function getFacultyServiceRecordWorksheet(
     let semestralRecordDataCol = semestralRecordStartCol;
     let currentAcadYear = 0;
     semestralRecords.forEach((record) => {
-        const { acadSemesterId, acadYear, semNum, remarks } = record;
+        const { academicSemesterId, acadYear, semNum, remarks } = record;
 
         const [{ currentCoursesTaught, teachingLoadCredit, numOfStudentsPerCourse }] =
-            currentTeachingLoad.filter((t) => t.acadSemesterId === acadSemesterId);
+            currentTeachingLoad.filter((t) => t.academicSemesterId === academicSemesterId);
         const [{ administrativeLoadCredit, currentAdminPositions }] =
-            currentAdministrativeLoad.filter((a) => a.acadSemesterId === acadSemesterId);
+            currentAdministrativeLoad.filter((a) => a.academicSemesterId === academicSemesterId);
         const [{ researchLoadCredit, researchTitles, researchPeriods, researchFundings }] =
-            currentResearchLoad.filter((r) => r.acadSemesterId === acadSemesterId);
+            currentResearchLoad.filter((r) => r.academicSemesterId === academicSemesterId);
 
         if (currentAcadYear !== acadYear) {
             const acadYearCell = sheet.getCell(semestralRecordDataRow, semestralRecordDataCol);

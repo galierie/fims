@@ -1,23 +1,23 @@
 import { db } from '../db/index';
 import {
     faculty,
-    facultycourse,
+    facultyCourse,
     course,
-    semester,
-    facultysemester,
-    facultyadminposition,
+    academicSemester,
+    facultyAcademicSemester,
+    facultyAdminPosition,
     rank,
-    facultyeducationalattainment,
-    adminposition,
-    facultycommmembership,
-    facultyresearch,
-    facultyadminwork,
-    facultyrank,
-    facultyhomeaddress,
-    facultyemail,
-    fieldofinterest,
-    facultyfieldofinterest,
-    facultycontactnumber,
+    facultyEducationalAttainment,
+    adminPosition,
+    facultyCommMembership,
+    facultyResearch,
+    facultyAdminWork,
+    facultyRank,
+    facultyHomeAddress,
+    facultyEmail,
+    fieldOfInterest,
+    facultyFieldOfInterest,
+    facultyContactNumber,
     research,
     office,
 } from '../db/schema';
@@ -26,21 +26,21 @@ import { eq, and, sql, avg, asc, desc, lt, gt, lte, gte, or, between } from 'dri
 export async function getFacultyProfileReport(facultyid: number) {
     return await db
         .select({
-            lastName: faculty.lastname,
-            firstName: faculty.firstname,
-            middleName: faculty.middlename,
-            homeAddresses: sql<string>`STRING_AGG(${facultyhomeaddress.homeaddress}, E'\n')`,
-            contactNumbers: sql<string>`STRING_AGG(${facultycontactnumber.contactnumber}, E'\n')`,
-            emailAddresses: sql<string>`STRING_AGG(${facultyemail.email}, E'\n')`,
-            birthDate: faculty.birthdate,
-            educationalAttainments: sql<string>`STRING_AGG(${facultyeducationalattainment.degree} || ', ' || ${facultyeducationalattainment.institution} || ', ' || ${facultyeducationalattainment.graduationyear}, E'\n' ORDER BY ${desc(facultyeducationalattainment.graduationyear)})`,
-            fieldsOfInterest: sql<string>`STRING_AGG(${fieldofinterest.field}, ', ' ORDER BY ${asc(fieldofinterest.field)})`,
-            designation: rank.ranktitle,
-            salaryGrade: rank.salarygrade,
-            salaryRate: rank.salaryrate,
-            dateOfOriginalAppointment: faculty.dateoforiginalappointment,
-            psiItem: faculty.psiitem,
-            employeeNumber: faculty.employeenumber,
+            lastName: faculty.lastName,
+            firstName: faculty.firstName,
+            middleName: faculty.middleName,
+            homeAddresses: sql<string>`STRING_AGG(${facultyHomeAddress.homeAddress}, E'\n')`,
+            contactNumbers: sql<string>`STRING_AGG(${facultyContactNumber.contactNumber}, E'\n')`,
+            emailAddresses: sql<string>`STRING_AGG(${facultyEmail.email}, E'\n')`,
+            birthDate: faculty.birthDate,
+            educationalAttainments: sql<string>`STRING_AGG(${facultyEducationalAttainment.degree} || ', ' || ${facultyEducationalAttainment.institution} || ', ' || ${facultyEducationalAttainment.graduationYear}, E'\n' ORDER BY ${desc(facultyEducationalAttainment.graduationYear)})`,
+            fieldsOfInterest: sql<string>`STRING_AGG(${fieldOfInterest.field}, ', ' ORDER BY ${asc(fieldOfInterest.field)})`,
+            designation: rank.title,
+            salaryGrade: rank.salaryGrade,
+            salaryRate: rank.salaryRate,
+            dateOfOriginalAppointment: faculty.dateOfOriginalAppointment,
+            psiItem: faculty.psiItem,
+            employeeNumber: faculty.employeeNumber,
             tin: faculty.tin,
             gsis: faculty.gsis,
             philhealth: faculty.philhealth,
@@ -48,40 +48,40 @@ export async function getFacultyProfileReport(facultyid: number) {
             remarks: faculty.remarks,
         })
         .from(faculty)
-        .leftJoin(facultyhomeaddress, eq(faculty.facultyid, facultyhomeaddress.facultyid))
-        .leftJoin(facultycontactnumber, eq(faculty.facultyid, facultycontactnumber.facultyid))
-        .leftJoin(facultyemail, eq(faculty.facultyid, facultyemail.facultyid))
+        .leftJoin(facultyHomeAddress, eq(faculty.id, facultyHomeAddress.facultyId))
+        .leftJoin(facultyContactNumber, eq(faculty.id, facultyContactNumber.facultyId))
+        .leftJoin(facultyEmail, eq(faculty.id, facultyEmail.facultyId))
         .leftJoin(
-            facultyeducationalattainment,
-            eq(faculty.facultyid, facultyeducationalattainment.facultyid),
+            facultyEducationalAttainment,
+            eq(faculty.id, facultyEducationalAttainment.facultyId),
         )
-        .leftJoin(facultyfieldofinterest, eq(faculty.facultyid, facultyfieldofinterest.facultyid))
+        .leftJoin(facultyFieldOfInterest, eq(faculty.id, facultyFieldOfInterest.facultyId))
         .leftJoin(
-            fieldofinterest,
-            eq(facultyfieldofinterest.fieldofinterestid, fieldofinterest.fieldofinterestid),
+            fieldOfInterest,
+            eq(facultyFieldOfInterest.fieldOfInterestId, fieldOfInterest.id),
         )
-        .leftJoin(facultyrank, eq(faculty.facultyid, facultyrank.facultyid))
-        .leftJoin(rank, eq(facultyrank.rankid, rank.rankid))
-        .where(eq(faculty.facultyid, facultyid))
+        .leftJoin(facultyRank, eq(faculty.id, facultyRank.facultyId))
+        .leftJoin(rank, eq(facultyRank.rankId, rank.id))
+        .where(eq(faculty.id, facultyid))
         .groupBy(
-            faculty.lastname,
-            faculty.firstname,
-            faculty.middlename,
-            faculty.birthdate,
-            faculty.dateoforiginalappointment,
-            faculty.psiitem,
-            faculty.employeenumber,
+            faculty.lastName,
+            faculty.firstName,
+            faculty.middleName,
+            faculty.birthDate,
+            faculty.dateOfOriginalAppointment,
+            faculty.psiItem,
+            faculty.employeeNumber,
             faculty.tin,
             faculty.gsis,
             faculty.philhealth,
             faculty.pagibig,
             faculty.remarks,
-            facultyrank.dateoftenureorrenewal,
-            rank.ranktitle,
-            rank.salarygrade,
-            rank.salaryrate,
+            facultyRank.dateOfTenureOrRenewal,
+            rank.title,
+            rank.salaryGrade,
+            rank.salaryRate,
         )
-        .orderBy(desc(facultyrank.dateoftenureorrenewal));
+        .orderBy(desc(facultyRank.dateOfTenureOrRenewal));
 }
 
 export async function getFacultyServiceRecordReport(
@@ -91,193 +91,193 @@ export async function getFacultyServiceRecordReport(
     toAcadYear: number,
     toSemNum: number,
 ) {
-    const existingFacultySemesterSq = db
+    const existingFacultyAcademicSemesterSq = db
         // TODO: limit
         .select({
-            facultyid: facultysemester.facultyid,
-            facultysemesterid: facultysemester.facultysemesterid,
-            acadsemesterid: facultysemester.acadsemesterid,
-            currentrankid: facultysemester.currentrankid,
-            currenthighesteducationalattainmentid:
-                facultysemester.currenthighesteducationalattainmentid,
-            remarks: facultysemester.remarks,
+            facultyId: facultyAcademicSemester.facultyId,
+            facultyAcademicSemesterId: facultyAcademicSemester.id,
+            academicSemesterId: facultyAcademicSemester.academicSemesterId,
+            currentRankId: facultyAcademicSemester.currentRankId,
+            currentHighestEducationalAttainmentId:
+                facultyAcademicSemester.currentHighestEducationalAttainmentId,
+            remarks: facultyAcademicSemester.remarks,
         })
-        .from(facultysemester)
-        .innerJoin(semester, eq(facultysemester.acadsemesterid, semester.acadsemesterid))
+        .from(facultyAcademicSemester)
+        .innerJoin(academicSemester, eq(facultyAcademicSemester.academicSemesterId, academicSemester.id))
         .where(
             and(
-                eq(facultysemester.facultyid, facultyid),
+                eq(facultyAcademicSemester.facultyId, facultyid),
                 or(
                     and(
-                        lt(semester.academicyear, toAcadYear),
-                        gt(semester.academicyear, fromAcadYear),
+                        lt(academicSemester.academicYear, toAcadYear),
+                        gt(academicSemester.academicYear, fromAcadYear),
                     ),
-                    and(eq(semester.academicyear, toAcadYear), lte(semester.semester, toSemNum)),
+                    and(eq(academicSemester.academicYear, toAcadYear), lte(academicSemester.semesterNumber, toSemNum)),
                     and(
-                        eq(semester.academicyear, fromAcadYear),
-                        gte(semester.semester, fromSemNum),
+                        eq(academicSemester.academicYear, fromAcadYear),
+                        gte(academicSemester.semesterNumber, fromSemNum),
                     ),
                 ),
             ),
         )
-        .as('existing_facultysemester_sq');
+        .as('existing_facultyAcademicSemester_sq');
 
     const profileQuery = db
         .select({
-            lastName: faculty.lastname,
-            firstName: faculty.firstname,
-            middleName: faculty.middlename,
-            currentAppointment: rank.ranktitle,
-            currentAppointmentStatus: facultyrank.appointmentstatus,
-            dateOfOriginalAppointment: faculty.dateoforiginalappointment,
-            highestEducationalAttainmentDegree: facultyeducationalattainment.degree,
-            highestEducationAttainmentInstitution: facultyeducationalattainment.institution,
-            highestEducationAttainmentGraduationYear: facultyeducationalattainment.graduationyear,
+            lastName: faculty.lastName,
+            firstName: faculty.firstName,
+            middleName: faculty.middleName,
+            currentAppointment: rank.title,
+            currentAppointmentStatus: facultyRank.appointmentStatus,
+            dateOfOriginalAppointment: faculty.dateOfOriginalAppointment,
+            highestEducationalAttainmentDegree: facultyEducationalAttainment.degree,
+            highestEducationAttainmentInstitution: facultyEducationalAttainment.institution,
+            highestEducationAttainmentGraduationYear: facultyEducationalAttainment.graduationYear,
         })
         .from(faculty)
         .innerJoin(
-            existingFacultySemesterSq,
-            eq(faculty.facultyid, existingFacultySemesterSq.facultyid),
+            existingFacultyAcademicSemesterSq,
+            eq(faculty.id, existingFacultyAcademicSemesterSq.facultyId),
         )
-        .innerJoin(semester, eq(existingFacultySemesterSq.acadsemesterid, semester.acadsemesterid))
+        .innerJoin(academicSemester, eq(existingFacultyAcademicSemesterSq.academicSemesterId, academicSemester.id))
         .leftJoin(
-            facultyrank,
-            eq(existingFacultySemesterSq.currentrankid, facultyrank.facultyrankid),
+            facultyRank,
+            eq(existingFacultyAcademicSemesterSq.currentRankId, facultyRank.id),
         )
-        .leftJoin(rank, eq(facultyrank.rankid, rank.rankid))
+        .leftJoin(rank, eq(facultyRank.rankId, rank.id))
         .leftJoin(
-            facultyeducationalattainment,
+            facultyEducationalAttainment,
             eq(
-                existingFacultySemesterSq.currenthighesteducationalattainmentid,
-                facultyeducationalattainment.facultyeducationalattainmentid,
+                existingFacultyAcademicSemesterSq.currentHighestEducationalAttainmentId,
+                facultyEducationalAttainment.id,
             ),
         )
-        .orderBy(desc(semester.academicyear), desc(semester.semester))
+        .orderBy(desc(academicSemester.academicYear), desc(academicSemester.semesterNumber))
         .limit(1);
 
     const originalTenureQuery = db
         .select({
-            tenureAppointment: rank.ranktitle,
-            tenureDateOfAppointment: facultyrank.dateoftenureorrenewal,
+            tenureAppointment: rank.title,
+            tenureDateOfAppointment: facultyRank.dateOfTenureOrRenewal,
         })
-        .from(facultyrank)
-        .innerJoin(rank, eq(facultyrank.rankid, rank.rankid))
-        .innerJoin(faculty, eq(facultyrank.facultyid, faculty.facultyid))
+        .from(facultyRank)
+        .innerJoin(rank, eq(facultyRank.rankId, rank.id))
+        .innerJoin(faculty, eq(facultyRank.facultyId, faculty.id))
         .where(
-            and(eq(faculty.facultyid, facultyid), eq(facultyrank.appointmentstatus, 'Permanent')),
+            and(eq(faculty.id, facultyid), eq(facultyRank.appointmentStatus, 'Permanent')),
         );
 
     const adminPositionsQuery = db
         .select({
-            adminPosition: adminposition.name,
+            adminPosition: adminPosition.title,
             office: office.name,
-            periods: sql<string>`STRING_AGG(${facultyadminposition.startdate} || ' - ' || ${facultyadminposition.enddate}, '; ' ORDER BY ${asc(facultyadminposition.enddate)}, ${asc(facultyadminposition.startdate)})`,
+            periods: sql<string>`STRING_AGG(${facultyAdminPosition.startDate} || ' - ' || ${facultyAdminPosition.endDate}, '; ' ORDER BY ${asc(facultyAdminPosition.endDate)}, ${asc(facultyAdminPosition.startDate)})`,
         })
-        .from(facultyadminposition)
+        .from(facultyAdminPosition)
         .innerJoin(
-            adminposition,
-            eq(facultyadminposition.adminpositionid, adminposition.adminpositionid),
+            adminPosition,
+            eq(facultyAdminPosition.adminPositionId, adminPosition.id),
         )
-        .innerJoin(office, eq(facultyadminposition.officeid, office.officeid))
+        .innerJoin(office, eq(facultyAdminPosition.officeId, office.id))
         .innerJoin(
-            existingFacultySemesterSq,
-            eq(facultyadminposition.facultysemesterid, existingFacultySemesterSq.facultysemesterid),
+            existingFacultyAcademicSemesterSq,
+            eq(facultyAdminPosition.facultyAcademicSemesterId, existingFacultyAcademicSemesterSq.facultyAcademicSemesterId),
         )
-        .groupBy(facultyadminposition.facultyadminpositionid, adminposition.name, office.name)
+        .groupBy(facultyAdminPosition.id, adminPosition.title, office.name)
         .orderBy(
-            desc(facultyadminposition.enddate),
-            desc(facultyadminposition.startdate),
-            desc(facultyadminposition.facultyadminpositionid),
+            desc(facultyAdminPosition.endDate),
+            desc(facultyAdminPosition.startDate),
+            desc(facultyAdminPosition.id),
         );
 
     const fieldsOfInterestQuery = db
         .select({
-            fields: sql<string>`STRING_AGG(${fieldofinterest.field}, ', ' ORDER BY ${asc(fieldofinterest.field)})`,
+            fields: sql<string>`STRING_AGG(${fieldOfInterest.field}, ', ' ORDER BY ${asc(fieldOfInterest.field)})`,
         })
-        .from(facultyfieldofinterest)
+        .from(facultyFieldOfInterest)
         .innerJoin(
-            fieldofinterest,
-            eq(facultyfieldofinterest.fieldofinterestid, fieldofinterest.fieldofinterestid),
+            fieldOfInterest,
+            eq(facultyFieldOfInterest.fieldOfInterestId, fieldOfInterest.id),
         )
-        .where(eq(facultyfieldofinterest.facultyid, facultyid))
-        .groupBy(facultyfieldofinterest.facultyid);
+        .where(eq(facultyFieldOfInterest.facultyId, facultyid))
+        .groupBy(facultyFieldOfInterest.facultyId);
 
     const currentTeachingLoadQuery = db
         .select({
-            acadSemesterId: existingFacultySemesterSq.acadsemesterid,
-            currentCoursesTaught: sql<string>`STRING_AGG(${course.coursename}, ', ' ORDER BY ${course.coursename})`,
+            academicSemesterId: existingFacultyAcademicSemesterSq.academicSemesterId,
+            currentCoursesTaught: sql<string>`STRING_AGG(${course.name}, ', ' ORDER BY ${course.name})`,
             teachingLoadCredit:
-                sql<number>`COALESCE(sum(${facultycourse.teachingloadcredit}), 0)`.mapWith(Number),
-            numOfStudentsPerCourse: sql<string>`STRING_AGG(${facultycourse.numberofstudents}::text, ', ' ORDER BY ${asc(course.coursename)})`,
+                sql<number>`COALESCE(sum(${facultyCourse.teachingLoadCredit}), 0)`.mapWith(Number),
+            numOfStudentsPerCourse: sql<string>`STRING_AGG(${facultyCourse.numberOfStudents}::text, ', ' ORDER BY ${asc(course.name)})`,
         })
-        .from(existingFacultySemesterSq)
+        .from(existingFacultyAcademicSemesterSq)
         .leftJoin(
-            facultycourse,
-            eq(existingFacultySemesterSq.facultysemesterid, facultycourse.facultysemesterid),
+            facultyCourse,
+            eq(existingFacultyAcademicSemesterSq.facultyAcademicSemesterId, facultyCourse.facultyAcademicSemesterId),
         )
-        .leftJoin(course, eq(facultycourse.courseid, course.courseid))
-        .groupBy(existingFacultySemesterSq.acadsemesterid);
+        .leftJoin(course, eq(facultyCourse.courseId, course.id))
+        .groupBy(existingFacultyAcademicSemesterSq.academicSemesterId);
 
     const currentAdministrativeLoadQuery = db
         .select({
-            acadSemesterId: existingFacultySemesterSq.acadsemesterid,
+            academicSemesterId: existingFacultyAcademicSemesterSq.academicSemesterId,
             administrativeLoadCredit:
-                sql<number>`COALESCE(sum(${facultyadminposition.administrativeloadcredit}), 0) + COALESCE(sum(${facultycommmembership.administrativeloadcredit}), 0) + COALESCE(sum(${facultyadminwork.administrativeloadcredit}), 0)`.mapWith(
+                sql<number>`COALESCE(sum(${facultyAdminPosition.administrativeLoadCredit}), 0) + COALESCE(sum(${facultyCommMembership.administrativeLoadCredit}), 0) + COALESCE(sum(${facultyAdminWork.administrativeLoadCredit}), 0)`.mapWith(
                     Number,
                 ),
-            currentAdminPositions: sql<string>`STRING_AGG(${adminposition.name}, ', ' ORDER BY ${asc(adminposition.name)})`,
+            currentAdminPositions: sql<string>`STRING_AGG(${adminPosition.title}, ', ' ORDER BY ${asc(adminPosition.title)})`,
         })
-        .from(existingFacultySemesterSq)
+        .from(existingFacultyAcademicSemesterSq)
         .leftJoin(
-            facultyadminposition,
-            eq(existingFacultySemesterSq.facultysemesterid, facultyadminposition.facultysemesterid),
+            facultyAdminPosition,
+            eq(existingFacultyAcademicSemesterSq.facultyAcademicSemesterId, facultyAdminPosition.facultyAcademicSemesterId),
         )
         .leftJoin(
-            adminposition,
-            eq(facultyadminposition.adminpositionid, adminposition.adminpositionid),
+            adminPosition,
+            eq(facultyAdminPosition.adminPositionId, adminPosition.id),
         )
         .leftJoin(
-            facultycommmembership,
+            facultyCommMembership,
             eq(
-                existingFacultySemesterSq.facultysemesterid,
-                facultycommmembership.facultysemesterid,
+                existingFacultyAcademicSemesterSq.facultyAcademicSemesterId,
+                facultyCommMembership.facultyAcademicSemesterId,
             ),
         )
         .leftJoin(
-            facultyadminwork,
-            eq(existingFacultySemesterSq.facultysemesterid, facultyadminwork.facultysemesterid),
+            facultyAdminWork,
+            eq(existingFacultyAcademicSemesterSq.facultyAcademicSemesterId, facultyAdminWork.facultyAcademicSemesterId),
         )
-        .groupBy(existingFacultySemesterSq.acadsemesterid);
+        .groupBy(existingFacultyAcademicSemesterSq.academicSemesterId);
 
     const currentResearchLoadQuery = db
         .select({
-            acadSemesterId: existingFacultySemesterSq.acadsemesterid,
+            academicSemesterId: existingFacultyAcademicSemesterSq.academicSemesterId,
             researchLoadCredit:
-                sql<number>`COALESCE(sum(${facultyresearch.researchloadcredit}), 0)`.mapWith(
+                sql<number>`COALESCE(sum(${facultyResearch.researchLoadCredit}), 0)`.mapWith(
                     Number,
                 ),
             researchTitles: sql<string>`STRING_AGG(${research.title}, ', ' ORDER BY ${asc(research.title)})`,
-            researchPeriods: sql<string>`STRING_AGG(${research.startdate} || ' - ' || ${research.enddate}, ', ' ORDER BY ${asc(research.title)})`,
+            researchPeriods: sql<string>`STRING_AGG(${research.startDate} || ' - ' || ${research.endDate}, ', ' ORDER BY ${asc(research.title)})`,
             researchFundings: sql<string>`STRING_AGG(${research.funding}, ', ' ORDER BY ${asc(research.title)})`,
         })
-        .from(existingFacultySemesterSq)
+        .from(existingFacultyAcademicSemesterSq)
         .leftJoin(
-            facultyresearch,
-            eq(existingFacultySemesterSq.facultysemesterid, facultyresearch.facultysemesterid),
+            facultyResearch,
+            eq(existingFacultyAcademicSemesterSq.facultyAcademicSemesterId, facultyResearch.facultyAcademicSemesterId),
         )
-        .leftJoin(research, eq(facultyresearch.researchid, research.researchid))
-        .groupBy(existingFacultySemesterSq.acadsemesterid);
+        .leftJoin(research, eq(facultyResearch.researchId, research.id))
+        .groupBy(existingFacultyAcademicSemesterSq.academicSemesterId);
 
     const semestralRecordsQuery = db
         .select({
-            acadSemesterId: existingFacultySemesterSq.acadsemesterid,
-            acadYear: semester.academicyear,
-            semNum: semester.semester,
-            remarks: existingFacultySemesterSq.remarks,
+            academicSemesterId: existingFacultyAcademicSemesterSq.academicSemesterId,
+            acadYear: academicSemester.academicYear,
+            semNum: academicSemester.semesterNumber,
+            remarks: existingFacultyAcademicSemesterSq.remarks,
         })
-        .from(existingFacultySemesterSq)
-        .innerJoin(semester, eq(existingFacultySemesterSq.acadsemesterid, semester.acadsemesterid))
-        .orderBy(desc(semester.academicyear), asc(semester.semester));
+        .from(existingFacultyAcademicSemesterSq)
+        .innerJoin(academicSemester, eq(existingFacultyAcademicSemesterSq.academicSemesterId, academicSemester.id))
+        .orderBy(desc(academicSemester.academicYear), asc(academicSemester.semesterNumber));
 
     const [
         profile,
@@ -314,75 +314,75 @@ export async function getFacultyServiceRecordReport(
 export async function getFacultyLoadingReport(facultyid: number, acadYear: number, semNum: number) {
     return await db
         .select({
-            lastName: faculty.lastname,
-            firstName: faculty.firstname,
-            middleName: faculty.middlename,
-            designation: rank.ranktitle,
-            degree: facultyeducationalattainment.degree,
-            coursesTaught: sql<string>`STRING_AGG(${course.coursename}, ', ' ORDER BY ${course.coursename})`,
+            lastName: faculty.lastName,
+            firstName: faculty.firstName,
+            middleName: faculty.middleName,
+            designation: rank.title,
+            degree: facultyEducationalAttainment.degree,
+            coursesTaught: sql<string>`STRING_AGG(${course.name}, ', ' ORDER BY ${course.name})`,
             teachingLoadUnits: sql<number>`COALESCE(sum(${course.units}), 0)`.mapWith(Number),
-            adminPosition: sql<string>`STRING_AGG(${adminposition.name}, ', ' ORDER BY ${adminposition.name})`,
+            adminPosition: sql<string>`STRING_AGG(${adminPosition.title}, ', ' ORDER BY ${adminPosition.title})`,
             administrativeLoadCredit:
-                sql<number>`COALESCE(sum(${facultyadminposition.administrativeloadcredit}), 0) + COALESCE(sum(${facultycommmembership.administrativeloadcredit}), 0) + COALESCE(sum(${facultyadminwork.administrativeloadcredit}), 0)`.mapWith(
+                sql<number>`COALESCE(sum(${facultyAdminPosition.administrativeLoadCredit}), 0) + COALESCE(sum(${facultyCommMembership.administrativeLoadCredit}), 0) + COALESCE(sum(${facultyAdminWork.administrativeLoadCredit}), 0)`.mapWith(
                     Number,
                 ),
             teachingLoadCredit:
-                sql<number>`COALESCE(sum(${facultycourse.teachingloadcredit}), 0)`.mapWith(Number),
+                sql<number>`COALESCE(sum(${facultyCourse.teachingLoadCredit}), 0)`.mapWith(Number),
             researchLoadCredit:
-                sql<number>`COALESCE(sum(${facultyresearch.researchloadcredit}), 0)`.mapWith(
+                sql<number>`COALESCE(sum(${facultyResearch.researchLoadCredit}), 0)`.mapWith(
                     Number,
                 ),
         })
         .from(faculty)
-        .innerJoin(facultysemester, eq(faculty.facultyid, facultysemester.facultyid))
-        .innerJoin(semester, eq(facultysemester.acadsemesterid, semester.acadsemesterid))
-        .leftJoin(facultyrank, eq(facultysemester.currentrankid, facultyrank.facultyrankid))
-        .leftJoin(rank, eq(facultyrank.rankid, rank.rankid))
+        .innerJoin(facultyAcademicSemester, eq(faculty.id, facultyAcademicSemester.facultyId))
+        .innerJoin(academicSemester, eq(facultyAcademicSemester.academicSemesterId, academicSemester.id))
+        .leftJoin(facultyRank, eq(facultyAcademicSemester.currentRankId, facultyRank.id))
+        .leftJoin(rank, eq(facultyRank.rankId, rank.id))
         .leftJoin(
-            facultyeducationalattainment,
+            facultyEducationalAttainment,
             eq(
-                facultysemester.currenthighesteducationalattainmentid,
-                facultyeducationalattainment.facultyeducationalattainmentid,
+                facultyAcademicSemester.currentHighestEducationalAttainmentId,
+                facultyEducationalAttainment.id,
             ),
         )
         .leftJoin(
-            facultycourse,
-            eq(facultysemester.facultysemesterid, facultycourse.facultysemesterid),
+            facultyCourse,
+            eq(facultyAcademicSemester.id, facultyCourse.facultyAcademicSemesterId),
         )
-        .leftJoin(course, eq(facultycourse.courseid, course.courseid))
+        .leftJoin(course, eq(facultyCourse.courseId, course.id))
         .leftJoin(
-            facultyadminposition,
-            eq(facultysemester.facultysemesterid, facultyadminposition.facultysemesterid),
-        )
-        .leftJoin(
-            adminposition,
-            eq(facultyadminposition.adminpositionid, adminposition.adminpositionid),
+            facultyAdminPosition,
+            eq(facultyAcademicSemester.id, facultyAdminPosition.facultyAcademicSemesterId),
         )
         .leftJoin(
-            facultycommmembership,
-            eq(facultysemester.facultysemesterid, facultycommmembership.facultysemesterid),
+            adminPosition,
+            eq(facultyAdminPosition.adminPositionId, adminPosition.id),
         )
         .leftJoin(
-            facultyadminwork,
-            eq(facultysemester.facultysemesterid, facultyadminwork.facultysemesterid),
+            facultyCommMembership,
+            eq(facultyAcademicSemester.id, facultyCommMembership.facultyAcademicSemesterId),
         )
         .leftJoin(
-            facultyresearch,
-            eq(facultysemester.facultysemesterid, facultyresearch.facultysemesterid),
+            facultyAdminWork,
+            eq(facultyAcademicSemester.id, facultyAdminWork.facultyAcademicSemesterId),
+        )
+        .leftJoin(
+            facultyResearch,
+            eq(facultyAcademicSemester.id, facultyResearch.facultyAcademicSemesterId),
         )
         .where(
             and(
-                eq(faculty.facultyid, facultyid),
-                eq(semester.academicyear, acadYear),
-                eq(semester.semester, semNum),
+                eq(faculty.id, facultyid),
+                eq(academicSemester.academicYear, acadYear),
+                eq(academicSemester.semesterNumber, semNum),
             ),
         )
         .groupBy(
-            faculty.lastname,
-            faculty.firstname,
-            faculty.middlename,
-            rank.ranktitle,
-            facultyeducationalattainment.degree,
+            faculty.lastName,
+            faculty.firstName,
+            faculty.middleName,
+            rank.title,
+            facultyEducationalAttainment.degree,
         );
 }
 
@@ -393,80 +393,80 @@ export async function getSubjectsByFacultyReport(
 ) {
     return await db
         .select({
-            lastName: faculty.lastname,
-            firstName: faculty.firstname,
-            middleName: faculty.middlename,
-            coursesTaught: sql<string>`STRING_AGG(${course.coursename}, ', ' ORDER BY ${course.coursename})`,
+            lastName: faculty.lastName,
+            firstName: faculty.firstName,
+            middleName: faculty.middleName,
+            coursesTaught: sql<string>`STRING_AGG(${course.name}, ', ' ORDER BY ${course.name})`,
         })
-        .from(facultycourse)
-        .innerJoin(course, eq(facultycourse.courseid, course.courseid))
+        .from(facultyCourse)
+        .innerJoin(course, eq(facultyCourse.courseId, course.id))
         .innerJoin(
-            facultysemester,
-            eq(facultycourse.facultysemesterid, facultysemester.facultysemesterid),
+            facultyAcademicSemester,
+            eq(facultyCourse.facultyAcademicSemesterId, facultyAcademicSemester.id),
         )
-        .innerJoin(faculty, eq(facultysemester.facultyid, faculty.facultyid))
-        .innerJoin(semester, eq(facultysemester.acadsemesterid, semester.acadsemesterid))
+        .innerJoin(faculty, eq(facultyAcademicSemester.facultyId, faculty.id))
+        .innerJoin(academicSemester, eq(facultyAcademicSemester.academicSemesterId, academicSemester.id))
         .where(
             and(
-                eq(faculty.facultyid, facultyid),
-                eq(semester.academicyear, acadYear),
-                eq(semester.semester, semNum),
+                eq(faculty.id, facultyid),
+                eq(academicSemester.academicYear, acadYear),
+                eq(academicSemester.semesterNumber, semNum),
             ),
         )
-        .groupBy(faculty.lastname, faculty.firstname, faculty.middlename);
+        .groupBy(faculty.lastName, faculty.firstName, faculty.middleName);
 }
 
 export async function getFacultyBySubjectReport() {
     return await db
         .select({
-            courseTaught: course.coursename,
+            courseTaught: course.name,
             // Use DISTINCT so a faculty member isn't listed twice if they taught it in multiple semesters
             // Use COALESCE to output 'None' if no one is teaching it
-            faculty: sql<string>`COALESCE(STRING_AGG(DISTINCT ${faculty.firstname} || ' ' || ${faculty.lastname}, ', '), 'None')`,
+            faculty: sql<string>`COALESCE(STRING_AGG(DISTINCT ${faculty.firstName} || ' ' || ${faculty.lastName}, ', '), 'None')`,
         })
         .from(course)
-        .leftJoin(facultycourse, eq(course.courseid, facultycourse.courseid))
+        .leftJoin(facultyCourse, eq(course.id, facultyCourse.courseId))
         .leftJoin(
-            facultysemester,
-            eq(facultycourse.facultysemesterid, facultysemester.facultysemesterid),
+            facultyAcademicSemester,
+            eq(facultyCourse.facultyAcademicSemesterId, facultyAcademicSemester.id),
         )
-        .leftJoin(faculty, eq(facultysemester.facultyid, faculty.facultyid))
+        .leftJoin(faculty, eq(facultyAcademicSemester.facultyId, faculty.id))
         // No .where() clause needed; we want the whole database
-        .groupBy(course.coursename)
-        .orderBy(asc(course.coursename));
+        .groupBy(course.name)
+        .orderBy(asc(course.name));
 }
 
 export async function getFacultySETReport(facultyid: number, acadYear: number) {
     const facultyInfoQuery = db
         .select({
-            lastName: faculty.lastname,
-            firstName: faculty.firstname,
-            middleName: faculty.middlename,
+            lastName: faculty.lastName,
+            firstName: faculty.firstName,
+            middleName: faculty.middleName,
             status: faculty.status,
         })
         .from(faculty)
-        .where(eq(faculty.facultyid, facultyid));
+        .where(eq(faculty.id, facultyid));
 
     const [midyearCoursesQuery, firstSemCoursesQuery, secondSemCoursesQuery] = [0, 1, 2].map(
         (semNum) => {
             return db
                 .select({
-                    courseName: course.coursename,
-                    section: facultycourse.section,
-                    sectionSET: facultycourse.sectionset,
+                    courseName: course.name,
+                    section: facultyCourse.section,
+                    sectionSET: facultyCourse.sectionSET,
                 })
-                .from(facultycourse)
-                .innerJoin(course, eq(facultycourse.courseid, course.courseid))
+                .from(facultyCourse)
+                .innerJoin(course, eq(facultyCourse.courseId, course.id))
                 .innerJoin(
-                    facultysemester,
-                    eq(facultycourse.facultysemesterid, facultysemester.facultysemesterid),
+                    facultyAcademicSemester,
+                    eq(facultyCourse.facultyAcademicSemesterId, facultyAcademicSemester.id),
                 )
-                .innerJoin(semester, eq(facultysemester.acadsemesterid, semester.acadsemesterid))
+                .innerJoin(academicSemester, eq(facultyAcademicSemester.academicSemesterId, academicSemester.id))
                 .where(
                     and(
-                        eq(facultysemester.facultyid, facultyid),
-                        eq(semester.academicyear, acadYear),
-                        eq(semester.semester, semNum),
+                        eq(facultyAcademicSemester.facultyId, facultyid),
+                        eq(academicSemester.academicYear, acadYear),
+                        eq(academicSemester.semesterNumber, semNum),
                     ),
                 );
         },

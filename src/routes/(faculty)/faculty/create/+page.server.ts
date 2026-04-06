@@ -18,16 +18,16 @@ export async function load() {
     const ranks = await getAllRanks();
     opts.set(
         'rankTitles',
-        ranks.map(({ rankTitle }) => rankTitle),
+        ranks.map(({ title }) => title),
     );
 
     const rankTitlesToSalaryGrades: Map<string, string> = new Map(
-        ranks.map(({ rankTitle, salaryGrade }) => [rankTitle, salaryGrade]),
+        ranks.map(({ title, salaryGrade }) => [title, salaryGrade]),
     );
     dependencyMaps.set('rankTitlesToSalaryGrades', rankTitlesToSalaryGrades);
 
     const rankTitlesToSalaryRates: Map<string, string> = new Map(
-        ranks.map(({ rankTitle, salaryRate }) => [rankTitle, salaryRate]),
+        ranks.map(({ title, salaryRate }) => [title, salaryRate]),
     );
     dependencyMaps.set('rankTitlesToSalaryRates', rankTitlesToSalaryRates);
 
@@ -129,14 +129,14 @@ export const actions = {
         };
 
         // Execute database creation
-        const { success, facultyid } = await createFacultyProfileRecords(
+        const { success, facultyId } = await createFacultyProfileRecords(
             basicProfile,
             dynamicTables,
         );
 
-        if (!success || !facultyid) return fail(500, { error: 'Failed to create faculty record.' });
+        if (!success || !facultyId) return fail(500, { error: 'Failed to create faculty record.' });
 
         // Redirect the user to the newly created profile
-        throw redirect(303, `/faculty/${facultyid}/profile`);
+        throw redirect(303, `/faculty/${facultyId}/profile`);
     },
 };

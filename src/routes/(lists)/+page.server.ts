@@ -1,6 +1,6 @@
 import { fail } from '@sveltejs/kit';
 
-import { adminposition, faculty, rank } from '$lib/server/db/schema';
+import { adminPosition, faculty, rank } from '$lib/server/db/schema';
 import { deleteFacultyRecords } from '$lib/server/queries/db-helpers';
 import type { FilterColumn, FilterObject } from '$lib/types/filter';
 import {
@@ -52,11 +52,11 @@ export async function load({ url }) {
         },
         {
             obj: filters[1],
-            column: rank.ranktitle,
+            column: rank.title,
         },
         {
             obj: filters[2],
-            column: adminposition.name,
+            column: adminPosition.title,
         },
     ];
 
