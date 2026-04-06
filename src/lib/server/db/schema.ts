@@ -51,6 +51,7 @@ export const faculty = pgTable(
         suffix: varchar('suffix', { length: 50 }),
         maidenName: varchar('maiden_name', { length: 100 }),
         birthDate: date('birth_date', { mode: 'date' }).notNull(),
+        isBiologicallyMale: boolean('is_biologically_male').notNull(),
         status: varchar('status', { length: 50 }),
         dateOfOriginalAppointment: date('date_of_original_appointment', { mode: 'date' }).notNull(),
         psiItem: varchar('psi_item', { length: 50 }).notNull(),
