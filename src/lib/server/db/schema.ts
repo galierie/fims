@@ -704,7 +704,7 @@ export const facultyCourseRelations = relations(facultyCourse, ({ one }) => ({
 }));
 
 export const studentRelations = relations(student, ({ many }) => ({
-    facultyMentoring: many(facultyMentoring),
+    facultyMentorings: many(facultyMentoring),
 }));
 
 export const facultyMentoringRelations = relations(facultyMentoring, ({ one }) => ({
