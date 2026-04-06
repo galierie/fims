@@ -253,7 +253,7 @@ export async function getFacultyMentees(facultyAcademicSemesterid: number) {
             category: facultyMentoring.category,
             startDate: facultyMentoring.startDate,
             endDate: facultyMentoring.endDate,
-            teachingLoadCredit: facultyMentoring.teachingLoadCredit,
+            remarks: facultyMentoring.remarks,
         })
         .from(facultyMentoring)
         .leftJoin(student, eq(student.id, facultyMentoring.studentId))

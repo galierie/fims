@@ -25,7 +25,7 @@ export async function load({ params, parent }) {
 
     let fetchedChangelogs: ChangelogRecordStructure[] | null = null;
 
-    if (layoutData.canViewChangeLogs)
+    if (layoutData.canViewChangelogs)
         fetchedChangelogs = await getFacultyRecordChangelogs(facultyid, 3, 0);
 
     // Validate parameters

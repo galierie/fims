@@ -145,10 +145,10 @@
             type: 'date',
         },
         {
-            label: 'Load Credit',
-            name: 'mentee-load-credit',
+            label: 'Remarks',
+            name: 'mentee-remarks',
             colSpan: 5,
-            type: 'number',
+            type: 'text',
         },
     ];
 
@@ -163,7 +163,7 @@
                     category,
                     startDate,
                     endDate,
-                    teachingLoadCredit,
+                    remarks,
                 },
                 index,
             ) => ({
@@ -175,7 +175,7 @@
                     { columnNum: 3, defaultValue: category ?? undefined },
                     { columnNum: 4, defaultValue: startDate },
                     { columnNum: 5, defaultValue: endDate },
-                    { columnNum: 6, defaultValue: teachingLoadCredit },
+                    { columnNum: 6, defaultValue: remarks ?? '' },
                 ],
                 tupleid,
             }),
@@ -186,7 +186,7 @@
 
     // Safelist Tailwind classes
     // grid-cols-22
-    // grid-cols-31
+    // grid-cols-27
 </script>
 
 <div>
@@ -225,7 +225,7 @@
                     rowLabel="Mentee"
                     columns={menteeColumns}
                     rows={menteeValues}
-                    numOfColumns={31}
+                    numOfColumns={27}
                     bind:hasChange={haveChanges[1]}
                 />
             </div>

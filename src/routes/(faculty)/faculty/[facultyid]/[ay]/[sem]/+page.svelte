@@ -16,7 +16,7 @@
         semestralRecord,
         opts,
         dependencyMaps,
-        canViewChangeLogs,
+        canViewChangelogs,
         fetchedChangelogs,
     } = $derived(data);
 
@@ -51,6 +51,6 @@
     {previousUrl}
 />
 
-{#if canViewChangeLogs && fetchedChangelogs != null}
+{#if canViewChangelogs && fetchedChangelogs != null}
     <ChangelogList changelogFetcher={() => fetchedChangelogs} />
 {/if}

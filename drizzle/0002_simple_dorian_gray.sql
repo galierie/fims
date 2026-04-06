@@ -1,0 +1,1 @@
+ALTER TABLE "faculty_mentoring" ADD COLUMN "remarks" text;
