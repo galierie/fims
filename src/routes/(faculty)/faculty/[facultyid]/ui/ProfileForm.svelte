@@ -194,7 +194,7 @@
                     { columnNum: 0, defaultValue: rankTitle ?? undefined },
                     { columnNum: 1 },
                     { columnNum: 2 },
-                    { columnNum: 3, defaultValue: appointmentStatus },
+                    { columnNum: 3, defaultValue: appointmentStatus ?? undefined },
                     { columnNum: 4, defaultValue: dateOfTenureOrRenewal },
                 ],
                 tupleid,
@@ -285,6 +285,12 @@
                 name="birth-date"
                 type="date"
                 defaultValue={profile?.birthDate}
+            />
+            <Field
+                label="Biological Sex"
+                name="biological-sex"
+                type="text"
+                defaultValue={profile?.isBiologicallyMale ? 'M' : 'F'}
             />
             <Field
                 label="Maiden Name"
