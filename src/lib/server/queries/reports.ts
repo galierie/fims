@@ -416,22 +416,24 @@ export async function getSubjectsByFacultyReport(
         .groupBy(faculty.lastname, faculty.firstname, faculty.middlename);
 }
 
-export async function getFacultyBySubjectReport(acadYear: number, semNum: number) {
+export async function getFacultyBySubjectReport() {
     return await db
         .select({
             courseTaught: course.coursename,
-            faculty: sql<string>`STRING_AGG(${faculty.firstname} || ' ' || ${faculty.lastname}, ', ' ORDER BY ${asc(faculty.lastname)}, ${asc(faculty.firstname)})`,
+            // Use DISTINCT so a faculty member isn't listed twice if they taught it in multiple semesters
+            // Use COALESCE to output 'None' if no one is teaching it
+            faculty: sql<string>`COALESCE(STRING_AGG(DISTINCT ${faculty.firstname} || ' ' || ${faculty.lastname}, ', '), 'None')`,
         })
-        .from(facultycourse)
-        .innerJoin(course, eq(facultycourse.courseid, course.courseid))
-        .innerJoin(
+        .from(course)
+        .leftJoin(facultycourse, eq(course.courseid, facultycourse.courseid))
+        .leftJoin(
             facultysemester,
             eq(facultycourse.facultysemesterid, facultysemester.facultysemesterid),
         )
-        .innerJoin(faculty, eq(facultysemester.facultyid, faculty.facultyid))
-        .innerJoin(semester, eq(facultysemester.acadsemesterid, semester.acadsemesterid))
-        .where(and(eq(semester.academicyear, acadYear), eq(semester.semester, semNum)))
-        .groupBy(course.coursename);
+        .leftJoin(faculty, eq(facultysemester.facultyid, faculty.facultyid))
+        // No .where() clause needed; we want the whole database
+        .groupBy(course.coursename)
+        .orderBy(asc(course.coursename));
 }
 
 export async function getFacultySETReport(facultyid: number, acadYear: number) {
