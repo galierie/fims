@@ -2,7 +2,7 @@ import { and, eq, inArray } from 'drizzle-orm';
 
 import {
     adminPosition,
-    appuser,
+    profile,
     changelog,
     course,
     faculty,
@@ -107,7 +107,7 @@ export async function getPermissions(userRole: string) {
 }
 
 export async function areYouHere(email: string) {
-    const you = await db.select().from(appuser).where(eq(appuser.email, email));
+    const you = await db.select().from(profile).where(eq(profile.email, email));
 
     return you.length !== 0;
 }

@@ -16,7 +16,7 @@ import {
 } from 'drizzle-orm/pg-core';
 import { eq, relations, sql } from 'drizzle-orm';
 
-import { appuser } from './auth.schema';
+import { profile } from './auth.schema';
 export * from './auth.schema';
 
 export const changelog = pgTable(
@@ -31,7 +31,7 @@ export const changelog = pgTable(
     (table) => [
         foreignKey({
             columns: [table.operatorId],
-            foreignColumns: [appuser.id],
+            foreignColumns: [profile.id],
             name: 'changelog_operator_id_fkey',
         }).onDelete('set null'),
     ],
@@ -491,7 +491,7 @@ export const profileInfo = pgTable(
     (table) => [
         foreignKey({
             columns: [table.profileId],
-            foreignColumns: [appuser.id],
+            foreignColumns: [profile.id],
             name: 'profile_info_profile_id_fkey',
         }).onDelete('cascade'),
         foreignKey({
@@ -512,9 +512,9 @@ export const changelogRelations = relations(changelog, ({ one }) => ({
         fields: [changelog.id],
         references: [faculty.latestChangelogId],
     }),
-    appuser: one(appuser, {
+    profile: one(profile, {
         fields: [changelog.operatorId],
-        references: [appuser.id],
+        references: [profile.id],
     }),
     profileInfo: one(profileInfo, {
         fields: [changelog.id],
@@ -755,9 +755,9 @@ export const roleRelations = relations(role, ({ one }) => ({
 }));
 
 export const profileInfoRelations = relations(profileInfo, ({ one }) => ({
-    user: one(appuser, {
+    user: one(profile, {
         fields: [profileInfo.profileId],
-        references: [appuser.id],
+        references: [profile.id],
     }),
     role: one(role, {
         fields: [profileInfo.role],
@@ -774,15 +774,15 @@ export const accountSearchView = pgMaterializedView('account_search_view').as((q
         .select({
             id: changelog.id,
             timestamp: changelog.timestamp,
-            operator: appuser.email,
+            operator: profile.email,
             operation: changelog.operation,
         })
         .from(changelog)
-        .leftJoin(appuser, eq(appuser.id, changelog.id))
+        .leftJoin(profile, eq(profile.id, changelog.id))
         .as('changelog_sq');
 
     const searchcontentQuery = sql<string>`
-            coalesce(${appuser.email}, '')
+            coalesce(${profile.email}, '')
             || ' ' || coalesce(${profileInfo.role}, '')
             || ' ' || coalesce(${changelogSq.timestamp}::text, '')
             || ' ' || coalesce(${changelogSq.operator}, '')
@@ -791,11 +791,11 @@ export const accountSearchView = pgMaterializedView('account_search_view').as((q
 
     const view = qb
         .select({
-            id: appuser.id,
+            id: profile.id,
             searchcontent: searchcontentQuery.as('search_content'),
         })
-        .from(appuser)
-        .leftJoin(profileInfo, eq(profileInfo.profileId, appuser.id))
+        .from(profile)
+        .leftJoin(profileInfo, eq(profileInfo.profileId, profile.id))
         .leftJoin(changelogSq, eq(changelogSq.id, profileInfo.latestChangelogId));
 
     index('account_search_idx').using('gin', sql`${searchcontentQuery} gin_trgm_ops`);

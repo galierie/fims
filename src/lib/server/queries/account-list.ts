@@ -2,7 +2,7 @@ import { and, asc, desc, eq, gt, ilike, lt, ne, or, type SQL, type SQLWrapper } 
 
 import type { FilterColumn } from '$lib/types/filter';
 
-import { accountSearchView, appuser, changelog, role, profileInfo } from '../db/schema';
+import { accountSearchView, profile, changelog, role, profileInfo } from '../db/schema';
 import { db } from '../db';
 
 const pageSize = 50;
@@ -15,7 +15,7 @@ export async function getAccountList(
     isNext: boolean = true,
     initLoad: boolean = false,
 ) {
-    // Search in search table all appusers affected
+    // Search in search table all profiles affected
     const searchSq = await db
         .select({
             id: accountSearchView.id,
@@ -41,16 +41,16 @@ export async function getAccountList(
         .select({
             userid: searchSq.id,
             profileInfoId: profileInfo.id,
-            email: appuser.email,
+            email: profile.email,
             role: profileInfo.role,
             latestChangelogId: profileInfo.latestChangelogId,
         })
-        .from(appuser)
-        .rightJoin(searchSq, eq(searchSq.id, appuser.id))
-        .leftJoin(profileInfo, eq(profileInfo.profileId, appuser.id))
+        .from(profile)
+        .rightJoin(searchSq, eq(searchSq.id, profile.id))
+        .leftJoin(profileInfo, eq(profileInfo.profileId, profile.id))
         .where(
             and(
-                ne(appuser.id, currentUserId),
+                ne(profile.id, currentUserId),
                 cursor
                     ? isNext
                         ? gt(profileInfo.id, cursor)
@@ -105,12 +105,12 @@ export async function getAccountList(
             email: userSq.email,
             role: userSq.role,
             logTimestamp: changelog.timestamp,
-            logMaker: appuser.email,
+            logMaker: profile.email,
             logOperation: changelog.operation,
         })
         .from(userSq)
         .leftJoin(changelog, eq(changelog.id, userSq.latestChangelogId))
-        .leftJoin(appuser, eq(appuser.id, changelog.operatorId));
+        .leftJoin(profile, eq(profile.id, changelog.operatorId));
 
     // Reverse account list and cursors if previous page
     if (!isNext) {

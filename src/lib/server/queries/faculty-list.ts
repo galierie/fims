@@ -4,7 +4,7 @@ import type { FilterColumn } from '$lib/types/filter';
 
 import {
     adminPosition,
-    appuser,
+    profile,
     changelog,
     faculty,
     facultyAdminPosition,
@@ -169,12 +169,12 @@ export async function getFacultyRecordList(
             rankTitle: facultyRecordSq.rankTitle,
             adminPosition: facultyRecordSq.adminPosition,
             logTimestamp: changelog.timestamp,
-            logMaker: appuser.email,
+            logMaker: profile.email,
             logOperation: changelog.operation,
         })
         .from(facultyRecordSq)
         .leftJoin(changelog, eq(changelog.id, facultyRecordSq.latestChangelogId))
-        .leftJoin(appuser, eq(appuser.id, changelog.operatorId));
+        .leftJoin(profile, eq(profile.id, changelog.operatorId));
 
     // Reverse account list and cursors if previous page
     if (!isNext) {
@@ -246,12 +246,12 @@ export async function getFacultyRecordChangelogs(facultyid: number, limit: numbe
     const changelogs = await db
         .select({
             timestamp: changelog.timestamp,
-            email: appuser.email,
+            email: profile.email,
             info: changelog.operation,
         })
         .from(changelog)
         .where(eq(changelog.tupleId, facultyid))
-        .innerJoin(appuser, eq(appuser.id, changelog.operatorId))
+        .innerJoin(profile, eq(profile.id, changelog.operatorId))
         .limit(limit)
         .offset(offset) // for pages if needed.
         .orderBy(desc(changelog.timestamp));
