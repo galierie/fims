@@ -907,6 +907,7 @@ export const facultyRecordSearchView = pgMaterializedView('faculty_record_search
                 || ' ' || coalesce(${facultyMentoring.category}, '')
                 || ' ' || coalesce(${facultyMentoring.startDate}::text, '')
                 || ' ' || coalesce(${facultyMentoring.endDate}::text, '')
+                || ' ' || coalesce(${facultyMentoring.remarks}, '')
                 AS searchcontent
         FROM ${facultyAcademicSemester}
             LEFT JOIN ${facultyMentoring}
