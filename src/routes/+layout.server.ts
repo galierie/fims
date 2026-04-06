@@ -35,7 +35,7 @@ export async function load({ locals, url }) {
             isViewingRecord: false,
             email: '',
             canViewAccounts: false,
-            canViewChangeLogs: false,
+            canViewChangelogs: false,
             accountColor: '',
         };
 }
