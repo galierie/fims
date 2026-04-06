@@ -21,7 +21,7 @@ export const auth = betterAuth({
         },
     },
     user: {
-        modelName: 'appuser',
+        modelName: 'profile',
     },
     plugins: [admin(), sveltekitCookies(getRequestEvent)], // make sure this is the last plugin in the array
 });

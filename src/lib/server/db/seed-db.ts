@@ -1,6 +1,6 @@
 import { sql } from 'drizzle-orm';
 
-import { appointmentstatus, course, fieldofinterest, rank, role, status } from './schema';
+import { appointmentStatus, course, fieldOfInterest, rank, role, status } from './schema';
 import { db } from './index';
 
 // TODO: Check if tama
@@ -9,175 +9,175 @@ export const statuses = [{ status: 'Active' }, { status: 'On Leave' }, { status:
 
 export const ranks = [
     {
-        ranktitle: 'Instructor 1',
-        salarygrade: '14-1',
-        salaryrate: '500000.00',
+        title: 'Instructor 1',
+        salaryGrade: '14-1',
+        salaryRate: '500000.00',
     },
     {
-        ranktitle: 'Instructor 2',
-        salarygrade: '15-1',
-        salaryrate: '500000.00',
+        title: 'Instructor 2',
+        salaryGrade: '15-1',
+        salaryRate: '500000.00',
     },
     {
-        ranktitle: 'Instructor 3',
-        salarygrade: '15-3',
-        salaryrate: '500000.00',
+        title: 'Instructor 3',
+        salaryGrade: '15-3',
+        salaryRate: '500000.00',
     },
     {
-        ranktitle: 'Instructor 4',
-        salarygrade: '16-1',
-        salaryrate: '500000.00',
+        title: 'Instructor 4',
+        salaryGrade: '16-1',
+        salaryRate: '500000.00',
     },
     {
-        ranktitle: 'Instructor 5',
-        salarygrade: '16-3',
-        salaryrate: '500000.00',
+        title: 'Instructor 5',
+        salaryGrade: '16-3',
+        salaryRate: '500000.00',
     },
     {
-        ranktitle: 'Instructor 6',
-        salarygrade: '17-1',
-        salaryrate: '500000.00',
+        title: 'Instructor 6',
+        salaryGrade: '17-1',
+        salaryRate: '500000.00',
     },
     {
-        ranktitle: 'Instructor 7',
-        salarygrade: '17-3',
-        salaryrate: '500000.00',
+        title: 'Instructor 7',
+        salaryGrade: '17-3',
+        salaryRate: '500000.00',
     },
     {
-        ranktitle: 'Assistant Professor 1',
-        salarygrade: '18-1',
-        salaryrate: '500000.00',
+        title: 'Assistant Professor 1',
+        salaryGrade: '18-1',
+        salaryRate: '500000.00',
     },
     {
-        ranktitle: 'Assistant Professor 2',
-        salarygrade: '19-1',
-        salaryrate: '500000.00',
+        title: 'Assistant Professor 2',
+        salaryGrade: '19-1',
+        salaryRate: '500000.00',
     },
     {
-        ranktitle: 'Assistant Professor 3',
-        salarygrade: '19-3',
-        salaryrate: '500000.00',
+        title: 'Assistant Professor 3',
+        salaryGrade: '19-3',
+        salaryRate: '500000.00',
     },
     {
-        ranktitle: 'Assistant Professor 4',
-        salarygrade: '20-1',
-        salaryrate: '500000.00',
+        title: 'Assistant Professor 4',
+        salaryGrade: '20-1',
+        salaryRate: '500000.00',
     },
     {
-        ranktitle: 'Assistant Professor 5',
-        salarygrade: '21-1',
-        salaryrate: '500000.00',
+        title: 'Assistant Professor 5',
+        salaryGrade: '21-1',
+        salaryRate: '500000.00',
     },
     {
-        ranktitle: 'Assistant Professor 6',
-        salarygrade: '21-3',
-        salaryrate: '500000.00',
+        title: 'Assistant Professor 6',
+        salaryGrade: '21-3',
+        salaryRate: '500000.00',
     },
     {
-        ranktitle: 'Assistant Professor 7',
-        salarygrade: '21-5',
-        salaryrate: '500000.00',
+        title: 'Assistant Professor 7',
+        salaryGrade: '21-5',
+        salaryRate: '500000.00',
     },
     {
-        ranktitle: 'Associate Professor 1',
-        salarygrade: '22-4',
-        salaryrate: '500000.00',
+        title: 'Associate Professor 1',
+        salaryGrade: '22-4',
+        salaryRate: '500000.00',
     },
     {
-        ranktitle: 'Associate Professor 2',
-        salarygrade: '22-5',
-        salaryrate: '500000.00',
+        title: 'Associate Professor 2',
+        salaryGrade: '22-5',
+        salaryRate: '500000.00',
     },
     {
-        ranktitle: 'Associate Professor 3',
-        salarygrade: '23-4',
-        salaryrate: '500000.00',
+        title: 'Associate Professor 3',
+        salaryGrade: '23-4',
+        salaryRate: '500000.00',
     },
     {
-        ranktitle: 'Associate Professor 4',
-        salarygrade: '24-3',
-        salaryrate: '500000.00',
+        title: 'Associate Professor 4',
+        salaryGrade: '24-3',
+        salaryRate: '500000.00',
     },
     {
-        ranktitle: 'Associate Professor 5',
-        salarygrade: '25-2',
-        salaryrate: '500000.00',
+        title: 'Associate Professor 5',
+        salaryGrade: '25-2',
+        salaryRate: '500000.00',
     },
     {
-        ranktitle: 'Associate Professor 6',
-        salarygrade: '25-3',
-        salaryrate: '500000.00',
+        title: 'Associate Professor 6',
+        salaryGrade: '25-3',
+        salaryRate: '500000.00',
     },
     {
-        ranktitle: 'Associate Professor 7',
-        salarygrade: '25-5',
-        salaryrate: '500000.00',
+        title: 'Associate Professor 7',
+        salaryGrade: '25-5',
+        salaryRate: '500000.00',
     },
     {
-        ranktitle: 'Professor 1',
-        salarygrade: '26-4',
-        salaryrate: '500000.00',
+        title: 'Professor 1',
+        salaryGrade: '26-4',
+        salaryRate: '500000.00',
     },
     {
-        ranktitle: 'Professor 2',
-        salarygrade: '26-5',
-        salaryrate: '500000.00',
+        title: 'Professor 2',
+        salaryGrade: '26-5',
+        salaryRate: '500000.00',
     },
     {
-        ranktitle: 'Professor 3',
-        salarygrade: '26-6',
-        salaryrate: '500000.00',
+        title: 'Professor 3',
+        salaryGrade: '26-6',
+        salaryRate: '500000.00',
     },
     {
-        ranktitle: 'Professor 4',
-        salarygrade: '27-5',
-        salaryrate: '500000.00',
+        title: 'Professor 4',
+        salaryGrade: '27-5',
+        salaryRate: '500000.00',
     },
     {
-        ranktitle: 'Professor 5',
-        salarygrade: '27-6',
-        salaryrate: '500000.00',
+        title: 'Professor 5',
+        salaryGrade: '27-6',
+        salaryRate: '500000.00',
     },
     {
-        ranktitle: 'Professor 6',
-        salarygrade: '27-7',
-        salaryrate: '500000.00',
+        title: 'Professor 6',
+        salaryGrade: '27-7',
+        salaryRate: '500000.00',
     },
     {
-        ranktitle: 'Professor 7',
-        salarygrade: '28-6',
-        salaryrate: '500000.00',
+        title: 'Professor 7',
+        salaryGrade: '28-6',
+        salaryRate: '500000.00',
     },
     {
-        ranktitle: 'Professor 8',
-        salarygrade: '28-7',
-        salaryrate: '500000.00',
+        title: 'Professor 8',
+        salaryGrade: '28-7',
+        salaryRate: '500000.00',
     },
     {
-        ranktitle: 'Professor 9',
-        salarygrade: '28-8',
-        salaryrate: '500000.00',
+        title: 'Professor 9',
+        salaryGrade: '28-8',
+        salaryRate: '500000.00',
     },
     {
-        ranktitle: 'Professor 10',
-        salarygrade: '29-7',
-        salaryrate: '500000.00',
+        title: 'Professor 10',
+        salaryGrade: '29-7',
+        salaryRate: '500000.00',
     },
     {
-        ranktitle: 'Professor 11',
-        salarygrade: '29-8',
-        salaryrate: '500000.00',
+        title: 'Professor 11',
+        salaryGrade: '29-8',
+        salaryRate: '500000.00',
     },
     {
-        ranktitle: 'Professor 12',
-        salarygrade: '29-8',
-        salaryrate: '500000.00',
+        title: 'Professor 12',
+        salaryGrade: '29-8',
+        salaryRate: '500000.00',
     },
 ];
 
 export const courses = [
     {
-        coursename: 'Econ 11',
+        name: 'Econ 11',
         units: 3,
     },
 ];
@@ -185,19 +185,19 @@ export const courses = [
 export const roles = [
     {
         role: 'Admin',
-        canaddfaculty: true,
-        canmodifyfaculty: true,
-        canaddaccount: false,
-        canmodifyaccount: false,
-        canviewchangelogs: false,
+        canAddFaculty: true,
+        canModifyFaculty: true,
+        canAddAccount: false,
+        canModifyAccount: false,
+        canViewChangelogs: false,
     },
     {
         role: 'IT',
-        canaddfaculty: true,
-        canmodifyfaculty: true,
-        canaddaccount: true,
-        canmodifyaccount: true,
-        canviewchangelogs: true,
+        canAddFaculty: true,
+        canModifyFaculty: true,
+        canAddAccount: true,
+        canModifyAccount: true,
+        canViewChangelogs: true,
     },
 ];
 
@@ -212,10 +212,10 @@ export const fieldsOfInterest = [
 
 // Final appointment status
 export const appointmentStatuses = [
-    { appointmentstatus: 'Permanent' },
-    { appointmentstatus: 'Full-Time' },
-    { appointmentstatus: 'Temporary' },
-    { appointmentstatus: 'Part-Time' },
+    { appointmentStatus: 'Permanent' },
+    { appointmentStatus: 'Full-Time' },
+    { appointmentStatus: 'Temporary' },
+    { appointmentStatus: 'Part-Time' },
 ];
 
 async function seedStatusTable() {
@@ -263,18 +263,18 @@ async function seedRoleTable() {
 }
 
 async function seedFieldOfInterestTable() {
-    const rows = await db.select().from(fieldofinterest).limit(1);
+    const rows = await db.select().from(fieldOfInterest).limit(1);
     if (rows.length > 0) return { success: true };
 
-    const response = await db.insert(fieldofinterest).values(fieldsOfInterest).returning();
+    const response = await db.insert(fieldOfInterest).values(fieldsOfInterest).returning();
     return { success: response.length > 0 };
 }
 
 async function seedAppointmentStatusTable() {
-    const rows = await db.select().from(appointmentstatus).limit(1);
+    const rows = await db.select().from(appointmentStatus).limit(1);
     if (rows.length > 0) return { success: true };
 
-    const response = await db.insert(appointmentstatus).values(appointmentStatuses).returning();
+    const response = await db.insert(appointmentStatus).values(appointmentStatuses).returning();
     return { success: response.length > 0 };
 }
 

@@ -1,7 +1,7 @@
 import { type Actions, error, fail } from '@sveltejs/kit';
 import { APIError } from 'better-auth';
 
-import { areYouHere, deleteUsersInfo, makeUserInfo } from '$lib/server/queries/db-helpers';
+import { areYouHere, deleteUsersInfo, makeProfileInfo } from '$lib/server/queries/db-helpers';
 import { auth } from '$lib/server/auth';
 import type { FilterColumn, FilterObject } from '$lib/types/filter';
 import {
@@ -9,7 +9,7 @@ import {
     getAllRoles,
     refreshAccountSearchView,
 } from '$lib/server/queries/account-list';
-import { userinfo } from '$lib/server/db/schema';
+import { profileInfo } from '$lib/server/db/schema';
 
 export async function load({ locals, parent, url }) {
     const { canViewAccounts } = await parent();
@@ -41,7 +41,7 @@ export async function load({ locals, parent, url }) {
     const filterMap: FilterColumn[] = [
         {
             obj: filters[0],
-            column: userinfo.role,
+            column: profileInfo.role,
         },
     ];
 
@@ -99,8 +99,8 @@ export const actions = {
 
             if (response.user.id === '') return fail(500, { error: 'Failed to make new account.' });
 
-            // Add user info
-            await makeUserInfo(locals.user.id, response.user.id, role);
+            // Add profile info
+            await makeProfileInfo(locals.user.id, response.user.id, role);
 
             // Refresh account search view
             await refreshAccountSearchView();

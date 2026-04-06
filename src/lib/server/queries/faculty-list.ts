@@ -3,16 +3,16 @@ import { and, asc, desc, eq, gt, ilike, lt, or, type SQL, type SQLWrapper } from
 import type { FilterColumn } from '$lib/types/filter';
 
 import {
-    adminposition,
-    appuser,
+    adminPosition,
+    profile,
     changelog,
     faculty,
-    facultyadminposition,
-    facultyrank,
+    facultyAdminPosition,
+    facultyRank,
     facultyRecordSearchView,
-    facultysemester,
+    facultyAcademicSemester,
     rank,
-    semester,
+    academicSemester,
     status,
 } from '../db/schema';
 import { db } from '../db';
@@ -26,25 +26,25 @@ export async function getFacultyRecordList(
     isNext: boolean = true,
     initLoad: boolean = false,
 ) {
-    // Get entries for the current semester
-    // TODO: Find a better way to know current semester
+    // Get entries for the current AcademicSemester
+    // TODO: Find a better way to know current AcademicSemester
     const currentAcademicYear = 2026;
-    const currentSemester = 2;
-    const [latestSemester] = await db
+    const currentAcademicSemester = 2;
+    const [latestAcademicSemester] = await db
         .select({
-            acadsemesterid: semester.acadsemesterid,
+            academicSemesterid: academicSemester.id,
         })
-        .from(semester)
+        .from(academicSemester)
         .where(
             and(
-                eq(semester.academicyear, currentAcademicYear),
-                eq(semester.semester, currentSemester),
+                eq(academicSemester.academicYear, currentAcademicYear),
+                eq(academicSemester.semesterNumber, currentAcademicSemester),
             ),
         )
         .limit(1);
 
-    // fallback ID in case there are no entries for current semester
-    const currentSemesterId = latestSemester?.acadsemesterid ?? -1;
+    // fallback ID in case there are no entries for current AcademicSemester
+    const currentAcademicSemesterId = latestAcademicSemester?.academicSemesterid ?? -1;
 
     const searchFilter = searchTerm
         ? ilike(facultyRecordSearchView.searchcontent, `%${searchTerm}%`)
@@ -70,56 +70,56 @@ export async function getFacultyRecordList(
         if (sameColumnQueries.length) filterQueries.push(or(...sameColumnQueries));
     });
 
-    // Get only the single most recent admin position per semester
+    // Get only the single most recent admin position per AcademicSemester
     const adminPositionSq = db
-        .selectDistinctOn([facultyadminposition.facultysemesterid], {
-            facultysemesterid: facultyadminposition.facultysemesterid,
-            positions: adminposition.name,
+        .selectDistinctOn([facultyAdminPosition.facultyAcademicSemesterId], {
+            facultyAcademicSemesterId: facultyAdminPosition.facultyAcademicSemesterId,
+            positions: adminPosition.title,
         })
-        .from(facultyadminposition)
+        .from(facultyAdminPosition)
         .leftJoin(
-            adminposition,
-            eq(adminposition.adminpositionid, facultyadminposition.adminpositionid),
+            adminPosition,
+            eq(adminPosition.id, facultyAdminPosition.adminPositionId),
         )
         .orderBy(
-            facultyadminposition.facultysemesterid,
-            desc(facultyadminposition.startdate), // Prioritize the latest start date
-            desc(facultyadminposition.facultyadminpositionid), // Tiebreaker: highest ID
+            facultyAdminPosition.facultyAcademicSemesterId,
+            desc(facultyAdminPosition.startDate), // Prioritize the latest start date
+            desc(facultyAdminPosition.id), // Tiebreaker: highest ID
         )
         .as('admin_position_sq');
 
     let cursorFilter: SQL | undefined;
     if (cursor)
-        cursorFilter = isNext ? gt(faculty.facultyid, cursor) : lt(faculty.facultyid, cursor);
+        cursorFilter = isNext ? gt(faculty.id, cursor) : lt(faculty.id, cursor);
 
     // Get faculty records from database
     const facultyRecordCountSq = await db
         .select({
-            facultyid: searchSq.id,
-            lastname: faculty.lastname,
-            firstname: faculty.firstname,
+            id: searchSq.id,
+            lastName: faculty.lastName,
+            firstName: faculty.firstName,
             status: faculty.status,
-            ranktitle: rank.ranktitle,
-            adminposition: adminPositionSq.positions,
-            latestchangelogid: faculty.latestchangelogid,
+            rankTitle: rank.title,
+            adminPosition: adminPositionSq.positions,
+            latestChangelogId: faculty.latestChangelogId,
         })
         .from(faculty)
-        .rightJoin(searchSq, eq(searchSq.id, faculty.facultyid))
+        .rightJoin(searchSq, eq(searchSq.id, faculty.id))
         .leftJoin(
-            facultysemester,
+            facultyAcademicSemester,
             and(
-                eq(facultysemester.facultyid, faculty.facultyid),
-                eq(facultysemester.acadsemesterid, currentSemesterId), // Match only the current semester
+                eq(facultyAcademicSemester.facultyId, faculty.id),
+                eq(facultyAcademicSemester.academicSemesterId, currentAcademicSemesterId), // Match only the current AcademicSemester
             ),
         )
-        .leftJoin(facultyrank, eq(facultyrank.facultyrankid, facultysemester.currentrankid))
-        .leftJoin(rank, eq(rank.rankid, facultyrank.rankid))
+        .leftJoin(facultyRank, eq(facultyRank.id, facultyAcademicSemester.currentRankId))
+        .leftJoin(rank, eq(rank.id, facultyRank.rankId))
         .leftJoin(
             adminPositionSq,
-            eq(adminPositionSq.facultysemesterid, facultysemester.facultysemesterid),
+            eq(adminPositionSq.facultyAcademicSemesterId, facultyAcademicSemester.id),
         )
         .where(and(cursorFilter, and(...filterQueries)))
-        .orderBy(isNext ? asc(faculty.facultyid) : desc(faculty.facultyid))
+        .orderBy(isNext ? asc(faculty.id) : desc(faculty.id))
         .limit(pageSize + 1)
         .as('faculty_record_count_sq');
 
@@ -137,7 +137,7 @@ export async function getFacultyRecordList(
         .select()
         .from(facultyRecordCountSq)
         .orderBy(
-            isNext ? asc(facultyRecordCountSq.facultyid) : desc(facultyRecordCountSq.facultyid),
+            isNext ? asc(facultyRecordCountSq.id) : desc(facultyRecordCountSq.id),
         )
         .limit(pageSize)
         .as('user_sq');
@@ -145,36 +145,36 @@ export async function getFacultyRecordList(
     // Get cursors
     let [firstId] = await db
         .select({
-            value: facultyRecordSq.facultyid,
+            value: facultyRecordSq.id,
         })
         .from(facultyRecordSq)
-        .orderBy(asc(facultyRecordSq.facultyid))
+        .orderBy(asc(facultyRecordSq.id))
         .limit(1);
 
     let [lastId] = await db
         .select({
-            value: facultyRecordSq.facultyid,
+            value: facultyRecordSq.id,
         })
         .from(facultyRecordSq)
-        .orderBy(desc(facultyRecordSq.facultyid))
+        .orderBy(desc(facultyRecordSq.id))
         .limit(1);
 
     // Get changelogs
     const shownFields = await db
         .select({
-            facultyid: facultyRecordSq.facultyid,
-            lastname: facultyRecordSq.lastname,
-            firstname: facultyRecordSq.firstname,
+            id: facultyRecordSq.id,
+            lastName: facultyRecordSq.lastName,
+            firstName: facultyRecordSq.firstName,
             status: facultyRecordSq.status,
-            ranktitle: facultyRecordSq.ranktitle,
-            adminposition: facultyRecordSq.adminposition,
+            rankTitle: facultyRecordSq.rankTitle,
+            adminPosition: facultyRecordSq.adminPosition,
             logTimestamp: changelog.timestamp,
-            logMaker: appuser.email,
+            logMaker: profile.email,
             logOperation: changelog.operation,
         })
         .from(facultyRecordSq)
-        .leftJoin(changelog, eq(changelog.logid, facultyRecordSq.latestchangelogid))
-        .leftJoin(appuser, eq(appuser.id, changelog.userid));
+        .leftJoin(changelog, eq(changelog.id, facultyRecordSq.latestChangelogId))
+        .leftJoin(profile, eq(profile.id, changelog.operatorId));
 
     // Reverse account list and cursors if previous page
     if (!isNext) {
@@ -192,12 +192,12 @@ export async function getFacultyRecordList(
 }
 
 export interface FacultyListDTO {
-    facultyid: number | null;
-    lastname: string | null;
-    firstname: string | null;
+    id: number | null;
+    lastName: string | null;
+    firstName: string | null;
     status: string | null;
-    ranktitle: string | null;
-    adminposition: string | null;
+    rankTitle: string | null;
+    adminPosition: string | null;
     logTimestamp: Date | null;
     logMaker: string | null;
     logOperation: string | null;
@@ -222,22 +222,22 @@ export async function getAllStatuses() {
 export async function getAllRankTitles() {
     const uniqueRows = await db
         .select({
-            ranktitle: rank.ranktitle,
+            title: rank.title,
         })
         .from(rank);
 
-    const uniqueValues = uniqueRows.map(({ ranktitle }) => ranktitle);
+    const uniqueValues = uniqueRows.map(({ title }) => title);
     return uniqueValues;
 }
 
 export async function getAllAdminPositions() {
     const uniqueRows = await db
         .select({
-            name: adminposition.name,
+            title: adminPosition.title,
         })
-        .from(adminposition);
+        .from(adminPosition);
 
-    const uniqueValues = uniqueRows.map(({ name }) => name);
+    const uniqueValues = uniqueRows.map(({ title }) => title);
     return uniqueValues;
 }
 
@@ -246,12 +246,12 @@ export async function getFacultyRecordChangelogs(facultyid: number, limit: numbe
     const changelogs = await db
         .select({
             timestamp: changelog.timestamp,
-            email: appuser.email,
+            email: profile.email,
             info: changelog.operation,
         })
         .from(changelog)
-        .where(eq(changelog.tupleid, facultyid))
-        .innerJoin(appuser, eq(appuser.id, changelog.userid))
+        .where(eq(changelog.tupleId, facultyid))
+        .innerJoin(profile, eq(profile.id, changelog.operatorId))
         .limit(limit)
         .offset(offset) // for pages if needed.
         .orderBy(desc(changelog.timestamp));

@@ -1,59 +1,59 @@
 import { and, eq, inArray } from 'drizzle-orm';
 
 import {
-    adminposition,
-    appuser,
+    adminPosition,
+    profile,
     changelog,
     course,
     faculty,
-    facultyadminposition,
-    facultyadminwork,
-    facultycommmembership,
-    facultycontactnumber,
-    facultycourse,
-    facultyeducationalattainment,
-    facultyemail,
-    facultyextension,
-    facultyfieldofinterest,
-    facultyhomeaddress,
-    facultymentoring,
-    facultyrank,
-    facultyresearch,
-    facultysemester,
-    facultystudyload,
-    fieldofinterest,
+    facultyAdminPosition,
+    facultyAdminWork,
+    facultyCommMembership,
+    facultyContactNumber,
+    facultyCourse,
+    facultyEducationalAttainment,
+    facultyEmail,
+    facultyExtension,
+    facultyFieldOfInterest,
+    facultyHomeAddress,
+    facultyMentoring,
+    facultyRank,
+    facultyResearch,
+    facultyAcademicSemester,
+    facultyStudyLoad,
+    fieldOfInterest,
     office,
     rank,
     research,
     role,
-    semester,
+    academicSemester,
     student,
-    userinfo,
+    profileInfo,
 } from '../db/schema';
 import { db } from '../db';
 
-export async function logChange(makerid: string, tupleid: number, operation: string) {
+export async function logChange(operatorId: string, tupleId: number, operation: string) {
     const logids = await db
         .insert(changelog)
         .values({
-            userid: makerid,
-            tupleid,
+            operatorId,
+            tupleId,
             operation,
             timestamp: new Date(),
         })
         .returning();
 
-    const [{ logid }, _] = logids;
+    const [{ id }, _] = logids;
 
-    return logid;
+    return id;
 }
 
-export async function makeUserInfo(makerid: string, id: string, role: string) {
+export async function makeProfileInfo(operatorId: string, id: string, role: string) {
     // Actual action
     const returnedIds = await db
-        .insert(userinfo)
+        .insert(profileInfo)
         .values({
-            userid: id,
+            profileId: id,
             role,
         })
         .returning();
@@ -61,41 +61,41 @@ export async function makeUserInfo(makerid: string, id: string, role: string) {
     if (returnedIds.length === 0) return { success: false };
 
     // Log!
-    const [{ userinfoid: tupleid }, _] = returnedIds;
+    const [{ id: tupleId }, _] = returnedIds;
 
-    const logid = await logChange(makerid, tupleid, 'Made account.');
+    const logid = await logChange(operatorId, tupleId, 'Made account.');
 
     await db
-        .update(userinfo)
+        .update(profileInfo)
         .set({
-            latestchangelogid: logid,
+            latestChangelogId: logid,
         })
-        .where(eq(userinfo.userinfoid, tupleid));
+        .where(eq(profileInfo.id, tupleId));
 
     return { success: true };
 }
 
-export async function deleteUsersInfo(makerid: string, userids: string[]) {
+export async function deleteUsersInfo(operatorId: string, userids: string[]) {
     if (!userids || userids.length === 0) return { success: false };
 
     // Actual action
     const returnedIds = await db
-        .delete(userinfo)
-        .where(inArray(userinfo.userid, userids))
+        .delete(profileInfo)
+        .where(inArray(profileInfo.profileId, userids))
         .returning();
 
     if (returnedIds.length === 0) return { success: false };
 
     // Log!
-    returnedIds.forEach(async ({ userinfoid: tupleid }) => {
-        await logChange(makerid, tupleid, 'Deleted account.');
+    returnedIds.forEach(async ({ id: tupleId }) => {
+        await logChange(operatorId, tupleId, 'Deleted account.');
     });
 
     return { success: true };
 }
 
 export async function getRole(id: string) {
-    const [fetchedUser] = await db.select().from(userinfo).where(eq(userinfo.userid, id)).limit(1);
+    const [fetchedUser] = await db.select().from(profileInfo).where(eq(profileInfo.profileId, id)).limit(1);
 
     return fetchedUser.role;
 }
@@ -107,22 +107,22 @@ export async function getPermissions(userRole: string) {
 }
 
 export async function areYouHere(email: string) {
-    const you = await db.select().from(appuser).where(eq(appuser.email, email));
+    const you = await db.select().from(profile).where(eq(profile.email, email));
 
     return you.length !== 0;
 }
 
-export async function deleteFacultyRecords(makerid: string, ids: number[]) {
+export async function deleteFacultyRecords(operatorId: string, ids: number[]) {
     if (!ids || ids.length === 0) return { success: false };
 
     // Actual action
-    const returnedIds = await db.delete(faculty).where(inArray(faculty.facultyid, ids)).returning();
+    const returnedIds = await db.delete(faculty).where(inArray(faculty.id, ids)).returning();
 
     if (returnedIds.length === 0) return { success: false };
 
     // Log!
-    returnedIds.forEach(async ({ facultyid: tupleid }) => {
-        await logChange(makerid, tupleid, 'Deleted record.');
+    returnedIds.forEach(async ({ id: tupleId }) => {
+        await logChange(operatorId, tupleId, 'Deleted record.');
     });
 
     return { success: true };
@@ -145,87 +145,87 @@ async function processDynamicTable(
 }
 
 export async function updateFacultyProfileRecords(
-    facultyid: number,
+    facultyId: number,
     basicProfile: any,
     dynamicTables: any,
 ) {
     try {
         const parseNum = (val: any) => (val ? parseInt(val, 10) || null : null);
 
-        await db.update(faculty).set(basicProfile).where(eq(faculty.facultyid, facultyid));
+        await db.update(faculty).set(basicProfile).where(eq(faculty.id, facultyId));
 
         await processDynamicTable(
-            facultyemail,
-            facultyemail.facultyemailid,
+            facultyEmail,
+            facultyEmail.id,
             dynamicTables.emails,
-            (e) => ({ facultyid, email: e.emails }),
+            (e) => ({ facultyId, email: e.emails }),
             (e) => ({ email: e.emails }),
         );
 
         await processDynamicTable(
-            facultycontactnumber,
-            facultycontactnumber.facultycontactnumberid,
+            facultyContactNumber,
+            facultyContactNumber.id,
             dynamicTables.contactNumbers,
-            (c) => ({ facultyid, contactnumber: c['contact-numbers'] }),
-            (c) => ({ contactnumber: c['contact-numbers'] }),
+            (c) => ({ facultyId, contactNumber: c['contact-numbers'] }),
+            (c) => ({ contactNumber: c['contact-numbers'] }),
         );
 
         await processDynamicTable(
-            facultyhomeaddress,
-            facultyhomeaddress.facultyhomeaddressid,
+            facultyHomeAddress,
+            facultyHomeAddress.id,
             dynamicTables.homeAddresses,
-            (h) => ({ facultyid, homeaddress: h['home-addresses'] }),
-            (h) => ({ homeaddress: h['home-addresses'] }),
+            (h) => ({ facultyId, homeAddress: h['home-addresses'] }),
+            (h) => ({ homeAddress: h['home-addresses'] }),
         );
 
         await processDynamicTable(
-            facultyeducationalattainment,
-            facultyeducationalattainment.facultyeducationalattainmentid,
+            facultyEducationalAttainment,
+            facultyEducationalAttainment.id,
             dynamicTables.educationalAttainments,
             (ea) => ({
-                facultyid,
+                facultyId,
                 degree: ea['educational-attainment-degree'],
                 institution: ea['educational-attainment-institution'],
-                graduationyear: parseNum(ea['educational-attainment-gradyear']),
+                graduationYear: parseNum(ea['educational-attainment-gradyear']),
             }),
             (ea) => ({
                 degree: ea['educational-attainment-degree'],
                 institution: ea['educational-attainment-institution'],
-                graduationyear: parseNum(ea['educational-attainment-gradyear']),
+                graduationYear: parseNum(ea['educational-attainment-gradyear']),
             }),
         );
 
         // Process Tables with Foreign Keys (Dropdowns)
-        const dbFieldsOfInterest = await db.select().from(fieldofinterest);
+        const dbFieldsOfInterest = await db.select().from(fieldOfInterest);
         const getFieldId = (fieldName: string) =>
-            dbFieldsOfInterest.find((f) => f.field === fieldName)?.fieldofinterestid || null;
+            dbFieldsOfInterest.find((f) => f.field === fieldName)?.id || null;
 
         await processDynamicTable(
-            facultyfieldofinterest,
-            facultyfieldofinterest.facultyfieldofinterestid,
+            facultyFieldOfInterest,
+            facultyFieldOfInterest.id,
             dynamicTables.fieldsOfInterest,
-            (f) => ({ facultyid, fieldofinterestid: getFieldId(f['fields-of-interest']) }),
-            (f) => ({ fieldofinterestid: getFieldId(f['fields-of-interest']) }),
+            (f) => ({ facultyId, fieldOfInterestId: getFieldId(f['fields-of-interest']) }),
+            (f) => ({ fieldOfInterestId: getFieldId(f['fields-of-interest']) }),
         );
 
         const dbRanks = await db.select().from(rank);
         const getRankId = (rankTitle: string) =>
-            dbRanks.find((r) => r.ranktitle === rankTitle)?.rankid || null;
+            dbRanks.find((r) => r.title === rankTitle)?.id || null;
 
         await processDynamicTable(
-            facultyrank,
-            facultyrank.facultyrankid,
+            facultyRank,
+            facultyRank.id,
             dynamicTables.promotionHistory,
             (p) => ({
-                facultyid,
-                rankid: getRankId(p['promotion-history-rank']),
-                appointmentstatus: p['promotion-history-appointment-status'],
-                dateoftenureorrenewal: p['promotion-history-date'] || null,
+                facultyId,
+                rankId: getRankId(p['promotion-history-rank']),
+                appointmentStatus: p['promotion-history-appointment-status'],
+                dateOfTenureOrRenewal: p['promotion-history-date'] || null,
             }),
             (p) => ({
                 rankid: getRankId(p['promotion-history-rank']),
-                appointmentstatus: p['promotion-history-appointment-status'],
-                dateoftenureorrenewal: p['promotion-history-date'] || null,
+                appointmentStatus: p['promotion-history-appointment-status'],
+                dateOfTenureOrRenewal: p['promotion-history-date'] || null,
             }),
         );
 
@@ -246,92 +246,92 @@ export async function createFacultyProfileRecords(basicProfile: any, dynamicTabl
         }
 
         const [newFaculty] = await db.insert(faculty).values(basicProfile).returning();
-        const { facultyid } = newFaculty;
+        const { id: facultyId } = newFaculty;
 
         await processDynamicTable(
-            facultyemail,
-            facultyemail.facultyemailid,
+            facultyEmail,
+            facultyEmail.id,
             dynamicTables.emails,
-            (e) => ({ facultyid, email: e.emails }),
+            (e) => ({ facultyId, email: e.emails }),
             (e) => ({ email: e.emails }),
         );
 
         await processDynamicTable(
-            facultycontactnumber,
-            facultycontactnumber.facultycontactnumberid,
+            facultyContactNumber,
+            facultyContactNumber.id,
             dynamicTables.contactNumbers,
-            (c) => ({ facultyid, contactnumber: c['contact-numbers'] }),
-            (c) => ({ contactnumber: c['contact-numbers'] }),
+            (c) => ({ facultyId, contactNumber: c['contact-numbers'] }),
+            (c) => ({ contactNumber: c['contact-numbers'] }),
         );
 
         await processDynamicTable(
-            facultyhomeaddress,
-            facultyhomeaddress.facultyhomeaddressid,
+            facultyHomeAddress,
+            facultyHomeAddress.id,
             dynamicTables.homeAddresses,
-            (h) => ({ facultyid, homeaddress: h['home-addresses'] }),
-            (h) => ({ homeaddress: h['home-addresses'] }),
+            (h) => ({ facultyId, homeAddress: h['home-addresses'] }),
+            (h) => ({ homeAddress: h['home-addresses'] }),
         );
 
         await processDynamicTable(
-            facultyeducationalattainment,
-            facultyeducationalattainment.facultyeducationalattainmentid,
+            facultyEducationalAttainment,
+            facultyEducationalAttainment.id,
             dynamicTables.educationalAttainments,
             (ea) => ({
-                facultyid,
+                facultyId,
                 degree: ea['educational-attainment-degree'],
                 institution: ea['educational-attainment-institution'],
-                graduationyear: parseNum(ea['educational-attainment-gradyear']),
+                graduationYear: parseNum(ea['educational-attainment-gradyear']),
             }),
             (ea) => ({
                 degree: ea['educational-attainment-degree'],
                 institution: ea['educational-attainment-institution'],
-                graduationyear: parseNum(ea['educational-attainment-gradyear']),
+                graduationYear: parseNum(ea['educational-attainment-gradyear']),
             }),
         );
 
-        const dbFieldsOfInterest = await db.select().from(fieldofinterest);
+        const dbFieldsOfInterest = await db.select().from(fieldOfInterest);
         function getFieldId(fieldName: string) {
-            return dbFieldsOfInterest.find((f) => f.field === fieldName)?.fieldofinterestid ?? null;
+            return dbFieldsOfInterest.find((f) => f.field === fieldName)?.id ?? null;
         }
 
         await processDynamicTable(
-            facultyfieldofinterest,
-            facultyfieldofinterest.facultyfieldofinterestid,
+            facultyFieldOfInterest,
+            facultyFieldOfInterest.id,
             dynamicTables.fieldsOfInterest,
-            (f) => ({ facultyid, fieldofinterestid: getFieldId(f['fields-of-interest']) }),
-            (f) => ({ fieldofinterestid: getFieldId(f['fields-of-interest']) }),
+            (f) => ({ facultyId, fieldOfInterestId: getFieldId(f['fields-of-interest']) }),
+            (f) => ({ fieldOfInterestId: getFieldId(f['fields-of-interest']) }),
         );
 
         const dbRanks = await db.select().from(rank);
         function getRankId(rankTitle: string) {
-            return dbRanks.find((r) => r.ranktitle === rankTitle)?.rankid ?? null;
+            return dbRanks.find((r) => r.title === rankTitle)?.id ?? null;
         }
 
         await processDynamicTable(
-            facultyrank,
-            facultyrank.facultyrankid,
+            facultyRank,
+            facultyRank.id,
             dynamicTables.promotionHistory,
             (p) => ({
-                facultyid,
-                rankid: getRankId(p['promotion-history-rank']),
-                appointmentstatus: p['promotion-history-appointment-status'],
-                dateoftenureorrenewal: p['promotion-history-date'] || null,
+                facultyId,
+                rankId: getRankId(p['promotion-history-rank']),
+                appointmentStatus: p['promotion-history-appointment-status'],
+                dateOfTenureOrRenewal: p['promotion-history-date'] || null,
             }),
             (p) => ({
-                rankid: getRankId(p['promotion-history-rank']),
-                appointmentstatus: p['promotion-history-appointment-status'],
-                dateoftenureorrenewal: p['promotion-history-date'] || null,
+                rankId: getRankId(p['promotion-history-rank']),
+                appointmentStatus: p['promotion-history-appointment-status'],
+                dateOfTenureOrRenewal: p['promotion-history-date'] || null,
             }),
         );
 
-        return { success: true, facultyid };
+        return { success: true, facultyId };
     } catch {
-        return { success: false, facultyid: null };
+        return { success: false, facultyId: null };
     }
 }
 
 export async function updateSemestralRecords(
-    facultyid: number,
+    facultyId: number,
     acadYear: number,
     semNum: number,
     basicSemestralData: any,
@@ -340,110 +340,110 @@ export async function updateSemestralRecords(
     try {
         const parseNum = (val: any) => (val ? parseFloat(val) || 0 : 0);
 
-        let acadsemesterid: number;
-        const existingSemester = await db
+        let academicSemesterId: number;
+        const existingAcademicSemester = await db
             .select()
-            .from(semester)
-            .where(and(eq(semester.academicyear, acadYear), eq(semester.semester, semNum)))
+            .from(academicSemester)
+            .where(and(eq(academicSemester.academicYear, acadYear), eq(academicSemester.semesterNumber, semNum)))
             .limit(1);
 
-        if (existingSemester.length > 0) {
-            acadsemesterid = existingSemester[0].acadsemesterid;
+        if (existingAcademicSemester.length > 0) {
+            academicSemesterId = existingAcademicSemester[0].id;
         } else {
             const newSem = await db
-                .insert(semester)
-                .values({ academicyear: acadYear, semester: semNum })
+                .insert(academicSemester)
+                .values({ academicYear: acadYear, semesterNumber: semNum })
                 .returning();
-            acadsemesterid = newSem[0].acadsemesterid;
+            academicSemesterId = newSem[0].id;
         }
 
-        let currentrankid = null;
+        let currentRankId = null;
         if (basicSemestralData.currentRankTitle) {
             const rankRes = await db
-                .select({ id: facultyrank.facultyrankid })
-                .from(facultyrank)
-                .leftJoin(rank, eq(rank.rankid, facultyrank.rankid))
+                .select({ id: facultyRank.id })
+                .from(facultyRank)
+                .leftJoin(rank, eq(rank.id, facultyRank.rankId))
                 .where(
                     and(
-                        eq(facultyrank.facultyid, facultyid),
-                        eq(rank.ranktitle, basicSemestralData.currentRankTitle),
+                        eq(facultyRank.facultyId, facultyId),
+                        eq(rank.title, basicSemestralData.currentRankTitle),
                     ),
                 )
                 .limit(1);
-            if (rankRes.length > 0) currentrankid = rankRes[0].id;
+            if (rankRes.length > 0) currentRankId = rankRes[0].id;
         }
 
-        let currenthighesteducationalattainmentid = null;
+        let currentHighestEducationalAttainmentId = null;
         if (basicSemestralData.currentHighestDegree) {
             const eduRes = await db
-                .select({ id: facultyeducationalattainment.facultyeducationalattainmentid })
-                .from(facultyeducationalattainment)
+                .select({ id: facultyEducationalAttainment.id })
+                .from(facultyEducationalAttainment)
                 .where(
                     and(
-                        eq(facultyeducationalattainment.facultyid, facultyid),
+                        eq(facultyEducationalAttainment.facultyId, facultyId),
                         eq(
-                            facultyeducationalattainment.degree,
+                            facultyEducationalAttainment.degree,
                             basicSemestralData.currentHighestDegree,
                         ),
                     ),
                 )
                 .limit(1);
-            if (eduRes.length > 0) currenthighesteducationalattainmentid = eduRes[0].id;
+            if (eduRes.length > 0) currentHighestEducationalAttainmentId = eduRes[0].id;
         }
 
-        // Create/Update Faculty Semester
-        let facultysemesterid: number;
+        // Create/Update Faculty AcademicSemester
+        let facultyAcademicSemesterId: number;
         const existingFacSem = await db
             .select()
-            .from(facultysemester)
+            .from(facultyAcademicSemester)
             .where(
                 and(
-                    eq(facultysemester.facultyid, facultyid),
-                    eq(facultysemester.acadsemesterid, acadsemesterid),
+                    eq(facultyAcademicSemester.facultyId, facultyId),
+                    eq(facultyAcademicSemester.academicSemesterId, academicSemesterId),
                 ),
             )
             .limit(1);
 
         if (existingFacSem.length > 0) {
-            facultysemesterid = existingFacSem[0].facultysemesterid;
+            facultyAcademicSemesterId = existingFacSem[0].id;
             await db
-                .update(facultysemester)
+                .update(facultyAcademicSemester)
                 .set({
-                    currentrankid,
-                    currenthighesteducationalattainmentid,
+                    currentRankId,
+                    currentHighestEducationalAttainmentId,
                     remarks: basicSemestralData.remarks,
                 })
-                .where(eq(facultysemester.facultysemesterid, facultysemesterid));
+                .where(eq(facultyAcademicSemester.id, facultyAcademicSemesterId));
         } else {
             const newFacSem = await db
-                .insert(facultysemester)
+                .insert(facultyAcademicSemester)
                 .values({
-                    facultyid,
-                    acadsemesterid,
-                    currentrankid,
-                    currenthighesteducationalattainmentid,
+                    facultyId,
+                    academicSemesterId,
+                    currentRankId,
+                    currentHighestEducationalAttainmentId,
                     remarks: basicSemestralData.remarks,
                 })
                 .returning();
-            facultysemesterid = newFacSem[0].facultysemesterid;
+            facultyAcademicSemesterId = newFacSem[0].id;
         }
 
         // Fetch foreign key mappings
-        const dbAdminPositions = await db.select().from(adminposition);
+        const dbAdminPositions = await db.select().from(adminPosition);
         const getAdminPosId = (name: string) =>
-            dbAdminPositions.find((a) => a.name === name)?.adminpositionid || null;
+            dbAdminPositions.find((a) => a.title === name)?.id || null;
 
         const dbOffices = await db.select().from(office);
         const getOfficeId = (name: string) =>
-            dbOffices.find((o) => o.name === name)?.officeid || null;
+            dbOffices.find((o) => o.name === name)?.id || null;
 
         const dbCourses = await db.select().from(course);
         const getCourseId = (name: string) =>
-            dbCourses.find((c) => c.coursename === name)?.courseid || null;
+            dbCourses.find((c) => c.name === name)?.id || null;
 
         const dbResearches = await db.select().from(research);
         const getResearchId = (title: string) =>
-            dbResearches.find((r) => r.title === title)?.researchid || null;
+            dbResearches.find((r) => r.title === title)?.id || null;
 
         // Find or Create Student for Mentoring
         const resolveStudent = async (last: string, first: string, middle: string) => {
@@ -453,20 +453,20 @@ export async function updateSemestralRecords(
                 .from(student)
                 .where(
                     and(
-                        eq(student.lastname, last),
-                        eq(student.firstname, first),
-                        eq(student.middlename, middle || ''),
+                        eq(student.lastName, last),
+                        eq(student.firstName, first),
+                        eq(student.middleName, middle || ''),
                     ),
                 )
                 .limit(1);
 
-            if (existing) return existing.studentnumber;
+            if (existing) return existing.id;
 
             const [newStudent] = await db
                 .insert(student)
-                .values({ lastname: last, firstname: first, middlename: middle || '' })
+                .values({ lastName: last, firstName: first, middleName: middle || '' })
                 .returning();
-            return newStudent.studentnumber;
+            return newStudent.id;
         };
 
         // Prepare student IDs before processing the table
@@ -481,176 +481,176 @@ export async function updateSemestralRecords(
 
         // Admin
         await processDynamicTable(
-            facultyadminposition,
-            facultyadminposition.facultyadminpositionid,
-            dynamicTables.adminPositions,
+            facultyAdminPosition,
+            facultyAdminPosition.id,
+            dynamicTables.AdminPositions,
             (a) => ({
-                facultysemesterid,
-                adminpositionid: getAdminPosId(a['administrative-position-title']),
-                officeid: getOfficeId(a['administrative-position-office']),
-                startdate: a['administrative-position-start-date'] || null,
-                enddate: a['administrative-position-end-date'] || null,
-                administrativeloadcredit: parseNum(a['administrative-position-load-credit']),
+                facultyAcademicSemesterId,
+                adminPositionId: getAdminPosId(a['administrative-position-title']),
+                officeId: getOfficeId(a['administrative-position-office']),
+                startDate: a['administrative-position-start-date'] || null,
+                endDate: a['administrative-position-end-date'] || null,
+                administrativeLoadCredit: parseNum(a['administrative-position-load-credit']),
             }),
             (a) => ({
-                adminpositionid: getAdminPosId(a['administrative-position-title']),
-                officeid: getOfficeId(a['administrative-position-office']),
-                startdate: a['administrative-position-start-date'] || null,
-                enddate: a['administrative-position-end-date'] || null,
-                administrativeloadcredit: parseNum(a['administrative-position-load-credit']),
+                adminPositionId: getAdminPosId(a['administrative-position-title']),
+                officeId: getOfficeId(a['administrative-position-office']),
+                startDate: a['administrative-position-start-date'] || null,
+                endDate: a['administrative-position-end-date'] || null,
+                administrativeLoadCredit: parseNum(a['administrative-position-load-credit']),
             }),
         );
 
         await processDynamicTable(
-            facultycommmembership,
-            facultycommmembership.facultycommmembershipid,
+            facultyCommMembership,
+            facultyCommMembership.id,
             dynamicTables.committees,
             (c) => ({
-                facultysemesterid,
+                facultyAcademicSemesterId,
                 membership: c['committee-membership-nature'],
                 committee: c['committee-membership-committee'],
-                startdate: c['committee-membership-start-date'] || null,
-                enddate: c['committee-membership-end-date'] || null,
-                administrativeloadcredit: parseNum(c['committee-membership-load-credit']),
+                startDate: c['committee-membership-start-date'] || null,
+                endDate: c['committee-membership-end-date'] || null,
+                administrativeLoadCredit: parseNum(c['committee-membership-load-credit']),
             }),
             (c) => ({
                 membership: c['committee-membership-nature'],
                 committee: c['committee-membership-committee'],
-                startdate: c['committee-membership-start-date'] || null,
-                enddate: c['committee-membership-end-date'] || null,
-                administrativeloadcredit: parseNum(c['committee-membership-load-credit']),
+                startDate: c['committee-membership-start-date'] || null,
+                endDate: c['committee-membership-end-date'] || null,
+                administrativeLoadCredit: parseNum(c['committee-membership-load-credit']),
             }),
         );
 
         await processDynamicTable(
-            facultyadminwork,
-            facultyadminwork.facultyadminworkid,
-            dynamicTables.adminWorks,
+            facultyAdminWork,
+            facultyAdminWork.id,
+            dynamicTables.AdminWorks,
             (aw) => ({
-                facultysemesterid,
-                natureofwork: aw['administrative-work-nature'],
-                officeid: getOfficeId(aw['administrative-work-committee']),
-                startdate: aw['administrative-work-start-date'] || null,
-                enddate: aw['administrative-work-end-date'] || null,
-                administrativeloadcredit: parseNum(aw['administrative-work-load-credit']),
+                facultyAcademicSemesterId,
+                natureOfWork: aw['administrative-work-nature'],
+                officeId: getOfficeId(aw['administrative-work-committee']),
+                startDate: aw['administrative-work-start-date'] || null,
+                endDate: aw['administrative-work-end-date'] || null,
+                administrativeLoadCredit: parseNum(aw['administrative-work-load-credit']),
             }),
             (aw) => ({
-                natureofwork: aw['administrative-work-nature'],
-                officeid: getOfficeId(aw['administrative-work-committee']),
-                startdate: aw['administrative-work-start-date'] || null,
-                enddate: aw['administrative-work-end-date'] || null,
-                administrativeloadcredit: parseNum(aw['administrative-work-load-credit']),
+                natureOfWork: aw['administrative-work-nature'],
+                officeId: getOfficeId(aw['administrative-work-committee']),
+                startDate: aw['administrative-work-start-date'] || null,
+                endDate: aw['administrative-work-end-date'] || null,
+                administrativeLoadCredit: parseNum(aw['administrative-work-load-credit']),
             }),
         );
 
         // Teaching
         await processDynamicTable(
-            facultycourse,
-            facultycourse.facultycourseid,
+            facultyCourse,
+            facultyCourse.id,
             dynamicTables.courses,
             (c) => ({
-                facultysemesterid,
-                courseid: getCourseId(c['course-title']),
+                facultyAcademicSemesterId,
+                courseId: getCourseId(c['course-title']),
                 section: c['course-section'],
-                numberofstudents: c['course-num-of-students']
+                numberOfStudents: c['course-num-of-students']
                     ? parseInt(c['course-num-of-students'], 10)
                     : null,
-                teachingloadcredit: parseNum(c['course-load-credit']),
-                sectionset: parseNum(c['course-section-set']) || null,
+                teachingLoadCredit: parseNum(c['course-load-credit']),
+                sectionSET: parseNum(c['course-section-set']) || null,
             }),
             (c) => ({
-                courseid: getCourseId(c['course-title']),
+                courseId: getCourseId(c['course-title']),
                 section: c['course-section'],
-                numberofstudents: c['course-num-of-students']
+                numberOfStudents: c['course-num-of-students']
                     ? parseInt(c['course-num-of-students'], 10)
                     : null,
-                teachingloadcredit: parseNum(c['course-load-credit']),
-                sectionset: parseNum(c['course-section-set']) || null,
+                teachingLoadCredit: parseNum(c['course-load-credit']),
+                sectionSET: parseNum(c['course-section-set']) || null,
             }),
         );
 
         await processDynamicTable(
-            facultymentoring,
-            facultymentoring.facultymentoringid,
+            facultyMentoring,
+            facultyMentoring.id,
             dynamicTables.mentees,
             (m) => ({
-                facultysemesterid,
-                studentnumber: m.resolvedStudentId,
+                facultyAcademicSemesterId,
+                studentId: m.resolvedStudentId,
                 category: m['mentee-category'],
-                startdate: m['mentee-start-date'] || null,
-                enddate: m['mentee-end-date'] || null,
-                teachingloadcredit: parseNum(m['mentee-load-credit']),
+                startDate: m['mentee-start-date'] || null,
+                endDate: m['mentee-end-date'] || null,
+                teachingLoadCredit: parseNum(m['mentee-load-credit']),
             }),
             (m) => ({
-                studentnumber: m.resolvedStudentId,
+                studentId: m.resolvedStudentId,
                 category: m['mentee-category'],
-                startdate: m['mentee-start-date'] || null,
-                enddate: m['mentee-end-date'] || null,
-                teachingloadcredit: parseNum(m['mentee-load-credit']),
+                startDate: m['mentee-start-date'] || null,
+                endDate: m['mentee-end-date'] || null,
+                teachingLoadCredit: parseNum(m['mentee-load-credit']),
             }),
         );
 
         // Research
         await processDynamicTable(
-            facultyresearch,
-            facultyresearch.facultyresearchid,
+            facultyResearch,
+            facultyResearch.id,
             dynamicTables.research,
             (r) => ({
-                facultysemesterid,
-                researchid: getResearchId(r['research-title']),
-                researchloadcredit: parseNum(r['research-load-credit']),
+                facultyAcademicSemesterId,
+                researchId: getResearchId(r['research-title']),
+                researchLoadCredit: parseNum(r['research-load-credit']),
                 remarks: r['research-remarks'],
             }),
             (r) => ({
-                researchid: getResearchId(r['research-title']),
-                researchloadcredit: parseNum(r['research-load-credit']),
+                researchId: getResearchId(r['research-title']),
+                researchLoadCredit: parseNum(r['research-load-credit']),
                 remarks: r['research-remarks'],
             }),
         );
 
         // Extension
         await processDynamicTable(
-            facultyextension,
-            facultyextension.facultyextensionid,
+            facultyExtension,
+            facultyExtension.id,
             dynamicTables.extension,
             (e) => ({
-                facultysemesterid,
-                natureofextension: e['extension-nature'],
+                facultyAcademicSemesterId,
+                natureOfExtension: e['extension-nature'],
                 agency: e['extension-agency'],
-                startdate: e['extension-start-date'] || null,
-                enddate: e['extension-end-date'] || null,
-                extensionloadcredit: parseNum(e['extension-load-credit']),
+                startDate: e['extension-start-date'] || null,
+                endDate: e['extension-end-date'] || null,
+                extensionLoadCredit: parseNum(e['extension-load-credit']),
             }),
             (e) => ({
-                natureofextension: e['extension-nature'],
+                natureOfExtension: e['extension-nature'],
                 agency: e['extension-agency'],
-                startdate: e['extension-start-date'] || null,
-                enddate: e['extension-end-date'] || null,
-                extensionloadcredit: parseNum(e['extension-load-credit']),
+                startDate: e['extension-start-date'] || null,
+                endDate: e['extension-end-date'] || null,
+                extensionLoadCredit: parseNum(e['extension-load-credit']),
             }),
         );
 
         // Study load
         await processDynamicTable(
-            facultystudyload,
-            facultystudyload.facultystudyloadid,
+            facultyStudyLoad,
+            facultyStudyLoad.id,
             dynamicTables.studyLoad,
             (s) => ({
-                facultysemesterid,
-                degreeprogram: s['study-load-degree'],
+                facultyAcademicSemesterId,
+                degreeProgram: s['study-load-degree'],
                 university: s['study-load-university'],
-                studyloadunits: parseNum(s['study-load-units']),
-                onfulltimeleavewithpay: s['study-load-on-leave-with-pay'],
-                isfacultyfellowshiprecipient: s['study-load-fellowship-recipient'],
-                studyloadcredit: parseNum(s['study-load-credit']),
+                studyLoadUnits: parseNum(s['study-load-units']),
+                onFullTimeLeaveWithPay: s['study-load-on-leave-with-pay'],
+                isFacultyFellowshipRecipient: s['study-load-fellowship-recipient'],
+                studyLoadCredit: parseNum(s['study-load-credit']),
             }),
             (s) => ({
-                degreeprogram: s['study-load-degree'],
+                degreeProgram: s['study-load-degree'],
                 university: s['study-load-university'],
-                studyloadunits: parseNum(s['study-load-units']),
-                onfulltimeleavewithpay: s['study-load-on-leave-with-pay'],
-                isfacultyfellowshiprecipient: s['study-load-fellowship-recipient'],
-                studyloadcredit: parseNum(s['study-load-credit']),
+                studyLoadUnits: parseNum(s['study-load-units']),
+                onFullTimeLeaveWithPay: s['study-load-on-leave-with-pay'],
+                isFacultyFellowshipRecipient: s['study-load-fellowship-recipient'],
+                studyLoadCredit: parseNum(s['study-load-credit']),
             }),
         );
 

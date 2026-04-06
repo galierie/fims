@@ -7,7 +7,7 @@
         label: string;
         name: string;
         type?: string;
-        defaultValue?: string;
+        defaultValue?: string | Date;
         colStart?: number;
         colSpan?: number;
         immutable?: boolean;

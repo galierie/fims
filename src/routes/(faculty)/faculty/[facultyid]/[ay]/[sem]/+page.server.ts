@@ -4,7 +4,7 @@ import type { ChangelogRecordStructure } from '$lib/ui/ChangelogList.svelte';
 import {
     getAllAdminPositions,
     getAllCourses,
-    getAllFacultySemesters,
+    getAllFacultyAcademicSemesters,
     getAllOffices,
     getAllResearches,
     getAllSemesterms,
@@ -36,7 +36,7 @@ export async function load({ params, parent }) {
     const semestralRecord = await getFacultySemestralRecords(facultyid, acadYear, semNum);
 
     // Get all possible semestral record options
-    const existingOpts = await getAllFacultySemesters(facultyid);
+    const existingOpts = await getAllFacultyAcademicSemesters(facultyid);
     const allSemStrs = getAllSemesterms();
 
     // Get academic year options
