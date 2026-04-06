@@ -23,7 +23,7 @@ export const changelog = pgTable(
     'changelog',
     {
         id: serial('id').primaryKey().notNull(),
-        timestamp: timestamp('timestamp').defaultNow().notNull(),
+        timestamp: timestamp('timestamp', { mode: 'date' }).defaultNow().notNull(),
         operatorId: text('operator_id'),
         tupleId: integer('tuple_id'),
         operation: text('operation').notNull(),
@@ -50,9 +50,9 @@ export const faculty = pgTable(
         firstName: varchar('first_name', { length: 100 }).notNull(),
         suffix: varchar('suffix', { length: 50 }),
         maidenName: varchar('maiden_name', { length: 100 }),
-        birthDate: date('birth_date').notNull(),
+        birthDate: date('birth_date', { mode: 'date' }).notNull(),
         status: varchar('status', { length: 50 }),
-        dateOfOriginalAppointment: date('date_of_original_appointment').notNull(),
+        dateOfOriginalAppointment: date('date_of_original_appointment', { mode: 'date' }).notNull(),
         psiItem: varchar('psi_item', { length: 50 }).notNull(),
         employeeNumber: varchar('employee_number', { length: 50 }).notNull(),
         tin: varchar('tin', { length: 50 }).notNull(),
@@ -158,7 +158,7 @@ export const facultyRank = pgTable(
         facultyId: integer('faculty_id'),
         rankId: integer('rank_id'),
         appointmentStatus: varchar('appointment_status', { length: 50 }).notNull(),
-        dateOfTenureOrRenewal: date('date_of_tenure_or_renewal').notNull(),
+        dateOfTenureOrRenewal: date('date_of_tenure_or_renewal', { mode: 'date' }).notNull(),
     },
     (table) => [
         foreignKey({
@@ -268,8 +268,8 @@ export const facultyAdminPosition = pgTable(
         facultyAcademicSemesterId: integer('faculty_academic_semester_id'),
         adminPositionId: integer('admin_position_id'),
         officeId: integer('office_id'),
-        startDate: date('start_date').notNull(),
-        endDate: date('end_date').notNull(),
+        startDate: date('start_date', { mode: 'date' }).notNull(),
+        endDate: date('end_date', { mode: 'date' }).notNull(),
         administrativeLoadCredit: numeric('administrative_load_credit', { precision: 5, scale: 2 }).notNull(),
     },
     (table) => [
@@ -298,8 +298,8 @@ export const facultyCommMembership = pgTable(
         facultyAcademicSemesterId: integer('faculty_academic_semester_id'),
         membership: varchar('membership', { length: 100 }).notNull(),
         committee: varchar('committee', { length: 150 }).notNull(),
-        startDate: date('start_date').notNull(),
-        endDate: date('end_date').notNull(),
+        startDate: date('start_date', { mode: 'date' }).notNull(),
+        endDate: date('end_date', { mode: 'date' }).notNull(),
         administrativeLoadCredit: numeric('administrative_load_credit', { precision: 5, scale: 2 }).notNull(),
     },
     (table) => [
@@ -318,8 +318,8 @@ export const facultyAdminWork = pgTable(
         facultyAcademicSemesterId: integer('faculty_academic_semester_id'),
         natureOfWork: varchar('nature_of_work', { length: 200 }).notNull(),
         officeId: integer('office_id'),
-        startDate: date('start_date').notNull(),
-        endDate: date('end_date').notNull(),
+        startDate: date('start_date', { mode: 'date' }).notNull(),
+        endDate: date('end_date', { mode: 'date' }).notNull(),
         administrativeLoadCredit: numeric('administrative_load_credit', { precision: 5, scale: 2 }).notNull(),
     },
     (table) => [
@@ -381,8 +381,8 @@ export const facultyMentoring = pgTable(
         facultyAcademicSemesterId: integer('faculty_academic_semester_id'),
         studentId: integer('student_id'),
         category: varchar('category', { length: 50 }),
-        startDate: date('start_date').notNull(),
-        endDate: date('end_date').notNull(),
+        startDate: date('start_date', { mode: 'date' }).notNull(),
+        endDate: date('end_date', { mode: 'date' }).notNull(),
         teachingLoadCredit: numeric('teaching_load_credit', { precision: 5, scale: 2 }).notNull(),
     },
     (table) => [
@@ -402,8 +402,8 @@ export const facultyMentoring = pgTable(
 export const research = pgTable('research', {
     id: serial('id').primaryKey().notNull(),
     title: varchar('title', { length: 200 }).notNull(),
-    startDate: date('start_date').notNull(),
-    endDate: date('end_date').notNull(),
+    startDate: date('start_date', { mode: 'date' }).notNull(),
+    endDate: date('end_date', { mode: 'date' }).notNull(),
     funding: text('funding'),
 });
 
@@ -437,8 +437,8 @@ export const facultyExtension = pgTable(
         facultyAcademicSemesterId: integer('faculty_academic_semester_id'),
         natureOfExtension: varchar('nature_of_extension', { length: 200 }).notNull(),
         agency: varchar('agency', { length: 150 }).notNull(),
-        startDate: date('start_date').notNull(),
-        endDate: date('end_date').notNull(),
+        startDate: date('start_date', { mode: 'date' }).notNull(),
+        endDate: date('end_date', { mode: 'date' }).notNull(),
         extensionLoadCredit: numeric('extension_load_credit', { precision: 5, scale: 2 }).notNull(),
     },
     (table) => [

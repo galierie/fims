@@ -82,7 +82,7 @@
                   : values[columns[columnNum].dependentOn]}
         {@const { dependencyMap } = columns[columnNum]}
 
-        {#if type === 'dropdown' && opts !== undefined}
+        {#if type === 'dropdown' && opts !== undefined && !(defaultValue instanceof Date)}
             <div
                 class="{colSpanClass} h-8 bg-white {isDeleted
                     ? 'text-fims-gray'
@@ -99,7 +99,7 @@
                     bind:hasChange={haveChanges[columnNum]}
                 />
             </div>
-        {:else if type === 'expandable'}
+        {:else if type === 'expandable' && !(defaultValue instanceof Date)}
             <div class={colSpanClass}>
                 <ExpandableCell
                     {name}

@@ -1,6 +1,6 @@
 export interface InputCellValue {
     columnNum: number;
-    defaultValue?: string;
+    defaultValue?: string | Date;
     defaultChecked?: boolean;
 }
 
