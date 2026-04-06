@@ -383,7 +383,6 @@ export const facultyMentoring = pgTable(
         category: varchar('category', { length: 50 }),
         startDate: date('start_date', { mode: 'date' }).notNull(),
         endDate: date('end_date', { mode: 'date' }).notNull(),
-        teachingLoadCredit: numeric('teaching_load_credit', { precision: 5, scale: 2 }).notNull(),
     },
     (table) => [
         foreignKey({

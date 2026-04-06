@@ -144,12 +144,6 @@
             colSpan: 3,
             type: 'date',
         },
-        {
-            label: 'Load Credit',
-            name: 'mentee-load-credit',
-            colSpan: 5,
-            type: 'number',
-        },
     ];
 
     const menteeValues: InputRowValue[] = $derived(
@@ -163,7 +157,6 @@
                     category,
                     startDate,
                     endDate,
-                    teachingLoadCredit,
                 },
                 index,
             ) => ({
@@ -175,7 +168,6 @@
                     { columnNum: 3, defaultValue: category ?? undefined },
                     { columnNum: 4, defaultValue: startDate },
                     { columnNum: 5, defaultValue: endDate },
-                    { columnNum: 6, defaultValue: teachingLoadCredit },
                 ],
                 tupleid,
             }),
@@ -186,7 +178,6 @@
 
     // Safelist Tailwind classes
     // grid-cols-22
-    // grid-cols-31
 </script>
 
 <div>
@@ -225,7 +216,7 @@
                     rowLabel="Mentee"
                     columns={menteeColumns}
                     rows={menteeValues}
-                    numOfColumns={31}
+                    numOfColumns={22}
                     bind:hasChange={haveChanges[1]}
                 />
             </div>

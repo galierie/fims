@@ -1,0 +1,1 @@
+ALTER TABLE "faculty_mentoring" DROP COLUMN "teaching_load_credit";
