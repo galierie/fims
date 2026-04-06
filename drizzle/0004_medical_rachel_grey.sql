@@ -1,0 +1,1 @@
+ALTER TABLE "faculty" ADD COLUMN "is_biologically_male" boolean NOT NULL;
