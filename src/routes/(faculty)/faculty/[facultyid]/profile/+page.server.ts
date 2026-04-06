@@ -29,7 +29,7 @@ export async function load({ params, parent }) {
     if (profile === null) throw error(400, { message: 'No record found.' });
 
     //get changelogs if possible
-    if (layoutData.canViewChangeLogs) {
+    if (layoutData.canViewChangelogs) {
         fetchedChangelogs = await getFacultyRecordChangelogs(facultyid, 3, 0);
         console.log(fetchedChangelogs);
     }

@@ -7,10 +7,10 @@
     import { resetViewState } from '../states/view-state.svelte.js';
 
     const { data, form } = $props();
-    const { profile, opts, dependencyMaps, canViewChangeLogs, fetchedChangelogs } = $derived(data);
+    const { profile, opts, dependencyMaps, canViewChangelogs, fetchedChangelogs } = $derived(data);
 
     function fetchChangelogs(): ChangelogRecordStructure[] {
-        if (canViewChangeLogs && fetchedChangelogs != null) return fetchedChangelogs!;
+        if (canViewChangelogs && fetchedChangelogs != null) return fetchedChangelogs!;
 
         console.log("can't fetch logs");
         return [];
@@ -30,6 +30,6 @@
 {/if}
 
 <ProfileForm {profile} {opts} {dependencyMaps} />
-{#if canViewChangeLogs && fetchedChangelogs != null}
+{#if canViewChangelogs && fetchedChangelogs != null}
     <ChangelogList changelogFetcher={fetchChangelogs} />
 {/if}
