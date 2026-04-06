@@ -120,13 +120,12 @@ export async function GET({ url, locals }: RequestEvent) {
                     );
                 }
             } else if (type === 'faculty-by-subject') {
-                // Faculty by subject does not depend on facultyIds, only on the period
-                    sheetPromises.push(
-                        getFacultyBySubjectWorksheet().then((sheet) => {
-                        if (sheet) sheet.sheetName = `Faculty by Subject Taught`;
+                sheetPromises.push(
+                    getFacultyBySubjectWorksheet().then(sheet => {
+                        if (sheet) sheet.sheetName = `By Subject, Faculty Taught`;
                         return sheet;
-                        }),
-                    );
+                    })
+                );
             } else {
                 console.warn(`Report type '${type}' is not yet fully implemented.`);
             }
