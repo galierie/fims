@@ -22,51 +22,51 @@ export * from './auth.schema';
 export const changelog = pgTable(
     'changelog',
     {
-        id: serial().primaryKey().notNull(),
-        timestamp: timestamp().defaultNow().notNull(),
-        operatorId: text(),
-        tupleId: integer(),
-        operation: text().notNull(),
+        id: serial('id').primaryKey().notNull(),
+        timestamp: timestamp('timestamp').defaultNow().notNull(),
+        operatorId: text('operator_id'),
+        tupleId: integer('tuple_id'),
+        operation: text('operation').notNull(),
     },
     (table) => [
         foreignKey({
             columns: [table.operatorId],
             foreignColumns: [appuser.id],
-            name: 'changelog_userid_fkey',
+            name: 'changelog_operator_id_fkey',
         }).onDelete('set null'),
     ],
 );
 
 export const status = pgTable('status', {
-    status: varchar({ length: 50 }).primaryKey().notNull(),
+    status: varchar('status', { length: 50 }).primaryKey().notNull(),
 });
 
 export const faculty = pgTable(
     'faculty',
     {
-        id: serial().primaryKey().notNull(),
-        lastName: varchar({ length: 100 }).notNull(),
-        middleName: varchar({ length: 100 }).notNull(),
-        firstName: varchar({ length: 100 }).notNull(),
-        suffix: varchar({ length: 50 }),
-        maidenName: varchar({ length: 100 }),
-        birthDate: date().notNull(),
-        status: varchar({ length: 50 }),
-        dateOfOriginalAppointment: date().notNull(),
-        psiItem: varchar({ length: 50 }).notNull(),
-        employeeNumber: varchar({ length: 50 }).notNull(),
-        tin: varchar({ length: 50 }).notNull(),
-        gsis: varchar({ length: 50 }).notNull(),
-        philhealth: varchar({ length: 50 }).notNull(),
-        pagibig: varchar({ length: 50 }).notNull(),
-        remarks: text(),
-        latestChangelogId: integer(),
+        id: serial('id').primaryKey().notNull(),
+        lastName: varchar('last_name', { length: 100 }).notNull(),
+        middleName: varchar('middle_name', { length: 100 }).notNull(),
+        firstName: varchar('first_name', { length: 100 }).notNull(),
+        suffix: varchar('suffix', { length: 50 }),
+        maidenName: varchar('maiden_name', { length: 100 }),
+        birthDate: date('birth_date').notNull(),
+        status: varchar('status', { length: 50 }),
+        dateOfOriginalAppointment: date('date_of_original_appointment').notNull(),
+        psiItem: varchar('psi_item', { length: 50 }).notNull(),
+        employeeNumber: varchar('employee_number', { length: 50 }).notNull(),
+        tin: varchar('tin', { length: 50 }).notNull(),
+        gsis: varchar('gsis', { length: 50 }).notNull(),
+        philhealth: varchar('philhealth', { length: 50 }).notNull(),
+        pagibig: varchar('pagibig', { length: 50 }).notNull(),
+        remarks: text('remarks'),
+        latestChangelogId: integer('latest_changelog_id'),
     },
     (table) => [
         foreignKey({
             columns: [table.latestChangelogId],
             foreignColumns: [changelog.id],
-            name: 'faculty_latestchangelogid_fkey',
+            name: 'faculty_latest_changelog_id_fkey',
         }),
         foreignKey({
             columns: [table.status],
@@ -77,432 +77,432 @@ export const faculty = pgTable(
 );
 
 export const facultyContactNumber = pgTable(
-    'facultyContactNumber',
+    'faculty_contact_number',
     {
-        id: serial().primaryKey().notNull(),
-        facultyId: integer(),
-        contactNumber: varchar({ length: 20 }).notNull(),
+        id: serial('id').primaryKey().notNull(),
+        facultyId: integer('faculty_id'),
+        contactNumber: varchar('contact_number', { length: 20 }).notNull(),
     },
     (table) => [
         foreignKey({
             columns: [table.facultyId],
             foreignColumns: [faculty.id],
-            name: 'facultyContactNumber_facultyId_fkey',
+            name: 'faculty_contact_number_faculty_id_fkey',
         }).onDelete('cascade'),
     ],
 );
 
 export const facultyEducationalAttainment = pgTable(
-    'facultyEducationalAttainment',
+    'faculty_educational_attainment',
     {
-        id: serial().primaryKey().notNull(),
-        facultyId: integer(),
-        degree: varchar({ length: 100 }).notNull(),
-        institution: varchar({ length: 200 }).notNull(),
-        graduationYear: integer(),
+        id: serial('id').primaryKey().notNull(),
+        facultyId: integer('faculty_id'),
+        degree: varchar('degree', { length: 100 }).notNull(),
+        institution: varchar('institution', { length: 200 }).notNull(),
+        graduationYear: integer('graduation_year'),
     },
     (table) => [
         foreignKey({
             columns: [table.facultyId],
             foreignColumns: [faculty.id],
-            name: 'facultyEducationalAttainment_facultyId_fkey',
+            name: 'faculty_educational_attainment_faculty_id_fkey',
         }).onDelete('cascade'),
     ],
 );
 
 export const fieldOfInterest = pgTable(
-    'fieldofinterest',
+    'field_of_interest',
     {
-        id: serial().primaryKey().notNull(),
-        field: varchar({ length: 100 }).notNull(),
+        id: serial('id').primaryKey().notNull(),
+        field: varchar('field', { length: 100 }).notNull(),
     },
-    (table) => [unique('fieldofinterest_field_key').on(table.field)],
+    (table) => [unique('field_of_interest_field_key').on(table.field)],
 );
 
 export const facultyFieldOfInterest = pgTable(
-    'facultyFieldOfInterest',
+    'faculty_field_of_interest',
     {
-        id: serial().primaryKey().notNull(),
-        facultyId: integer(),
-        fieldOfInterestId: integer(),
+        id: serial('id').primaryKey().notNull(),
+        facultyId: integer('faculty_id'),
+        fieldOfInterestId: integer('field_of_interest_id'),
     },
     (table) => [
         foreignKey({
             columns: [table.facultyId],
             foreignColumns: [faculty.id],
-            name: 'facultyFieldOfInterest_facultyId_fkey',
+            name: 'faculty_field_of_interest_faculty_id_fkey',
         }).onDelete('cascade'),
         foreignKey({
             columns: [table.fieldOfInterestId],
             foreignColumns: [fieldOfInterest.id],
-            name: 'facultyFieldOfInterest_fieldofinterestid_fkey',
+            name: 'faculty_field_of_interest_field_of_interest_id_fkey',
         }).onDelete('cascade'),
     ],
 );
 
 export const rank = pgTable('rank', {
-    id: serial().primaryKey().notNull(),
-    title: varchar({ length: 100 }).notNull(),
-    salaryGrade: varchar({ length: 10 }).notNull(),
-    salaryRate: numeric({ precision: 10, scale: 2 }).notNull(),
+    id: serial('id').primaryKey().notNull(),
+    title: varchar('title', { length: 100 }).notNull(),
+    salaryGrade: varchar('salary_grade', { length: 10 }).notNull(),
+    salaryRate: numeric('salary_rate', { precision: 10, scale: 2 }).notNull(),
 });
 
-export const appointmentStatus = pgTable('appointmentstatus', {
-    appointmentStatus: varchar({ length: 50 }).primaryKey().notNull(),
+export const appointmentStatus = pgTable('appointment_status', {
+    appointmentStatus: varchar('appointment_status', { length: 50 }).primaryKey().notNull(),
 });
 
 export const facultyRank = pgTable(
-    'facultyRank',
+    'faculty_rank',
     {
-        id: serial().primaryKey().notNull(),
-        facultyId: integer(),
-        rankId: integer(),
-        appointmentStatus: varchar({ length: 50 }).notNull(),
-        dateOfTenureOrRenewal: date().notNull(),
+        id: serial('id').primaryKey().notNull(),
+        facultyId: integer('faculty_id'),
+        rankId: integer('rank_id'),
+        appointmentStatus: varchar('appointment_status', { length: 50 }).notNull(),
+        dateOfTenureOrRenewal: date('date_of_tenure_or_renewal').notNull(),
     },
     (table) => [
         foreignKey({
             columns: [table.facultyId],
             foreignColumns: [faculty.id],
-            name: 'facultyRank_facultyId_fkey',
+            name: 'faculty_rank_faculty_id_fkey',
         }).onDelete('cascade'),
         foreignKey({
             columns: [table.rankId],
             foreignColumns: [rank.id],
-            name: 'facultyRank_rankid_fkey',
+            name: 'faculty_rank_rank_id_fkey',
         }),
         foreignKey({
             columns: [table.appointmentStatus],
             foreignColumns: [appointmentStatus.appointmentStatus],
-            name: 'facultyRank_appointmentstatus_fkey',
+            name: 'faculty_rank_appointment_status_fkey',
         }),
     ],
 );
 
 export const facultyHomeAddress = pgTable(
-    'facultyHomeAddress',
+    'faculty_home_address',
     {
-        id: serial().primaryKey().notNull(),
-        facultyId: integer(),
-        homeAddress: text().notNull(),
+        id: serial('id').primaryKey().notNull(),
+        facultyId: integer('faculty_id'),
+        homeAddress: text('home_address').notNull(),
     },
     (table) => [
         foreignKey({
             columns: [table.facultyId],
             foreignColumns: [faculty.id],
-            name: 'facultyHomeAddress_facultyId_fkey',
+            name: 'faculty_home_address_faculty_id_fkey',
         }).onDelete('cascade'),
     ],
 );
 
 export const facultyEmail = pgTable(
-    'facultyEmail',
+    'faculty_email',
     {
-        id: serial().primaryKey().notNull(),
-        facultyId: integer(),
-        email: varchar({ length: 100 }).notNull(),
+        id: serial('id').primaryKey().notNull(),
+        facultyId: integer('faculty_id'),
+        email: varchar('email', { length: 100 }).notNull(),
     },
     (table) => [
         foreignKey({
             columns: [table.facultyId],
             foreignColumns: [faculty.id],
-            name: 'facultyEmail_facultyId_fkey',
+            name: 'faculty_email_faculty_id_fkey',
         }).onDelete('cascade'),
     ],
 );
 
-export const academicSemester = pgTable('semester', {
-    id: serial().primaryKey().notNull(),
-    semesterNumber: smallint().notNull(),
-    academicYear: integer().notNull(),
+export const academicSemester = pgTable('academic_semester', {
+    id: serial('id').primaryKey().notNull(),
+    semesterNumber: smallint('semester_number').notNull(),
+    academicYear: integer('academic_year').notNull(),
 });
 
 export const facultyAcademicSemester = pgTable(
-    'facultyAcademicSemester',
+    'faculty_academic_semester',
     {
-        id: serial().primaryKey().notNull(),
-        facultyId: integer(),
-        academicSemesterId: integer(),
-        currentRankId: integer(),
-        currentHighestEducationalAttainmentId: integer(),
-        remarks: text(),
+        id: serial('id').primaryKey().notNull(),
+        facultyId: integer('faculty_id'),
+        academicSemesterId: integer('academic_semester_id'),
+        currentRankId: integer('current_rank_id'),
+        currentHighestEducationalAttainmentId: integer('current_highest_educational_attainment_id'),
+        remarks: text('remarks'),
     },
     (table) => [
         foreignKey({
             columns: [table.facultyId],
             foreignColumns: [faculty.id],
-            name: 'facultyAcademicSemester_facultyId_fkey',
+            name: 'faculty_academic_semester_faculty_id_fkey',
         }).onDelete('cascade'),
         foreignKey({
             columns: [table.academicSemesterId],
             foreignColumns: [academicSemester.id],
-            name: 'facultyAcademicSemester_acadsemesterid_fkey',
+            name: 'faculty_academic_semester_academic_semester_id_fkey',
         }),
         foreignKey({
             columns: [table.currentRankId],
             foreignColumns: [facultyRank.id],
-            name: 'facultyAcademicSemester_currentrankid_fkey',
+            name: 'faculty_academic_semester_current_rank_id_fkey',
         }),
         foreignKey({
             columns: [table.currentHighestEducationalAttainmentId],
             foreignColumns: [facultyEducationalAttainment.id],
-            name: 'facultyAcademicSemester_currenthighestEducationalAttainmentid_fkey',
+            name: 'faculty_academic_semester_current_highest_educational_attainment_id_fkey',
         }),
     ],
 );
 
-export const adminPosition = pgTable('adminposition', {
-    id: serial().primaryKey().notNull(),
-    title: varchar({ length: 100 }).notNull(),
+export const adminPosition = pgTable('admin_position', {
+    id: serial('id').primaryKey().notNull(),
+    title: varchar('title', { length: 100 }).notNull(),
 });
 
 export const office = pgTable('office', {
-    id: serial().primaryKey().notNull(),
-    name: varchar({ length: 100 }).notNull(),
+    id: serial('id').primaryKey().notNull(),
+    name: varchar('name', { length: 100 }).notNull(),
 });
 
 export const facultyAdminPosition = pgTable(
-    'facultyAdminPosition',
+    'faculty_admin_position',
     {
-        id: serial().primaryKey().notNull(),
-        facultyAcademicSemesterId: integer(),
-        adminPositionId: integer(),
-        officeId: integer(),
-        startDate: date().notNull(),
-        endDate: date().notNull(),
-        administrativeLoadCredit: numeric({ precision: 5, scale: 2 }).notNull(),
+        id: serial('id').primaryKey().notNull(),
+        facultyAcademicSemesterId: integer('faculty_academic_semester_id'),
+        adminPositionId: integer('admin_position_id'),
+        officeId: integer('office_id'),
+        startDate: date('start_date').notNull(),
+        endDate: date('end_date').notNull(),
+        administrativeLoadCredit: numeric('administrative_load_credit', { precision: 5, scale: 2 }).notNull(),
     },
     (table) => [
         foreignKey({
             columns: [table.facultyAcademicSemesterId],
             foreignColumns: [facultyAcademicSemester.id],
-            name: 'facultyAdminPosition_facultyAcademicSemesterid_fkey',
+            name: 'faculty_admin_position_faculty_academic_semester_id_fkey',
         }).onDelete('set null'),
         foreignKey({
             columns: [table.adminPositionId],
             foreignColumns: [adminPosition.id],
-            name: 'facultyAdminPosition_adminpositionid_fkey',
+            name: 'faculty_admin_position_admin_position_id_fkey',
         }),
         foreignKey({
             columns: [table.officeId],
             foreignColumns: [office.id],
-            name: 'facultyAdminPosition_officeid_fkey',
+            name: 'faculty_admin_position_office_id_fkey',
         }),
     ],
 );
 
 export const facultyCommMembership = pgTable(
-    'facultyCommMembership',
+    'faculty_comm_membership',
     {
-        id: serial().primaryKey().notNull(),
-        facultyAcademicSemesterId: integer(),
-        membership: varchar({ length: 100 }).notNull(),
-        committee: varchar({ length: 150 }).notNull(),
-        startDate: date().notNull(),
-        endDate: date().notNull(),
-        administrativeLoadCredit: numeric({ precision: 5, scale: 2 }).notNull(),
+        id: serial('id').primaryKey().notNull(),
+        facultyAcademicSemesterId: integer('faculty_academic_semester_id'),
+        membership: varchar('membership', { length: 100 }).notNull(),
+        committee: varchar('committee', { length: 150 }).notNull(),
+        startDate: date('start_date').notNull(),
+        endDate: date('end_date').notNull(),
+        administrativeLoadCredit: numeric('administrative_load_credit', { precision: 5, scale: 2 }).notNull(),
     },
     (table) => [
         foreignKey({
             columns: [table.facultyAcademicSemesterId],
             foreignColumns: [facultyAcademicSemester.id],
-            name: 'facultyCommMembership_facultyAcademicSemesterid_fkey',
+            name: 'faculty_comm_membership_faculty_academic_semester_id_fkey',
         }).onDelete('set null'),
     ],
 );
 
 export const facultyAdminWork = pgTable(
-    'facultyAdminWork',
+    'faculty_admin_work',
     {
-        id: serial().primaryKey().notNull(),
-        facultyAcademicSemesterId: integer(),
-        natureOfWork: varchar({ length: 200 }).notNull(),
-        officeId: integer(),
-        startDate: date().notNull(),
-        endDate: date().notNull(),
-        administrativeLoadCredit: numeric({ precision: 5, scale: 2 }).notNull(),
+        id: serial('id').primaryKey().notNull(),
+        facultyAcademicSemesterId: integer('faculty_academic_semester_id'),
+        natureOfWork: varchar('nature_of_work', { length: 200 }).notNull(),
+        officeId: integer('office_id'),
+        startDate: date('start_date').notNull(),
+        endDate: date('end_date').notNull(),
+        administrativeLoadCredit: numeric('administrative_load_credit', { precision: 5, scale: 2 }).notNull(),
     },
     (table) => [
         foreignKey({
             columns: [table.facultyAcademicSemesterId],
             foreignColumns: [facultyAcademicSemester.id],
-            name: 'facultyAdminWork_facultyAcademicSemesterid_fkey',
+            name: 'faculty_admin_work_faculty_academic_semester_id_fkey',
         }).onDelete('set null'),
         foreignKey({
             columns: [table.officeId],
             foreignColumns: [office.id],
-            name: 'facultyAdminWork_officeid_fkey',
+            name: 'faculty_admin_work_office_id_fkey',
         }),
     ],
 );
 
 export const course = pgTable('course', {
-    id: serial().primaryKey().notNull(),
-    name: varchar({ length: 100 }).notNull(),
-    units: integer().notNull(),
+    id: serial('id').primaryKey().notNull(),
+    name: varchar('name', { length: 100 }).notNull(),
+    units: integer('units').notNull(),
 });
 
 export const facultyCourse = pgTable(
-    'facultyCourse',
+    'faculty_course',
     {
-        id: serial().primaryKey().notNull(),
-        facultyAcademicSemesterId: integer(),
-        courseId: integer(),
-        section: varchar({ length: 50 }),
-        numberOfStudents: integer(),
-        teachingLoadCredit: numeric({ precision: 5, scale: 2 }).notNull(),
-        sectionSET: numeric({ precision: 4, scale: 3 }),
+        id: serial('id').primaryKey().notNull(),
+        facultyAcademicSemesterId: integer('faculty_academic_semester_id'),
+        courseId: integer('course_id'),
+        section: varchar('section', { length: 50 }),
+        numberOfStudents: integer('number_of_students'),
+        teachingLoadCredit: numeric('teaching_load_credit', { precision: 5, scale: 2 }).notNull(),
+        sectionSET: numeric('section_set', { precision: 4, scale: 3 }),
     },
     (table) => [
         foreignKey({
             columns: [table.facultyAcademicSemesterId],
             foreignColumns: [facultyAcademicSemester.id],
-            name: 'facultyCourse_facultyAcademicSemesterid_fkey',
+            name: 'faculty_course_faculty_academic_semester_id_fkey',
         }).onDelete('set null'),
         foreignKey({
             columns: [table.courseId],
             foreignColumns: [course.id],
-            name: 'facultyCourse_courseid_fkey',
+            name: 'faculty_course_course_id_fkey',
         }),
     ],
 );
 
 export const student = pgTable('student', {
-    id: serial().primaryKey().notNull(),
-    lastName: varchar({ length: 100 }).notNull(),
-    middleName: varchar({ length: 100 }).notNull(),
-    firstName: varchar({ length: 100 }).notNull(),
+    id: serial('id').primaryKey().notNull(),
+    lastName: varchar('last_name', { length: 100 }).notNull(),
+    middleName: varchar('middle_name', { length: 100 }).notNull(),
+    firstName: varchar('first_name', { length: 100 }).notNull(),
 });
 
 export const facultyMentoring = pgTable(
-    'facultyMentoring',
+    'faculty_mentoring',
     {
-        id: serial().primaryKey().notNull(),
-        facultyAcademicSemesterId: integer(),
-        studentId: integer(),
-        category: varchar({ length: 50 }),
-        startDate: date().notNull(),
-        endDate: date().notNull(),
-        teachingLoadCredit: numeric({ precision: 5, scale: 2 }).notNull(),
+        id: serial('id').primaryKey().notNull(),
+        facultyAcademicSemesterId: integer('faculty_academic_semester_id'),
+        studentId: integer('student_id'),
+        category: varchar('category', { length: 50 }),
+        startDate: date('start_date').notNull(),
+        endDate: date('end_date').notNull(),
+        teachingLoadCredit: numeric('teaching_load_credit', { precision: 5, scale: 2 }).notNull(),
     },
     (table) => [
         foreignKey({
             columns: [table.facultyAcademicSemesterId],
             foreignColumns: [facultyAcademicSemester.id],
-            name: 'facultyMentoring_facultyAcademicSemesterid_fkey',
+            name: 'faculty_mentoring_faculty_academic_semester_id_fkey',
         }).onDelete('set null'),
         foreignKey({
             columns: [table.studentId],
             foreignColumns: [student.id],
-            name: 'facultyMentoring_studentnumber_fkey',
+            name: 'faculty_mentoring_student_id_fkey',
         }),
     ],
 );
 
 export const research = pgTable('research', {
-    id: serial().primaryKey().notNull(),
-    title: varchar({ length: 200 }).notNull(),
-    startDate: date().notNull(),
-    endDate: date().notNull(),
-    funding: text(),
+    id: serial('id').primaryKey().notNull(),
+    title: varchar('title', { length: 200 }).notNull(),
+    startDate: date('start_date').notNull(),
+    endDate: date('end_date').notNull(),
+    funding: text('funding'),
 });
 
 export const facultyResearch = pgTable(
-    'facultyResearch',
+    'faculty_research',
     {
-        id: serial().primaryKey().notNull(),
-        facultyAcademicSemesterId: integer(),
-        researchId: integer(),
-        researchLoadCredit: numeric({ precision: 5, scale: 2 }).notNull(),
-        remarks: text(),
+        id: serial('id').primaryKey().notNull(),
+        facultyAcademicSemesterId: integer('faculty_academic_semester_id'),
+        researchId: integer('research_id'),
+        researchLoadCredit: numeric('research_load_credit', { precision: 5, scale: 2 }).notNull(),
+        remarks: text('remarks'),
     },
     (table) => [
         foreignKey({
             columns: [table.facultyAcademicSemesterId],
             foreignColumns: [facultyAcademicSemester.id],
-            name: 'facultyResearch_facultyAcademicSemesterid_fkey',
+            name: 'faculty_research_faculty_academic_semester_id_fkey',
         }).onDelete('set null'),
         foreignKey({
             columns: [table.researchId],
             foreignColumns: [research.id],
-            name: 'facultyResearch_researchid_fkey',
+            name: 'faculty_research_research_id_fkey',
         }),
     ],
 );
 
 export const facultyExtension = pgTable(
-    'facultyExtension',
+    'faculty_extension',
     {
-        id: serial().primaryKey().notNull(),
-        facultyAcademicSemesterId: integer(),
-        natureOfExtension: varchar({ length: 200 }).notNull(),
-        agency: varchar({ length: 150 }).notNull(),
-        startDate: date().notNull(),
-        endDate: date().notNull(),
-        extensionLoadCredit: numeric({ precision: 5, scale: 2 }).notNull(),
+        id: serial('id').primaryKey().notNull(),
+        facultyAcademicSemesterId: integer('faculty_academic_semester_id'),
+        natureOfExtension: varchar('nature_of_extension', { length: 200 }).notNull(),
+        agency: varchar('agency', { length: 150 }).notNull(),
+        startDate: date('start_date').notNull(),
+        endDate: date('end_date').notNull(),
+        extensionLoadCredit: numeric('extension_load_credit', { precision: 5, scale: 2 }).notNull(),
     },
     (table) => [
         foreignKey({
             columns: [table.facultyAcademicSemesterId],
             foreignColumns: [facultyAcademicSemester.id],
-            name: 'facultyExtension_facultyAcademicSemesterid_fkey',
+            name: 'faculty_extension_faculty_academic_semester_id_fkey',
         }).onDelete('set null'),
     ],
 );
 
 export const facultyStudyLoad = pgTable(
-    'facultyStudyLoad',
+    'faculty_study_load',
     {
-        id: serial().primaryKey().notNull(),
-        facultyAcademicSemesterId: integer(),
-        degreeProgram: varchar({ length: 200 }).notNull(),
-        university: varchar({ length: 150 }).notNull(),
-        studyLoadUnits: numeric({ precision: 5, scale: 2 }).notNull(),
-        onFullTimeLeaveWithPay: boolean().notNull(),
-        isFacultyFellowshipRecipient: boolean().notNull(),
-        studyLoadCredit: numeric({ precision: 5, scale: 2 }).notNull(),
+        id: serial('id').primaryKey().notNull(),
+        facultyAcademicSemesterId: integer('faculty_academic_semester_id'),
+        degreeProgram: varchar('degree_program', { length: 200 }).notNull(),
+        university: varchar('university', { length: 150 }).notNull(),
+        studyLoadUnits: numeric('study_load_units', { precision: 5, scale: 2 }).notNull(),
+        onFullTimeLeaveWithPay: boolean('on_full_time_leave_with_pay').notNull(),
+        isFacultyFellowshipRecipient: boolean('is_faculty_fellowship_recipient').notNull(),
+        studyLoadCredit: numeric('study_load_credit', { precision: 5, scale: 2 }).notNull(),
     },
     (table) => [
         foreignKey({
             columns: [table.facultyAcademicSemesterId],
             foreignColumns: [facultyAcademicSemester.id],
-            name: 'facultyStudyLoad_facultyAcademicSemesterid_fkey',
+            name: 'faculty_study_load_faculty_academic_semester_id_fkey',
         }).onDelete('set null'),
     ],
 );
 
 export const role = pgTable('role', {
-    role: varchar({ length: 50 }).primaryKey().notNull(),
-    canAddFaculty: boolean().notNull(),
-    canModifyFaculty: boolean().notNull(),
-    canAddAccount: boolean().notNull(),
-    canModifyAccount: boolean().notNull(),
-    canViewChangelogs: boolean().notNull(),
+    role: varchar('role', { length: 50 }).primaryKey().notNull(),
+    canAddFaculty: boolean('can_add_faculty').notNull(),
+    canModifyFaculty: boolean('can_modify_faculty').notNull(),
+    canAddAccount: boolean('can_add_account').notNull(),
+    canModifyAccount: boolean('can_modify_account').notNull(),
+    canViewChangelogs: boolean('can_view_changelogs').notNull(),
 });
 
 export const profileInfo = pgTable(
-    'userinfo',
+    'profile_info',
     {
-        id: serial().primaryKey().notNull(),
-        profileId: text(),
-        role: varchar({ length: 50 }).notNull(),
-        latestChangelogId: integer(),
+        id: serial('id').primaryKey().notNull(),
+        profileId: text('profile_id'),
+        role: varchar('role', { length: 50 }).notNull(),
+        latestChangelogId: integer('latest_changelog_id'),
     },
     (table) => [
         foreignKey({
             columns: [table.profileId],
             foreignColumns: [appuser.id],
-            name: 'userinfo_userid_fkey',
+            name: 'profile_info_profile_id_fkey',
         }).onDelete('cascade'),
         foreignKey({
             columns: [table.role],
             foreignColumns: [role.role],
-            name: 'userinfo_role_fkey',
+            name: 'profile_info_role_fkey',
         }),
         foreignKey({
             columns: [table.latestChangelogId],
             foreignColumns: [changelog.id],
-            name: 'userinfo_latestchangelogid_fkey',
+            name: 'profile_info_latest_changelog_id_fkey',
         }),
     ],
 );
