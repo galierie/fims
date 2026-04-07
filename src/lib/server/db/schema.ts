@@ -337,11 +337,27 @@ export const facultyAdminWork = pgTable(
     ],
 );
 
-export const course = pgTable('course', {
+export const degreeProgram = pgTable('degree_program', {
     id: serial('id').primaryKey().notNull(),
-    name: varchar('name', { length: 100 }).notNull(),
-    units: integer('units').notNull(),
-});
+    name: varchar('name', { length: 200 }).notNull(),
+    isGraduateLevel: boolean('is_graduate_level').notNull(),
+})
+
+export const course = pgTable(
+    'course', {
+        id: serial('id').primaryKey().notNull(),
+        name: varchar('name', { length: 100 }).notNull(),
+        units: integer('units').notNull(),
+        degreeProgramId: integer('degree_program_id'), 
+    },
+    (table) => [
+        foreignKey({
+            columns: [table.degreeProgramId],
+            foreignColumns: [degreeProgram.id],
+            name: 'course_degree_program_id_fkey',
+        }).onDelete('set null'),
+    ],
+);
 
 export const facultyCourse = pgTable(
     'faculty_course',
@@ -689,7 +705,15 @@ export const facultyAdminWorkRelations = relations(facultyAdminWork, ({ one }) =
     }),
 }));
 
-export const courseRelations = relations(course, ({ many }) => ({
+export const degreeProgramRelations = relations(degreeProgram, ({ many }) => ({
+    courses: many(course),
+}));
+
+export const courseRelations = relations(course, ({ many, one }) => ({
+    degreeProgram: one(degreeProgram, {
+        fields: [course.degreeProgramId],
+        references: [degreeProgram.id],
+    }),
     facultyCourses: many(facultyCourse),
 }));
 
