@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gt, ilike, lt, or, type SQL, type SQLWrapper } from 'drizzle-orm';
+import { and, asc, desc, eq, gt, ilike, lt, or, sql, type SQL, type SQLWrapper } from 'drizzle-orm';
 
 import type { FilterColumn } from '$lib/types/filter';
 
@@ -74,7 +74,7 @@ export async function getFacultyRecordList(
     const adminPositionSq = db
         .selectDistinctOn([facultyAdminPosition.facultyAcademicSemesterId], {
             facultyAcademicSemesterId: facultyAdminPosition.facultyAcademicSemesterId,
-            positions: adminPosition.title,
+            title: sql<string>`${adminPosition.title}`.as('position_title'),
         })
         .from(facultyAdminPosition)
         .leftJoin(
@@ -100,7 +100,7 @@ export async function getFacultyRecordList(
             firstName: faculty.firstName,
             status: faculty.status,
             rankTitle: rank.title,
-            adminPosition: adminPositionSq.positions,
+            adminPosition: adminPositionSq.title,
             latestChangelogId: faculty.latestChangelogId,
         })
         .from(faculty)
