@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gt, ilike, lt, ne, or, type SQL, type SQLWrapper } from 'drizzle-orm';
+import { and, asc, desc, eq, gt, ilike, lt, ne, or, sql, type SQL, type SQLWrapper } from 'drizzle-orm';
 
 import type { FilterColumn } from '$lib/types/filter';
 
@@ -40,7 +40,7 @@ export async function getAccountList(
     const userCountSq = await db
         .select({
             userid: searchSq.id,
-            profileInfoId: profileInfo.id,
+            profileInfoId: sql<string>`${profileInfo.id}`.as('profile_info_id'),
             email: profile.email,
             role: profileInfo.role,
             latestChangelogId: profileInfo.latestChangelogId,
