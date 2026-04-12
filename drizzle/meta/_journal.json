@@ -50,6 +50,13 @@
       "when": 1776002395842,
       "tag": "0006_long_lethal_legion",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1776003019858,
+      "tag": "0007_woozy_gertrude_yorkes",
+      "breakpoints": true
     }
   ]
 }

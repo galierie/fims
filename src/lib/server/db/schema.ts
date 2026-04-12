@@ -1,5 +1,7 @@
 import {
     boolean,
+    char,
+    check,
     date,
     foreignKey,
     index,
@@ -51,6 +53,7 @@ export const faculty = pgTable(
         suffix: varchar('suffix', { length: 50 }),
         maidenName: varchar('maiden_name', { length: 100 }),
         birthDate: date('birth_date', { mode: 'date' }).notNull(),
+        biologicalSex: char('biological_sex', { length: 1 }).notNull(),
         status: varchar('status', { length: 50 }),
         dateOfOriginalAppointment: date('date_of_original_appointment', { mode: 'date' }).notNull(),
         psiItem: varchar('psi_item', { length: 50 }).notNull(),
@@ -73,6 +76,7 @@ export const faculty = pgTable(
             foreignColumns: [status.status],
             name: 'faculty_status_fkey',
         }).onDelete('set null'),
+        check('faculty_biological_sex_check', sql`${table.biologicalSex} IN ('M', 'F', 'I', 'U')`)
     ],
 );
 
