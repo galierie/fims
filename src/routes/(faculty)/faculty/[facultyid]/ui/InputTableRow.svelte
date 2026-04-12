@@ -40,8 +40,8 @@
     // svelte-ignore state_referenced_locally
     let values: any[] = $state(
         row.map((r) =>
-            columns[r.columnNum].type === 'checkbox' ? (r.defaultChecked ?? false) : r.defaultValue
-        )
+            columns[r.columnNum].type === 'checkbox' ? (r.defaultChecked ?? false) : r.defaultValue,
+        ),
     );
 
     $effect(() => {
@@ -128,7 +128,8 @@
                     >{dependentOnValue === undefined || dependentOnValue === ''
                         ? ''
                         : dependencyMap.get(dependentOnValue as string)}</span
-                > </div>
+                >
+            </div>
         {:else if type === 'checkbox'}
             <div class="{colSpanClass} flex h-8 w-full items-center justify-center bg-white py-0">
                 <input

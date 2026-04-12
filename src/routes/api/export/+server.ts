@@ -121,10 +121,10 @@ export async function GET({ url, locals }: RequestEvent) {
                 }
             } else if (type === 'faculty-by-subject') {
                 sheetPromises.push(
-                    getFacultyBySubjectWorksheet().then(sheet => {
+                    getFacultyBySubjectWorksheet().then((sheet) => {
                         if (sheet) sheet.sheetName = `By Subject, Faculty Taught`;
                         return sheet;
-                    })
+                    }),
                 );
             } else {
                 console.warn(`Report type '${type}' is not yet fully implemented.`);

@@ -76,7 +76,7 @@ export const faculty = pgTable(
             foreignColumns: [status.status],
             name: 'faculty_status_fkey',
         }).onDelete('set null'),
-        check('faculty_biological_sex_check', sql`${table.biologicalSex} IN ('M', 'F', 'I', 'U')`)
+        check('faculty_biological_sex_check', sql`${table.biologicalSex} IN ('M', 'F', 'I', 'U')`),
     ],
 );
 
@@ -274,7 +274,10 @@ export const facultyAdminPosition = pgTable(
         officeId: integer('office_id'),
         startDate: date('start_date', { mode: 'date' }).notNull(),
         endDate: date('end_date', { mode: 'date' }).notNull(),
-        administrativeLoadCredit: numeric('administrative_load_credit', { precision: 5, scale: 2 }).notNull(),
+        administrativeLoadCredit: numeric('administrative_load_credit', {
+            precision: 5,
+            scale: 2,
+        }).notNull(),
     },
     (table) => [
         foreignKey({
@@ -304,7 +307,10 @@ export const facultyCommMembership = pgTable(
         committee: varchar('committee', { length: 150 }).notNull(),
         startDate: date('start_date', { mode: 'date' }).notNull(),
         endDate: date('end_date', { mode: 'date' }).notNull(),
-        administrativeLoadCredit: numeric('administrative_load_credit', { precision: 5, scale: 2 }).notNull(),
+        administrativeLoadCredit: numeric('administrative_load_credit', {
+            precision: 5,
+            scale: 2,
+        }).notNull(),
     },
     (table) => [
         foreignKey({
@@ -324,7 +330,10 @@ export const facultyAdminWork = pgTable(
         officeId: integer('office_id'),
         startDate: date('start_date', { mode: 'date' }).notNull(),
         endDate: date('end_date', { mode: 'date' }).notNull(),
-        administrativeLoadCredit: numeric('administrative_load_credit', { precision: 5, scale: 2 }).notNull(),
+        administrativeLoadCredit: numeric('administrative_load_credit', {
+            precision: 5,
+            scale: 2,
+        }).notNull(),
     },
     (table) => [
         foreignKey({
@@ -344,14 +353,15 @@ export const degreeProgram = pgTable('degree_program', {
     id: serial('id').primaryKey().notNull(),
     name: varchar('name', { length: 200 }).notNull(),
     isGraduateLevel: boolean('is_graduate_level').notNull(),
-})
+});
 
 export const course = pgTable(
-    'course', {
+    'course',
+    {
         id: serial('id').primaryKey().notNull(),
         name: varchar('name', { length: 100 }).notNull(),
         units: integer('units').notNull(),
-        degreeProgramId: integer('degree_program_id'), 
+        degreeProgramId: integer('degree_program_id'),
     },
     (table) => [
         foreignKey({
@@ -639,32 +649,35 @@ export const academicSemesterRelations = relations(academicSemester, ({ many }) 
     facultyAcademicSemesters: many(facultyAcademicSemester),
 }));
 
-export const facultyAcademicSemesterRelations = relations(facultyAcademicSemester, ({ many, one }) => ({
-    faculty: one(faculty, {
-        fields: [facultyAcademicSemester.facultyId],
-        references: [faculty.id],
+export const facultyAcademicSemesterRelations = relations(
+    facultyAcademicSemester,
+    ({ many, one }) => ({
+        faculty: one(faculty, {
+            fields: [facultyAcademicSemester.facultyId],
+            references: [faculty.id],
+        }),
+        academicSemester: one(academicSemester, {
+            fields: [facultyAcademicSemester.academicSemesterId],
+            references: [academicSemester.id],
+        }),
+        facultyEducationalAttainment: one(facultyEducationalAttainment, {
+            fields: [facultyAcademicSemester.currentHighestEducationalAttainmentId],
+            references: [facultyEducationalAttainment.id],
+        }),
+        facultyRank: one(facultyRank, {
+            fields: [facultyAcademicSemester.currentRankId],
+            references: [facultyRank.id],
+        }),
+        facultyAdminPositions: many(facultyAdminPosition),
+        facultyCommMemberships: many(facultyCommMembership),
+        facultyAdminWorks: many(facultyAdminWork),
+        facultyCourses: many(facultyCourse),
+        facultyMentorings: many(facultyMentoring),
+        facultyResearches: many(facultyResearch),
+        facultyExtensions: many(facultyExtension),
+        facultyStudyLoad: many(facultyStudyLoad),
     }),
-    academicSemester: one(academicSemester, {
-        fields: [facultyAcademicSemester.academicSemesterId],
-        references: [academicSemester.id],
-    }),
-    facultyEducationalAttainment: one(facultyEducationalAttainment, {
-        fields: [facultyAcademicSemester.currentHighestEducationalAttainmentId],
-        references: [facultyEducationalAttainment.id],
-    }),
-    facultyRank: one(facultyRank, {
-        fields: [facultyAcademicSemester.currentRankId],
-        references: [facultyRank.id],
-    }),
-    facultyAdminPositions: many(facultyAdminPosition),
-    facultyCommMemberships: many(facultyCommMembership),
-    facultyAdminWorks: many(facultyAdminWork),
-    facultyCourses: many(facultyCourse),
-    facultyMentorings: many(facultyMentoring),
-    facultyResearches: many(facultyResearch),
-    facultyExtensions: many(facultyExtension),
-    facultyStudyLoad: many(facultyStudyLoad),
-}));
+);
 
 export const adminPositionRelations = relations(adminPosition, ({ many }) => ({
     facultyAdminPositions: many(facultyAdminPosition),

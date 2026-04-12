@@ -56,7 +56,7 @@ export const actions = {
 
         const getDateVal = (key: string) => {
             const val = getVal(key);
-            return val ? new Date(val as string) : new Date(); 
+            return val ? new Date(val as string) : new Date();
         };
 
         const mapBiologicalSex = (val: string | null | undefined) => {
@@ -64,7 +64,7 @@ export const actions = {
             if (val === 'Female') return 'F';
             if (val === 'Intersex') return 'I';
             if (val === 'Unknown') return 'U';
-            return val; 
+            return val;
         };
 
         const basicProfile = {
@@ -74,7 +74,7 @@ export const actions = {
             suffix: getVal('suffix') || null,
             birthDate: getDateVal('birth-date'),
             maidenName: getVal('maiden-name') || null,
-            biologicalSex: mapBiologicalSex(getVal('biological-sex')), 
+            biologicalSex: mapBiologicalSex(getVal('biological-sex')),
             status: getVal('status') || null,
             dateOfOriginalAppointment: getDateVal('date-of-original-appointment'),
             remarks: getVal('remarks') || null,

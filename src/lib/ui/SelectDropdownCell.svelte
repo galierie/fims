@@ -8,7 +8,7 @@
         defaultSelectedOpt: string | null;
         isEditable: boolean;
         hasChange?: boolean;
-        isRequired?: boolean; 
+        isRequired?: boolean;
     }
 
     let {
@@ -18,7 +18,7 @@
         defaultSelectedOpt,
         isEditable,
         hasChange = $bindable(),
-        isRequired = false, 
+        isRequired = false,
     }: Props = $props();
 
     $effect(() => {
@@ -83,11 +83,11 @@
         </div>
     {/if}
 
-    <input 
-        type="text" 
-        {name} 
-        value={(!selectedOpt || selectedOpt === '-') ? '' : selectedOpt} 
-        class="pointer-events-none absolute bottom-0 left-0 -z-10 h-0 w-full opacity-0" 
+    <input
+        type="text"
+        {name}
+        value={!selectedOpt || selectedOpt === '-' ? '' : selectedOpt}
+        class="pointer-events-none absolute bottom-0 left-0 -z-10 h-0 w-full opacity-0"
         required={isRequired}
         tabindex="-1"
     />

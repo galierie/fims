@@ -77,10 +77,7 @@ export async function getFacultyRecordList(
             title: sql<string>`${adminPosition.title}`.as('position_title'),
         })
         .from(facultyAdminPosition)
-        .leftJoin(
-            adminPosition,
-            eq(adminPosition.id, facultyAdminPosition.adminPositionId),
-        )
+        .leftJoin(adminPosition, eq(adminPosition.id, facultyAdminPosition.adminPositionId))
         .orderBy(
             facultyAdminPosition.facultyAcademicSemesterId,
             desc(facultyAdminPosition.startDate), // Prioritize the latest start date
@@ -89,8 +86,7 @@ export async function getFacultyRecordList(
         .as('admin_position_sq');
 
     let cursorFilter: SQL | undefined;
-    if (cursor)
-        cursorFilter = isNext ? gt(faculty.id, cursor) : lt(faculty.id, cursor);
+    if (cursor) cursorFilter = isNext ? gt(faculty.id, cursor) : lt(faculty.id, cursor);
 
     // Get faculty records from database
     const facultyRecordCountSq = await db
@@ -136,9 +132,7 @@ export async function getFacultyRecordList(
     const facultyRecordSq = await db
         .select()
         .from(facultyRecordCountSq)
-        .orderBy(
-            isNext ? asc(facultyRecordCountSq.id) : desc(facultyRecordCountSq.id),
-        )
+        .orderBy(isNext ? asc(facultyRecordCountSq.id) : desc(facultyRecordCountSq.id))
         .limit(pageSize)
         .as('user_sq');
 
