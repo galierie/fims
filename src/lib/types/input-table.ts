@@ -18,6 +18,7 @@ export interface InputColumnType {
         | 'expandable'
         | 'dependent';
     isImmutable?: boolean;
+    isRequired?: boolean;
 
     // For dropdown columns
     opts?: string[];

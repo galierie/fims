@@ -212,6 +212,8 @@ export async function updateFacultyProfileRecords(
         const getRankId = (rankTitle: string) =>
             dbRanks.find((r) => r.title === rankTitle)?.id || null;
 
+        const parseDate = (val: any) => (typeof val === 'string' && val.trim() !== '' ? new Date(val) : new Date());
+
         await processDynamicTable(
             facultyRank,
             facultyRank.id,
@@ -220,12 +222,12 @@ export async function updateFacultyProfileRecords(
                 facultyId,
                 rankId: getRankId(p['promotion-history-rank']),
                 appointmentStatus: p['promotion-history-appointment-status'],
-                dateOfTenureOrRenewal: p['promotion-history-date'] || null,
+                dateOfTenureOrRenewal: parseDate(p['promotion-history-date']),
             }),
             (p) => ({
-                rankid: getRankId(p['promotion-history-rank']),
+                rankId: getRankId(p['promotion-history-rank']),
                 appointmentStatus: p['promotion-history-appointment-status'],
-                dateOfTenureOrRenewal: p['promotion-history-date'] || null,
+                dateOfTenureOrRenewal: parseDate(p['promotion-history-date']),
             }),
         );
 
@@ -307,6 +309,8 @@ export async function createFacultyProfileRecords(basicProfile: any, dynamicTabl
             return dbRanks.find((r) => r.title === rankTitle)?.id ?? null;
         }
 
+        const parseDate = (val: any) => (typeof val === 'string' && val.trim() !== '' ? new Date(val) : new Date());
+
         await processDynamicTable(
             facultyRank,
             facultyRank.id,
@@ -315,17 +319,18 @@ export async function createFacultyProfileRecords(basicProfile: any, dynamicTabl
                 facultyId,
                 rankId: getRankId(p['promotion-history-rank']),
                 appointmentStatus: p['promotion-history-appointment-status'],
-                dateOfTenureOrRenewal: p['promotion-history-date'] || null,
+                dateOfTenureOrRenewal: parseDate(p['promotion-history-date']),
             }),
             (p) => ({
                 rankId: getRankId(p['promotion-history-rank']),
                 appointmentStatus: p['promotion-history-appointment-status'],
-                dateOfTenureOrRenewal: p['promotion-history-date'] || null,
+                dateOfTenureOrRenewal: parseDate(p['promotion-history-date']),
             }),
         );
 
         return { success: true, facultyId };
-    } catch {
+    } catch (error) {
+        console.error('Database error in CREATE mode', error);
         return { success: false, facultyId: null };
     }
 }
