@@ -1,0 +1,2 @@
+ALTER TABLE "faculty" ADD COLUMN "biological_sex" char(1) NOT NULL;--> statement-breakpoint
+ALTER TABLE "faculty" ADD CONSTRAINT "faculty_biological_sex_check" CHECK ("faculty"."biological_sex" IN ('M', 'F', 'I', 'U'));
