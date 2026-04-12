@@ -1,0 +1,1 @@
+ALTER TABLE "faculty" DROP COLUMN "is_biologically_male";
