@@ -6,6 +6,7 @@ import {
     getAllFieldsOfInterest,
     getAllRanks,
 } from '$lib/server/queries/faculty-view';
+import { refreshFacultyRecordSearchView } from '$lib/server/queries/faculty-list';
 
 export async function load() {
     // Get input dropdown options and dependency mappings
@@ -35,7 +36,8 @@ export async function load() {
 }
 
 export const actions = {
-    async update({ request }) {
+    // Renamed to 'create' to match dynamic form action
+    async create({ request }) {
         const formData = await request.formData();
 
         // Extract fields
@@ -52,22 +54,36 @@ export const actions = {
             return val;
         };
 
+        const getDateVal = (key: string) => {
+            const val = getVal(key);
+            return val ? new Date(val as string) : new Date(); 
+        };
+
+        const mapBiologicalSex = (val: string | null | undefined) => {
+            if (val === 'Male') return 'M';
+            if (val === 'Female') return 'F';
+            if (val === 'Intersex') return 'I';
+            if (val === 'Unknown') return 'U';
+            return val; 
+        };
+
         const basicProfile = {
-            lastname: getVal('last-name'),
-            firstname: getVal('first-name'),
-            middlename: getVal('middle-name'),
-            suffix: getVal('suffix'),
-            birthdate: getVal('birth-date'),
-            maidenname: getVal('maiden-name'),
-            status: getVal('status'),
-            dateoforiginalappointment: getVal('date-of-original-appointment'),
-            remarks: getVal('remarks'),
-            philhealth: getVal('philhealth'),
-            pagibig: getVal('pagibig'),
-            psiitem: getVal('psi-item'),
-            tin: getVal('tin'),
-            gsis: getVal('gsis'),
-            employeenumber: getVal('employee-number'),
+            lastName: getVal('last-name'),
+            firstName: getVal('first-name'),
+            middleName: getVal('middle-name'),
+            suffix: getVal('suffix') || null,
+            birthDate: getDateVal('birth-date'),
+            maidenName: getVal('maiden-name') || null,
+            biologicalSex: mapBiologicalSex(getVal('biological-sex')), 
+            status: getVal('status') || null,
+            dateOfOriginalAppointment: getDateVal('date-of-original-appointment'),
+            remarks: getVal('remarks') || null,
+            philhealth: getVal('philhealth') || '',
+            pagibig: getVal('pagibig') || '',
+            psiItem: getVal('psi-item') || '',
+            tin: getVal('tin') || '',
+            gsis: getVal('gsis') || '',
+            employeeNumber: getVal('employee-number') || '',
         };
 
         // Helper function to parse dynamic table
@@ -135,6 +151,8 @@ export const actions = {
         );
 
         if (!success || !facultyId) return fail(500, { error: 'Failed to create faculty record.' });
+
+        await refreshFacultyRecordSearchView();
 
         // Redirect the user to the newly created profile
         throw redirect(303, `/faculty/${facultyId}/profile`);

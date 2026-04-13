@@ -38,7 +38,12 @@
     }: Props = $props();
 
     // svelte-ignore state_referenced_locally
-    const values = $state(Array(row.length).fill(undefined));
+    let values: any[] = $state(
+        row.map((r) =>
+            columns[r.columnNum].type === 'checkbox' ? (r.defaultChecked ?? false) : r.defaultValue
+        )
+    );
+
     $effect(() => {
         hasValue = values.some((v) => v !== undefined && v !== null && v !== '' && v !== false);
     });
@@ -74,6 +79,7 @@
         {@const name = `${rowNum}[${columns[columnNum].name}]`}
         {@const { isImmutable } = columns[columnNum]}
         {@const { opts } = columns[columnNum]}
+        {@const { isRequired } = columns[columnNum]}
         {@const dependentOnValue =
             columns[columnNum].dependentOn === undefined
                 ? undefined
@@ -92,18 +98,19 @@
                     {name}
                     {opts}
                     bind:selectedOpt={values[columnNum]}
-                    defaultSelectedOpt={defaultValue ?? '-'}
+                    defaultSelectedOpt={(defaultValue as string) ?? '-'}
                     isEditable={viewState.isEditing &&
                         (!isImmutable || defaultValue === undefined || defaultValue === '') &&
                         !isDeleted}
                     bind:hasChange={haveChanges[columnNum]}
+                    isRequired={isRequired && hasValue && !isDeleted}
                 />
             </div>
         {:else if type === 'expandable' && !(defaultValue instanceof Date)}
             <div class={colSpanClass}>
                 <ExpandableCell
                     {name}
-                    {defaultValue}
+                    defaultValue={defaultValue as string}
                     {isDeleted}
                     bind:value={values[columnNum]}
                     onchange={() => {
@@ -120,9 +127,8 @@
                 <span
                     >{dependentOnValue === undefined || dependentOnValue === ''
                         ? ''
-                        : dependencyMap.get(dependentOnValue)}</span
-                >
-            </div>
+                        : dependencyMap.get(dependentOnValue as string)}</span
+                > </div>
         {:else if type === 'checkbox'}
             <div class="{colSpanClass} flex h-8 w-full items-center justify-center bg-white py-0">
                 <input
@@ -150,8 +156,9 @@
                 disabled={!viewState.isEditing ||
                     (isImmutable && defaultValue !== undefined && defaultValue !== '') ||
                     isDeleted}
-                defaultValue={defaultValue ?? ''}
+                defaultValue={(defaultValue as string) ?? ''}
                 bind:value={values[columnNum]}
+                required={isRequired && hasValue && !isDeleted}
                 onchange={() => {
                     haveChanges[columnNum] = values[columnNum] !== defaultValue;
                 }}
