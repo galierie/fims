@@ -1,6 +1,7 @@
-import { type Locator, type Page, test, expect } from '@playwright/test';
-import * as testConsts from '../../test-consts';
+import { expect, type Locator, type Page, test } from '@playwright/test';
+
 import * as exportHelp from '../../test-helpers/export-test';
+import * as testConsts from '../../test-consts';
 
 const pathPrefix = 'tests/temp/output_';
 
@@ -9,9 +10,9 @@ async function waitDownload(
     action: () => Promise<void>,
     path: string = 'tests/temp/output.xlsx',
 ) {
-    let downProm = page.waitForEvent('download');
+    const downProm = page.waitForEvent('download');
     await action();
-    let download = await downProm;
+    const download = await downProm;
     await download.saveAs(path);
 }
 
@@ -23,7 +24,7 @@ async function downloadManually(
     format: string,
 ) {
     for (let bi = 0; bi < buttons.length; bi++) {
-        let b = buttons[bi];
+        const b = buttons[bi];
         await waitDownload(page, async () => {
             (await b.click(), pathPrefix.concat(`${bi}`, format));
         });
@@ -31,12 +32,12 @@ async function downloadManually(
 }
 
 async function tickBox(page: Page, text: string) {
-    let cb = await exportHelp.getCheckbox(page, text);
+    const cb = await exportHelp.getCheckbox(page, text);
     await cb.click();
 }
 
 async function tickRadio(page: Page, text: string) {
-    let radio = await exportHelp.getRadio(page, text);
+    const radio = await exportHelp.getRadio(page, text);
     await radio.click();
 }
 
@@ -47,10 +48,10 @@ async function setRanges(
     startSem: string = '1st Semester',
     endSem: string = '2nd Semester',
 ) {
-    let fromYearBox = await exportHelp.getDateSelects(page, 'From:', 'Choose Academic Year');
-    let fromSemBox = await exportHelp.getDateSelects(page, 'From:', 'Choose Semester');
-    let toYearBox = await exportHelp.getDateSelects(page, 'To:', 'Choose Academic Year');
-    let toSemBox = await exportHelp.getDateSelects(page, 'To:', 'Choose Semester');
+    const fromYearBox = await exportHelp.getDateSelects(page, 'From:', 'Choose Academic Year');
+    const fromSemBox = await exportHelp.getDateSelects(page, 'From:', 'Choose Semester');
+    const toYearBox = await exportHelp.getDateSelects(page, 'To:', 'Choose Academic Year');
+    const toSemBox = await exportHelp.getDateSelects(page, 'To:', 'Choose Semester');
 
     await fromYearBox.click();
     await expect(fromYearBox.locator('> *').filter({ hasText: endSem })).toBeVisible();
@@ -70,8 +71,8 @@ async function setRanges(
 }
 
 async function selectRecords(page: Page, recs: string[]) {
-    for (let rec of recs) {
-        let cb = page
+    for (const rec of recs) {
+        const cb = page
             .locator('a', { hasText: rec })
             .last()
             .locator('..')
@@ -90,41 +91,38 @@ test.describe('ui validation', async () => {
 
         await selectRecords(page, ['Camingao, Ericsson Jake', 'Mandario, Maricris']);
 
-        let firstButton = await exportHelp.getExportRecords(page);
+        const firstButton = await exportHelp.getExportRecords(page);
         await firstButton.click();
 
-        for (let option of exportHelp.dateRanges) {
-            let yearBox = await exportHelp.getDateSelects(page, option, 'Choose Academic Year');
-            let semBox = await exportHelp.getDateSelects(page, option, 'Choose Semester');
+        for (const option of exportHelp.dateRanges) {
+            const yearBox = await exportHelp.getDateSelects(page, option, 'Choose Academic Year');
+            const semBox = await exportHelp.getDateSelects(page, option, 'Choose Semester');
 
             await yearBox.click();
-            for (let yearOption of exportHelp.acadYears)
+            for (const yearOption of exportHelp.acadYears)
                 await expect(yearBox.locator('> *').filter({ hasText: yearOption })).toBeVisible();
             await yearBox.click();
 
             await semBox.click();
-            for (let semOption of exportHelp.sems)
+            for (const semOption of exportHelp.sems)
                 await expect(semBox.locator('> *').filter({ hasText: semOption })).toBeVisible();
             await semBox.click();
         }
-        for (let option of exportHelp.checkboxOptions) {
-            await exportHelp.getCheckbox(page, option);
-        }
-        for (let option of exportHelp.exportOptions) {
-            await exportHelp.getRadio(page, option);
-        }
+        for (const option of exportHelp.checkboxOptions) await exportHelp.getCheckbox(page, option);
+
+        for (const option of exportHelp.exportOptions) await exportHelp.getRadio(page, option);
 
         await tickBox(page, 'Faculty Profile');
 
-        let exportButton = await exportHelp.getExportButton(page);
+        const exportButton = await exportHelp.getExportButton(page);
         await exportHelp.getCancel(page);
         await exportButton.click();
 
         await expect(page.getByRole('button', { name: 'Download All' })).toBeVisible();
-        let downloadButtons = await page.getByRole('link', { name: 'Download' }).all();
+        const downloadButtons = await page.getByRole('link', { name: 'Download' }).all();
         expect(downloadButtons.length).toBe(2); // two records selected
 
-        let closeButton = page.getByRole('button', { name: 'Close' });
+        const closeButton = page.getByRole('button', { name: 'Close' });
         await expect(closeButton).toBeVisible();
         await closeButton.click();
     });
@@ -139,13 +137,13 @@ test.describe('faculty file tests', async () => {
         await page.goto('/');
         await selectRecords(page, ['Dela Cruz, Gabrielle Zach']);
 
-        let firstButton = await exportHelp.getExportRecords(page);
+        const firstButton = await exportHelp.getExportRecords(page);
         await firstButton.click();
 
         await setRanges(page);
         await tickBox(page, 'Faculty Profile');
 
-        let exportButton = await exportHelp.getExportButton(page);
+        const exportButton = await exportHelp.getExportButton(page);
         expect(await exportButton.isDisabled()).toBeFalsy();
         await (await exportHelp.getExportButton(page)).click();
         await downloadManually(

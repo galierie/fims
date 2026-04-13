@@ -1,10 +1,12 @@
 import { and, eq } from 'drizzle-orm';
 
 import {
+    academicSemester,
     adminPosition,
     appointmentStatus,
     course,
     faculty,
+    facultyAcademicSemester,
     facultyAdminPosition,
     facultyAdminWork,
     facultyCommMembership,
@@ -18,13 +20,11 @@ import {
     facultyMentoring,
     facultyRank,
     facultyResearch,
-    facultyAcademicSemester,
     facultyStudyLoad,
     fieldOfInterest,
     office,
     rank,
     research,
-    academicSemester,
     student,
 } from '../db/schema';
 import { db } from '../db';
@@ -73,10 +73,7 @@ export async function getFacultyFieldsOfInterest(facultyid: number) {
             field: fieldOfInterest.field,
         })
         .from(facultyFieldOfInterest)
-        .leftJoin(
-            fieldOfInterest,
-            eq(fieldOfInterest.id, facultyFieldOfInterest.fieldOfInterestId),
-        )
+        .leftJoin(fieldOfInterest, eq(fieldOfInterest.id, facultyFieldOfInterest.fieldOfInterestId))
         .where(eq(facultyFieldOfInterest.facultyId, facultyid));
 }
 
@@ -113,13 +110,22 @@ export async function getFacultyEmailAddresses(facultyid: number) {
         .where(eq(facultyEmail.facultyId, facultyid));
 }
 
-export async function getFacultyAcademicSemester(facultyid: number, acadYear: number, semNum: number) {
+export async function getFacultyAcademicSemester(
+    facultyid: number,
+    acadYear: number,
+    semNum: number,
+) {
     const currentSemesterArr = await db
         .select({
             id: academicSemester.id,
         })
         .from(academicSemester)
-        .where(and(eq(academicSemester.academicYear, acadYear), eq(academicSemester.semesterNumber, semNum)));
+        .where(
+            and(
+                eq(academicSemester.academicYear, acadYear),
+                eq(academicSemester.semesterNumber, semNum),
+            ),
+        );
 
     if (currentSemesterArr.length !== 1) return null;
     const [currentSemester] = currentSemesterArr;
@@ -141,7 +147,9 @@ export async function getFacultyAcademicSemester(facultyid: number, acadYear: nu
         )
         .as('current_faculty_semester_sq');
 
-    const tempCurrentFacultyAcademicSemesterArr = await db.select().from(currentFacultyAcademicSemesterSq);
+    const tempCurrentFacultyAcademicSemesterArr = await db
+        .select()
+        .from(currentFacultyAcademicSemesterSq);
     if (tempCurrentFacultyAcademicSemesterArr.length !== 1) return null;
 
     const currentFacultyAcademicSemesterArr = await db
@@ -152,10 +160,7 @@ export async function getFacultyAcademicSemester(facultyid: number, acadYear: nu
             remarks: currentFacultyAcademicSemesterSq.remarks,
         })
         .from(currentFacultyAcademicSemesterSq)
-        .leftJoin(
-            facultyRank,
-            eq(facultyRank.id, currentFacultyAcademicSemesterSq.currentRankId),
-        )
+        .leftJoin(facultyRank, eq(facultyRank.id, currentFacultyAcademicSemesterSq.currentRankId))
         .leftJoin(rank, eq(rank.id, facultyRank.rankId))
         .leftJoin(
             facultyEducationalAttainment,
@@ -182,10 +187,7 @@ export async function getFacultyAdminPositions(facultyAcademicSemesterid: number
             administrativeLoadCredit: facultyAdminPosition.administrativeLoadCredit,
         })
         .from(facultyAdminPosition)
-        .leftJoin(
-            adminPosition,
-            eq(adminPosition.id, facultyAdminPosition.adminPositionId),
-        )
+        .leftJoin(adminPosition, eq(adminPosition.id, facultyAdminPosition.adminPositionId))
         .leftJoin(office, eq(office.id, facultyAdminPosition.officeId))
         .where(eq(facultyAdminPosition.facultyAcademicSemesterId, facultyAcademicSemesterid));
 }
@@ -397,7 +399,10 @@ export async function getAllFacultyAcademicSemesters(facultyid: number) {
             semNum: academicSemester.semesterNumber,
         })
         .from(facultyAcademicSemester)
-        .leftJoin(academicSemester, eq(academicSemester.id, facultyAcademicSemester.academicSemesterId))
+        .leftJoin(
+            academicSemester,
+            eq(academicSemester.id, facultyAcademicSemester.academicSemesterId),
+        )
         .where(eq(facultyAcademicSemester.facultyId, facultyid));
 }
 

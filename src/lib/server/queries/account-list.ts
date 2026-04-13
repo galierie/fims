@@ -1,8 +1,21 @@
-import { and, asc, desc, eq, gt, ilike, lt, ne, or, sql, type SQL, type SQLWrapper } from 'drizzle-orm';
+import {
+    and,
+    asc,
+    desc,
+    eq,
+    gt,
+    ilike,
+    lt,
+    ne,
+    or,
+    type SQL,
+    type SQLWrapper,
+    sql,
+} from 'drizzle-orm';
 
 import type { FilterColumn } from '$lib/types/filter';
 
-import { accountSearchView, profile, changelog, role, profileInfo } from '../db/schema';
+import { accountSearchView, changelog, profile, profileInfo, role } from '../db/schema';
 import { db } from '../db';
 
 const pageSize = 50;

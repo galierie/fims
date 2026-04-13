@@ -6,11 +6,8 @@ import { seedDatabase } from '$lib/server/db/seed-db.js';
 export async function load({ locals, url }) {
     if (locals.user) {
         const userRole = await getRole(locals.user.id);
-        const {
-            canAddAccount,
-            canModifyAccount,
-            canViewChangelogs,
-        } = await getPermissions(userRole);
+        const { canAddAccount, canModifyAccount, canViewChangelogs } =
+            await getPermissions(userRole);
 
         const accountColorMap = new Map();
         accountColorMap.set('IT', 'fims-red');
