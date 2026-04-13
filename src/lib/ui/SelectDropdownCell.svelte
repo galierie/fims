@@ -8,6 +8,7 @@
         defaultSelectedOpt: string | null;
         isEditable: boolean;
         hasChange?: boolean;
+        isRequired?: boolean; 
     }
 
     let {
@@ -17,6 +18,7 @@
         defaultSelectedOpt,
         isEditable,
         hasChange = $bindable(),
+        isRequired = false, 
     }: Props = $props();
 
     $effect(() => {
@@ -81,5 +83,12 @@
         </div>
     {/if}
 
-    <input type="hidden" {name} bind:value={selectedOpt} defaultValue={defaultSelectedOpt} />
+    <input 
+        type="text" 
+        {name} 
+        value={(!selectedOpt || selectedOpt === '-') ? '' : selectedOpt} 
+        class="pointer-events-none absolute bottom-0 left-0 -z-10 h-0 w-full opacity-0" 
+        required={isRequired}
+        tabindex="-1"
+    />
 </div>

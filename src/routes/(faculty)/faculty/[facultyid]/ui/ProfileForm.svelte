@@ -1,5 +1,6 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
+    import { goto } from '$app/navigation';
     import Icon from '@iconify/svelte';
     import { onMount } from 'svelte';
     import { browser } from '$app/environment';
@@ -25,9 +26,22 @@
 
     const { profile, opts, dependencyMaps, isCreating }: Props = $props();
 
+    function toDateString(dateObj: Date | string | null | undefined): string | undefined {
+        if (!dateObj) return undefined;
+        const d = new Date(dateObj);
+        if (isNaN(d.getTime())) return undefined;
+        
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        
+        return `${year}-${month}-${day}`;
+    }
+
     // Check for changes
     let haveChanges: boolean[] = $state(Array(6).fill(false));
     let hasChange = $derived(haveChanges.some((e) => e === true));
+    
     $effect(() => {
         console.log(`Ping from ProfileForm! hasChange = ${hasChange}`);
     });
@@ -36,6 +50,10 @@
     $effect(() => {
         if (isCreating) setToEdit();
     });
+
+    const biologicalSexMapToFull: Record<string, string> = { 
+        M: 'Male', F: 'Female', I: 'Intersex', U: 'Unknown' 
+    };
 
     // Input Table Columns
     const emailColumns: InputColumnType[] = [
@@ -177,12 +195,14 @@
             colSpan: 2,
             type: 'dropdown',
             opts: appointmentStatuses,
+            isRequired: true,
         },
         {
             label: 'Date of Tenure/Renewal',
             name: 'promotion-history-date',
             colSpan: 2,
             type: 'date',
+            isRequired: true,
         },
     ]);
 
@@ -195,7 +215,7 @@
                     { columnNum: 1 },
                     { columnNum: 2 },
                     { columnNum: 3, defaultValue: appointmentStatus ?? undefined },
-                    { columnNum: 4, defaultValue: dateOfTenureOrRenewal },
+                    { columnNum: 4, defaultValue: toDateString(dateOfTenureOrRenewal) },
                 ],
                 tupleid,
             }),
@@ -224,7 +244,7 @@
 
 <form
     method="POST"
-    action="?/update"
+    action="?/{isCreating ? 'create' : 'update'}" 
     onreset={() => {
         resetViewState();
         willDiscardChanges = false;
@@ -232,11 +252,18 @@
     id={profileFormId}
     bind:this={profileForm}
     use:enhance={() => {
-        resetViewState();
+        // Prevent table data wipeout when creating
+        if (!isCreating) resetViewState(); 
+        
         isLoading = true;
-        return async ({ update }) => {
+        return async ({ update, result }) => {
             await update();
             isLoading = false;
+            
+            // Alert on silent failures
+            if (result.type === 'error' || result.type === 'failure') {
+                alert("Failed to save! Check the terminal for backend errors.");
+            }
         };
     }}
 >
@@ -251,6 +278,7 @@
                 <Icon icon="tabler:device-floppy" class="mr-2 h-5 w-5" />
                 <span>Save Record</span>
             </GreenButton>
+            
             {#if !isCreating}
                 <RedButton
                     type="button"
@@ -263,6 +291,15 @@
                     <Icon icon="tabler:database-off" class="mr-2 h-5 w-5" />
                     <span>Discard Changes</span>
                 </RedButton>
+            {:else}
+                <RedButton
+                    type="button"
+                    onclick={() => {
+                        willDiscardChanges = true; 
+                    }}
+                >
+                    <span>Cancel</span>
+                </RedButton>
             {/if}
         {:else if !isCreating}
             <GreenButton type="button" onclick={setToEdit}>
@@ -274,9 +311,9 @@
 
     <div>
         <div class="mt-4 grid w-full grid-cols-4">
-            <Field label="Last Name" name="last-name" defaultValue={profile?.lastName} />
-            <Field label="First Name" name="first-name" defaultValue={profile?.firstName} />
-            <Field label="Middle Name" name="middle-name" defaultValue={profile?.middleName} />
+            <Field label="Last Name" name="last-name" defaultValue={profile?.lastName} required={true} />
+            <Field label="First Name" name="first-name" defaultValue={profile?.firstName} required={true} />
+            <Field label="Middle Name" name="middle-name" defaultValue={profile?.middleName} required={true} />
             <Field label="Suffix" name="suffix" defaultValue={profile?.suffix ?? undefined} />
         </div>
         <div class="mt-4 grid w-full grid-cols-4">
@@ -284,13 +321,16 @@
                 label="Birth Date"
                 name="birth-date"
                 type="date"
-                defaultValue={profile?.birthDate}
+                defaultValue={toDateString(profile?.birthDate)}
+                required={true}
             />
             <Field
                 label="Biological Sex"
                 name="biological-sex"
-                type="text"
-                defaultValue={profile?.isBiologicallyMale ? 'M' : 'F'}
+                type="dropdown"
+                opts={['Male', 'Female', 'Intersex', 'Unknown']}
+                defaultValue={profile?.biologicalSex ? biologicalSexMapToFull[profile.biologicalSex] : ''}
+                required={true}
             />
             <Field
                 label="Maiden Name"
@@ -352,40 +392,51 @@
             <Field
                 label="PhilHealth No."
                 name="philhealth"
-                immutable={true}
+                immutable={!isCreating}
                 defaultValue={profile?.philhealth}
+                required={true}
             />
             <Field
                 label="Pag-IBIG No."
                 name="pagibig"
-                immutable={true}
+                immutable={!isCreating}
                 defaultValue={profile?.pagibig}
+                required={true}
             />
             <Field
                 label="PSI Item No."
                 name="psi-item"
-                immutable={true}
+                immutable={!isCreating}
                 defaultValue={profile?.psiItem}
+                required={true}
             />
         </div>
         <div class="mt-4 grid w-full grid-cols-4">
-            <Field label="TIN" name="tin" immutable={true} defaultValue={profile?.tin} />
-            <Field label="GSIS BP No." name="gsis" immutable={true} defaultValue={profile?.gsis} />
+            <Field label="TIN" name="tin" immutable={!isCreating} defaultValue={profile?.tin} required={true} />
+            <Field label="GSIS BP No." name="gsis" immutable={!isCreating} defaultValue={profile?.gsis} required={true} />
             <Field
                 label="Employee No."
                 name="employee-number"
-                immutable={true}
+                immutable={!isCreating}
                 defaultValue={profile?.employeeNumber}
+                required={true}
             />
         </div>
         <div class="mt-4 grid w-full grid-cols-4">
-            <Field label="Status" name="status" defaultValue={profile?.status ?? ''} />
+            <Field 
+                label="Status" 
+                name="status" 
+                type="dropdown"
+                opts={['Active', 'On Leave', 'Sabbatical', 'On Secondment']}
+                defaultValue={profile?.status ?? ''} 
+            />
             <Field
                 label="Date of Original Appointment"
                 name="date-of-original-appointment"
                 type="date"
                 colSpan={2}
-                defaultValue={profile?.dateOfOriginalAppointment}
+                defaultValue={toDateString(profile?.dateOfOriginalAppointment)}
+                required={true}
             />
         </div>
 
@@ -423,12 +474,18 @@
 
 {#if willDiscardChanges}
     <DeleteConfirmation
-        onDelete={() => {
+        onDelete={async () => {
+            willDiscardChanges = false; 
             if (profileForm) profileForm.reset();
+            
+            if (isCreating) {
+                isLoading = true; 
+                await goto('/'); 
+            }
         }}
         onCancel={() => {
             willDiscardChanges = false;
         }}
-        text="You have unsaved changes. Do you want to discard them?"
+        text="Are you sure you want to cancel creating this record?"
     />
 {/if}
