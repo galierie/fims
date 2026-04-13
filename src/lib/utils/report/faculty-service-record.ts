@@ -395,6 +395,7 @@ export async function getFacultyServiceRecordWorksheet(
         // 15. Course Units (Task 12)
         const courseUnitsCell = sheet.getCell(semestralRecordDataRow, semestralRecordDataCol++);
         courseUnitsCell.value = teaching?.courseUnits || 0;
+        courseUnitsCell.numFmt = '0.00';
         courseUnitsCell.border = cellBorders;
         courseUnitsCell.alignment = defaultTableCellAlignment;
 
