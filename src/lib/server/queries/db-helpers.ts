@@ -201,6 +201,24 @@ export async function updateFacultyProfileRecords(
 
         // Process Tables with Foreign Keys (Dropdowns)
         const dbFieldsOfInterest = await db.select().from(fieldOfInterest);
+        
+        const allProvidedFields = [
+            ...dynamicTables.fieldsOfInterest.create, 
+            ...dynamicTables.fieldsOfInterest.update
+        ]
+            .map(f => f['fields-of-interest'])
+            .filter(f => f && f.trim() !== '');
+
+        const existingFieldNames = new Set(dbFieldsOfInterest.map(f => f.field));
+        const newFields = [...new Set(allProvidedFields)].filter(f => !existingFieldNames.has(f));
+
+        if (newFields.length > 0) {
+            const insertedFields = await db.insert(fieldOfInterest)
+                .values(newFields.map(f => ({ field: f })))
+                .returning();
+            dbFieldsOfInterest.push(...insertedFields);
+        }
+
         const getFieldId = (fieldName: string) =>
             dbFieldsOfInterest.find((f) => f.field === fieldName)?.id || null;
 
@@ -236,7 +254,8 @@ export async function updateFacultyProfileRecords(
         );
 
         return { success: true };
-    } catch {
+    } catch (error) {
+        console.error('DB ERROR IN UPDATE:', error); 
         return { success: false };
     }
 }
@@ -296,9 +315,26 @@ export async function createFacultyProfileRecords(basicProfile: any, dynamicTabl
         );
 
         const dbFieldsOfInterest = await db.select().from(fieldOfInterest);
-        function getFieldId(fieldName: string) {
-            return dbFieldsOfInterest.find((f) => f.field === fieldName)?.id ?? null;
+
+        const allProvidedFields = [
+            ...dynamicTables.fieldsOfInterest.create, 
+            ...dynamicTables.fieldsOfInterest.update
+        ]
+            .map(f => f['fields-of-interest'])
+            .filter(f => f && f.trim() !== '');
+
+        const existingFieldNames = new Set(dbFieldsOfInterest.map(f => f.field));
+        const newFields = [...new Set(allProvidedFields)].filter(f => !existingFieldNames.has(f));
+        
+        if (newFields.length > 0) {
+            const insertedFields = await db.insert(fieldOfInterest)
+                .values(newFields.map(f => ({ field: f })))
+                .returning();
+            dbFieldsOfInterest.push(...insertedFields);
         }
+
+        const getFieldId = (fieldName: string) =>
+            dbFieldsOfInterest.find((f) => f.field === fieldName)?.id || null;
 
         await processDynamicTable(
             facultyFieldOfInterest,

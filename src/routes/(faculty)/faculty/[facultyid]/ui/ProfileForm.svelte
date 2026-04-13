@@ -148,8 +148,9 @@
             label: 'Fields of Interest',
             name: 'fields-of-interest',
             colSpan: 1,
-            type: 'dropdown',
+            type: 'datalist',
             opts: fieldsOfInterest,
+            isRequired: true,
         },
     ]);
 
@@ -252,17 +253,15 @@
     id={profileFormId}
     bind:this={profileForm}
     use:enhance={() => {
-        // Prevent table data wipeout when creating
-        if (!isCreating) resetViewState(); 
-        
         isLoading = true;
         return async ({ update, result }) => {
-            await update();
+            await update({ reset: false }); 
             isLoading = false;
             
-            // Alert on silent failures
-            if (result.type === 'error' || result.type === 'failure') {
-                alert("Failed to save! Check the terminal for backend errors.");
+            if (result.type === 'success' || result.type === 'redirect') {
+                if (!isCreating) resetViewState();
+            } else {
+                alert("Failed to save!");
             }
         };
     }}
