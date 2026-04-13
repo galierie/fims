@@ -387,6 +387,7 @@ export async function getFacultyLoadingReport(facultyid: number, acadYear: numbe
             eq(facultyAcademicSemester.id, facultyAdminPosition.facultyAcademicSemesterId),
         )
         .leftJoin(adminPosition, eq(facultyAdminPosition.adminPositionId, adminPosition.id))
+        .leftJoin(facultyCommMembership, eq(facultyAcademicSemester.id, facultyCommMembership.facultyAcademicSemesterId))
         .leftJoin(
             facultyAdminWork,
             eq(facultyAcademicSemester.id, facultyAdminWork.facultyAcademicSemesterId),
