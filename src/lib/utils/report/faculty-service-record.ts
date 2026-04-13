@@ -282,7 +282,7 @@ export async function getFacultyServiceRecordWorksheet(
 
         // 1. Semester (First Col)
         const semNumCell = sheet.getCell(semestralRecordDataRow, semestralRecordDataCol++);
-        semNumCell.value = semNumCellValues[semNum - 1]; // -1 because semNum is 1-indexed, array is 0-indexed
+        semNumCell.value = semNumCellValues[semNum % 3];
         semNumCell.border = cellBorders;
         semNumCell.alignment = defaultTableCellAlignment;
 
