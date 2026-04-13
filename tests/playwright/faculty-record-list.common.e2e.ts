@@ -8,8 +8,8 @@ import { sql } from 'drizzle-orm';
 
 import * as schema from '$lib/server/db/schema';
 
-import * as testConsts from '../test-consts';
 import * as fieldHelp from '../test-helpers/field-test';
+import * as testConsts from '../test-consts';
 
 // Database stuff
 function initializeDbClient() {
@@ -131,22 +131,20 @@ test.describe('viewing and searching records as it', () => {
         await expect(page.getByText('Mandario, Maricris')).toBeVisible(); //correct record is shown
 
         //check for the required fields in the profile tab
-        for (let field of testConsts.profileTabFields) {
+        for (const field of testConsts.profileTabFields)
             await expect(page.getByText(field, { exact: true })).toBeVisible();
-        }
 
         //check for the required fields in the semestral records tab
-        let semrecsTab = await fieldHelp.semrecstab(page);
+        const semrecsTab = await fieldHelp.semrecstab(page);
         await semrecsTab.click();
         await expect(page).not.toHaveURL(/profile/u); //it went somewhere
 
         //check for the required fields in the sem recs tab
-        for (let field of testConsts.semRecsFields) {
+        for (const field of testConsts.semRecsFields)
             await expect(page.getByText(field, { exact: true }).first()).toBeVisible();
-        }
 
         //check if you can go back to the profile tab
-        let profileTab = await fieldHelp.profiletab(page);
+        const profileTab = await fieldHelp.profiletab(page);
         await profileTab.click();
         await expect(page).toHaveURL(/faculty/u); //in faculty route
 
@@ -272,22 +270,20 @@ test.describe('viewing and searching records as admin', async () => {
         await expect(page.getByText('Mandario, Maricris')).toBeVisible(); //correct record is shown
 
         //check for the required fields in the profile tab
-        for (let field of testConsts.profileTabFields) {
+        for (const field of testConsts.profileTabFields)
             await expect(page.getByText(field, { exact: true })).toBeVisible();
-        }
 
         //check for the required fields in the semestral records tab
-        let semrecsTab = await fieldHelp.semrecstab(page);
+        const semrecsTab = await fieldHelp.semrecstab(page);
         await semrecsTab.click();
         await expect(page).not.toHaveURL(/profile/u); //it went somewhere
 
         //check for the required fields in the sem recs tab
-        for (let field of testConsts.semRecsFields) {
+        for (const field of testConsts.semRecsFields)
             await expect(page.getByText(field, { exact: true }).first()).toBeVisible();
-        }
 
         //check if you can go back to the profile tab
-        let profileTab = await fieldHelp.profiletab(page);
+        const profileTab = await fieldHelp.profiletab(page);
         await profileTab.click();
         await expect(page).toHaveURL(/faculty/u); //in faculty route
 

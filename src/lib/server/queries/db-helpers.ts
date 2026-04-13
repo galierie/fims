@@ -1,11 +1,12 @@
 import { and, eq, inArray } from 'drizzle-orm';
 
 import {
+    academicSemester,
     adminPosition,
-    profile,
     changelog,
     course,
     faculty,
+    facultyAcademicSemester,
     facultyAdminPosition,
     facultyAdminWork,
     facultyCommMembership,
@@ -19,16 +20,15 @@ import {
     facultyMentoring,
     facultyRank,
     facultyResearch,
-    facultyAcademicSemester,
     facultyStudyLoad,
     fieldOfInterest,
     office,
+    profile,
+    profileInfo,
     rank,
     research,
     role,
-    academicSemester,
     student,
-    profileInfo,
 } from '../db/schema';
 import { db } from '../db';
 
@@ -95,7 +95,11 @@ export async function deleteUsersInfo(operatorId: string, userids: string[]) {
 }
 
 export async function getRole(id: string) {
-    const [fetchedUser] = await db.select().from(profileInfo).where(eq(profileInfo.profileId, id)).limit(1);
+    const [fetchedUser] = await db
+        .select()
+        .from(profileInfo)
+        .where(eq(profileInfo.profileId, id))
+        .limit(1);
 
     return fetchedUser.role;
 }
@@ -344,7 +348,12 @@ export async function updateSemestralRecords(
         const existingAcademicSemester = await db
             .select()
             .from(academicSemester)
-            .where(and(eq(academicSemester.academicYear, acadYear), eq(academicSemester.semesterNumber, semNum)))
+            .where(
+                and(
+                    eq(academicSemester.academicYear, acadYear),
+                    eq(academicSemester.semesterNumber, semNum),
+                ),
+            )
             .limit(1);
 
         if (existingAcademicSemester.length > 0) {
@@ -434,12 +443,10 @@ export async function updateSemestralRecords(
             dbAdminPositions.find((a) => a.title === name)?.id || null;
 
         const dbOffices = await db.select().from(office);
-        const getOfficeId = (name: string) =>
-            dbOffices.find((o) => o.name === name)?.id || null;
+        const getOfficeId = (name: string) => dbOffices.find((o) => o.name === name)?.id || null;
 
         const dbCourses = await db.select().from(course);
-        const getCourseId = (name: string) =>
-            dbCourses.find((c) => c.name === name)?.id || null;
+        const getCourseId = (name: string) => dbCourses.find((c) => c.name === name)?.id || null;
 
         const dbResearches = await db.select().from(research);
         const getResearchId = (title: string) =>

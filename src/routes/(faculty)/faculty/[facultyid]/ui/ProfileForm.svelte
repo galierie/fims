@@ -26,8 +26,8 @@
     const { profile, opts, dependencyMaps, isCreating }: Props = $props();
 
     // Check for changes
-    let haveChanges: boolean[] = $state(Array(6).fill(false));
-    let hasChange = $derived(haveChanges.some((e) => e === true));
+    const haveChanges: boolean[] = $state(Array(6).fill(false));
+    const hasChange = $derived(haveChanges.some((e) => e === true));
     $effect(() => {
         console.log(`Ping from ProfileForm! hasChange = ${hasChange}`);
     });

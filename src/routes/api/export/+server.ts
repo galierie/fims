@@ -1,17 +1,16 @@
-import { json, type RequestEvent } from '@sveltejs/kit';
 import ExcelJS from '@protobi/exceljs';
+import { json, type RequestEvent } from '@sveltejs/kit';
 
+import { getFacultyBySubjectWorksheet } from '$lib/utils/report/faculty-by-subject';
 import { getFacultyLoadingWorksheet } from '$lib/utils/report/faculty-loading';
-import { getSubjectsByFacultyWorksheet } from '$lib/utils/report/subjects-by-faculty';
 import { getFacultyProfileWorksheet } from '$lib/utils/report/faculty-profile';
 import { getFacultyServiceRecordWorksheet } from '$lib/utils/report/faculty-service-record';
 import { getFacultySETAverageWorksheet } from '$lib/utils/report/faculty-set-average';
-import { getFacultyBySubjectWorksheet } from '$lib/utils/report/faculty-by-subject';
+import { getSubjectsByFacultyWorksheet } from '$lib/utils/report/subjects-by-faculty';
 
 export async function GET({ url, locals }: RequestEvent) {
-    if (!locals.user) {
+    if (!locals.user)
         return json({ error: 'Unauthorized. Please log in to export.' }, { status: 401 });
-    }
 
     // Extract and Validate Parameters
     const typesStr = url.searchParams.get('types');
@@ -32,15 +31,14 @@ export async function GET({ url, locals }: RequestEvent) {
     if (
         !isOnlyProfile &&
         (isNaN(rawFromAy) || isNaN(rawFromSem) || rawFromAy === 0 || rawFromSem === 0)
-    ) {
+    )
         return json({ error: 'Invalid academic year/semester range' }, { status: 400 });
-    }
 
     // If ever the AY/sem are backwards (also added new feature for these in UI)
-    let fromAy = rawFromAy,
-        fromSem = rawFromSem,
-        toAy = rawToAy,
-        toSem = rawToSem;
+    let fromAy = rawFromAy;
+    let fromSem = rawFromSem;
+    let toAy = rawToAy;
+    let toSem = rawToSem;
     if (!isOnlyProfile && (fromAy > toAy || (fromAy === toAy && fromSem > toSem))) {
         fromAy = rawToAy;
         fromSem = rawToSem;
@@ -71,17 +69,17 @@ export async function GET({ url, locals }: RequestEvent) {
         // Isolate unique years for yearly reports (for Faculty Loading)
         const uniqueYears = Array.from(new Set(periods.map((p) => p.ay)));
 
-        for (const type of types) {
-            if (type === 'profile') {
+        for (const type of types)
+            if (type === 'profile')
                 sheetPromises.push(
                     getFacultyProfileWorksheet(facultyIds).then((sheet) => {
                         if (sheet) sheet.sheetName = 'Faculty Profile';
                         return sheet;
                     }),
                 );
-            } else if (type === 'service-record') {
+            else if (type === 'service-record')
                 // Service record queries by individual faculty ID over the whole date range
-                for (const id of facultyIds) {
+                for (const id of facultyIds)
                     sheetPromises.push(
                         getFacultyServiceRecordWorksheet(id, fromAy, fromSem, toAy, toSem).then(
                             (sheet) => {
@@ -90,46 +88,39 @@ export async function GET({ url, locals }: RequestEvent) {
                             },
                         ),
                     );
-                }
-            } else if (type === 'loading') {
-                for (const { ay, sem } of periods) {
+            else if (type === 'loading')
+                for (const { ay, sem } of periods)
                     sheetPromises.push(
                         getFacultyLoadingWorksheet(facultyIds, ay, sem).then((sheet) => {
                             if (sheet) sheet.sheetName = `Loading AY${ay}-${ay + 1}-${sem}`;
                             return sheet;
                         }),
                     );
-                }
-            } else if (type === 'set-avg') {
+            else if (type === 'set-avg')
                 // SET average is a yearly report
-                for (const ay of uniqueYears) {
+                for (const ay of uniqueYears)
                     sheetPromises.push(
                         getFacultySETAverageWorksheet(facultyIds, ay).then((sheet) => {
                             if (sheet) sheet.sheetName = `SET Avg AY${ay}-${ay + 1}`;
                             return sheet;
                         }),
                     );
-                }
-            } else if (type === 'subjects-by-faculty') {
-                for (const { ay, sem } of periods) {
+            else if (type === 'subjects-by-faculty')
+                for (const { ay, sem } of periods)
                     sheetPromises.push(
                         getSubjectsByFacultyWorksheet(facultyIds, ay, sem).then((sheet) => {
                             if (sheet) sheet.sheetName = `Subjects AY${ay} Sem${sem}`;
                             return sheet;
                         }),
                     );
-                }
-            } else if (type === 'faculty-by-subject') {
+            else if (type === 'faculty-by-subject')
                 sheetPromises.push(
-                    getFacultyBySubjectWorksheet().then(sheet => {
+                    getFacultyBySubjectWorksheet().then((sheet) => {
                         if (sheet) sheet.sheetName = `By Subject, Faculty Taught`;
                         return sheet;
-                    })
+                    }),
                 );
-            } else {
-                console.warn(`Report type '${type}' is not yet fully implemented.`);
-            }
-        }
+            else console.warn(`Report type '${type}' is not yet fully implemented.`);
 
         const sheets = await Promise.all(sheetPromises);
 
@@ -154,9 +145,7 @@ export async function GET({ url, locals }: RequestEvent) {
             addedSheets++;
         });
 
-        if (addedSheets === 0) {
-            workbook.addWorksheet('No Data Generated');
-        }
+        if (addedSheets === 0) workbook.addWorksheet('No Data Generated');
 
         const buf = await workbook.xlsx.writeBuffer();
 

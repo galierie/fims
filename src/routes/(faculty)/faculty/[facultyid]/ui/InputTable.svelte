@@ -30,11 +30,11 @@
 
     let nextRowNum = $derived(rows.length);
     // svelte-ignore state_referenced_locally
-    let haveValues: boolean[] = $state(Array(nextRowNum).fill(true));
+    const haveValues: boolean[] = $state(Array(nextRowNum).fill(true));
 
     // Check for changes
     // svelte-ignore state_referenced_locally
-    let haveChanges: boolean[] = $state(Array(nextRowNum).fill(false));
+    const haveChanges: boolean[] = $state(Array(nextRowNum).fill(false));
     $effect(() => {
         hasChange = haveChanges.some((e) => e === true);
         console.log(`Ping from InputTable! hasChange = ${hasChange}`);

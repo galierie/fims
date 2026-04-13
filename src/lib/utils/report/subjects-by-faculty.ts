@@ -1,6 +1,7 @@
 import ExcelJS from '@protobi/exceljs';
+
+import { cellBorders, type SheetCellValue } from '$lib/types/sheet-cell';
 import { getSubjectsByFacultyReport } from '$lib/server/queries/reports';
-import { type SheetCellValue, cellBorders } from '$lib/types/sheet-cell';
 
 const constantHeaderCellValues: SheetCellValue[] = [
     {
@@ -56,22 +57,49 @@ export async function getSubjectsByFacultyWorksheet(
     let row = dataStartRow;
     for (let i = 0; i < data.length; i++, row++) {
         let col = dataStartCol;
-        const facultyMember = data[i];
+        const facultyMemberCourses = data[i]; // This is now an array of course objects
 
-        if (facultyMember.length === 0) continue;
+        if (facultyMemberCourses.length === 0) continue;
 
-        console.log(facultyMember);
-
-        const [{ lastName, firstName, middleName, coursesTaught }] = facultyMember;
+        // Extract faculty name from the first course entry
+        const { lastName, firstName, middleName } = facultyMemberCourses[0];
 
         const nameCell = sheet.getCell(row, col);
         nameCell.value = `${lastName}, ${firstName} ${middleName[0]}.`;
         nameCell.border = cellBorders;
+        nameCell.alignment = { vertical: 'top' };
         col++;
 
+        // --- Task 15: Sort and Category Logic ---
+        const undergrad = facultyMemberCourses
+            .filter((c) => c.courseLevel === 'Undergraduate')
+            .map((c) => c.courseName)
+            .join(', ');
+
+        const maphd = facultyMemberCourses
+            .filter((c) => c.courseLevel === 'MA/PhD')
+            .map((c) => c.courseName)
+            .join(', ');
+
+        const mde = facultyMemberCourses
+            .filter((c) => c.courseLevel === 'MDE')
+            .map((c) => c.courseName)
+            .join(', ');
+
+        // Construct the combined string with labels
+        const displayParts = [];
+        if (undergrad) displayParts.push(`Undergraduate: ${undergrad}`);
+        if (maphd) displayParts.push(`MA/PhD: ${maphd}`);
+        if (mde) displayParts.push(`MDE: ${mde}`);
+
+        const finalSubjectsValue = displayParts.join('\n');
+        // ----------------------------------------
+
         const subjectsCell = sheet.getCell(row, col);
-        subjectsCell.value = coursesTaught;
+        subjectsCell.value = finalSubjectsValue;
         subjectsCell.border = cellBorders;
+        subjectsCell.alignment = { wrapText: true, vertical: 'top' }; // wrapText is vital for \n
+
         sheet.mergeCells(row, col, row, col + 2);
         col += 3;
     }

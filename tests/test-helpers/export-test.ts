@@ -1,4 +1,4 @@
-import { type Page, type Locator, expect } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 
 export const acadYears = [
     'AY 2023-2024',
@@ -25,7 +25,7 @@ export const checkboxOptions = [
 export const exportOptions = ['CSV', 'XLSX'];
 
 export async function getExportRecords(page: Page): Promise<Locator> {
-    let loc = page.getByRole('button', { name: 'Export Reports', exact: true });
+    const loc = page.getByRole('button', { name: 'Export Reports', exact: true });
     await expect(loc).toBeVisible();
     return loc;
 }
@@ -35,33 +35,33 @@ export async function getDateSelects(
     rangeText: string,
     text: string,
 ): Promise<Locator> {
-    let rangeDiv = page.locator('div').filter({ hasText: rangeText }).first();
+    const rangeDiv = page.locator('div').filter({ hasText: rangeText }).first();
     await expect(rangeDiv).toBeVisible();
-    let loc = rangeDiv.locator('> *').filter({ has: page.getByRole('combobox'), hasText: text });
+    const loc = rangeDiv.locator('> *').filter({ has: page.getByRole('combobox'), hasText: text });
     await expect(loc).toBeVisible();
     return loc;
 }
 
 export async function getCheckbox(page: Page, text: string): Promise<Locator> {
-    let loc = page.getByRole('checkbox', { name: text }).first();
+    const loc = page.getByRole('checkbox', { name: text }).first();
     await expect(loc).toBeVisible();
     return loc;
 }
 
 export async function getRadio(page: Page, text: string): Promise<Locator> {
-    let loc = page.getByRole('radio', { name: text }).first();
+    const loc = page.getByRole('radio', { name: text }).first();
     await expect(loc).toBeVisible();
     return loc;
 }
 
 export async function getCancel(page: Page): Promise<Locator> {
-    let button = page.getByRole('button', { name: 'Cancel' }).last();
+    const button = page.getByRole('button', { name: 'Cancel' }).last();
     await expect(button).toBeVisible();
     return button;
 }
 
 export async function getExportButton(page: Page): Promise<Locator> {
-    let button = page.getByRole('button', { name: 'Export', exact: true }).last();
+    const button = page.getByRole('button', { name: 'Export', exact: true }).last();
     await expect(button).toBeVisible();
     return button;
 }

@@ -1,15 +1,16 @@
-import { expect, type Page, type Locator } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
+
 import * as consts from '../test-consts';
 
 export async function profiletab(page: Page): Promise<Locator> {
-    let tab = page.locator('a').getByText('Profile');
+    const tab = page.locator('a').getByText('Profile');
     await expect(tab).toBeVisible();
 
     return tab;
 }
 
 export async function semrecstab(page: Page): Promise<Locator> {
-    let tab = page.locator('a').getByText('Semestral Records');
+    const tab = page.locator('a').getByText('Semestral Records');
     await expect(tab).toBeVisible();
 
     return tab;
@@ -17,13 +18,13 @@ export async function semrecstab(page: Page): Promise<Locator> {
 
 export async function inputField(field: string, input: string, page: Page) {
     console.log(`Filled ${field} with ${input}`);
-    let elem = page.getByRole('textbox', { name: field, exact: true });
+    const elem = page.getByRole('textbox', { name: field, exact: true });
     await expect(elem).toBeVisible();
     await elem.fill(input);
 }
 
 export async function compareField(field: string, cmp: string, page: Page) {
-    let elem = page.getByRole('textbox', { name: field, exact: true });
+    const elem = page.getByRole('textbox', { name: field, exact: true });
     await expect(elem).toBeVisible();
     console.log(`comparing ${field}: ${await elem.inputValue()} with ${cmp}`);
     expect(await elem.inputValue()).toBe(cmp);
@@ -37,20 +38,20 @@ export async function testList(
     buttonText: string,
     page: Page,
 ) {
-    let addButton = page.getByRole('button', { name: buttonText, exact: true });
+    const addButton = page.getByRole('button', { name: buttonText, exact: true });
     await expect(addButton).toBeVisible();
     await addButton.click();
 
-    let listDiv = page.getByTestId('list-table').filter({ hasText: listHeader }).first();
+    const listDiv = page.getByTestId('list-table').filter({ hasText: listHeader }).first();
     await expect(listDiv).toBeVisible();
 
-    let inputRow = listDiv.getByTestId('list-table-input').last();
+    const inputRow = listDiv.getByTestId('list-table-input').last();
     await expect(inputRow).toBeVisible();
 
     for (let idx = 0; idx < inputs.length; idx++) {
         // expects either input or div, hence name
-        let inputDiv = inputRow.locator('> *').nth(idx);
-        let curInput = inputs[idx];
+        const inputDiv = inputRow.locator('> *').nth(idx);
+        const curInput = inputs[idx];
 
         await expect(inputDiv).toBeVisible();
 
@@ -87,10 +88,10 @@ export async function testList(
 
 //compares the last entry in the header
 export async function compareList(listHeader: string, compare: string[], page: Page) {
-    let listDiv = page.getByTestId('list-table').filter({ hasText: listHeader });
+    const listDiv = page.getByTestId('list-table').filter({ hasText: listHeader });
     await expect(listDiv).toBeVisible();
 
-    let inputRow = listDiv.locator('div').filter({ hasNotText: listHeader }).last();
+    const inputRow = listDiv.locator('div').filter({ hasNotText: listHeader }).last();
     //empty case
     if (compare.length === 0) {
         await expect(inputRow).not.toBeVisible();
@@ -99,7 +100,7 @@ export async function compareList(listHeader: string, compare: string[], page: P
 
     await expect(inputRow).toBeVisible();
     for (let idx = 0; idx < compare.length; idx++) {
-        let inputText = inputRow.locator('*').nth(idx); //get each column
+        const inputText = inputRow.locator('*').nth(idx); //get each column
         await expect(inputText).toBeVisible();
         await expect(inputText).toHaveText(compare[idx]);
     }
@@ -107,15 +108,13 @@ export async function compareList(listHeader: string, compare: string[], page: P
 
 //get the last entry of a list and return it as an array of strings
 export async function getLastEntry(listHeader: string, page: Page): Promise<string[]> {
-    let listDiv = page.getByTestId('list-table').filter({ hasText: listHeader });
+    const listDiv = page.getByTestId('list-table').filter({ hasText: listHeader });
     await expect(listDiv).toBeVisible();
 
-    let lastEntry = listDiv.locator('div').filter({ hasNotText: listHeader }).last();
-    if (!(await lastEntry.isVisible())) {
-        return []; // empty case
-    }
+    const lastEntry = listDiv.locator('div').filter({ hasNotText: listHeader }).last();
+    if (!(await lastEntry.isVisible())) return []; // empty case
 
-    let res = await lastEntry.evaluate((div) =>
+    const res = await lastEntry.evaluate((div) =>
         Array.from(div.childNodes).map((node) => node.textContent ?? ''),
     );
 

@@ -155,16 +155,7 @@
     const menteeValues: InputRowValue[] = $derived(
         mentees.map(
             (
-                {
-                    tupleid,
-                    lastName,
-                    middleName,
-                    firstName,
-                    category,
-                    startDate,
-                    endDate,
-                    remarks,
-                },
+                { tupleid, lastName, middleName, firstName, category, startDate, endDate, remarks },
                 index,
             ) => ({
                 rowNum: index,
