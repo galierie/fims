@@ -45,11 +45,20 @@
     let aggregateCourseReports = $state(false);
     let format = $state<'csv' | 'xlsx'>('xlsx');
 
+    $effect(() => {
+        if (format === 'csv') {
+            aggregateFacultyReports = false;
+            aggregateCourseReports = false;
+        }
+    });
+
     const semesters = [
         { id: 1, name: 'Sem 1' },
         { id: 2, name: 'Sem 2' },
         { id: 3, name: 'Midyear' },
     ];
+
+    const noFacultySelected = $derived(selectedFaculty.length === 0);
 
     const hasDateDependentReports = $derived(
         exportServiceRecord || exportLoading || exportSetAvg || exportByFacSubj,
@@ -176,11 +185,12 @@
                 <div class="rounded-xl border border-fims-green/20 bg-white p-6 shadow-sm">
                     <h3 class="mb-4 text-lg font-bold text-fims-green">Overview Reports</h3>
                     <div class="flex flex-col gap-3 pl-2">
-                        <label class="flex cursor-pointer items-start gap-3">
+                        <label class="flex items-start gap-3 {noFacultySelected ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}">
                             <input
                                 type="checkbox"
                                 bind:checked={exportProfile}
-                                class="mt-0.5 h-5 w-5 rounded border-fims-green text-fims-green focus:ring-fims-green"
+                                disabled={noFacultySelected}
+                                class="mt-0.5 h-5 w-5 rounded border-fims-green text-fims-green focus:ring-fims-green disabled:bg-gray-200 disabled:border-gray-300"
                             />
                             <span class="text-base text-black"
                                 >Faculty Profile <span class="text-sm text-gray-400"
@@ -208,35 +218,39 @@
 
                     <div class="grid grid-cols-1 gap-6 md:grid-cols-12">
                         <div class="flex flex-col gap-3 pl-2 md:col-span-5">
-                            <label class="flex cursor-pointer items-start gap-3">
+                            <label class="flex items-start gap-3 {noFacultySelected ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}">
                                 <input
                                     type="checkbox"
                                     bind:checked={exportServiceRecord}
-                                    class="mt-0.5 h-5 w-5 rounded border-fims-green text-fims-green focus:ring-fims-green"
+                                    disabled={noFacultySelected}
+                                    class="mt-0.5 h-5 w-5 rounded border-fims-green text-fims-green focus:ring-fims-green disabled:bg-gray-200 disabled:border-gray-300"
                                 />
                                 <span class="text-base text-black">Faculty Service Record</span>
                             </label>
-                            <label class="flex cursor-pointer items-start gap-3">
+                            <label class="flex items-start gap-3 {noFacultySelected ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}">
                                 <input
                                     type="checkbox"
                                     bind:checked={exportLoading}
-                                    class="mt-0.5 h-5 w-5 rounded border-fims-green text-fims-green focus:ring-fims-green"
+                                    disabled={noFacultySelected}
+                                    class="mt-0.5 h-5 w-5 rounded border-fims-green text-fims-green focus:ring-fims-green disabled:bg-gray-200 disabled:border-gray-300"
                                 />
                                 <span class="text-base text-black">Faculty Loading</span>
                             </label>
-                            <label class="flex cursor-pointer items-start gap-3">
+                            <label class="flex items-start gap-3 {noFacultySelected ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}">
                                 <input
                                     type="checkbox"
                                     bind:checked={exportSetAvg}
-                                    class="mt-0.5 h-5 w-5 rounded border-fims-green text-fims-green focus:ring-fims-green"
+                                    disabled={noFacultySelected}
+                                    class="mt-0.5 h-5 w-5 rounded border-fims-green text-fims-green focus:ring-fims-green disabled:bg-gray-200 disabled:border-gray-300"
                                 />
                                 <span class="text-base text-black">Faculty SET Average</span>
                             </label>
-                            <label class="flex cursor-pointer items-start gap-3">
+                            <label class="flex items-start gap-3 {noFacultySelected ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}">
                                 <input
                                     type="checkbox"
                                     bind:checked={exportByFacSubj}
-                                    class="mt-0.5 h-5 w-5 rounded border-fims-green text-fims-green focus:ring-fims-green"
+                                    disabled={noFacultySelected}
+                                    class="mt-0.5 h-5 w-5 rounded border-fims-green text-fims-green focus:ring-fims-green disabled:bg-gray-200 disabled:border-gray-300"
                                 />
                                 <span class="text-base text-black">By Faculty, Subject Taught</span>
                             </label>
@@ -376,11 +390,12 @@
                     class="flex flex-col gap-5 rounded-xl border border-fims-green/20 bg-white p-6 shadow-sm"
                 >
                     <div class="flex flex-col gap-3">
-                        <label class="flex cursor-pointer items-start gap-3">
+                        <label class="flex items-start gap-3 {format === 'csv' || noFacultySelected ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}">
                             <input
                                 type="checkbox"
                                 bind:checked={aggregateFacultyReports}
-                                class="mt-0.5 h-5 w-5 rounded border-fims-green text-fims-green focus:ring-fims-green"
+                                disabled={format === 'csv' || noFacultySelected}
+                                class="mt-0.5 h-5 w-5 rounded border-fims-green text-fims-green focus:ring-fims-green disabled:bg-gray-200 disabled:border-gray-300"
                             />
                             <span class="text-base font-semibold text-fims-green"
                                 >Aggregate Faculty Reports <span
@@ -390,11 +405,13 @@
                                 ></span
                             >
                         </label>
-                        <label class="flex cursor-pointer items-start gap-3">
+                        
+                        <label class="flex items-start gap-3 {format === 'csv' || noFacultySelected ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}">
                             <input
                                 type="checkbox"
                                 bind:checked={aggregateCourseReports}
-                                class="mt-0.5 h-5 w-5 rounded border-fims-green text-fims-green focus:ring-fims-green"
+                                disabled={format === 'csv' || noFacultySelected}
+                                class="mt-0.5 h-5 w-5 rounded border-fims-green text-fims-green focus:ring-fims-green disabled:bg-gray-200 disabled:border-gray-300"
                             />
                             <span class="text-base font-semibold text-fims-green"
                                 >Aggregate Course Info Reports <span
