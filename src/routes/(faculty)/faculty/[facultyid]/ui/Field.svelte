@@ -46,7 +46,8 @@
 >
     <span class="mr-2 w-fit text-right">
         {label}
-        {#if required}
+        
+        {#if required && viewState.isEditing}
             <span class="text-fims-red">*</span>
         {/if}
     </span>

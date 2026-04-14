@@ -39,13 +39,16 @@
 
     // svelte-ignore state_referenced_locally
     let values: any[] = $state(
-        row.map((r) =>
-            columns[r.columnNum].type === 'checkbox' ? (r.defaultChecked ?? false) : r.defaultValue
-        )
+        row.map((r) => {
+            if (columns[r.columnNum].type === 'checkbox') return r.defaultChecked ?? false;
+            return r.defaultValue !== undefined && r.defaultValue !== null ? r.defaultValue : '';
+        })
     );
 
     $effect(() => {
-        hasValue = values.some((v) => v !== undefined && v !== null && v !== '' && v !== false);
+        hasValue = values.some(
+            (v) => v !== undefined && v !== null && v !== '' && v !== false && String(v) !== 'undefined'
+        );
     });
 
     // Check for changes
@@ -53,8 +56,22 @@
     const haveChanges: boolean[] = $state(Array(row.length).fill(false));
     $effect(() => {
         hasChange = haveChanges.some((e) => e === true);
-        console.log(haveChanges);
-        console.log(`Ping from InputTableRow! hasChange = ${hasChange}`);
+    });
+    $effect(() => {
+        if (!viewState.isEditing) {
+            const newValues = row.map((r) => {
+                if (columns[r.columnNum].type === 'checkbox') return r.defaultChecked ?? false;
+                return r.defaultValue !== undefined && r.defaultValue !== null ? r.defaultValue : '';
+            });
+            
+            for (let i = 0; i < newValues.length; i++) {
+                values[i] = newValues[i];
+            }
+            
+            for (let i = 0; i < haveChanges.length; i++) {
+                haveChanges[i] = false;
+            }
+        }
     });
 
     const gridTemplateColumns = $derived(`grid-cols-${numOfColumns}`);
@@ -103,7 +120,7 @@
                         (!isImmutable || defaultValue === undefined || defaultValue === '') &&
                         !isDeleted}
                     bind:hasChange={haveChanges[columnNum]}
-                    isRequired={isRequired && hasValue && !isDeleted}
+                    isRequired={isRequired && hasValue && (tupleid === undefined || hasChange) && !isDeleted}
                 />
             </div>
         {:else if type === 'expandable' && !(defaultValue instanceof Date)}
@@ -146,6 +163,25 @@
                 />
                 <input type="hidden" {name} defaultValue={false} />
             </div>
+        {:else if type === 'datalist' && opts !== undefined && !(defaultValue instanceof Date)}
+            <div
+                class="{colSpanClass} h-8 bg-white {isDeleted
+                    ? 'text-fims-gray'
+                    : ''} flex items-center"
+            >
+                <SelectDropdownCell
+                    {name}
+                    {opts}
+                    bind:selectedOpt={values[columnNum]}
+                    defaultSelectedOpt={(defaultValue as string) ?? '-'}
+                    isEditable={viewState.isEditing &&
+                        (!isImmutable || defaultValue === undefined || defaultValue === '') &&
+                        !isDeleted}
+                    bind:hasChange={haveChanges[columnNum]}
+                    isRequired={isRequired && !isDeleted && ((tupleid === undefined && hasValue) || (tupleid !== undefined && hasChange))}
+                    
+                    isCombobox={true} />
+            </div>
         {:else if type !== 'dropdown'}
             <input
                 {type}
@@ -158,7 +194,7 @@
                     isDeleted}
                 defaultValue={(defaultValue as string) ?? ''}
                 bind:value={values[columnNum]}
-                required={isRequired && hasValue && !isDeleted}
+                required={isRequired && !isDeleted && ((tupleid === undefined && hasValue) || (tupleid !== undefined && hasChange))}
                 onchange={() => {
                     haveChanges[columnNum] = values[columnNum] !== defaultValue;
                 }}
