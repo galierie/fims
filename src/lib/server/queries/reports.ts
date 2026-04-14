@@ -71,7 +71,6 @@ export async function getFacultyServiceRecordReport(
     toSemNum: number,
 ) {
     const existingFacultyAcademicSemesterSq = db
-        // TODO: limit
         .select({
             facultyId: facultyAcademicSemester.facultyId,
             facultyAcademicSemesterId: facultyAcademicSemester.id,
