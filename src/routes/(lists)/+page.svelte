@@ -130,7 +130,7 @@
                 </div>
             </div>
         {:else}
-            <div class="mt-6 flex w-315 justify-end gap-2 2xl:w-432">
+            <div class="mt-6 flex w-315 justify-between 2xl:w-432">
                 <GreenButton onclick={() => (isExportModalOpen = true)}>
                     <Icon icon="tabler:file-export" class="mr-2 h-5 w-5" />
                     <span>Export Reports</span>
