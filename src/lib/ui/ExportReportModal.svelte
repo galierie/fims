@@ -155,7 +155,7 @@
                     const fileName = `By_Subject_Faculty_Taught`;
                     links.push({
                         name: fileName,
-                        url: `/api/export?types=faculty-by-subject&fileName=${fileName}`,
+                        url: `/api/export?types=faculty-by-subject&fileName=${fileName}&format=${format}`,
                     });
                 }
                 if (exportByFacSubj) {
