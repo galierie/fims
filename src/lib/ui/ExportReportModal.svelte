@@ -137,7 +137,7 @@
                 let courseReportTitle = `AggregatedCourseReports${courseSuffix}`;
                 if (courseTypes.length === 1) {
                     if (exportBySubjFac) courseReportTitle = 'By_Subject_Faculty_Taught';
-                    if (exportByFacSubj) courseReportTitle = `SelectedFaculty-BySubjectTaught${courseSuffix}`;
+                    if (exportByFacSubj) courseReportTitle = `SelectedFaculty_BySubjectTaught${courseSuffix}`;
                 }
                 
                 links.push({
@@ -153,7 +153,7 @@
                     });
                 }
                 if (exportByFacSubj) {
-                    const fileName = `SelectedFaculty-BySubjectTaught${courseSuffix}`;
+                    const fileName = `SelectedFaculty_BySubjectTaught${courseSuffix}`;
                     links.push({
                         name: fileName,
                         url: `/api/export?types=subjects-by-faculty&facultyIds=${allFacIds}&${baseParams}&fileName=${fileName}`,

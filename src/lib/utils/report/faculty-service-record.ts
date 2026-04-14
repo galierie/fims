@@ -49,7 +49,6 @@ export async function getFacultyServiceRecordWorksheet(
     toAcadYear: number,
     toSemNum: number,
 ) {
-    const sheetName = 'Faculty Service Record';
     const {
         profile,
         originalTenure,
@@ -67,6 +66,7 @@ export async function getFacultyServiceRecordWorksheet(
         toAcadYear,
         toSemNum,
     );
+    const sheetName = `SR - ${profile[0].lastName}`.substring(0, 31);
 
     // Create Workbook
     const workbook = new ExcelJS.Workbook();
