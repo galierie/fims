@@ -57,12 +57,11 @@ export async function getSubjectsByFacultyWorksheet(
     let row = dataStartRow;
     for (let i = 0; i < data.length; i++, row++) {
         let col = dataStartCol;
-        const facultyMemberCourses = data[i]; // This is now an array of course objects
+        const { name, courses } = data[i];
 
-        if (facultyMemberCourses.length === 0) continue;
+        if (typeof name === 'undefined' || courses.length === 0) continue;
 
-        // Extract faculty name from the first course entry
-        const { lastName, firstName, middleName } = facultyMemberCourses[0];
+        const { lastName, firstName, middleName } = name;
 
         const nameCell = sheet.getCell(row, col);
         nameCell.value = `${lastName}, ${firstName} ${middleName[0]}.`;
@@ -70,18 +69,17 @@ export async function getSubjectsByFacultyWorksheet(
         nameCell.alignment = { vertical: 'top' };
         col++;
 
-        // --- Task 15: Sort and Category Logic ---
-        const undergrad = facultyMemberCourses
+        const undergrad = courses
             .filter((c) => c.courseLevel === 'Undergraduate')
             .map((c) => c.courseName)
             .join(', ');
 
-        const maphd = facultyMemberCourses
+        const maphd = courses
             .filter((c) => c.courseLevel === 'MA/PhD')
             .map((c) => c.courseName)
             .join(', ');
 
-        const mde = facultyMemberCourses
+        const mde = courses
             .filter((c) => c.courseLevel === 'MDE')
             .map((c) => c.courseName)
             .join(', ');

@@ -455,14 +455,20 @@ export async function getSubjectsByFacultyReport(
     acadYear: number,
     semNum: number,
 ) {
-    return await db
+    const nameQuery = db
         .select({
             lastName: faculty.lastName,
             firstName: faculty.firstName,
             middleName: faculty.middleName,
+        })
+        .from(faculty)
+        .where(eq(faculty.id, facultyid))
+        .limit(1);
+
+    const coursesQuery = db
+        .select({
             courseName: course.name,
             courseLevel: sql<string>`COALESCE(${degreeProgram.name}, 'Undergraduate')`, // Task 15 Fix
-            units: course.units,
         })
         .from(facultyCourse)
         .innerJoin(course, eq(facultyCourse.courseId, course.id))
@@ -471,19 +477,22 @@ export async function getSubjectsByFacultyReport(
             facultyAcademicSemester,
             eq(facultyCourse.facultyAcademicSemesterId, facultyAcademicSemester.id),
         )
-        .innerJoin(faculty, eq(facultyAcademicSemester.facultyId, faculty.id))
         .innerJoin(
             academicSemester,
             eq(facultyAcademicSemester.academicSemesterId, academicSemester.id),
         )
         .where(
             and(
-                eq(faculty.id, facultyid),
+                eq(facultyAcademicSemester.facultyId, facultyid),
                 eq(academicSemester.academicYear, acadYear),
                 eq(academicSemester.semesterNumber, semNum),
             ),
         )
         .orderBy(asc(degreeProgram.name), asc(course.name));
+    
+    const [[name], courses] = await Promise.all([nameQuery, coursesQuery]);
+
+    return { name, courses };
 }
 
 export async function getFacultyBySubjectReport() {
