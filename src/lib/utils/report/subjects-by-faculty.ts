@@ -18,9 +18,30 @@ const constantHeaderCellValues: SheetCellValue[] = [
             horizontal: 'center',
         },
     },
+    {
+        value: 'Undergraduate',
+        cellNum: 'B5',
+        alignment: {
+            horizontal: 'center',
+        },
+    },
+    {
+        value: 'MA, PhD',
+        cellNum: 'C5',
+        alignment: {
+            horizontal: 'center',
+        },
+    },
+    {
+        value: 'MDE',
+        cellNum: 'D5',
+        alignment: {
+            horizontal: 'center',
+        },
+    },
 ];
 
-const dataStartRow = 5;
+const dataStartRow = 6;
 const dataStartCol = 1;
 
 export async function getSubjectsByFacultyWorksheet(
@@ -53,6 +74,11 @@ export async function getSubjectsByFacultyWorksheet(
     titleCell.value = 'Faculty subject taught';
     titleCell.font = { bold: true };
 
+    // Widen columns
+    for (let i = 1; i <= 4; i++) {
+        sheet.getColumn(i).width = 20;
+    }
+
     // Set data cells
     let row = dataStartRow;
     for (let i = 0; i < data.length; i++, row++) {
@@ -84,22 +110,15 @@ export async function getSubjectsByFacultyWorksheet(
             .map((c) => c.courseName)
             .join(', ');
 
-        // Construct the combined string with labels
-        const displayParts = [];
-        if (undergrad) displayParts.push(`Undergraduate: ${undergrad}`);
-        if (maphd) displayParts.push(`MA/PhD: ${maphd}`);
-        if (mde) displayParts.push(`MDE: ${mde}`);
+        [undergrad, maphd, mde].forEach(level => {
+            const subjectsCell = sheet.getCell(row, col);
+            subjectsCell.value = level;
+            subjectsCell.border = cellBorders;
+            subjectsCell.alignment = { vertical: 'top' };
+            col++;
+        });
 
-        const finalSubjectsValue = displayParts.join('\n');
-        // ----------------------------------------
-
-        const subjectsCell = sheet.getCell(row, col);
-        subjectsCell.value = finalSubjectsValue;
-        subjectsCell.border = cellBorders;
-        subjectsCell.alignment = { wrapText: true, vertical: 'top' }; // wrapText is vital for \n
-
-        sheet.mergeCells(row, col, row, col + 2);
-        col += 3;
+        row++;
     }
 
     return { sheetName, model: sheet.model };
