@@ -28,19 +28,20 @@
         hasChange = $bindable(),
     }: Props = $props();
 
-    let nextRowNum = $derived(rows.length);
+    // changed to $state instead of $derived for mutation when adding rows
     // svelte-ignore state_referenced_locally
-    let haveValues: boolean[] = $state(Array(nextRowNum).fill(true));
+    let actualRows: InputRowValue[] = $state(rows);
+    // svelte-ignore state_referenced_locally
+    let nextRowNum = $state(rows.length);
+    // svelte-ignore state_referenced_locally
+    let haveValues: boolean[] = $state(Array(rows.length).fill(true));
+    // svelte-ignore state_referenced_locally
+    let haveChanges: boolean[] = $state(Array(rows.length).fill(false));
 
-    // Check for changes
-    // svelte-ignore state_referenced_locally
-    let haveChanges: boolean[] = $state(Array(nextRowNum).fill(false));
     $effect(() => {
         hasChange = haveChanges.some((e) => e === true);
-        console.log(`Ping from InputTable! hasChange = ${hasChange}`);
     });
 
-    let actualRows: InputRowValue[] = $derived(rows);
     let deletedRows: number[] = $state([]);
 
     function toggleRowDeletion(rowNum: number) {
@@ -56,6 +57,11 @@
         for (let c = 0; c < columns.length; c++) newRow.push({ columnNum: c });
 
         actualRows = [...actualRows, { rowNum: nextRowNum, row: newRow }];
+        
+        // expand the arrays so the new row's binding doesn't go out of bounds
+        haveValues[nextRowNum] = false;
+        haveChanges[nextRowNum] = false;
+        
         nextRowNum++;
     }
 
@@ -70,10 +76,14 @@
         if (domContainer) domContainer.classList.remove('hidden');
     });
 
+    // reset all states when Edit Mode is cancelled
     $effect(() => {
         if (!viewState.isEditing) {
             deletedRows = [];
             actualRows = rows;
+            nextRowNum = rows.length;
+            haveValues = Array(rows.length).fill(true);
+            haveChanges = Array(rows.length).fill(false);
         }
     });
 

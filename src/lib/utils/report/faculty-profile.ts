@@ -1,6 +1,7 @@
 import ExcelJS from '@protobi/exceljs';
+
+import { cellBorders, type SheetCellValue } from '$lib/types/sheet-cell';
 import { getFacultyProfileReport } from '$lib/server/queries/reports';
-import { type SheetCellValue, cellBorders } from '$lib/types/sheet-cell';
 
 const defaultHeaderCellAlignment: Partial<ExcelJS.Alignment> = {
     horizontal: 'center',
@@ -17,74 +18,24 @@ const defaultCellAlignment: Partial<ExcelJS.Alignment> = {
 };
 
 const constantHeaderCellValues: SheetCellValue[] = [
-    {
-        value: 'Name of Faculty',
-        cellNum: 'A1',
-    },
-    {
-        value: 'Home Addresses',
-        cellNum: 'B1',
-    },
-    {
-        value: 'Contact Nos.',
-        cellNum: 'C1',
-    },
-    {
-        value: 'Email Addresses',
-        cellNum: 'D1',
-    },
-    {
-        value: 'Birth Date',
-        cellNum: 'E1',
-    },
-    {
-        value: 'Degree / Institution / Year',
-        cellNum: 'F1',
-    },
-    {
-        value: 'Field of Interest',
-        cellNum: 'G1',
-    },
-    {
-        value: 'Designation / SG',
-        cellNum: 'H1',
-    },
-    {
-        value: 'Salary Rate / annum',
-        cellNum: 'I1',
-    },
-    {
-        value: 'Date of Original Appointment',
-        cellNum: 'J1',
-    },
-    {
-        value: 'PSI Item Number',
-        cellNum: 'K1',
-    },
-    {
-        value: 'Employee Number',
-        cellNum: 'L1',
-    },
-    {
-        value: 'TIN',
-        cellNum: 'M1',
-    },
-    {
-        value: 'GSIS BP#',
-        cellNum: 'N1',
-    },
-    {
-        value: 'Philhealth#',
-        cellNum: 'O1',
-    },
-    {
-        value: 'Pag-IBIG#',
-        cellNum: 'P1',
-    },
-    {
-        value: 'Remarks (Tenure, promotion, etc.)',
-        cellNum: 'Q1',
-    },
+    { value: 'Name of Faculty', cellNum: 'A1' },
+    { value: 'Home Addresses', cellNum: 'B1' },
+    { value: 'Contact Nos.', cellNum: 'C1' },
+    { value: 'Email Addresses', cellNum: 'D1' },
+    { value: 'Birth Date', cellNum: 'E1' },
+    { value: 'Degree / Institution / Year', cellNum: 'F1' },
+    { value: 'Field of Interest', cellNum: 'G1' },
+    { value: 'Designation / SG', cellNum: 'H1' },
+    { value: 'Salary Rate / annum', cellNum: 'I1' },
+    { value: 'Appointment Status', cellNum: 'J1' }, // <-- NEW Column J
+    { value: 'Date of Original Appointment', cellNum: 'K1' }, // Shisted K
+    { value: 'PSI Item Number', cellNum: 'L1' }, // Shifted L
+    { value: 'Employee Number', cellNum: 'M1' }, // Shifted M
+    { value: 'TIN', cellNum: 'N1' }, // Shifted N
+    { value: 'GSIS BP#', cellNum: 'O1' }, // Shifted O
+    { value: 'Philhealth#', cellNum: 'P1' }, // Shifted P
+    { value: 'Pag-IBIG#', cellNum: 'Q1' }, // Shifted Q
+    { value: 'Remarks (Tenure, promotion, etc.)', cellNum: 'R1' }, // Shifted R
 ];
 
 const dataStartCol = 1;
@@ -106,6 +57,11 @@ export async function getFacultyProfileWorksheet(facultyIds: number[]) {
         cell.alignment = defaultHeaderCellAlignment;
         cell.font = defaultHeaderCellFont;
     });
+
+    // Widen all columns
+    for (let i = 1; i <= constantHeaderCellValues.length; i++) {
+        sheet.getColumn(i).width = 20;
+    }
 
     // Set data cells
     let row = dataStartRow;
@@ -131,6 +87,7 @@ export async function getFacultyProfileWorksheet(facultyIds: number[]) {
                 designation,
                 salaryGrade,
                 salaryRate,
+                appointmentStatus,
                 dateOfOriginalAppointment,
                 psiItem,
                 employeeNumber,
@@ -196,6 +153,12 @@ export async function getFacultyProfileWorksheet(facultyIds: number[]) {
         salaryRateCell.numFmt = '0.00';
         salaryRateCell.border = cellBorders;
         salaryRateCell.alignment = defaultCellAlignment;
+        col++;
+
+        const appointmentStatusCell = sheet.getCell(row, col);
+        appointmentStatusCell.value = appointmentStatus || '';
+        appointmentStatusCell.border = cellBorders;
+        appointmentStatusCell.alignment = defaultCellAlignment;
         col++;
 
         const dateOfOriginalAppointmentCell = sheet.getCell(row, col);

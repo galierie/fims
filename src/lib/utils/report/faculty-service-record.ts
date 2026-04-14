@@ -1,7 +1,7 @@
 import ExcelJS from '@protobi/exceljs';
-import { getFacultyServiceRecordReport } from '$lib/server/queries/reports';
-import { type SheetCellValue, cellBorders } from '$lib/types/sheet-cell';
 
+import { cellBorders, type SheetCellValue } from '$lib/types/sheet-cell';
+import { getFacultyServiceRecordReport } from '$lib/server/queries/reports';
 import { INSTITUTION } from '$env/static/private';
 
 const adminPositionsStartRow = 5;
@@ -19,6 +19,7 @@ const defaultNonTableCellAlignment: Partial<ExcelJS.Alignment> = {
 const defaultTableCellAlignment: Partial<ExcelJS.Alignment> = {
     horizontal: 'center',
     vertical: 'top',
+    wrapText: true,
 };
 
 const constantSemestralRecordHeaderCellValues = [
@@ -28,16 +29,19 @@ const constantSemestralRecordHeaderCellValues = [
     'Subject (No. of Students)',
     'Admin Load',
     'Admin Position',
+    'Additional Assignments', // Task 11: facultyAdminWork
+    'Committee Memberships', // Task 11
     'Research Credit',
     'Title of Research',
     'Start/End Date',
     'Funding',
+    'Mentoring', // Task 11
     'TOTAL',
-    'Number of Units',
-    'Remarks',
+    'Course Units', // Task 12: Rephrased
+    'Remarks', // Task 13: Mentoring remarks appended here
 ];
 
-const semNumCellValues = ['Midyear', 'First Semester', 'Second Semester'];
+const semNumCellValues = ['Midyear', 'First', 'Second'];
 
 export async function getFacultyServiceRecordWorksheet(
     facultyid: number,
@@ -46,16 +50,18 @@ export async function getFacultyServiceRecordWorksheet(
     toAcadYear: number,
     toSemNum: number,
 ) {
-    const sheetName = 'Faculty Service Record';
     const {
         profile,
         originalTenure,
         adminPositions,
         fieldsOfInterest,
         semestralRecords,
-        currentTeachingLoad,
-        currentAdministrativeLoad,
-        currentResearchLoad,
+        currentCoursesTaught,
+        currentAdminPositions,
+        currentCommMemberships,
+        currentAdminWorks,
+        currentResearch,
+        currentMentoring,
     } = await getFacultyServiceRecordReport(
         facultyid,
         fromAcadYear,
@@ -63,6 +69,7 @@ export async function getFacultyServiceRecordWorksheet(
         toAcadYear,
         toSemNum,
     );
+    const sheetName = `SR - ${profile[0].lastName}`.substring(0, 31);
 
     // Create Workbook
     const workbook = new ExcelJS.Workbook();
@@ -73,18 +80,23 @@ export async function getFacultyServiceRecordWorksheet(
     institutionCell.value = INSTITUTION;
     institutionCell.alignment = { horizontal: 'center' };
     institutionCell.font = { bold: true };
-    sheet.mergeCells('A1:M1');
+    sheet.mergeCells('A1:P1');
 
     const universityCell = sheet.getCell('A2');
     universityCell.value = 'University of the Philippines';
     universityCell.alignment = { horizontal: 'center' };
-    sheet.mergeCells('A2:M2');
+    sheet.mergeCells('A2:P2');
 
     const titleCell = sheet.getCell('A4');
     titleCell.value = 'Faculty Service Record';
     titleCell.alignment = { horizontal: 'center' };
     titleCell.font = { bold: true };
-    sheet.mergeCells('A4:M4');
+    sheet.mergeCells('A4:P4');
+
+    // Widen all columns
+    for (let i = 1; i <= constantSemestralRecordHeaderCellValues.length; i++) {
+        sheet.getColumn(i).width = 20;
+    }
 
     // Populate admin positions
     let adminPositionRow = adminPositionsStartRow;
@@ -96,7 +108,7 @@ export async function getFacultyServiceRecordWorksheet(
             adminPositionRow,
             adminPositionsStartCol,
             adminPositionRow,
-            adminPositionsStartCol + 7,
+            adminPositionsStartCol + 10,
         );
         adminPositionRow++;
     });
@@ -137,11 +149,7 @@ export async function getFacultyServiceRecordWorksheet(
         },
     ] = profile;
 
-    const educationalAttainmentLabelCell = sheet.getCell(profileRow, profileStartCol);
-    educationalAttainmentLabelCell.value = 'Degree:';
-    educationalAttainmentLabelCell.alignment = defaultNonTableCellAlignment;
-
-    const educationalAttainmentCell = sheet.getCell(profileRow, profileStartCol + 1);
+    const educationalAttainmentCell = sheet.getCell(profileRow, profileStartCol);
     const educationalAttainmentStr = [
         highestEducationalAttainmentDegree,
         highestEducationAttainmentInstitution,
@@ -149,81 +157,66 @@ export async function getFacultyServiceRecordWorksheet(
     ]
         .filter((str) => str !== null)
         .join(', ');
-    educationalAttainmentCell.value = educationalAttainmentStr;
+    educationalAttainmentCell.value = `Degree: ${educationalAttainmentStr}`;
     educationalAttainmentCell.alignment = defaultNonTableCellAlignment;
-    sheet.mergeCells(profileRow, profileStartCol + 1, profileRow, profileStartCol + 3);
+    sheet.mergeCells(profileRow, profileStartCol, profileRow, profileStartCol + 3);
 
     profileRow--;
 
-    const tenureLabelCell = sheet.getCell(profileRow, profileStartCol);
-    tenureLabelCell.value = 'Tenure:';
-    tenureLabelCell.alignment = defaultNonTableCellAlignment;
-
-    const tenureCell = sheet.getCell(profileRow, profileStartCol + 1);
+    const tenureCell = sheet.getCell(profileRow, profileStartCol);
     if (originalTenure.length === 1) {
         const [{ tenureAppointment, tenureDateOfAppointment }] = originalTenure;
-        tenureCell.value = `Tenure (${tenureAppointment}) ${tenureDateOfAppointment}`;
+        tenureCell.value = `Tenure: Tenure (${tenureAppointment}) ${tenureDateOfAppointment}`;
     }
     tenureCell.alignment = defaultNonTableCellAlignment;
-    sheet.mergeCells(profileRow, profileStartCol + 1, profileRow, profileStartCol + 3);
+    sheet.mergeCells(profileRow, profileStartCol, profileRow, profileStartCol + 3);
 
     profileRow--;
 
-    const originalAppointmentDateLabelCell = sheet.getCell(profileRow, profileStartCol);
-    originalAppointmentDateLabelCell.value = 'Original Appointment:';
-    originalAppointmentDateLabelCell.alignment = defaultNonTableCellAlignment;
-
-    const originalAppointmentDateCell = sheet.getCell(profileRow, profileStartCol + 1);
-    originalAppointmentDateCell.value = dateOfOriginalAppointment;
+    const originalAppointmentDateCell = sheet.getCell(profileRow, profileStartCol);
+    originalAppointmentDateCell.value = `Original Appointment: ${dateOfOriginalAppointment}`;
     originalAppointmentDateCell.alignment = defaultNonTableCellAlignment;
-    sheet.mergeCells(profileRow, profileStartCol + 1, profileRow, profileStartCol + 3);
+    sheet.mergeCells(profileRow, profileStartCol, profileRow, profileStartCol + 3);
 
     profileRow--;
 
-    const appointmentStatusLabelCell = sheet.getCell(profileRow, profileStartCol);
-    appointmentStatusLabelCell.value = 'Status of Appointment:';
-    appointmentStatusLabelCell.alignment = defaultNonTableCellAlignment;
-
-    const appointmentStatusCell = sheet.getCell(profileRow, profileStartCol + 1);
-    appointmentStatusCell.value = currentAppointmentStatus;
+    const appointmentStatusCell = sheet.getCell(profileRow, profileStartCol);
+    appointmentStatusCell.value = `Status of Appointment: ${currentAppointmentStatus ?? ''}`;
     appointmentStatusCell.alignment = defaultNonTableCellAlignment;
-    sheet.mergeCells(profileRow, profileStartCol + 1, profileRow, profileStartCol + 3);
+    sheet.mergeCells(profileRow, profileStartCol, profileRow, profileStartCol + 3);
 
     profileRow--;
 
-    const positionLabelCell = sheet.getCell(profileRow, profileStartCol);
-    positionLabelCell.value = 'Position:';
-    positionLabelCell.alignment = defaultNonTableCellAlignment;
-
-    const positionCell = sheet.getCell(profileRow, profileStartCol + 1);
-    positionCell.value = currentAppointment;
+    const positionCell = sheet.getCell(profileRow, profileStartCol);
+    positionCell.value = `Position: ${currentAppointment ?? ''}`;
     positionCell.alignment = defaultNonTableCellAlignment;
-    sheet.mergeCells(profileRow, profileStartCol + 1, profileRow, profileStartCol + 3);
+    sheet.mergeCells(profileRow, profileStartCol, profileRow, profileStartCol + 3);
 
     profileRow -= 3;
 
-    const nameLabelCell = sheet.getCell(profileRow, profileStartCol);
-    nameLabelCell.value = 'Name:';
-    nameLabelCell.alignment = defaultNonTableCellAlignment;
-
-    const nameCell = sheet.getCell(profileRow, profileStartCol + 1);
-    nameCell.value = `${lastName}, ${firstName} ${middleName}`;
-    nameCell.font = { bold: true };
+    const nameCell = sheet.getCell(profileRow, profileStartCol);
+    nameCell.value = {
+        richText: [
+            { text: 'Name: ' },
+            { text: `${lastName}, ${firstName} ${middleName}`, font: { bold: true } },
+        ],
+    };
     nameCell.alignment = defaultNonTableCellAlignment;
-    sheet.mergeCells(profileRow, profileStartCol + 1, profileRow, profileStartCol + 3);
+    sheet.mergeCells(profileRow, profileStartCol, profileRow, profileStartCol + 3);
 
     // Populate semestral records
-    let semestralRecordHeaderRow = adminPositionRow + 2;
+    const semestralRecordHeaderRow = adminPositionRow + 2;
     let semestralRecordHeaderCol = semestralRecordStartCol;
     constantSemestralRecordHeaderCellValues.forEach((header) => {
         const headerCell = sheet.getCell(semestralRecordHeaderRow, semestralRecordHeaderCol);
         headerCell.value = header;
-        ((headerCell.border = cellBorders),
-            (headerCell.alignment = {
-                horizontal: 'center',
-                vertical: 'top',
-                wrapText: true,
-            }));
+        headerCell.border = cellBorders;
+        headerCell.alignment = {
+            horizontal: (header === 'Semester AY') ? 'left' : 'center',
+            vertical: 'top',
+            wrapText: true,
+        };
+        headerCell.font = { bold: true };
         semestralRecordHeaderCol++;
     });
 
@@ -233,19 +226,37 @@ export async function getFacultyServiceRecordWorksheet(
     semestralRecords.forEach((record) => {
         const { academicSemesterId, acadYear, semNum, remarks } = record;
 
-        const [{ currentCoursesTaught, teachingLoadCredit, numOfStudentsPerCourse }] =
-            currentTeachingLoad.filter((t) => t.academicSemesterId === academicSemesterId);
-        const [{ administrativeLoadCredit, currentAdminPositions }] =
-            currentAdministrativeLoad.filter((a) => a.academicSemesterId === academicSemesterId);
-        const [{ researchLoadCredit, researchTitles, researchPeriods, researchFundings }] =
-            currentResearchLoad.filter((r) => r.academicSemesterId === academicSemesterId);
+        // Find the specific data for this semester
+        const curCoursesTaught = currentCoursesTaught.find(
+            (t) => t.academicSemesterId === academicSemesterId,
+        );
+        const curAdminPositions = currentAdminPositions.find(
+            (a) => a.academicSemesterId === academicSemesterId,
+        );
+        const curCommMemberships = currentCommMemberships.find(
+            (a) => a.academicSemesterId === academicSemesterId,
+        );
+        const curAdminWorks = currentAdminWorks.find(
+            (a) => a.academicSemesterId === academicSemesterId,
+        );
+        const curResearch = currentResearch.find(
+            (r) => r.academicSemesterId === academicSemesterId,
+        );
+        const mentoring = currentMentoring.find((m) => m.academicSemesterId === academicSemesterId);
+
+        // Prep Task 13: Combine Mentoring remarks with Semester remarks
+        const mainRemarks = remarks || '';
+        const mRemarks = mentoring?.mentoringRemarks
+            ? `Mentoring: ${mentoring.mentoringRemarks}`
+            : '';
+        const combinedRemarks = [mainRemarks, mRemarks].filter(Boolean).join('; ');
 
         if (currentAcadYear !== acadYear) {
             const acadYearCell = sheet.getCell(semestralRecordDataRow, semestralRecordDataCol);
             acadYearCell.value = `${acadYear}-${acadYear + 1}`;
             acadYearCell.border = cellBorders;
             acadYearCell.alignment = {
-                horizontal: 'center',
+                horizontal: 'left',
                 vertical: 'top',
             };
             acadYearCell.font = { bold: true };
@@ -256,111 +267,147 @@ export async function getFacultyServiceRecordWorksheet(
                 let i = 2;
                 i <= constantSemestralRecordHeaderCellValues.length;
                 i++, semestralRecordDataCol++
-            ) {
+            )
                 sheet.getCell(semestralRecordDataRow, semestralRecordDataCol).border = cellBorders;
-            }
 
             semestralRecordDataRow++;
             semestralRecordDataCol = semestralRecordStartCol;
             currentAcadYear = acadYear;
         }
 
-        const semNumCell = sheet.getCell(semestralRecordDataRow, semestralRecordDataCol);
-        semNumCell.value = semNumCellValues[semNum];
+        // 1. Semester (First Col)
+        const semNumCell = sheet.getCell(semestralRecordDataRow, semestralRecordDataCol++);
+        semNumCell.value = semNumCellValues[semNum % 3];
         semNumCell.border = cellBorders;
-        semNumCell.alignment = defaultTableCellAlignment;
-        semestralRecordDataCol++;
+        semNumCell.alignment = { horizontal: 'left', vertical: 'top' };
 
-        const coursesTaughtCell = sheet.getCell(semestralRecordDataRow, semestralRecordDataCol);
-        coursesTaughtCell.value = currentCoursesTaught;
+        // 2. Subject
+        const coursesTaughtCell = sheet.getCell(semestralRecordDataRow, semestralRecordDataCol++);
+        coursesTaughtCell.value = curCoursesTaught?.currentCoursesTaught || '';
         coursesTaughtCell.border = cellBorders;
         coursesTaughtCell.alignment = defaultTableCellAlignment;
-        semestralRecordDataCol++;
 
+        // 3. Teaching Credit
         const teachingLoadCreditCell = sheet.getCell(
             semestralRecordDataRow,
-            semestralRecordDataCol,
+            semestralRecordDataCol++,
         );
-        teachingLoadCreditCell.value = teachingLoadCredit;
+        if (typeof curCoursesTaught?.teachingLoadCredit !== 'undefined') teachingLoadCreditCell.value = curCoursesTaught?.teachingLoadCredit;
         teachingLoadCreditCell.numFmt = '0.00';
         teachingLoadCreditCell.border = cellBorders;
         teachingLoadCreditCell.alignment = defaultTableCellAlignment;
-        semestralRecordDataCol++;
 
+        // 4. Subject (No. of Students)
         const numOfStudentsPerCourseCell = sheet.getCell(
             semestralRecordDataRow,
-            semestralRecordDataCol,
+            semestralRecordDataCol++,
         );
-        numOfStudentsPerCourseCell.value = numOfStudentsPerCourse;
+        numOfStudentsPerCourseCell.value = curCoursesTaught?.numOfStudentsPerCourse || '0';
         numOfStudentsPerCourseCell.border = cellBorders;
         numOfStudentsPerCourseCell.alignment = defaultTableCellAlignment;
-        semestralRecordDataCol++;
 
+        // 5. Admin Load
         const administrativeLoadCreditCell = sheet.getCell(
             semestralRecordDataRow,
-            semestralRecordDataCol,
+            semestralRecordDataCol++,
         );
-        administrativeLoadCreditCell.value = administrativeLoadCredit;
+        if (
+            typeof curAdminPositions?.administrativeLoadCredit !== 'undefined' ||
+            typeof curCommMemberships?.administrativeLoadCredit !== 'undefined' ||
+            typeof curAdminWorks?.administrativeLoadCredit !== 'undefined'
+        ) administrativeLoadCreditCell.value =
+            (curAdminPositions?.administrativeLoadCredit ?? 0) + 
+            (curCommMemberships?.administrativeLoadCredit ?? 0) +
+            (curAdminWorks?.administrativeLoadCredit ?? 0);
         administrativeLoadCreditCell.numFmt = '0.00';
         administrativeLoadCreditCell.border = cellBorders;
         administrativeLoadCreditCell.alignment = defaultTableCellAlignment;
-        semestralRecordDataCol++;
 
+        // 6. Admin Position
         const currentAdminPositionsCell = sheet.getCell(
             semestralRecordDataRow,
-            semestralRecordDataCol,
+            semestralRecordDataCol++,
         );
-        currentAdminPositionsCell.value = currentAdminPositions;
+        currentAdminPositionsCell.value = curAdminPositions?.currentAdminPositions || '';
         currentAdminPositionsCell.border = cellBorders;
         currentAdminPositionsCell.alignment = defaultTableCellAlignment;
-        semestralRecordDataCol++;
 
+        // 7. Additional Assignments (Task 11)
+        const additionalAssignmentsCell = sheet.getCell(
+            semestralRecordDataRow,
+            semestralRecordDataCol++,
+        );
+        additionalAssignmentsCell.value = curAdminWorks?.additionalAssignments || '';
+        additionalAssignmentsCell.border = cellBorders;
+        additionalAssignmentsCell.alignment = defaultTableCellAlignment;
+
+        // 8. Committee Memberships (Task 11)
+        const committeeCell = sheet.getCell(semestralRecordDataRow, semestralRecordDataCol++);
+        committeeCell.value = curCommMemberships?.committeeMemberships || '';
+        committeeCell.border = cellBorders;
+        committeeCell.alignment = defaultTableCellAlignment;
+
+        // 9. Research Credit
         const researchLoadCreditCell = sheet.getCell(
             semestralRecordDataRow,
-            semestralRecordDataCol,
+            semestralRecordDataCol++,
         );
-        researchLoadCreditCell.value = researchLoadCredit;
+        if (typeof curResearch?.researchLoadCredit !== 'undefined') researchLoadCreditCell.value = curResearch?.researchLoadCredit;
         researchLoadCreditCell.numFmt = '0.00';
         researchLoadCreditCell.border = cellBorders;
         researchLoadCreditCell.alignment = defaultTableCellAlignment;
-        semestralRecordDataCol++;
 
-        const researchTitlesCell = sheet.getCell(semestralRecordDataRow, semestralRecordDataCol);
-        researchTitlesCell.value = researchTitles;
+        // 10. Title of Research
+        const researchTitlesCell = sheet.getCell(semestralRecordDataRow, semestralRecordDataCol++);
+        researchTitlesCell.value = curResearch?.researchTitles || '';
         researchTitlesCell.border = cellBorders;
         researchTitlesCell.alignment = defaultTableCellAlignment;
-        semestralRecordDataCol++;
 
-        const researchPeriodsCell = sheet.getCell(semestralRecordDataRow, semestralRecordDataCol);
-        researchPeriodsCell.value = researchPeriods;
+        // 11. Start/End Date
+        const researchPeriodsCell = sheet.getCell(semestralRecordDataRow, semestralRecordDataCol++);
+        researchPeriodsCell.value = curResearch?.researchPeriods || '';
         researchPeriodsCell.border = cellBorders;
         researchPeriodsCell.alignment = defaultTableCellAlignment;
-        semestralRecordDataCol++;
 
-        const researchFundingsCell = sheet.getCell(semestralRecordDataRow, semestralRecordDataCol);
-        researchFundingsCell.value = researchFundings;
+        // 12. Funding
+        const researchFundingsCell = sheet.getCell(
+            semestralRecordDataRow,
+            semestralRecordDataCol++,
+        );
+        researchFundingsCell.value = curResearch?.researchFundings || '';
         researchFundingsCell.border = cellBorders;
         researchFundingsCell.alignment = defaultTableCellAlignment;
-        semestralRecordDataCol++;
 
-        const totalLoadCreditCell = sheet.getCell(semestralRecordDataRow, semestralRecordDataCol);
+        // 13. Mentoring (Task 11)
+        const mentoringCell = sheet.getCell(semestralRecordDataRow, semestralRecordDataCol++);
+        mentoringCell.value = mentoring?.mentoringDetails || '';
+        mentoringCell.border = cellBorders;
+        mentoringCell.alignment = defaultTableCellAlignment;
+
+        // 14. TOTAL (Sum of Teaching + Admin + Research)
+        const totalLoadCreditCell = sheet.getCell(semestralRecordDataRow, semestralRecordDataCol++);
         totalLoadCreditCell.value =
-            teachingLoadCredit + administrativeLoadCredit + researchLoadCredit;
+            (curCoursesTaught?.teachingLoadCredit || 0) +
+            (curAdminPositions?.administrativeLoadCredit || 0) +
+            (curCommMemberships?.administrativeLoadCredit || 0) +
+            (curAdminWorks?.administrativeLoadCredit || 0) +
+            (curResearch?.researchLoadCredit || 0);
         totalLoadCreditCell.numFmt = '0.00';
         totalLoadCreditCell.border = cellBorders;
         totalLoadCreditCell.alignment = defaultTableCellAlignment;
-        semestralRecordDataCol++;
 
-        const numOfUnitsCell = sheet.getCell(semestralRecordDataRow, semestralRecordDataCol);
-        numOfUnitsCell.border = cellBorders;
-        numOfUnitsCell.alignment = defaultTableCellAlignment;
-        semestralRecordDataCol++;
+        // 15. Course Units (Task 12)
+        const courseUnitsCell = sheet.getCell(semestralRecordDataRow, semestralRecordDataCol++);
+        if (typeof curCoursesTaught?.courseUnits !== 'undefined') courseUnitsCell.value = curCoursesTaught?.courseUnits;
+        courseUnitsCell.numFmt = '0.00';
+        courseUnitsCell.border = cellBorders;
+        courseUnitsCell.alignment = defaultTableCellAlignment;
 
-        const remarksCell = sheet.getCell(semestralRecordDataRow, semestralRecordDataCol);
-        remarksCell.value = remarks;
+        // 16. Remarks (Task 13 - Combined)
+        const remarksCell = sheet.getCell(semestralRecordDataRow, semestralRecordDataCol++);
+        remarksCell.value = combinedRemarks;
         remarksCell.border = cellBorders;
         remarksCell.alignment = defaultTableCellAlignment;
-        semestralRecordDataCol++;
 
         semestralRecordDataRow++;
         semestralRecordDataCol = semestralRecordStartCol;

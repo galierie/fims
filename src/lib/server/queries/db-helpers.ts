@@ -1,11 +1,12 @@
 import { and, eq, inArray } from 'drizzle-orm';
 
 import {
+    academicSemester,
     adminPosition,
-    profile,
     changelog,
     course,
     faculty,
+    facultyAcademicSemester,
     facultyAdminPosition,
     facultyAdminWork,
     facultyCommMembership,
@@ -19,16 +20,15 @@ import {
     facultyMentoring,
     facultyRank,
     facultyResearch,
-    facultyAcademicSemester,
     facultyStudyLoad,
     fieldOfInterest,
     office,
+    profile,
+    profileInfo,
     rank,
     research,
     role,
-    academicSemester,
     student,
-    profileInfo,
 } from '../db/schema';
 import { db } from '../db';
 
@@ -95,7 +95,11 @@ export async function deleteUsersInfo(operatorId: string, userids: string[]) {
 }
 
 export async function getRole(id: string) {
-    const [fetchedUser] = await db.select().from(profileInfo).where(eq(profileInfo.profileId, id)).limit(1);
+    const [fetchedUser] = await db
+        .select()
+        .from(profileInfo)
+        .where(eq(profileInfo.profileId, id))
+        .limit(1);
 
     return fetchedUser.role;
 }
@@ -197,6 +201,24 @@ export async function updateFacultyProfileRecords(
 
         // Process Tables with Foreign Keys (Dropdowns)
         const dbFieldsOfInterest = await db.select().from(fieldOfInterest);
+        
+        const allProvidedFields = [
+            ...dynamicTables.fieldsOfInterest.create, 
+            ...dynamicTables.fieldsOfInterest.update
+        ]
+            .map(f => f['fields-of-interest'])
+            .filter(f => f && f.trim() !== '');
+
+        const existingFieldNames = new Set(dbFieldsOfInterest.map(f => f.field));
+        const newFields = [...new Set(allProvidedFields)].filter(f => !existingFieldNames.has(f));
+
+        if (newFields.length > 0) {
+            const insertedFields = await db.insert(fieldOfInterest)
+                .values(newFields.map(f => ({ field: f })))
+                .returning();
+            dbFieldsOfInterest.push(...insertedFields);
+        }
+
         const getFieldId = (fieldName: string) =>
             dbFieldsOfInterest.find((f) => f.field === fieldName)?.id || null;
 
@@ -212,6 +234,8 @@ export async function updateFacultyProfileRecords(
         const getRankId = (rankTitle: string) =>
             dbRanks.find((r) => r.title === rankTitle)?.id || null;
 
+        const parseDate = (val: any) => (typeof val === 'string' && val.trim() !== '' ? new Date(val) : new Date());
+
         await processDynamicTable(
             facultyRank,
             facultyRank.id,
@@ -220,17 +244,18 @@ export async function updateFacultyProfileRecords(
                 facultyId,
                 rankId: getRankId(p['promotion-history-rank']),
                 appointmentStatus: p['promotion-history-appointment-status'],
-                dateOfTenureOrRenewal: p['promotion-history-date'] || null,
+                dateOfTenureOrRenewal: parseDate(p['promotion-history-date']),
             }),
             (p) => ({
-                rankid: getRankId(p['promotion-history-rank']),
+                rankId: getRankId(p['promotion-history-rank']),
                 appointmentStatus: p['promotion-history-appointment-status'],
-                dateOfTenureOrRenewal: p['promotion-history-date'] || null,
+                dateOfTenureOrRenewal: parseDate(p['promotion-history-date']),
             }),
         );
 
         return { success: true };
-    } catch {
+    } catch (error) {
+        console.error('DB ERROR IN UPDATE:', error); 
         return { success: false };
     }
 }
@@ -290,9 +315,26 @@ export async function createFacultyProfileRecords(basicProfile: any, dynamicTabl
         );
 
         const dbFieldsOfInterest = await db.select().from(fieldOfInterest);
-        function getFieldId(fieldName: string) {
-            return dbFieldsOfInterest.find((f) => f.field === fieldName)?.id ?? null;
+
+        const allProvidedFields = [
+            ...dynamicTables.fieldsOfInterest.create, 
+            ...dynamicTables.fieldsOfInterest.update
+        ]
+            .map(f => f['fields-of-interest'])
+            .filter(f => f && f.trim() !== '');
+
+        const existingFieldNames = new Set(dbFieldsOfInterest.map(f => f.field));
+        const newFields = [...new Set(allProvidedFields)].filter(f => !existingFieldNames.has(f));
+        
+        if (newFields.length > 0) {
+            const insertedFields = await db.insert(fieldOfInterest)
+                .values(newFields.map(f => ({ field: f })))
+                .returning();
+            dbFieldsOfInterest.push(...insertedFields);
         }
+
+        const getFieldId = (fieldName: string) =>
+            dbFieldsOfInterest.find((f) => f.field === fieldName)?.id || null;
 
         await processDynamicTable(
             facultyFieldOfInterest,
@@ -307,6 +349,8 @@ export async function createFacultyProfileRecords(basicProfile: any, dynamicTabl
             return dbRanks.find((r) => r.title === rankTitle)?.id ?? null;
         }
 
+        const parseDate = (val: any) => (typeof val === 'string' && val.trim() !== '' ? new Date(val) : new Date());
+
         await processDynamicTable(
             facultyRank,
             facultyRank.id,
@@ -315,17 +359,18 @@ export async function createFacultyProfileRecords(basicProfile: any, dynamicTabl
                 facultyId,
                 rankId: getRankId(p['promotion-history-rank']),
                 appointmentStatus: p['promotion-history-appointment-status'],
-                dateOfTenureOrRenewal: p['promotion-history-date'] || null,
+                dateOfTenureOrRenewal: parseDate(p['promotion-history-date']),
             }),
             (p) => ({
                 rankId: getRankId(p['promotion-history-rank']),
                 appointmentStatus: p['promotion-history-appointment-status'],
-                dateOfTenureOrRenewal: p['promotion-history-date'] || null,
+                dateOfTenureOrRenewal: parseDate(p['promotion-history-date']),
             }),
         );
 
         return { success: true, facultyId };
-    } catch {
+    } catch (error) {
+        console.error('Database error in CREATE mode', error);
         return { success: false, facultyId: null };
     }
 }
@@ -344,7 +389,12 @@ export async function updateSemestralRecords(
         const existingAcademicSemester = await db
             .select()
             .from(academicSemester)
-            .where(and(eq(academicSemester.academicYear, acadYear), eq(academicSemester.semesterNumber, semNum)))
+            .where(
+                and(
+                    eq(academicSemester.academicYear, acadYear),
+                    eq(academicSemester.semesterNumber, semNum),
+                ),
+            )
             .limit(1);
 
         if (existingAcademicSemester.length > 0) {
@@ -434,12 +484,10 @@ export async function updateSemestralRecords(
             dbAdminPositions.find((a) => a.title === name)?.id || null;
 
         const dbOffices = await db.select().from(office);
-        const getOfficeId = (name: string) =>
-            dbOffices.find((o) => o.name === name)?.id || null;
+        const getOfficeId = (name: string) => dbOffices.find((o) => o.name === name)?.id || null;
 
         const dbCourses = await db.select().from(course);
-        const getCourseId = (name: string) =>
-            dbCourses.find((c) => c.name === name)?.id || null;
+        const getCourseId = (name: string) => dbCourses.find((c) => c.name === name)?.id || null;
 
         const dbResearches = await db.select().from(research);
         const getResearchId = (title: string) =>

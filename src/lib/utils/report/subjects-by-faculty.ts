@@ -1,6 +1,7 @@
 import ExcelJS from '@protobi/exceljs';
+
+import { cellBorders, type SheetCellValue } from '$lib/types/sheet-cell';
 import { getSubjectsByFacultyReport } from '$lib/server/queries/reports';
-import { type SheetCellValue, cellBorders } from '$lib/types/sheet-cell';
 
 const constantHeaderCellValues: SheetCellValue[] = [
     {
@@ -17,9 +18,30 @@ const constantHeaderCellValues: SheetCellValue[] = [
             horizontal: 'center',
         },
     },
+    {
+        value: 'Undergraduate',
+        cellNum: 'B5',
+        alignment: {
+            horizontal: 'center',
+        },
+    },
+    {
+        value: 'MA, PhD',
+        cellNum: 'C5',
+        alignment: {
+            horizontal: 'center',
+        },
+    },
+    {
+        value: 'MDE',
+        cellNum: 'D5',
+        alignment: {
+            horizontal: 'center',
+        },
+    },
 ];
 
-const dataStartRow = 5;
+const dataStartRow = 6;
 const dataStartCol = 1;
 
 export async function getSubjectsByFacultyWorksheet(
@@ -52,28 +74,49 @@ export async function getSubjectsByFacultyWorksheet(
     titleCell.value = 'Faculty subject taught';
     titleCell.font = { bold: true };
 
+    // Widen columns
+    for (let i = 1; i <= 4; i++) {
+        sheet.getColumn(i).width = 20;
+    }
+
     // Set data cells
     let row = dataStartRow;
     for (let i = 0; i < data.length; i++, row++) {
         let col = dataStartCol;
-        const facultyMember = data[i];
+        const { name, courses } = data[i];
 
-        if (facultyMember.length === 0) continue;
+        if (typeof name === 'undefined' || courses.length === 0) continue;
 
-        console.log(facultyMember);
-
-        const [{ lastName, firstName, middleName, coursesTaught }] = facultyMember;
+        const { lastName, firstName, middleName } = name;
 
         const nameCell = sheet.getCell(row, col);
         nameCell.value = `${lastName}, ${firstName} ${middleName[0]}.`;
         nameCell.border = cellBorders;
+        nameCell.alignment = { vertical: 'top' };
         col++;
 
-        const subjectsCell = sheet.getCell(row, col);
-        subjectsCell.value = coursesTaught;
-        subjectsCell.border = cellBorders;
-        sheet.mergeCells(row, col, row, col + 2);
-        col += 3;
+        const undergrad = courses
+            .filter((c) => c.courseLevel === 'Undergraduate')
+            .map((c) => c.courseName)
+            .join(', ');
+
+        const maphd = courses
+            .filter((c) => c.courseLevel === 'MA/PhD')
+            .map((c) => c.courseName)
+            .join(', ');
+
+        const mde = courses
+            .filter((c) => c.courseLevel === 'MDE')
+            .map((c) => c.courseName)
+            .join(', ');
+
+        [undergrad, maphd, mde].forEach(level => {
+            const subjectsCell = sheet.getCell(row, col);
+            subjectsCell.value = level;
+            subjectsCell.border = cellBorders;
+            subjectsCell.alignment = { vertical: 'top' };
+            col++;
+        });
     }
 
     return { sheetName, model: sheet.model };

@@ -1,6 +1,7 @@
 import ExcelJS from '@protobi/exceljs';
+
+import { cellBorders, type SheetCellValue } from '$lib/types/sheet-cell';
 import { getFacultyLoadingReport } from '$lib/server/queries/reports';
-import { type SheetCellValue, cellBorders } from '$lib/types/sheet-cell';
 
 const defaultHeaderCellAlignment: Partial<ExcelJS.Alignment> = {
     horizontal: 'center',
@@ -12,87 +13,43 @@ const defaultHeaderCellFont: Partial<ExcelJS.Font> = {
 };
 
 const constantHeaderCellValues: SheetCellValue[] = [
-    {
-        value: 'Last Name/First Name/MI',
-        cellNum: 'A5',
-    },
-    {
-        value: 'Designation',
-        cellNum: 'B5',
-    },
-    {
-        value: 'Degree',
-        cellNum: 'C5',
-    },
-    {
-        value: 'Course Taught',
-        cellNum: 'D5',
-    },
-    {
-        value: 'Earned',
-        cellNum: 'E5:F5',
-    },
-    {
-        value: 'Schedule of Classes',
-        cellNum: 'G5',
-    },
-    {
-        value: 'Administrative Position',
-        cellNum: 'H5',
-    },
-    {
-        value: 'TOTAL',
-        cellNum: 'I5:L5',
-    },
-    {
-        value: 'Regular Faculty',
-        cellNum: 'A6',
-        alignment: {
-            horizontal: 'left',
-            vertical: 'top',
-        },
-    },
-    {
-        value: 'Undergrad',
-        cellNum: 'E6',
-    },
-    {
-        value: 'Graduate',
-        cellNum: 'F6',
-    },
-    {
-        value: 'TLC',
-        cellNum: 'I6',
-    },
-    {
-        value: 'RLC',
-        cellNum: 'J6',
-    },
-    {
-        value: 'ALC',
-        cellNum: 'K6',
-    },
-    {
-        value: 'Total Load',
-        cellNum: 'L6',
-    },
-    {
-        value: 'Underload / Overload',
-        cellNum: 'M6',
-        font: {
-            color: { argb: 'FFFF0000' },
-        },
-    },
-    {
-        value: 'Teaching load units',
-        cellNum: 'N6',
-    },
+    { value: 'Last Name/First Name/MI', cellNum: 'A5' },
+    { value: 'Appointment Status', cellNum: 'B5' }, // Task 16: New B
+    { value: 'Designation', cellNum: 'C5' }, // Shifted B -> C
+    { value: 'Degree', cellNum: 'D5' }, // Shifted C -> D
+    { value: 'Course Taught', cellNum: 'E5' }, // Shifted D -> E
+    { value: 'Earned', cellNum: 'F5:G5' }, // Task 14: Shifted E:F -> F:G
+    { value: 'Schedule of Classes', cellNum: 'H5' }, // Shifted G -> H
+    { value: 'Administrative Position', cellNum: 'I5' }, // Shifted H -> I
+    { value: 'TOTAL', cellNum: 'J5:M5' }, // Shifted I:L -> J:M
+    // Appointment Status (B6) will be handled by emptyHeaderCells
+    { value: 'Undergrad', cellNum: 'F6' }, // Task 14: Shifted E -> F
+    { value: 'Graduate', cellNum: 'G6' }, // Task 14: Shifted F -> G
+    { value: 'TLC', cellNum: 'J6' }, // Shifted I -> J
+    { value: 'RLC', cellNum: 'K6' }, // Shifted J -> K
+    { value: 'ALC', cellNum: 'L6' }, // Shifted K -> L
+    { value: 'Total Load', cellNum: 'M6' }, // Shifted L -> M
+    { value: 'Underload / Overload', cellNum: 'N6', font: { color: { argb: 'FFFF0000' } } }, // Shifted M -> N
+    { value: 'Teaching load units', cellNum: 'O6' }, // Shifted N -> O
 ];
 
-const emptyHeaderCells: string[] = ['M5', 'N5', 'B6', 'C6', 'D6', 'G6', 'H6'];
+// These are cells in the 2-row header that don't have text but need borders
+const emptyHeaderCells: string[] = [
+    'A6',
+    'B6',
+    'C6',
+    'D6',
+    'E6',
+    'H6',
+    'I6', // Row 6 empties
+    'N5',
+    'O5', // Row 5 empties above Overload/Units
+];
 
 const dataStartCol = 1;
 const dataStartRow = 7;
+
+const usedColumns = 15;
 
 export async function getFacultyLoadingWorksheet(
     facultyIds: number[],
@@ -136,113 +93,125 @@ export async function getFacultyLoadingWorksheet(
         if (cellNums.length > 1) sheet.mergeCells(cellNum);
     });
 
+    // Widen all cells
+    for (let i = 1; i <= usedColumns; i++) {
+        sheet.getColumn(i).width = (i === 1) ? 40 : 20;
+    }
+
     // Set data cells
     let row = dataStartRow;
     for (let i = 0; i < data.length; i++, row++) {
         let col = dataStartCol;
         const facultyMember = data[i];
 
-        if (facultyMember.length === 0) continue;
-
         console.log(facultyMember);
 
-        const [
-            {
-                lastName,
-                firstName,
-                middleName,
-                designation,
-                degree,
-                coursesTaught,
-                teachingLoadUnits,
-                adminPosition,
-                teachingLoadCredit,
-                administrativeLoadCredit,
-                researchLoadCredit,
-            },
-        ] = facultyMember;
+        const {
+            lastName,
+            firstName,
+            middleName,
+            appointmentStatus, // Task 16
+            designation,
+            degree,
+            coursesTaught,
+            undergradCredit, // Task 14
+            gradCredit, // Task 14
+            teachingLoadUnits,
+            adminPositions,
+            administrativeLoadCredit,
+            researchLoadCredit,
+        } = facultyMember;
 
-        const nameCell = sheet.getCell(row, col);
+        // 1. Name
+        const nameCell = sheet.getCell(row, col++);
         nameCell.value = `${lastName}, ${firstName} ${middleName[0]}.`;
         nameCell.border = cellBorders;
-        col++;
 
-        const designationCell = sheet.getCell(row, col);
+        // 2. Appointment Status (Task 16)
+        const statusCell = sheet.getCell(row, col++);
+        statusCell.value = appointmentStatus || '';
+        statusCell.border = cellBorders;
+
+        // 3. Designation
+        const designationCell = sheet.getCell(row, col++);
         designationCell.value = designation ?? '';
         designationCell.border = cellBorders;
-        col++;
 
-        const degreeCell = sheet.getCell(row, col);
-        degreeCell.value = degree ?? null;
+        // 4. Degree
+        const degreeCell = sheet.getCell(row, col++);
+        degreeCell.value = degree ?? '';
         degreeCell.border = cellBorders;
-        col++;
 
-        const coursesTaughtCell = sheet.getCell(row, col);
+        // 5. Course Taught
+        const coursesTaughtCell = sheet.getCell(row, col++);
         coursesTaughtCell.value = coursesTaught;
         coursesTaughtCell.border = cellBorders;
-        col++;
 
-        const earnedUndergrad = sheet.getCell(row, col);
+        // 6. Earned: Undergrad (Task 14)
+        const earnedUndergrad = sheet.getCell(row, col++);
+        earnedUndergrad.value = undergradCredit;
+        earnedUndergrad.numFmt = '0.00';
         earnedUndergrad.border = cellBorders;
         earnedUndergrad.alignment = { horizontal: 'right' };
-        col++;
 
-        const earnedGraduate = sheet.getCell(row, col);
+        // 7. Earned: Graduate (Task 14)
+        const earnedGraduate = sheet.getCell(row, col++);
+        earnedGraduate.value = gradCredit;
+        earnedGraduate.numFmt = '0.00';
         earnedGraduate.border = cellBorders;
         earnedGraduate.alignment = { horizontal: 'right' };
-        col++;
 
-        const scheduleOfClassesCell = sheet.getCell(row, col);
+        // 8. Schedule of Classes (Empty/Placeholder)
+        const scheduleOfClassesCell = sheet.getCell(row, col++);
         scheduleOfClassesCell.border = cellBorders;
-        col++;
 
-        const adminPositionCell = sheet.getCell(row, col);
-        adminPositionCell.value = adminPosition;
+        // 9. Admin Position
+        const adminPositionCell = sheet.getCell(row, col++);
+        adminPositionCell.value = adminPositions;
         adminPositionCell.border = cellBorders;
-        col++;
 
-        const teachingLoadCreditCell = sheet.getCell(row, col);
-        teachingLoadCreditCell.value = teachingLoadCredit;
+        // 10. TLC (Teaching Load Credit)
+        const teachingLoadCreditCell = sheet.getCell(row, col++);
+        teachingLoadCreditCell.value = undergradCredit + gradCredit;
         teachingLoadCreditCell.numFmt = '0.00';
         teachingLoadCreditCell.border = cellBorders;
         teachingLoadCreditCell.alignment = { horizontal: 'center' };
-        col++;
 
-        const researchLoadCreditCell = sheet.getCell(row, col);
+        // 11. RLC (Research Load Credit)
+        const researchLoadCreditCell = sheet.getCell(row, col++);
         researchLoadCreditCell.value = researchLoadCredit;
         researchLoadCreditCell.numFmt = '0.00';
         researchLoadCreditCell.border = cellBorders;
         researchLoadCreditCell.alignment = { horizontal: 'center' };
-        col++;
 
-        const administrativeLoadCreditCell = sheet.getCell(row, col);
+        // 12. ALC (Administrative Load Credit)
+        const administrativeLoadCreditCell = sheet.getCell(row, col++);
         administrativeLoadCreditCell.value = administrativeLoadCredit;
         administrativeLoadCreditCell.numFmt = '0.00';
         administrativeLoadCreditCell.border = cellBorders;
         administrativeLoadCreditCell.alignment = { horizontal: 'center' };
-        col++;
 
-        const totalLoadCreditCell = sheet.getCell(row, col);
-        const totalLoadCredit = teachingLoadCredit + researchLoadCredit + administrativeLoadCredit;
-        totalLoadCreditCell.value = totalLoadCredit;
+        // 13. TOTAL Load
+        const totalLoadCreditCell = sheet.getCell(row, col++);
+        const totalLoadValue = undergradCredit + gradCredit + researchLoadCredit + administrativeLoadCredit;
+        totalLoadCreditCell.value = totalLoadValue;
         totalLoadCreditCell.numFmt = '0.00';
         totalLoadCreditCell.border = cellBorders;
         totalLoadCreditCell.alignment = { horizontal: 'right' };
-        col++;
 
-        const loadStatusCell = sheet.getCell(row, col);
-        loadStatusCell.value = totalLoadCredit - 12;
+        // 14. Underload / Overload
+        const loadStatusCell = sheet.getCell(row, col++);
+        loadStatusCell.value = totalLoadValue - 12;
         loadStatusCell.numFmt = '0.00';
         loadStatusCell.border = cellBorders;
         loadStatusCell.alignment = { horizontal: 'right' };
-        col++;
 
-        const teachingLoadUnitsCell = sheet.getCell(row, col);
+        // 15. Teaching Load Units (Task 12 context)
+        const teachingLoadUnitsCell = sheet.getCell(row, col++);
         teachingLoadUnitsCell.value = teachingLoadUnits;
         teachingLoadUnitsCell.numFmt = '0.00';
         teachingLoadUnitsCell.border = cellBorders;
         teachingLoadUnitsCell.alignment = { horizontal: 'right' };
-        col++;
     }
 
     return { sheetName, model: sheet.model };

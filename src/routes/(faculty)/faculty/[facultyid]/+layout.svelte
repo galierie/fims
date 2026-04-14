@@ -26,12 +26,11 @@
     let deleteForm: HTMLFormElement | null = $state(null);
 
     $effect(() => {
-        if (page.params.ay && page.params.sem) {
+        if (page.params.ay && page.params.sem)
             chooseSemestralRecord(parseInt(page.params.ay, 10), parseInt(page.params.sem, 10));
-        } else {
+        else
             // If on Profile page, reset state to latest DB values
             chooseSemestralRecord(latestAcadYear, latestSemNum);
-        }
     });
 </script>
 

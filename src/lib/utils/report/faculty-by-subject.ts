@@ -1,6 +1,7 @@
 import ExcelJS from '@protobi/exceljs';
+
+import { cellBorders, type SheetCellValue } from '$lib/types/sheet-cell';
 import { getFacultyBySubjectReport } from '$lib/server/queries/reports';
-import { type SheetCellValue, cellBorders } from '$lib/types/sheet-cell';
 
 const constantHeaderCellValues: SheetCellValue[] = [
     {
@@ -46,23 +47,59 @@ export async function getFacultyBySubjectWorksheet() {
     titleCell.value = 'By subject taught, faculty';
     titleCell.font = { bold: true };
 
+    // Widen second column
+    sheet.getColumn(2).width = 20;
+
+    // Task 15: Define the specific order of categories
+    const categories = ['Undergraduate', 'MA/PhD', 'MDE'];
+
     // Set data cells
     let row = dataStartRow;
-    for (let i = 0; i < data.length; i++, row++) {
-        let col = dataStartCol;
 
-        const { courseTaught, faculty } = data[i];
+    categories.forEach((cat) => {
+        // Filter subjects belonging to the current category
+        const subjectsInCategory = data.filter((d) => d.courseLevel === cat);
 
-        const subjectCell = sheet.getCell(row, col);
-        subjectCell.value = courseTaught;
-        subjectCell.border = cellBorders;
-        col++;
+        if (subjectsInCategory.length > 0) {
+            // 1. Add a Category Header Row
+            const categoryHeaderCell = sheet.getCell(row, dataStartCol);
+            categoryHeaderCell.value = cat.toUpperCase();
+            categoryHeaderCell.font = { bold: true, italic: true };
+            categoryHeaderCell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FFF0F0F0' }, // Light grey background for the header
+            };
 
-        const nameCell = sheet.getCell(row, col);
-        nameCell.value = faculty;
-        nameCell.border = cellBorders;
-        col++;
-    }
+            // Merge header across the two columns (Subject and Faculty)
+            sheet.mergeCells(row, dataStartCol, row, dataStartCol + 1);
+
+            // Apply borders to the merged header
+            sheet.getCell(row, dataStartCol).border = cellBorders;
+            sheet.getCell(row, dataStartCol + 1).border = cellBorders;
+
+            row++; // Move to next row for the actual data
+
+            // 2. Add the Subjects and Faculty for this category
+            subjectsInCategory.forEach((s) => {
+                let col = dataStartCol;
+
+                const subjectCell = sheet.getCell(row, col++);
+                subjectCell.value = s.courseTaught;
+                subjectCell.border = cellBorders;
+
+                const nameCell = sheet.getCell(row, col++);
+                nameCell.value = s.faculty;
+                nameCell.border = cellBorders;
+                nameCell.alignment = { wrapText: true };
+
+                row++; // Move to next row
+            });
+
+            // 3. Add a blank row as a spacer between categories
+            row++;
+        }
+    });
 
     return { sheetName, model: sheet.model };
 }

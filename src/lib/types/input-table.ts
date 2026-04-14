@@ -16,8 +16,10 @@ export interface InputColumnType {
         | 'checkbox'
         | 'dropdown'
         | 'expandable'
-        | 'dependent';
+        | 'dependent'
+        | 'datalist';
     isImmutable?: boolean;
+    isRequired?: boolean;
 
     // For dropdown columns
     opts?: string[];

@@ -1,6 +1,7 @@
 import ExcelJS from '@protobi/exceljs';
+
+import { cellBorders, type SheetCellValue } from '$lib/types/sheet-cell';
 import { getFacultySETReport } from '$lib/server/queries/reports';
-import { type SheetCellValue, cellBorders } from '$lib/types/sheet-cell';
 
 const defaultHeaderCellAlignment: Partial<ExcelJS.Alignment> = {
     horizontal: 'center',
@@ -17,20 +18,24 @@ const constantHeaderCellValues: SheetCellValue[] = [
         cellNum: 'A6:A7',
     },
     {
-        value: 'Semester',
+        value: 'Appointment Status', // <-- Task 16: New Column B
         cellNum: 'B6:B7',
     },
     {
-        value: 'Course/Section',
+        value: 'Semester', // Shifted to C
         cellNum: 'C6:C7',
     },
     {
-        value: 'Teacher Average',
+        value: 'Course/Section', // Shifted to D
         cellNum: 'D6:D7',
     },
     {
-        value: 'Average',
+        value: 'Teacher Average', // Shifted to E
         cellNum: 'E6:E7',
+    },
+    {
+        value: 'Average', // Shifted to F
+        cellNum: 'F6:F7',
     },
 ];
 
@@ -61,6 +66,11 @@ export async function getFacultySETAverageWorksheet(facultyIds: number[], acadYe
     titleCell.value = `S E T   Results for AY ${acadYear}-${acadYear + 1}`;
     titleCell.font = { bold: true };
 
+    // Widen all columns
+    for (let i = 1; i <= constantHeaderCellValues.length; i++) {
+        sheet.getColumn(i).width = 20;
+    }
+
     // Set data cells
     let row = dataStartRow;
     for (let i = 0; i < data.length; i++) {
@@ -70,11 +80,16 @@ export async function getFacultySETAverageWorksheet(facultyIds: number[], acadYe
         console.log(facultyInfo);
 
         // Faculty Info
-        const { lastName, firstName, middleName } = facultyInfo;
+        const { lastName, firstName, middleName, appointmentStatus } = facultyInfo;
 
         const nameCell = sheet.getCell(row, col);
         nameCell.value = `${lastName}, ${firstName} ${middleName[0]}.`;
         nameCell.border = cellBorders;
+        col++;
+
+        const appointmentStatusCell = sheet.getCell(row, col);
+        appointmentStatusCell.value = appointmentStatus || '';
+        appointmentStatusCell.border = cellBorders;
         col++;
 
         // Semester-specific data
@@ -92,6 +107,9 @@ export async function getFacultySETAverageWorksheet(facultyIds: number[], acadYe
                     totalSemSET += sectionSETNum;
 
                     if (courseIdx !== 0) {
+                        sheet.getCell(row, col).border = cellBorders;
+                        col++;
+
                         sheet.getCell(row, col).border = cellBorders;
                         col++;
 
@@ -140,8 +158,11 @@ export async function getFacultySETAverageWorksheet(facultyIds: number[], acadYe
                 sheet.getCell(row, col).border = cellBorders;
                 col++;
 
+                sheet.getCell(row, col).border = cellBorders;
+                col++;
+
                 row++;
-                col = dataStartCol + 1;
+                col = dataStartCol + 2;
             }
         });
     }
