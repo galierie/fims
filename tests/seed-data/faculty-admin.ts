@@ -1,6 +1,7 @@
 // contains adminpositions and offices for seeding
 // doing this for organizational purposes
 
+
 // delete all entries in the table muna
 
 export const statusRelations = [
@@ -13,160 +14,171 @@ export const statusRelations = [
     {
         status: 'Sabbatical',
     },
+    {
+        status: 'On Secondment'
+    }
 ];
 
 export const apppointmentStatuses = [
-    {
-        appointmentstatus: 'Permanent',
-    },
-    {
-        appointmentstatus: 'Part-Time',
-    },
-    {
-        appointmentstatus: 'Full-Time',
-    },
+    {appointmentStatus:'Permanent'},
+    {appointmentStatus:'Temporary'},
+    {appointmentStatus:'Part-Time'},
+    {appointmentStatus:'Full-Time'},
 ];
 
 // faculty
 export const testFaculty = [
     {
-        facultyid: 1,
-        lastname: 'Galinato',
-        middlename: 'D',
-        firstname: 'Eriene',
-        birthdate: new Date().toISOString(),
+        id: 1,
+        lastName: 'Galinato',
+        middleName: 'D',
+        firstName: 'Eriene',
+        maidenName: '',
+        birthDate: new Date(),
+        biologicalSex: 'F',
         status: 'Active',
-        dateoforiginalappointment: new Date().toISOString(),
-        maidenname: '',
-        psiitem: '',
-        employeenumber: '',
-        tin: '',
-        gsis: '',
-        philhealth: '',
-        pagibig: '',
+        dateOfOriginalAppointment: new Date(),
+        psiItem: '123',
+        employeeNumber: '123',
+        tin: '123',
+        gsis: '123',
+        philhealth: '123',
+        pagibig: '123',
     },
     {
-        facultyid: 2,
-        lastname: 'Camingao',
-        middlename: 'B',
-        firstname: 'Ericsson Jake',
-        birthdate: new Date().toISOString(),
+        id: 2,
+        lastName: 'Camingao',
+        middleName: 'B',
+        firstName: 'Ericsson Jake',
+        maidenName: '',
+        birthDate: new Date(),
+        biologicalSex: 'M',
         status: 'On Leave',
-        dateoforiginalappointment: new Date().toISOString(),
-        psiitem: '',
-        employeenumber: '',
-        tin: '',
-        gsis: '',
-        philhealth: '',
-        pagibig: '',
-        maidenname: '',
+        dateOfOriginalAppointment: new Date(),
+        psiItem: '123',
+        employeeNumber: '123',
+        tin: '123',
+        gsis: '123',
+        philhealth: '123',
+        pagibig: '123',
     },
     {
-        facultyid: 3,
-        lastname: 'Dela Cruz',
-        middlename: 'O',
-        firstname: 'Gabrielle Zach',
-        birthdate: new Date().toISOString(),
+        id: 3,
+        lastName: 'Dela Cruz',
+        middleName: 'O',
+        firstName: 'Gabrielle Zach',
+        maidenName: '',
+        birthDate: new Date(),
+        biologicalSex: 'M',
         status: 'Sabbatical',
-        dateoforiginalappointment: new Date().toISOString(),
-        psiitem: '',
-        employeenumber: '',
-        tin: '',
-        gsis: '',
-        philhealth: '',
-        pagibig: '',
-        maidenname: '',
+        dateOfOriginalAppointment: new Date(),
+        psiItem: '123',
+        employeeNumber: '123',
+        tin: '123',
+        gsis: '123',
+        philhealth: '123',
+        pagibig: '123',
     },
     {
-        facultyid: 4,
-        lastname: 'Mandario',
-        middlename: 'S',
-        firstname: 'Maricris',
-        birthdate: new Date().toISOString(),
+        id: 4,
+        lastName: 'Mandario',
+        middleName: 'S',
+        firstName: 'Maricris',
+        maidenName: '',
+        birthDate: new Date(),
+        biologicalSex: 'F',
         status: 'Active',
-        dateoforiginalappointment: new Date().toISOString(),
-        psiitem: '',
-        employeenumber: '',
-        tin: '',
-        gsis: '',
-        philhealth: '',
-        pagibig: '',
-        maidenname: '',
+        dateOfOriginalAppointment: new Date(),
+        psiItem: '123',
+        employeeNumber: '123',
+        tin: '123',
+        gsis: '123',
+        philhealth: '123',
+        pagibig: '123',
     },
 ];
 
 // facultyrank
 export const rankRelations = [
     {
-        facultyrankid: 1,
-        facultyid: 1,
-        rankid: 26,
-        appointmentstatus: 'Permanent',
-        dateoftenureorrenewal: new Date().toISOString(),
+        id: 4,
+        facultyId: 4,
+        rankId: 1,
+        appointmentStatus: 'Temporary',
+        dateOfTenureOrRenewal: new Date(),
     },
     {
-        facultyrankid: 2,
-        facultyid: 2,
-        rankid: 20,
-        appointmentstatus: 'Part-Time',
-        dateoftenureorrenewal: new Date().toISOString(),
+        id: 3,
+        facultyId: 3,
+        rankId: 1,
+        appointmentStatus: 'Temporary',
+        dateOfTenureOrRenewal: new Date(),
     },
     {
-        facultyrankid: 3,
-        facultyid: 3,
-        rankid: 6,
-        appointmentstatus: 'Full-Time',
-        dateoftenureorrenewal: new Date().toISOString(),
+        id: 2,
+        facultyId: 2,
+        rankId: 1,
+        appointmentStatus: 'Part-Time',
+        dateOfTenureOrRenewal: new Date(),
     },
     {
-        facultyrankid: 4,
-        facultyid: 4,
-        rankid: 1,
-        appointmentstatus: 'Permanent',
-        dateoftenureorrenewal: new Date().toISOString(),
+        id: 1,
+        facultyId: 1,
+        rankId: 1,
+        appointmentStatus: 'Full-Time',
+        dateOfTenureOrRenewal: new Date(),
     },
 ];
 
 // facultysemester
 export const semesterRelations = [
     {
-        facultysemesterid: 1,
-        facultyid: 1,
-        acadsemesterid: 1,
-        currentrankid: 1,
+        id: 1,
+        facultyId: 1,
+        academicSemesterId: 1,
+        currentRankId: 1,
     },
     {
-        facultysemesterid: 2,
-        facultyid: 2,
-        acadsemesterid: 1,
-        currentrankid: 2,
+        id: 2,
+        facultyId: 2,
+        academicSemesterId: 1,
+        currentRankId: 2,
     },
     {
-        facultysemesterid: 3,
-        facultyid: 3,
-        acadsemesterid: 1,
-        currentrankid: 3,
+        id: 3,
+        facultyId: 3,
+        academicSemesterId: 1,
+        currentRankId: 3,
     },
     {
-        facultysemesterid: 4,
-        facultyid: 4,
-        acadsemesterid: 1,
-        currentrankid: 4,
+        id: 4,
+        facultyId: 4,
+        academicSemesterId: 1,
+        currentRankId: 4,
     },
 ];
 
 // facultyadminposition
 export const adminRelations = [
     {
-        facultyadminpositionid: 1,
-        facultysemesterid: 1,
-        adminpositionid: 1,
-        officeid: 1,
-        startdate: new Date().toISOString(),
-        enddate: new Date().toISOString(),
-        administrativeloadcredit: '5',
+        id: 1,
+        facultyAcademicSemesterId: 1,
+        adminPositionId: 1,
+        officeId: 1,
+        startDate: new Date(),
+        endDate: new Date(),
+        administrativeLoadCredit: '5',
     },
 ];
+
+// academicSemester
+export const academicSemesters = [
+    {
+        id: 1,
+        semesterNumber: 0,
+        academicYear: 2025
+    }
+]
 
 /*
 // Refresh faculty record search view

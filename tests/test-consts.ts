@@ -7,7 +7,165 @@ import { neon } from '@neondatabase/serverless';
 import * as schema from '../src/lib/server/db/schema';
 
 import * as seedData from './seed-data/faculty-admin';
+export type possibleInputs = Array<
+    'textbox' | 'dropdown' | 'numeric' | 'date' | 'remarks' | 'checkbox' | 'none'
+>;
 
+//[ header, add button text, inputs, type of input field ]
+export type testRowTuple = [string, string, string[], possibleInputs];
+
+//for the tests to work with different test accounts
+export const ITAcc = 'it@up.edu.ph';
+export const AdminAcc = 'admin@up.edu.ph';
+
+export const ITPass = 'password';
+export const AdminPass = 'password';
+
+export const ITConfig = 'playwright/.auth/it.json';
+export const AdminConfig = 'playwright/.auth/admin.json';
+
+// as of making this, the save confirmation hasn't yet been made
+// so i made this preemtively
+export const SaveConfirmText = 'Save';
+
+// for editing records
+export function getFieldTest() {
+    return [
+        'test-name', // Last name
+        'test=name2', // First name
+        'test-name3', // Middle name
+        'mm.', // suffix
+        new Date().toISOString().split('T')[0], // birth date
+        'maiden-name', // maiden name
+        `${Math.floor(Math.random() * 9999)}`, //philhealth
+        `${Math.floor(Math.random() * 9999)}`, //pag-ibig
+        `${Math.floor(Math.random() * 9999)}`, //psi item
+        `${Math.floor(Math.random() * 9999)}`, //tin
+        `${Math.floor(Math.random() * 9999)}`, //gsis
+        `${Math.floor(Math.random() * 9999)}`, //employee
+        expectedStatuses[Math.floor(Math.random() * 3)], // status
+        new Date().toISOString().split('T')[0], // date of original appointment
+        'test remarks', // remarks
+    ];
+}
+
+export function sampleEmails() {
+    return ['test@up.edu.ph'];
+}
+export function sampleContactNums() {
+    return ['123456'];
+}
+export function sampleHomeAddrs() {
+    return ['up street'];
+}
+export function sampleEduAttain() {
+    return ['BS Test Degree', 'UP Diliman', '3000'];
+}
+export function sampleFieldsInterest() {
+    return ['Software Engineering'];
+}
+export function samplePromHist() {
+    return [
+        'Instructor 1', //todo: random picking of roles
+        '10-2',
+        '100000.00',
+        'Permanent',
+        new Date().toISOString().split('T')[0],
+    ];
+}
+
+export function samplePosition() {
+    return [
+        'Department Head',
+        'Test Office',
+        new Date().toISOString().split('T')[0],
+        new Date().toISOString().split('T')[0],
+        '2',
+    ];
+}
+
+export function sampleMembership() {
+    return [
+        'membership-test',
+        'test committee',
+        new Date().toISOString().split('T')[0],
+        new Date().toISOString().split('T')[0],
+        '2',
+    ];
+}
+
+export function sampleAdminWork() {
+    return [
+        'admin-test',
+        new Date().toISOString().split('T')[0],
+        new Date().toISOString().split('T')[0],
+        '2',
+    ];
+}
+
+export function sampleClass() {
+    return ['Econ 11', 'Section ABC', '11', '2', '5.0000'];
+}
+
+export function sampleMentor() {
+    return [
+        'Lastname',
+        'Firstname',
+        'Middlename',
+        'Test Category',
+        new Date().toISOString().split('T')[0],
+        new Date().toISOString().split('T')[0],
+        '2',
+    ];
+}
+
+export function sampleResearch() {
+    return [
+        'Title Testing',
+        new Date().toISOString().split('T')[0],
+        new Date().toISOString().split('T')[0],
+        '100000.00',
+        '2',
+        'testmark',
+    ];
+}
+
+export function sampleExt() {
+    return [
+        'Test Extension',
+        'Test Agency',
+        new Date().toISOString().split('T')[0],
+        new Date().toISOString().split('T')[0],
+        '2',
+    ];
+}
+
+export function sampleStudy() {
+    return [
+        'BS More Test',
+        'UP Diliman 2',
+        '29',
+        `${Math.random() < 0.5}`,
+        `${Math.random() < 0.5}`,
+        '2',
+    ];
+}
+
+// in the case your sample data is different
+export const expectedFacultyName = 'Dela Cruz, Juan';
+
+export const expectedStatuses = ['Active', 'On Leave', 'Sabbatical'];
+
+export const expectedRankPrefixes = [
+    'Instructor',
+    'Assistant Professor',
+    'Associate Professor',
+    'Professor',
+];
+
+//specific db instance for the tests.
+//uses the same schema though since the schema has no runes.
+//remember to clean up entries from this
 dotenv.config({ path: '.env' });
 
 export const testDB = drizzle(neon(process.env.DATABASE_URL!), { schema });
@@ -16,7 +174,7 @@ export const testDB = drizzle(neon(process.env.DATABASE_URL!), { schema });
 export function getData(): string[] {
     const res: string[] = [];
 
-    for (const rec of seedData.testFaculty) res.push(`${rec.lastname}, ${rec.firstname}`);
+    for (const rec of seedData.testFaculty) res.push(`${rec.lastName}, ${rec.firstName}`);
 
     return res;
 }
@@ -26,35 +184,46 @@ export async function seed() {
     console.log('seeding!!!');
     // clear all tables
     await testDB.delete(schema.faculty);
-    await testDB.delete(schema.facultyrank);
-    await testDB.delete(schema.facultysemester);
-    await testDB.delete(schema.facultyadminposition);
-    await testDB.delete(schema.appointmentstatus);
+    await testDB.delete(schema.facultyRank);
+    await testDB.delete(schema.facultyAcademicSemester);
+    await testDB.delete(schema.facultyAdminPosition);
+    await testDB.delete(schema.appointmentStatus);
+
     await testDB.delete(schema.office);
+    await testDB.delete(schema.adminPosition);
+    await testDB.delete(schema.academicSemester);
 
     await testDB.execute(sql`REFRESH MATERIALIZED VIEW account_search_view`);
     await testDB.execute(sql`REFRESH MATERIALIZED VIEW faculty_record_search_view`);
 
     //push office
     await testDB.insert(schema.office).values({
-        officeid: 1,
+        id: 1,
         name: 'Test Office',
     });
+    await testDB.insert(schema.adminPosition).values({
+        id: 1,
+        title: 'Department Head'
+    })
+
+    //push semesters
+    await testDB.insert(schema.academicSemester).values(seedData.academicSemesters)
 
     //push appointment statuses
-    await testDB.insert(schema.appointmentstatus).values(seedData.apppointmentStatuses);
+    await testDB.insert(schema.appointmentStatus).values(seedData.apppointmentStatuses);
 
     // push faculty
     await testDB.insert(schema.faculty).values(seedData.testFaculty);
 
     // push faculty ranks
-    await testDB.insert(schema.facultyrank).values(seedData.rankRelations);
+    await testDB.insert(schema.facultyRank).values(seedData.rankRelations);
+
 
     // push faculty semesters
-    await testDB.insert(schema.facultysemester).values(seedData.semesterRelations);
+    await testDB.insert(schema.facultyAcademicSemester).values(seedData.semesterRelations);
 
     // push faculty adminpositions
-    await testDB.insert(schema.facultyadminposition).values(seedData.adminRelations);
+    await testDB.insert(schema.facultyAdminPosition).values(seedData.adminRelations);
 
     // refresh views
     // TODO: restart serials
