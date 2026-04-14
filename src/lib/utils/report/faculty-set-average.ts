@@ -66,6 +66,11 @@ export async function getFacultySETAverageWorksheet(facultyIds: number[], acadYe
     titleCell.value = `S E T   Results for AY ${acadYear}-${acadYear + 1}`;
     titleCell.font = { bold: true };
 
+    // Widen all columns
+    for (let i = 1; i <= constantHeaderCellValues.length; i++) {
+        sheet.getColumn(i).width = 20;
+    }
+
     // Set data cells
     let row = dataStartRow;
     for (let i = 0; i < data.length; i++) {
@@ -83,7 +88,7 @@ export async function getFacultySETAverageWorksheet(facultyIds: number[], acadYe
         col++;
 
         const appointmentStatusCell = sheet.getCell(row, col);
-        appointmentStatusCell.value = appointmentStatus || 'N/A';
+        appointmentStatusCell.value = appointmentStatus || '';
         appointmentStatusCell.border = cellBorders;
         col++;
 
@@ -102,6 +107,9 @@ export async function getFacultySETAverageWorksheet(facultyIds: number[], acadYe
                     totalSemSET += sectionSETNum;
 
                     if (courseIdx !== 0) {
+                        sheet.getCell(row, col).border = cellBorders;
+                        col++;
+
                         sheet.getCell(row, col).border = cellBorders;
                         col++;
 
