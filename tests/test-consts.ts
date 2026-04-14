@@ -174,7 +174,7 @@ export const testDB = drizzle(neon(process.env.DATABASE_URL!), { schema });
 export function getData(): string[] {
     const res: string[] = [];
 
-    for (const rec of seedData.testFaculty) res.push(`${rec.lastname}, ${rec.firstname}`);
+    for (const rec of seedData.testFaculty) res.push(`${rec.lastName}, ${rec.firstName}`);
 
     return res;
 }
@@ -184,10 +184,10 @@ export async function seed() {
     console.log('seeding!!!');
     // clear all tables
     await testDB.delete(schema.faculty);
-    await testDB.delete(schema.facultyrank);
-    await testDB.delete(schema.facultysemester);
-    await testDB.delete(schema.facultyadminposition);
-    await testDB.delete(schema.appointmentstatus);
+    await testDB.delete(schema.facultyRank);
+    await testDB.delete(schema.facultyAcademicSemester);
+    await testDB.delete(schema.facultyAdminPosition);
+    await testDB.delete(schema.appointmentStatus);
     await testDB.delete(schema.office);
 
     await testDB.execute(sql`REFRESH MATERIALIZED VIEW account_search_view`);
@@ -195,24 +195,24 @@ export async function seed() {
 
     //push office
     await testDB.insert(schema.office).values({
-        officeid: 1,
+        id: 1,
         name: 'Test Office',
     });
 
     //push appointment statuses
-    await testDB.insert(schema.appointmentstatus).values(seedData.apppointmentStatuses);
+    await testDB.insert(schema.appointmentStatus).values(seedData.apppointmentStatuses);
 
     // push faculty
     await testDB.insert(schema.faculty).values(seedData.testFaculty);
 
     // push faculty ranks
-    await testDB.insert(schema.facultyrank).values(seedData.rankRelations);
+    await testDB.insert(schema.facultyRank).values(seedData.rankRelations);
 
     // push faculty semesters
-    await testDB.insert(schema.facultysemester).values(seedData.semesterRelations);
+    await testDB.insert(schema.facultyAcademicSemester).values(seedData.semesterRelations);
 
     // push faculty adminpositions
-    await testDB.insert(schema.facultyadminposition).values(seedData.adminRelations);
+    await testDB.insert(schema.facultyAdminPosition).values(seedData.adminRelations);
 
     // refresh views
     // TODO: restart serials
