@@ -117,8 +117,6 @@ export async function getSubjectsByFacultyWorksheet(
             subjectsCell.alignment = { vertical: 'top' };
             col++;
         });
-
-        row++;
     }
 
     return { sheetName, model: sheet.model };
