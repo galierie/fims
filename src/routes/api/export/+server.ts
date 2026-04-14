@@ -17,11 +17,13 @@ export async function GET({ url, locals }: RequestEvent) {
     if (!typesStr) return json({ error: 'No report type specified' }, { status: 400 });
     const types = typesStr.split(',');
 
-    const facultyIdsStr = url.searchParams.get('facultyIds');
-    if (!facultyIdsStr) return json({ error: 'No faculty member specified' }, { status: 400 });
+    const needsFacultyIds = !(new Set(types)).isDisjointFrom(new Set(['profile', 'service-record', 'loading', 'set-avg', 'subjects-by-faculty']));
+
+    const facultyIdsStr = url.searchParams.get('facultyIds') ?? '';
+    if (needsFacultyIds && facultyIdsStr === '') return json({ error: 'No faculty member specified' }, { status: 400 });
     const facultyIds = facultyIdsStr.split(',').map((idStr: string) => parseInt(idStr, 10));
 
-    const isOnlyProfile = types.length === 1 && types[0] === 'profile';
+    const needsPeriods = !(new Set(types)).isDisjointFrom(new Set(['service-record', 'loading', 'set-avg', 'subjects-by-faculty']));
 
     const rawFromAy = parseInt(url.searchParams.get('fromAy') || '0', 10);
     const rawFromSem = parseInt(url.searchParams.get('fromSem') || '0', 10);
@@ -29,7 +31,7 @@ export async function GET({ url, locals }: RequestEvent) {
     const rawToSem = parseInt(url.searchParams.get('toSem') ?? `${rawFromSem}`, 10);
 
     if (
-        !isOnlyProfile &&
+        needsPeriods &&
         (isNaN(rawFromAy) || isNaN(rawFromSem) || rawFromAy === 0 || rawFromSem === 0)
     )
         return json({ error: 'Invalid academic year/semester range' }, { status: 400 });
@@ -39,7 +41,7 @@ export async function GET({ url, locals }: RequestEvent) {
     let fromSem = rawFromSem;
     let toAy = rawToAy;
     let toSem = rawToSem;
-    if (!isOnlyProfile && (fromAy > toAy || (fromAy === toAy && fromSem > toSem))) {
+    if (needsPeriods && (fromAy > toAy || (fromAy === toAy && fromSem > toSem))) {
         fromAy = rawToAy;
         fromSem = rawToSem;
         toAy = rawFromAy;
@@ -47,9 +49,7 @@ export async function GET({ url, locals }: RequestEvent) {
     }
 
     const periods = [];
-    if (isOnlyProfile) {
-        periods.push({ ay: 0, sem: 0 });
-    } else {
+    if (needsPeriods) {
         let currAy = fromAy;
         let currSem = fromSem;
         while (currAy < toAy || (currAy === toAy && currSem <= toSem)) {
@@ -60,6 +60,8 @@ export async function GET({ url, locals }: RequestEvent) {
                 currAy++;
             }
         }
+    } else {
+        periods.push({ ay: 0, sem: 0 });
     }
 
     // Fetch the requested reports for ALL periods
@@ -160,9 +162,9 @@ export async function GET({ url, locals }: RequestEvent) {
         const customFileName = url.searchParams.get('fileName');
         const finalName = customFileName
             ? `${customFileName}.xlsx`
-            : isOnlyProfile
-              ? 'Faculty_Profile.xlsx'
-              : `Export-AY${fromAy}-S${fromSem}-to-AY${toAy}-S${toSem}.xlsx`;
+            : needsPeriods
+                ? `Export-AY${fromAy}-S${fromSem}-to-AY${toAy}-S${toSem}.xlsx`
+                : 'Faculty_Profile.xlsx';
 
         return new Response(buf, {
             headers: {
