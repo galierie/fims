@@ -22,7 +22,6 @@ const constantHeaderCellValues: SheetCellValue[] = [
     { value: 'Schedule of Classes', cellNum: 'H5' }, // Shifted G -> H
     { value: 'Administrative Position', cellNum: 'I5' }, // Shifted H -> I
     { value: 'TOTAL', cellNum: 'J5:M5' }, // Shifted I:L -> J:M
-    { value: 'Regular Faculty', cellNum: 'A6', alignment: { horizontal: 'left' } },
     // Appointment Status (B6) will be handled by emptyHeaderCells
     { value: 'Undergrad', cellNum: 'F6' }, // Task 14: Shifted E -> F
     { value: 'Graduate', cellNum: 'G6' }, // Task 14: Shifted F -> G
@@ -36,6 +35,7 @@ const constantHeaderCellValues: SheetCellValue[] = [
 
 // These are cells in the 2-row header that don't have text but need borders
 const emptyHeaderCells: string[] = [
+    'A6',
     'B6',
     'C6',
     'D6',
@@ -48,6 +48,8 @@ const emptyHeaderCells: string[] = [
 
 const dataStartCol = 1;
 const dataStartRow = 7;
+
+const usedColumns = 15;
 
 export async function getFacultyLoadingWorksheet(
     facultyIds: number[],
@@ -91,6 +93,11 @@ export async function getFacultyLoadingWorksheet(
         if (cellNums.length > 1) sheet.mergeCells(cellNum);
     });
 
+    // Widen all cells
+    for (let i = 1; i <= usedColumns; i++) {
+        sheet.getColumn(i).width = (i === 1) ? 40 : 20;
+    }
+
     // Set data cells
     let row = dataStartRow;
     for (let i = 0; i < data.length; i++, row++) {
@@ -122,7 +129,7 @@ export async function getFacultyLoadingWorksheet(
 
         // 2. Appointment Status (Task 16)
         const statusCell = sheet.getCell(row, col++);
-        statusCell.value = appointmentStatus || 'N/A';
+        statusCell.value = appointmentStatus || '';
         statusCell.border = cellBorders;
 
         // 3. Designation
@@ -132,7 +139,7 @@ export async function getFacultyLoadingWorksheet(
 
         // 4. Degree
         const degreeCell = sheet.getCell(row, col++);
-        degreeCell.value = degree ?? 'N/A';
+        degreeCell.value = degree ?? '';
         degreeCell.border = cellBorders;
 
         // 5. Course Taught
@@ -142,14 +149,14 @@ export async function getFacultyLoadingWorksheet(
 
         // 6. Earned: Undergrad (Task 14)
         const earnedUndergrad = sheet.getCell(row, col++);
-        earnedUndergrad.value = undergradCredit || 0;
+        earnedUndergrad.value = undergradCredit;
         earnedUndergrad.numFmt = '0.00';
         earnedUndergrad.border = cellBorders;
         earnedUndergrad.alignment = { horizontal: 'right' };
 
         // 7. Earned: Graduate (Task 14)
         const earnedGraduate = sheet.getCell(row, col++);
-        earnedGraduate.value = gradCredit || 0;
+        earnedGraduate.value = gradCredit;
         earnedGraduate.numFmt = '0.00';
         earnedGraduate.border = cellBorders;
         earnedGraduate.alignment = { horizontal: 'right' };
@@ -186,8 +193,7 @@ export async function getFacultyLoadingWorksheet(
 
         // 13. TOTAL Load
         const totalLoadCreditCell = sheet.getCell(row, col++);
-        const totalLoadValue =
-            (undergradCredit || 0) + (gradCredit || 0) + (researchLoadCredit || 0) + (administrativeLoadCredit || 0);
+        const totalLoadValue = undergradCredit + gradCredit + researchLoadCredit + administrativeLoadCredit;
         totalLoadCreditCell.value = totalLoadValue;
         totalLoadCreditCell.numFmt = '0.00';
         totalLoadCreditCell.border = cellBorders;
