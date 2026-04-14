@@ -149,55 +149,57 @@
     </div>
 
     <!-- Faculty Record List Table -->
-    <div class="mt-2.5">
-        <!-- Header -->
-        <div
-            class="flex justify-center [&>*>span]:text-center [&>*>span]:font-semibold [&>*>span]:text-white [&>div]:flex [&>div]:h-12 [&>div]:items-center [&>div]:bg-fims-green [&>div]:px-6"
-        >
-            <div class="w-25 justify-center"><span>Select</span></div>
-            <div class={canViewChangelogs ? 'w-66 2xl:w-132' : 'w-116 2xl:w-182'}>
-                <span>Full Name</span>
-                <Icon icon="tabler:arrow-up" class="ml-3 h-5 w-5 text-white" />
+    <div class="mt-2.5 w-full overflow-x-auto custom-scrollbar">
+        <div class="w-full min-w-[1024px] pb-4">
+            <!-- Header -->
+            <div
+                class="flex justify-center [&>*>span]:text-center [&>*>span]:font-semibold [&>*>span]:text-white [&>div]:flex [&>div]:h-12 [&>div]:items-center [&>div]:bg-fims-green [&>div]:px-6"
+            >
+                <div class="w-25 justify-center"><span>Select</span></div>
+                <div class={canViewChangelogs ? 'w-66 2xl:w-132' : 'w-116 2xl:w-182'}>
+                    <span>Full Name</span>
+                    <Icon icon="tabler:arrow-up" class="ml-3 h-5 w-5 text-white" />
+                </div>
+                <div class="w-50 justify-center 2xl:w-75">
+                    <span>Status</span>
+                    <Icon icon="tabler:arrow-up" class="ml-3 h-5 w-5 text-white" />
+                </div>
+                <div class="w-62.5 justify-center 2xl:w-75">
+                    <span>Rank</span>
+                    <Icon icon="tabler:arrow-up" class="ml-3 h-5 w-5 text-white" />
+                </div>
+                <div class="w-62.5 justify-center 2xl:w-75">
+                    <span>Administrative Position</span>
+                    <Icon icon="tabler:arrow-up" class="ml-3 h-5 w-5 text-white" />
+                </div>
+                {#if canViewChangelogs}
+                    <div class="w-50 justify-center"><span>Change Logs</span></div>
+                {/if}
             </div>
-            <div class="w-50 justify-center 2xl:w-75">
-                <span>Status</span>
-                <Icon icon="tabler:arrow-up" class="ml-3 h-5 w-5 text-white" />
-            </div>
-            <div class="w-62.5 justify-center 2xl:w-75">
-                <span>Rank</span>
-                <Icon icon="tabler:arrow-up" class="ml-3 h-5 w-5 text-white" />
-            </div>
-            <div class="w-62.5 justify-center 2xl:w-75">
-                <span>Administrative Position</span>
-                <Icon icon="tabler:arrow-up" class="ml-3 h-5 w-5 text-white" />
-            </div>
-            {#if canViewChangelogs}
-                <div class="w-50 justify-center"><span>Change Logs</span></div>
-            {/if}
+        
+            <!-- Rows -->
+            {#each facultyRecordList as facultyRecord (facultyRecord.id)}
+                <FacultyRecordRow
+                    {facultyRecord}
+                    {canViewChangelogs}
+                    isSelected={selectedIds.includes(facultyRecord.id)}
+                    onToggle={() => toggleSelection(facultyRecord.id)}
+                />
+            {/each}
         </div>
+    </div>
 
-        <!-- Rows -->
-        {#each facultyRecordList as facultyRecord (facultyRecord.id)}
-            <FacultyRecordRow
-                {facultyRecord}
-                {canViewChangelogs}
-                isSelected={selectedIds.includes(facultyRecord.id)}
-                onToggle={() => toggleSelection(facultyRecord.id)}
-            />
-        {/each}
-
-        <!-- Pagination Controls -->
-        <div class="mt-2 flex justify-center">
-            <div class="flex w-315 items-center justify-between 2xl:w-432">
-                <GreenButton onclick={() => goToPage(false)} type="button" disabled={!hasPrev}>
-                    <Icon icon="line-md:arrow-left-circle" class="mr-2 h-5 w-5" />
-                    <span>Previous</span>
-                </GreenButton>
-                <GreenButton onclick={() => goToPage(true)} type="button" disabled={!hasNext}>
-                    <span>Next</span>
-                    <Icon icon="line-md:arrow-right-circle" class="ml-2 h-5 w-5" />
-                </GreenButton>
-            </div>
+    <!-- Pagination Controls -->
+    <div class="mt-2 flex justify-center">
+        <div class="flex w-315 items-center justify-between 2xl:w-432">
+            <GreenButton onclick={() => goToPage(false)} type="button" disabled={!hasPrev}>
+                <Icon icon="line-md:arrow-left-circle" class="mr-2 h-5 w-5" />
+                <span>Previous</span>
+            </GreenButton>
+            <GreenButton onclick={() => goToPage(true)} type="button" disabled={!hasNext}>
+                <span>Next</span>
+                <Icon icon="line-md:arrow-right-circle" class="ml-2 h-5 w-5" />
+            </GreenButton>
         </div>
     </div>
 </div>
