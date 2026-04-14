@@ -370,7 +370,7 @@ export async function getFacultyServiceRecordReport(
 }
 
 export async function getFacultyLoadingReport(facultyid: number, acadYear: number, semNum: number) {
-    return await db
+    const profileQuery = db
         .select({
             lastName: faculty.lastName,
             firstName: faculty.firstName,
@@ -378,28 +378,6 @@ export async function getFacultyLoadingReport(facultyid: number, acadYear: numbe
             appointmentStatus: facultyRank.appointmentStatus,
             designation: rank.title,
             degree: facultyEducationalAttainment.degree,
-            coursesTaught: sql<string>`STRING_AGG(${course.name}, ', ' ORDER BY ${course.name})`,
-            teachingLoadUnits: sql<number>`COALESCE(sum(${course.units}), 0)`.mapWith(Number),
-            adminPosition: sql<string>`STRING_AGG(${adminPosition.title}, ', ' ORDER BY ${adminPosition.title})`,
-            // Task 14 Fix: Use degreeProgram.isGraduateLevel
-            undergradCredit:
-                sql<number>`COALESCE(SUM(CASE WHEN ${degreeProgram.isGraduateLevel} = false THEN ${facultyCourse.teachingLoadCredit} ELSE 0 END), 0)`.mapWith(
-                    Number,
-                ),
-            gradCredit:
-                sql<number>`COALESCE(SUM(CASE WHEN ${degreeProgram.isGraduateLevel} = true THEN ${facultyCourse.teachingLoadCredit} ELSE 0 END), 0)`.mapWith(
-                    Number,
-                ),
-            administrativeLoadCredit:
-                sql<number>`COALESCE(sum(${facultyAdminPosition.administrativeLoadCredit}), 0) + COALESCE(sum(${facultyCommMembership.administrativeLoadCredit}), 0) + COALESCE(sum(${facultyAdminWork.administrativeLoadCredit}), 0)`.mapWith(
-                    Number,
-                ),
-            teachingLoadCredit:
-                sql<number>`COALESCE(sum(${facultyCourse.teachingLoadCredit}), 0)`.mapWith(Number),
-            researchLoadCredit:
-                sql<number>`COALESCE(sum(${facultyResearch.researchLoadCredit}), 0)`.mapWith(
-                    Number,
-                ),
         })
         .from(faculty)
         .innerJoin(facultyAcademicSemester, eq(faculty.id, facultyAcademicSemester.facultyId))
@@ -407,31 +385,11 @@ export async function getFacultyLoadingReport(facultyid: number, acadYear: numbe
             academicSemester,
             eq(facultyAcademicSemester.academicSemesterId, academicSemester.id),
         )
-        .leftJoin(facultyRank, eq(faculty.id, facultyRank.facultyId))
+        .leftJoin(facultyRank, eq(facultyAcademicSemester.currentRankId, facultyRank.id))
         .leftJoin(rank, eq(facultyRank.rankId, rank.id))
         .leftJoin(
             facultyEducationalAttainment,
-            eq(faculty.id, facultyEducationalAttainment.facultyId),
-        )
-        .leftJoin(
-            facultyCourse,
-            eq(facultyAcademicSemester.id, facultyCourse.facultyAcademicSemesterId),
-        )
-        .leftJoin(course, eq(facultyCourse.courseId, course.id))
-        .leftJoin(degreeProgram, eq(course.degreeProgramId, degreeProgram.id))
-        .leftJoin(
-            facultyAdminPosition,
-            eq(facultyAcademicSemester.id, facultyAdminPosition.facultyAcademicSemesterId),
-        )
-        .leftJoin(adminPosition, eq(facultyAdminPosition.adminPositionId, adminPosition.id))
-        .leftJoin(facultyCommMembership, eq(facultyAcademicSemester.id, facultyCommMembership.facultyAcademicSemesterId))
-        .leftJoin(
-            facultyAdminWork,
-            eq(facultyAcademicSemester.id, facultyAdminWork.facultyAcademicSemesterId),
-        )
-        .leftJoin(
-            facultyResearch,
-            eq(facultyAcademicSemester.id, facultyResearch.facultyAcademicSemesterId),
+            eq(facultyAcademicSemester.currentHighestEducationalAttainmentId, facultyEducationalAttainment.id),
         )
         .where(
             and(
@@ -440,14 +398,161 @@ export async function getFacultyLoadingReport(facultyid: number, acadYear: numbe
                 eq(academicSemester.semesterNumber, semNum),
             ),
         )
-        .groupBy(
-            faculty.lastName,
-            faculty.firstName,
-            faculty.middleName,
-            facultyRank.appointmentStatus,
-            rank.title,
-            facultyEducationalAttainment.degree,
-        );
+        .limit(1);
+    
+    const coursesQuery = db
+        .select({
+            coursesTaught: sql<string>`STRING_AGG(${course.name}, ', ' ORDER BY ${course.name})`,
+            teachingLoadUnits: sql<number>`COALESCE(sum(${course.units}), 0)`.mapWith(Number),
+            undergradCredit:
+                sql<number>`COALESCE(SUM(CASE WHEN ${degreeProgram.isGraduateLevel} = false THEN ${facultyCourse.teachingLoadCredit} ELSE 0 END), 0)`.mapWith(
+                    Number,
+                ),
+            gradCredit:
+                sql<number>`COALESCE(SUM(CASE WHEN ${degreeProgram.isGraduateLevel} = true THEN ${facultyCourse.teachingLoadCredit} ELSE 0 END), 0)`.mapWith(
+                    Number,
+                ),
+        })
+        .from(facultyAcademicSemester)
+        .innerJoin(
+            academicSemester,
+            eq(facultyAcademicSemester.academicSemesterId, academicSemester.id),
+        )
+        .leftJoin(
+            facultyCourse,
+            eq(facultyAcademicSemester.id, facultyCourse.facultyAcademicSemesterId),
+        )
+        .leftJoin(course, eq(facultyCourse.courseId, course.id))
+        .leftJoin(degreeProgram, eq(course.degreeProgramId, degreeProgram.id))
+        .where(
+            and(
+                eq(facultyAcademicSemester.facultyId, facultyid),
+                eq(academicSemester.academicYear, acadYear),
+                eq(academicSemester.semesterNumber, semNum),
+            ),
+        )
+        .limit(1);
+    
+    const adminPositionsQuery = db
+        .select({
+            administrativeLoadCredit:
+                sql<number>`COALESCE(sum(${facultyAdminPosition.administrativeLoadCredit}), 0)`.mapWith(
+                    Number,
+                ),
+            adminPositions: sql<string>`STRING_AGG(${adminPosition.title}, ', ' ORDER BY ${adminPosition.title})`,
+        })
+        .from(facultyAcademicSemester)
+        .innerJoin(
+            academicSemester,
+            eq(facultyAcademicSemester.academicSemesterId, academicSemester.id),
+        )
+        .leftJoin(
+            facultyAdminPosition,
+            eq(facultyAcademicSemester.id, facultyAdminPosition.facultyAcademicSemesterId),
+        )
+        .leftJoin(adminPosition, eq(facultyAdminPosition.adminPositionId, adminPosition.id))
+        .where(
+            and(
+                eq(facultyAcademicSemester.facultyId, facultyid),
+                eq(academicSemester.academicYear, acadYear),
+                eq(academicSemester.semesterNumber, semNum),
+            ),
+        )
+        .limit(1);
+
+    const commMembershipsQuery = db
+        .select({
+            administrativeLoadCredit:
+                sql<number>`COALESCE(sum(${facultyCommMembership.administrativeLoadCredit}), 0)`.mapWith(
+                    Number,
+                ),
+        })
+        .from(facultyAcademicSemester)
+        .innerJoin(
+            academicSemester,
+            eq(facultyAcademicSemester.academicSemesterId, academicSemester.id),
+        )
+        .leftJoin(facultyCommMembership, eq(facultyAcademicSemester.id, facultyCommMembership.facultyAcademicSemesterId))
+        .where(
+            and(
+                eq(facultyAcademicSemester.facultyId, facultyid),
+                eq(academicSemester.academicYear, acadYear),
+                eq(academicSemester.semesterNumber, semNum),
+            ),
+        )
+        .limit(1);
+        
+    const adminWorksQuery = db
+        .select({
+            administrativeLoadCredit:
+                sql<number>`COALESCE(sum(${facultyAdminWork.administrativeLoadCredit}), 0)`.mapWith(
+                    Number,
+                ),
+        })
+        .from(facultyAcademicSemester)
+        .innerJoin(
+            academicSemester,
+            eq(facultyAcademicSemester.academicSemesterId, academicSemester.id),
+        )
+        .leftJoin(
+            facultyAdminWork,
+            eq(facultyAcademicSemester.id, facultyAdminWork.facultyAcademicSemesterId),
+        )
+        .where(
+            and(
+                eq(facultyAcademicSemester.facultyId, facultyid),
+                eq(academicSemester.academicYear, acadYear),
+                eq(academicSemester.semesterNumber, semNum),
+            ),
+        )
+        .limit(1);
+    
+    const researchQuery = db
+        .select({
+            researchLoadCredit:
+                sql<number>`COALESCE(sum(${facultyResearch.researchLoadCredit}), 0)`.mapWith(
+                    Number,
+                ),
+        })
+        .from(facultyAcademicSemester)
+        .innerJoin(
+            academicSemester,
+            eq(facultyAcademicSemester.academicSemesterId, academicSemester.id),
+        )
+        .leftJoin(
+            facultyResearch,
+            eq(facultyAcademicSemester.id, facultyResearch.facultyAcademicSemesterId),
+        )
+        .where(
+            and(
+                eq(facultyAcademicSemester.facultyId, facultyid),
+                eq(academicSemester.academicYear, acadYear),
+                eq(academicSemester.semesterNumber, semNum),
+            ),
+        )
+        .limit(1);
+    
+    const [[profile], [courses], [adminPositions], [commMemberships], [adminWorks], [research]] = await Promise.all([
+        profileQuery,
+        coursesQuery,
+        adminPositionsQuery,
+        commMembershipsQuery,
+        adminWorksQuery,
+        researchQuery
+    ]);
+
+    const administrativeLoadCredit =
+        (adminPositions?.administrativeLoadCredit ?? 0)
+        + (commMemberships?.administrativeLoadCredit ?? 0)
+        + (adminWorks?.administrativeLoadCredit ?? 0)
+
+    return {
+        ...profile,
+        ...courses,
+        administrativeLoadCredit,
+        adminPositions: adminPositions?.adminPositions,
+        ...research,
+    }
 }
 
 export async function getSubjectsByFacultyReport(
