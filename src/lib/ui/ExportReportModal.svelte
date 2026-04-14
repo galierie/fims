@@ -83,8 +83,6 @@
     let selectedDownloads: Download[] = $state([]);
 
     async function handleExport() {
-        step = 2;
-
         const links = [];
         const allFacIds = selectedFaculty.map((f) => f.facultyid || f.id).join(',');
 
@@ -525,6 +523,7 @@
                 <GreenButton
                     onclick={async () => {
                         selectedDownloads = await handleExport();
+                        step = 2;
                     }}
                     disabled={isExportDisabled}
                 >
