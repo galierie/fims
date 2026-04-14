@@ -50,9 +50,12 @@ export async function getSubjectsByFacultyWorksheet(
     semNum: number,
 ) {
     const sheetName = 'By Faculty, Subjects Taught';
-    const data = await Promise.all(
+    const rawData = await Promise.all(
         facultyIds.map((id) => getSubjectsByFacultyReport(id, acadYear, semNum)),
     );
+    const data = rawData.filter(datum => datum !== null);
+
+    if (data.length === 0) return null;
 
     // Create Workbook
     const workbook = new ExcelJS.Workbook();

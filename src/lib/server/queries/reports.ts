@@ -98,7 +98,7 @@ export async function getFacultyProfileReport(facultyid: number) {
         profileQuery,
         educationalAttainmentsQuery,
     ]);
-    return [{ ...profile, ...educationalAttainments }];
+    return (typeof profile === 'undefined') ? null : { ...profile, ...educationalAttainments };
 }
 
 export async function getFacultyServiceRecordReport(
@@ -143,6 +143,9 @@ export async function getFacultyServiceRecordReport(
             ),
         )
         .as('existing_facultyAcademicSemester_sq');
+
+    const [existingFacultyAcademicSemester] = await db.select().from(existingFacultyAcademicSemesterSq).limit(1);
+    if (typeof existingFacultyAcademicSemester === 'undefined') return null;
 
     const profileQuery = db
         .select({
@@ -575,6 +578,8 @@ export async function getFacultyLoadingReport(facultyid: number, acadYear: numbe
             researchQuery,
         ]);
 
+    if (typeof profile === 'undefined') return null;
+
     const administrativeLoadCredit =
         (adminPositions?.administrativeLoadCredit ?? 0) +
         (commMemberships?.administrativeLoadCredit ?? 0) +
@@ -631,7 +636,7 @@ export async function getSubjectsByFacultyReport(
 
     const [[name], courses] = await Promise.all([nameQuery, coursesQuery]);
 
-    return { name, courses };
+    return (typeof name === 'undefined') ? null : { name, courses };
 }
 
 export async function getFacultyBySubjectReport() {
@@ -703,7 +708,7 @@ export async function getFacultySETReport(facultyid: number, acadYear: number) {
         midyearCoursesQuery,
     ]);
 
-    return {
+    return (typeof facultyInfo === 'undefined') ? null : {
         facultyInfo,
         semestralCoursesInfo: [firstSemCourses, secondSemCourses, midyearCourses],
     };

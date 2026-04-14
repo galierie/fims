@@ -50,6 +50,16 @@ export async function getFacultyServiceRecordWorksheet(
     toAcadYear: number,
     toSemNum: number,
 ) {
+    const data = await getFacultyServiceRecordReport(
+        facultyid,
+        fromAcadYear,
+        fromSemNum,
+        toAcadYear,
+        toSemNum,
+    );
+
+    if (data === null) return null;
+
     const {
         profile,
         originalTenure,
@@ -62,13 +72,8 @@ export async function getFacultyServiceRecordWorksheet(
         currentAdminWorks,
         currentResearch,
         currentMentoring,
-    } = await getFacultyServiceRecordReport(
-        facultyid,
-        fromAcadYear,
-        fromSemNum,
-        toAcadYear,
-        toSemNum,
-    );
+    } = data;
+
     const sheetName = `SR - ${profile[0].lastName}`.substring(0, 31);
 
     // Create Workbook

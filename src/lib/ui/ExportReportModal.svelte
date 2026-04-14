@@ -75,7 +75,16 @@
             : `AY${startAy}_Sem${startSem}-AY${endAy}_Sem${endSem}`,
     );
 
-    const selectedDownloads = $derived.by(() => {
+    interface Download {
+        name: string;
+        url: string;
+    }
+
+    let selectedDownloads: Download[] = $state([]);
+
+    async function handleExport() {
+        step = 2;
+
         const links = [];
         const allFacIds = selectedFaculty.map((f) => f.facultyid || f.id).join(',');
 
@@ -150,7 +159,7 @@
                     const fileName = `By_Subject_Faculty_Taught`;
                     links.push({
                         name: fileName,
-                        url: `/api/export?types=faculty-by-subject&facultyIds=${allFacIds}&${baseParams}&fileName=${fileName}`,
+                        url: `/api/export?types=faculty-by-subject&fileName=${fileName}`,
                     });
                 }
                 if (exportByFacSubj) {
@@ -161,12 +170,22 @@
                     });
                 }
             }
-        
-        return links;
-    });
 
-    function handleExport() {
-        step = 2;
+        // Return only working links
+        const nullableDownloads = await Promise.all(links.map(
+            async download => {
+                try {
+                    const response = await fetch(download.url, { method: 'HEAD' });
+                    return (response.ok) ? download : null;
+                } catch {
+                    return null;
+                }
+            }
+        ));
+
+        const workingLinks = nullableDownloads.filter(download => download !== null);
+
+        return workingLinks;
     }
 
     function handleDownloadAll() {
@@ -505,7 +524,7 @@
                     class="rounded-3xl border-2 border-fims-green px-7 py-2 font-medium text-fims-green transition-all hover:opacity-70 active:scale-95"
                     onclick={onCancel}>Cancel</button
                 >
-                <GreenButton onclick={handleExport} disabled={isExportDisabled}>
+                <GreenButton onclick={async () => { selectedDownloads = await handleExport() }} disabled={isExportDisabled}>
                     <Icon icon="tabler:file-export" class="mr-2 h-5 w-5" />
                     <span>Export</span>
                 </GreenButton>
@@ -529,6 +548,14 @@
                             <Icon icon="tabler:download" class="h-5 w-5" />
                             <span>Download</span>
                         </a>
+                    </div>
+                {:else}
+                    <div
+                        class="flex items-center justify-between rounded-xl border-fims-red border-2 bg-fims-red-50 p-4"
+                    >
+                        <span class="font-medium break-all text-fims-red"
+                            >There are no available spreadsheets for download.</span
+                        >
                     </div>
                 {/each}
             </div>
