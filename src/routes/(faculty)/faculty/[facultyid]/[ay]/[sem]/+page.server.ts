@@ -1,32 +1,23 @@
 import { error, fail } from '@sveltejs/kit';
 
 import type { ChangelogRecordStructure } from '$lib/ui/ChangelogList.svelte';
-import {
-    getAllAdminPositions,
-    getAllCourses,
-    getAllFacultyAcademicSemesters,
-    getAllOffices,
-    getAllResearches,
-    getAllSemesterms,
-    getFacultyEducationalAttainments,
-    getFacultyPromotionHistory,
-    getFacultySemestralRecords,
-} from '$lib/server/queries/faculty-view';
+import { getAllAdminPositions, getAllCourses, getAllFacultyAcademicSemesters, getAllOffices, getAllResearches, getAllSemesterms, getFacultyEducationalAttainments, getFacultyPromotionHistory, getFacultySemestralRecords } from '$lib/server/queries/faculty-view';
 import { getFacultyRecordChangelogs } from '$lib/server/queries/faculty-list.js';
-import { updateSemestralRecords } from '$lib/server/queries/db-helpers';
+import { getUserPermissions, updateSemestralRecords } from '$lib/server/queries/db-helpers';
 
-export async function load({ params, parent }) {
-    const layoutData = await parent();
+export async function load({ params, locals }) {
     const { facultyid: facultyidStr, ay: acadYearStr, sem: semNumStr } = params;
 
     const facultyid = parseInt(facultyidStr, 10);
     const acadYear = parseInt(acadYearStr, 10);
     const semNum = parseInt(semNumStr, 10);
 
+    const permissions = await getUserPermissions(locals.user.id);
+    const canViewChangelogs = permissions?.canViewChangelogs ?? false;
+
     let fetchedChangelogs: ChangelogRecordStructure[] | null = null;
 
-    if (layoutData.canViewChangelogs)
-        fetchedChangelogs = await getFacultyRecordChangelogs(facultyid, 3, 0);
+    if (canViewChangelogs) fetchedChangelogs = await getFacultyRecordChangelogs(facultyid, 3, 0);
 
     // Validate parameters
     if (Number.isNaN(facultyid)) throw error(400, { message: 'Invalid record identifier.' });
@@ -105,11 +96,16 @@ export async function load({ params, parent }) {
         opts,
         dependencyMaps,
         fetchedChangelogs,
+        canViewChangelogs,
     };
 }
 
 export const actions = {
-    async update({ request, params }) {
+    async update({ request, params, locals }) {
+        const permissions = await getUserPermissions(locals.user.id);
+        if (!permissions?.canModifyFaculty)
+            return fail(403, { error: 'Insufficient permissions.' });
+
         const formData = await request.formData();
 
         // Extract URL parameters

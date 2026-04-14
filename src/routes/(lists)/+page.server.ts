@@ -1,7 +1,7 @@
 import { fail } from '@sveltejs/kit';
 
 import { adminPosition, faculty, rank } from '$lib/server/db/schema';
-import { deleteFacultyRecords } from '$lib/server/queries/db-helpers';
+import { deleteFacultyRecords, getUserPermissions } from '$lib/server/queries/db-helpers';
 import type { FilterColumn, FilterObject } from '$lib/types/filter';
 import {
     getAllAdminPositions,
@@ -11,7 +11,11 @@ import {
     refreshFacultyRecordSearchView,
 } from '$lib/server/queries/faculty-list';
 
-export async function load({ url }) {
+export async function load({ url, locals }) {
+    const permissions = await getUserPermissions(locals.user.id);
+    const canViewAccounts = permissions?.canAddAccount || permissions?.canModifyAccount || false;
+    const canViewChangelogs = permissions?.canViewChangelogs ?? false;
+
     // Extract queries
 
     // Cursor and Direction
@@ -81,10 +85,17 @@ export async function load({ url }) {
         hasNext,
         filters,
         searchTerm, // We send this back to the UI
+        canViewAccounts, // Added here
+        canViewChangelogs, // Added here
     };
 }
 export const actions = {
     async delete({ locals, request }) {
+        // Security Guard
+        const permissions = await getUserPermissions(locals.user.id);
+        if (!permissions?.canModifyFaculty)
+            return fail(403, { error: 'Insufficient permissions.' });
+
         const formData = await request.formData();
         const idsString = formData.get('ids') as string;
 

@@ -1,14 +1,13 @@
-import { fail, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 
-import { createFacultyProfileRecords } from '$lib/server/queries/db-helpers';
-import {
-    getAllAppointmentStatuses,
-    getAllFieldsOfInterest,
-    getAllRanks,
-} from '$lib/server/queries/faculty-view';
+import { createFacultyProfileRecords, getUserPermissions } from '$lib/server/queries/db-helpers';
+import { getAllAppointmentStatuses, getAllFieldsOfInterest, getAllRanks } from '$lib/server/queries/faculty-view';
 import { refreshFacultyRecordSearchView } from '$lib/server/queries/faculty-list';
 
-export async function load() {
+export async function load({ locals }) {
+    const permissions = await getUserPermissions(locals.user.id);
+    if (!permissions?.canAddFaculty) throw error(403, { message: 'Insufficient permissions.' });
+
     // Get input dropdown options and dependency mappings
     const opts: Map<string, Array<string>> = new Map();
     const dependencyMaps: Map<string, Map<string, string>> = new Map();
@@ -37,7 +36,10 @@ export async function load() {
 
 export const actions = {
     // Renamed to 'create' to match dynamic form action
-    async create({ request }) {
+    async create({ request, locals }) {
+        const permissions = await getUserPermissions(locals.user.id);
+        if (!permissions?.canAddFaculty) return fail(403, { error: 'Insufficient permissions.' });
+
         const formData = await request.formData();
 
         // Extract fields
@@ -56,7 +58,7 @@ export const actions = {
 
         const getDateVal = (key: string) => {
             const val = getVal(key);
-            return val ? new Date(val as string) : new Date(); 
+            return val ? new Date(val as string) : new Date();
         };
 
         const mapBiologicalSex = (val: string | null | undefined) => {
@@ -64,7 +66,7 @@ export const actions = {
             if (val === 'Female') return 'F';
             if (val === 'Intersex') return 'I';
             if (val === 'Unknown') return 'U';
-            return val; 
+            return val;
         };
 
         const basicProfile = {
@@ -74,7 +76,7 @@ export const actions = {
             suffix: getVal('suffix') || null,
             birthDate: getDateVal('birth-date'),
             maidenName: getVal('maiden-name') || null,
-            biologicalSex: mapBiologicalSex(getVal('biological-sex')), 
+            biologicalSex: mapBiologicalSex(getVal('biological-sex')),
             status: getVal('status') || null,
             dateOfOriginalAppointment: getDateVal('date-of-original-appointment'),
             remarks: getVal('remarks') || null,

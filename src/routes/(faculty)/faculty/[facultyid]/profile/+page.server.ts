@@ -1,22 +1,16 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 
 import type { ChangelogRecordStructure } from '$lib/ui/ChangelogList.svelte';
-import { deleteFacultyRecords, updateFacultyProfileRecords } from '$lib/server/queries/db-helpers';
-import {
-    getAllAppointmentStatuses,
-    getAllFieldsOfInterest,
-    getAllRanks,
-    getFacultyProfile,
-} from '$lib/server/queries/faculty-view';
-import {
-    getFacultyRecordChangelogs,
-    refreshFacultyRecordSearchView,
-} from '$lib/server/queries/faculty-list';
+import { deleteFacultyRecords, getUserPermissions, updateFacultyProfileRecords } from '$lib/server/queries/db-helpers';
+import { getAllAppointmentStatuses, getAllFieldsOfInterest, getAllRanks, getFacultyProfile } from '$lib/server/queries/faculty-view';
+import { getFacultyRecordChangelogs, refreshFacultyRecordSearchView } from '$lib/server/queries/faculty-list';
 
-export async function load({ params, parent }) {
-    const layoutData = await parent();
+export async function load({ params, locals }) {
     const { facultyid: facultyidStr } = params;
     const facultyid = parseInt(facultyidStr, 10);
+
+    const permissions = await getUserPermissions(locals.user.id);
+    const canViewChangelogs = permissions?.canViewChangelogs ?? false;
 
     let fetchedChangelogs: ChangelogRecordStructure[] | null = null;
 
@@ -29,9 +23,8 @@ export async function load({ params, parent }) {
     if (profile === null) throw error(400, { message: 'No record found.' });
 
     //get changelogs if possible
-    if (layoutData.canViewChangelogs) {
+    if (canViewChangelogs) {
         fetchedChangelogs = await getFacultyRecordChangelogs(facultyid, 3, 0);
-        console.log(fetchedChangelogs);
     }
 
     // Get input dropdown options and dependency mappings
@@ -57,11 +50,15 @@ export async function load({ params, parent }) {
     );
     dependencyMaps.set('rankTitlesToSalaryRates', rankTitlesToSalaryRates);
 
-    return { profile, opts, dependencyMaps, fetchedChangelogs };
+    return { profile, opts, dependencyMaps, fetchedChangelogs, canViewChangelogs };
 }
 
 export const actions = {
     async delete({ locals, request }) {
+        const permissions = await getUserPermissions(locals.user.id);
+        if (!permissions?.canModifyFaculty)
+            return fail(403, { error: 'Insufficient permissions.' });
+
         const formData = await request.formData();
         const facultyidStr = formData.get('facultyid') as string;
         const facultyid = parseInt(facultyidStr, 10);
@@ -75,6 +72,10 @@ export const actions = {
     },
 
     async update({ locals, request, params }) {
+        const permissions = await getUserPermissions(locals.user.id);
+        if (!permissions?.canModifyFaculty)
+            return fail(403, { error: 'Insufficient permissions.' });
+
         const formData = await request.formData();
         const facultyidStr = params.facultyid;
         const facultyid = parseInt(facultyidStr, 10);
@@ -97,14 +98,14 @@ export const actions = {
 
         const getDateVal = (key: string) => {
             const val = getVal(key);
-            return val ? new Date(val as string) : new Date(); 
+            return val ? new Date(val as string) : new Date();
         };
         const mapBiologicalSex = (val: string | null | undefined) => {
             if (val === 'Male') return 'M';
             if (val === 'Female') return 'F';
             if (val === 'Intersex') return 'I';
             if (val === 'Unknown') return 'U';
-            return val; 
+            return val;
         };
 
         const basicProfile = {
@@ -114,7 +115,7 @@ export const actions = {
             suffix: getVal('suffix') || null,
             birthDate: getDateVal('birth-date'),
             maidenName: getVal('maiden-name') || null,
-            biologicalSex: mapBiologicalSex(getVal('biological-sex')), 
+            biologicalSex: mapBiologicalSex(getVal('biological-sex')),
             status: getVal('status') || null,
             dateOfOriginalAppointment: getDateVal('date-of-original-appointment'),
             remarks: getVal('remarks') || null,

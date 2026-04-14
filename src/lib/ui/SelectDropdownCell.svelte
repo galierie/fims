@@ -8,7 +8,7 @@
         defaultSelectedOpt: string | null;
         isEditable: boolean;
         hasChange?: boolean;
-        isRequired?: boolean; 
+        isRequired?: boolean;
         isCombobox?: boolean;
     }
 
@@ -19,7 +19,7 @@
         defaultSelectedOpt,
         isEditable,
         hasChange = $bindable(),
-        isRequired = false, 
+        isRequired = false,
         isCombobox = false,
     }: Props = $props();
 
@@ -39,12 +39,12 @@
                     class="h-full w-full border-0 bg-transparent px-0 pl-1 focus:ring-0"
                     bind:value={selectedOpt}
                     placeholder={defaultSelectedOpt !== '-' ? defaultSelectedOpt : ''}
-                    onclick={() => isDropdownOpen = true}
+                    onclick={() => (isDropdownOpen = true)}
                 />
                 <button
                     type="button"
                     class="absolute right-1 h-full w-4"
-                    onclick={() => isDropdownOpen = !isDropdownOpen}
+                    onclick={() => (isDropdownOpen = !isDropdownOpen)}
                     tabindex="-1"
                 >
                     <Icon
@@ -78,7 +78,7 @@
         <div
             class="rounded-lg p-1 {isDropdownOpen
                 ? 'block'
-                : 'hidden'} absolute z-50 w-full max-h-60 overflow-y-auto bg-white shadow-lg"
+                : 'hidden'} absolute z-50 max-h-60 w-full overflow-y-auto bg-white shadow-lg"
         >
             {#each opts as opt (opt)}
                 {#if opt === selectedOpt}
@@ -110,11 +110,11 @@
         </div>
     {/if}
 
-    <input 
-        type="text" 
-        {name} 
-        value={(!selectedOpt || selectedOpt === '-') ? defaultSelectedOpt : selectedOpt} 
-        class="pointer-events-none absolute bottom-0 left-0 -z-10 h-0 w-full opacity-0" 
+    <input
+        type="text"
+        {name}
+        value={!selectedOpt || selectedOpt === '-' ? defaultSelectedOpt : selectedOpt}
+        class="pointer-events-none absolute bottom-0 left-0 -z-10 h-0 w-full opacity-0"
         required={isRequired}
         tabindex="-1"
     />

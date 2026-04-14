@@ -201,20 +201,21 @@ export async function updateFacultyProfileRecords(
 
         // Process Tables with Foreign Keys (Dropdowns)
         const dbFieldsOfInterest = await db.select().from(fieldOfInterest);
-        
-        const allProvidedFields = [
-            ...dynamicTables.fieldsOfInterest.create, 
-            ...dynamicTables.fieldsOfInterest.update
-        ]
-            .map(f => f['fields-of-interest'])
-            .filter(f => f && f.trim() !== '');
 
-        const existingFieldNames = new Set(dbFieldsOfInterest.map(f => f.field));
-        const newFields = [...new Set(allProvidedFields)].filter(f => !existingFieldNames.has(f));
+        const allProvidedFields = [
+            ...dynamicTables.fieldsOfInterest.create,
+            ...dynamicTables.fieldsOfInterest.update,
+        ]
+            .map((f) => f['fields-of-interest'])
+            .filter((f) => f && f.trim() !== '');
+
+        const existingFieldNames = new Set(dbFieldsOfInterest.map((f) => f.field));
+        const newFields = [...new Set(allProvidedFields)].filter((f) => !existingFieldNames.has(f));
 
         if (newFields.length > 0) {
-            const insertedFields = await db.insert(fieldOfInterest)
-                .values(newFields.map(f => ({ field: f })))
+            const insertedFields = await db
+                .insert(fieldOfInterest)
+                .values(newFields.map((f) => ({ field: f })))
                 .returning();
             dbFieldsOfInterest.push(...insertedFields);
         }
@@ -234,7 +235,8 @@ export async function updateFacultyProfileRecords(
         const getRankId = (rankTitle: string) =>
             dbRanks.find((r) => r.title === rankTitle)?.id || null;
 
-        const parseDate = (val: any) => (typeof val === 'string' && val.trim() !== '' ? new Date(val) : new Date());
+        const parseDate = (val: any) =>
+            typeof val === 'string' && val.trim() !== '' ? new Date(val) : new Date();
 
         await processDynamicTable(
             facultyRank,
@@ -255,7 +257,7 @@ export async function updateFacultyProfileRecords(
 
         return { success: true };
     } catch (error) {
-        console.error('DB ERROR IN UPDATE:', error); 
+        console.error('DB ERROR IN UPDATE:', error);
         return { success: false };
     }
 }
@@ -317,18 +319,19 @@ export async function createFacultyProfileRecords(basicProfile: any, dynamicTabl
         const dbFieldsOfInterest = await db.select().from(fieldOfInterest);
 
         const allProvidedFields = [
-            ...dynamicTables.fieldsOfInterest.create, 
-            ...dynamicTables.fieldsOfInterest.update
+            ...dynamicTables.fieldsOfInterest.create,
+            ...dynamicTables.fieldsOfInterest.update,
         ]
-            .map(f => f['fields-of-interest'])
-            .filter(f => f && f.trim() !== '');
+            .map((f) => f['fields-of-interest'])
+            .filter((f) => f && f.trim() !== '');
 
-        const existingFieldNames = new Set(dbFieldsOfInterest.map(f => f.field));
-        const newFields = [...new Set(allProvidedFields)].filter(f => !existingFieldNames.has(f));
-        
+        const existingFieldNames = new Set(dbFieldsOfInterest.map((f) => f.field));
+        const newFields = [...new Set(allProvidedFields)].filter((f) => !existingFieldNames.has(f));
+
         if (newFields.length > 0) {
-            const insertedFields = await db.insert(fieldOfInterest)
-                .values(newFields.map(f => ({ field: f })))
+            const insertedFields = await db
+                .insert(fieldOfInterest)
+                .values(newFields.map((f) => ({ field: f })))
                 .returning();
             dbFieldsOfInterest.push(...insertedFields);
         }
@@ -349,7 +352,8 @@ export async function createFacultyProfileRecords(basicProfile: any, dynamicTabl
             return dbRanks.find((r) => r.title === rankTitle)?.id ?? null;
         }
 
-        const parseDate = (val: any) => (typeof val === 'string' && val.trim() !== '' ? new Date(val) : new Date());
+        const parseDate = (val: any) =>
+            typeof val === 'string' && val.trim() !== '' ? new Date(val) : new Date();
 
         await processDynamicTable(
             facultyRank,
@@ -706,4 +710,10 @@ export async function updateSemestralRecords(
     } catch {
         return { success: false };
     }
+}
+
+export async function getUserPermissions(userId: string) {
+    const userRole = await getRole(userId);
+    if (!userRole) return null;
+    return await getPermissions(userRole);
 }

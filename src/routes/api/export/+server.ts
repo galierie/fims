@@ -94,7 +94,8 @@ export async function GET({ url, locals }: RequestEvent) {
                             // Convert 2023 to 23 to save tab space
                             const shortAy = ay.toString().slice(-2);
                             const shortNextAy = (ay + 1).toString().slice(-2);
-                            if (sheet) sheet.sheetName = `Loading AY${shortAy}-${shortNextAy} S${sem}`;
+                            if (sheet)
+                                sheet.sheetName = `Loading AY${shortAy}-${shortNextAy} S${sem}`;
                             return sheet;
                         }),
                     );
@@ -114,7 +115,8 @@ export async function GET({ url, locals }: RequestEvent) {
                         getSubjectsByFacultyWorksheet(facultyIds, ay, sem).then((sheet) => {
                             const shortAy = ay.toString().slice(-2);
                             const shortNextAy = (ay + 1).toString().slice(-2);
-                            if (sheet) sheet.sheetName = `Subj by Fac AY${shortAy}-${shortNextAy} S${sem}`;
+                            if (sheet)
+                                sheet.sheetName = `Subj by Fac AY${shortAy}-${shortNextAy} S${sem}`;
                             return sheet;
                         }),
                     );
@@ -147,7 +149,7 @@ export async function GET({ url, locals }: RequestEvent) {
             const clone = workbook.addWorksheet(finalSheetName);
             clone.model = model;
             clone.name = finalSheetName;
-            model.merges.forEach(range => clone.mergeCells(range));
+            model.merges.forEach((range) => clone.mergeCells(range));
             addedSheets++;
         });
 

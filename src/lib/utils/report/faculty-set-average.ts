@@ -67,9 +67,9 @@ export async function getFacultySETAverageWorksheet(facultyIds: number[], acadYe
     titleCell.font = { bold: true };
 
     // Widen all columns
-    for (let i = 1; i <= constantHeaderCellValues.length; i++) {
+    for (let i = 1; i <= constantHeaderCellValues.length; i++) 
         sheet.getColumn(i).width = 20;
-    }
+    
 
     // Set data cells
     let row = dataStartRow;
