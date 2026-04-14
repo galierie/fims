@@ -16,7 +16,6 @@ export async function load({ locals, url }) {
         return {
             isLoggedIn: true, // if it's not, then this line shouldn't have been reached
             email: locals.user.email,
-            isViewingRecord: url.pathname.startsWith('/record'),
             accountColor: accountColorMap.get(userRole),
         };
     }
@@ -25,7 +24,6 @@ export async function load({ locals, url }) {
     else
         return {
             isLoggedIn: false,
-            isViewingRecord: false,
             email: '',
             accountColor: '',
         };
