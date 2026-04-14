@@ -184,7 +184,7 @@ export async function getFacultyServiceRecordReport(
         .where(eq(facultyFieldOfInterest.facultyId, facultyid))
         .groupBy(facultyFieldOfInterest.facultyId);
 
-    const currentTeachingLoadQuery = db
+    const currentCoursesTaughtQuery = db
         .select({
             academicSemesterId: existingFacultyAcademicSemesterSq.academicSemesterId,
             currentCoursesTaught: sql<string>`STRING_AGG(${course.name}, ', ' ORDER BY ${course.name})`,
@@ -204,17 +204,14 @@ export async function getFacultyServiceRecordReport(
         .leftJoin(course, eq(facultyCourse.courseId, course.id))
         .groupBy(existingFacultyAcademicSemesterSq.academicSemesterId);
 
-    const currentAdministrativeLoadQuery = db
+    const currentAdminPositionsQuery = db
         .select({
             academicSemesterId: existingFacultyAcademicSemesterSq.academicSemesterId,
             administrativeLoadCredit:
-                sql<number>`COALESCE(sum(${facultyAdminPosition.administrativeLoadCredit}), 0) + COALESCE(sum(${facultyCommMembership.administrativeLoadCredit}), 0) + COALESCE(sum(${facultyAdminWork.administrativeLoadCredit}), 0)`.mapWith(
+                sql<number>`COALESCE(sum(${facultyAdminPosition.administrativeLoadCredit}), 0)`.mapWith(
                     Number,
                 ),
-            currentAdminPositions: sql<string>`STRING_AGG(${adminPosition.title}, ', ' ORDER BY ${asc(adminPosition.title)})`,
-            // Task 11 fixes: Actually fetch the text for the Excel rows
-            additionalAssignments: sql<string>`STRING_AGG(${facultyAdminWork.natureOfWork}, ', ')`,
-            committeeMemberships: sql<string>`STRING_AGG(${facultyCommMembership.committee}, ', ')`,
+            currentAdminPositions: sql<string>`COALESCE(STRING_AGG(DISTINCT ${adminPosition.title}, ', ' ORDER BY ${asc(adminPosition.title)}), '')`,
         })
         .from(existingFacultyAcademicSemesterSq)
         .leftJoin(
@@ -225,6 +222,18 @@ export async function getFacultyServiceRecordReport(
             ),
         )
         .leftJoin(adminPosition, eq(facultyAdminPosition.adminPositionId, adminPosition.id))
+        .groupBy(existingFacultyAcademicSemesterSq.academicSemesterId);
+
+    const currentCommMembershipsQuery = db
+        .select({
+            academicSemesterId: existingFacultyAcademicSemesterSq.academicSemesterId,
+            administrativeLoadCredit:
+                sql<number>`COALESCE(sum(${facultyCommMembership.administrativeLoadCredit}), 0)`.mapWith(
+                    Number,
+                ),
+            committeeMemberships: sql<string>`COALESCE(STRING_AGG(${facultyCommMembership.committee}, ', '), '')`,
+        })
+        .from(existingFacultyAcademicSemesterSq)
         .leftJoin(
             facultyCommMembership,
             eq(
@@ -232,6 +241,18 @@ export async function getFacultyServiceRecordReport(
                 facultyCommMembership.facultyAcademicSemesterId,
             ),
         )
+        .groupBy(existingFacultyAcademicSemesterSq.academicSemesterId);
+
+    const currentAdminWorksQuery = db
+        .select({
+            academicSemesterId: existingFacultyAcademicSemesterSq.academicSemesterId,
+            administrativeLoadCredit:
+                sql<number>`COALESCE(sum(${facultyAdminWork.administrativeLoadCredit}), 0)`.mapWith(
+                    Number,
+                ),
+            additionalAssignments: sql<string>`COALESCE(STRING_AGG(DISTINCT ${facultyAdminWork.natureOfWork}, ', '), '')`,
+        })
+        .from(existingFacultyAcademicSemesterSq)
         .leftJoin(
             facultyAdminWork,
             eq(
@@ -241,7 +262,7 @@ export async function getFacultyServiceRecordReport(
         )
         .groupBy(existingFacultyAcademicSemesterSq.academicSemesterId);
 
-    const currentResearchLoadQuery = db
+    const currentResearchQuery = db
         .select({
             academicSemesterId: existingFacultyAcademicSemesterSq.academicSemesterId,
             researchLoadCredit:
@@ -302,9 +323,11 @@ export async function getFacultyServiceRecordReport(
         adminPositions,
         fieldsOfInterest,
         semestralRecords,
-        currentTeachingLoad,
-        currentAdministrativeLoad,
-        currentResearchLoad,
+        currentCoursesTaught,
+        currentAdminPositions,
+        currentCommMemberships,
+        currentAdminWorks,
+        currentResearch,
         currentMentoring,
     ] = await Promise.all([
         profileQuery,
@@ -312,9 +335,11 @@ export async function getFacultyServiceRecordReport(
         adminPositionsQuery,
         fieldsOfInterestQuery,
         semestralRecordsQuery,
-        currentTeachingLoadQuery,
-        currentAdministrativeLoadQuery,
-        currentResearchLoadQuery,
+        currentCoursesTaughtQuery,
+        currentAdminPositionsQuery,
+        currentCommMembershipsQuery,
+        currentAdminWorksQuery,
+        currentResearchQuery,
         currentMentoringQuery,
     ]);
 
@@ -324,9 +349,11 @@ export async function getFacultyServiceRecordReport(
         adminPositions,
         fieldsOfInterest,
         semestralRecords,
-        currentTeachingLoad,
-        currentAdministrativeLoad,
-        currentResearchLoad,
+        currentCoursesTaught,
+        currentAdminPositions,
+        currentCommMemberships,
+        currentAdminWorks,
+        currentResearch,
         currentMentoring,
     };
 }
