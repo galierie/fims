@@ -143,7 +143,7 @@
     </div>
 
     <!-- Account List Table -->
-    <div class="mt-2.5 w-full overflow-x-auto custom-scrollbar">
+    <div class="custom-scrollbar mt-2.5 w-full overflow-x-auto">
         <div class="w-full min-w-[1024px] pb-4">
             <!-- Header -->
             <div

@@ -203,11 +203,11 @@ export async function seed() {
     });
     await testDB.insert(schema.adminPosition).values({
         id: 1,
-        title: 'Department Head'
-    })
+        title: 'Department Head',
+    });
 
     //push semesters
-    await testDB.insert(schema.academicSemester).values(seedData.academicSemesters)
+    await testDB.insert(schema.academicSemester).values(seedData.academicSemesters);
 
     //push appointment statuses
     await testDB.insert(schema.appointmentStatus).values(seedData.apppointmentStatuses);
@@ -217,7 +217,6 @@ export async function seed() {
 
     // push faculty ranks
     await testDB.insert(schema.facultyRank).values(seedData.rankRelations);
-
 
     // push faculty semesters
     await testDB.insert(schema.facultyAcademicSemester).values(seedData.semesterRelations);

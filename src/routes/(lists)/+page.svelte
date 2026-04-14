@@ -149,7 +149,7 @@
     </div>
 
     <!-- Faculty Record List Table -->
-    <div class="mt-2.5 w-full overflow-x-auto custom-scrollbar">
+    <div class="custom-scrollbar mt-2.5 w-full overflow-x-auto">
         <div class="w-full min-w-[1024px] pb-4">
             <!-- Header -->
             <div
@@ -176,7 +176,7 @@
                     <div class="w-50 justify-center"><span>Change Logs</span></div>
                 {/if}
             </div>
-        
+
             <!-- Rows -->
             {#each facultyRecordList as facultyRecord (facultyRecord.id)}
                 <FacultyRecordRow

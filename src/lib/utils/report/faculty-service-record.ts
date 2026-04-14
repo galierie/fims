@@ -99,9 +99,8 @@ export async function getFacultyServiceRecordWorksheet(
     sheet.mergeCells('A4:P4');
 
     // Widen all columns
-    for (let i = 1; i <= constantSemestralRecordHeaderCellValues.length; i++) 
+    for (let i = 1; i <= constantSemestralRecordHeaderCellValues.length; i++)
         sheet.getColumn(i).width = 20;
-    
 
     // Populate admin positions
     let adminPositionRow = adminPositionsStartRow;

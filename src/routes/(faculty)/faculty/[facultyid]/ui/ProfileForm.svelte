@@ -210,25 +210,30 @@
         },
     ]);
 
-    const promotionHistoryValues: InputRowValue[] | undefined = $derived(profile?.promotionHistory
-        // sort array before mapping
-        .slice() // Create copy to avoid mutating array
-        .sort((a, b) => {
-            const dateA = a.dateOfTenureOrRenewal ? new Date(a.dateOfTenureOrRenewal).getTime() : 0;
-            const dateB = b.dateOfTenureOrRenewal ? new Date(b.dateOfTenureOrRenewal).getTime() : 0;
-            return dateB - dateA; 
-        })
-        .map(({ tupleid, rankTitle, appointmentStatus, dateOfTenureOrRenewal }, index) => ({
-            rowNum: index,
-            row: [
-                { columnNum: 0, defaultValue: rankTitle ?? undefined },
-                { columnNum: 1 },
-                { columnNum: 2 },
-                { columnNum: 3, defaultValue: appointmentStatus ?? undefined },
-                { columnNum: 4, defaultValue: toDateString(dateOfTenureOrRenewal) },
-            ],
-            tupleid,
-        })),
+    const promotionHistoryValues: InputRowValue[] | undefined = $derived(
+        profile?.promotionHistory
+            // sort array before mapping
+            .slice() // Create copy to avoid mutating array
+            .sort((a, b) => {
+                const dateA = a.dateOfTenureOrRenewal
+                    ? new Date(a.dateOfTenureOrRenewal).getTime()
+                    : 0;
+                const dateB = b.dateOfTenureOrRenewal
+                    ? new Date(b.dateOfTenureOrRenewal).getTime()
+                    : 0;
+                return dateB - dateA;
+            })
+            .map(({ tupleid, rankTitle, appointmentStatus, dateOfTenureOrRenewal }, index) => ({
+                rowNum: index,
+                row: [
+                    { columnNum: 0, defaultValue: rankTitle ?? undefined },
+                    { columnNum: 1 },
+                    { columnNum: 2 },
+                    { columnNum: 3, defaultValue: appointmentStatus ?? undefined },
+                    { columnNum: 4, defaultValue: toDateString(dateOfTenureOrRenewal) },
+                ],
+                tupleid,
+            })),
     );
 
     let isLoading = $state(false);

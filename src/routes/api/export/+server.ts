@@ -17,13 +17,18 @@ export async function GET({ url, locals }: RequestEvent) {
     if (!typesStr) return json({ error: 'No report type specified' }, { status: 400 });
     const types = typesStr.split(',');
 
-    const needsFacultyIds = !(new Set(types)).isDisjointFrom(new Set(['profile', 'service-record', 'loading', 'set-avg', 'subjects-by-faculty']));
+    const needsFacultyIds = !new Set(types).isDisjointFrom(
+        new Set(['profile', 'service-record', 'loading', 'set-avg', 'subjects-by-faculty']),
+    );
 
     const facultyIdsStr = url.searchParams.get('facultyIds') ?? '';
-    if (needsFacultyIds && facultyIdsStr === '') return json({ error: 'No faculty member specified' }, { status: 400 });
+    if (needsFacultyIds && facultyIdsStr === '')
+        return json({ error: 'No faculty member specified' }, { status: 400 });
     const facultyIds = facultyIdsStr.split(',').map((idStr: string) => parseInt(idStr, 10));
 
-    const needsPeriods = !(new Set(types)).isDisjointFrom(new Set(['service-record', 'loading', 'set-avg', 'subjects-by-faculty']));
+    const needsPeriods = !new Set(types).isDisjointFrom(
+        new Set(['service-record', 'loading', 'set-avg', 'subjects-by-faculty']),
+    );
 
     const rawFromAy = parseInt(url.searchParams.get('fromAy') || '0', 10);
     const rawFromSem = parseInt(url.searchParams.get('fromSem') || '0', 10);
@@ -163,8 +168,8 @@ export async function GET({ url, locals }: RequestEvent) {
         const finalName = customFileName
             ? `${customFileName}.xlsx`
             : needsPeriods
-                ? `Export-AY${fromAy}-S${fromSem}-to-AY${toAy}-S${toSem}.xlsx`
-                : 'Faculty_Profile.xlsx';
+              ? `Export-AY${fromAy}-S${fromSem}-to-AY${toAy}-S${toSem}.xlsx`
+              : 'Faculty_Profile.xlsx';
 
         return new Response(buf, {
             headers: {

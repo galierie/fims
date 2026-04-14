@@ -1,10 +1,19 @@
 import { type Actions, error, fail } from '@sveltejs/kit';
 import { APIError } from 'better-auth';
 
-import { areYouHere, deleteUsersInfo, getUserPermissions, makeProfileInfo } from '$lib/server/queries/db-helpers';
+import {
+    areYouHere,
+    deleteUsersInfo,
+    getUserPermissions,
+    makeProfileInfo,
+} from '$lib/server/queries/db-helpers';
 import { auth } from '$lib/server/auth';
 import type { FilterColumn, FilterObject } from '$lib/types/filter';
-import { getAccountList, getAllRoles, refreshAccountSearchView } from '$lib/server/queries/account-list';
+import {
+    getAccountList,
+    getAllRoles,
+    refreshAccountSearchView,
+} from '$lib/server/queries/account-list';
 import { profileInfo } from '$lib/server/db/schema';
 
 export async function load({ locals, url }) {

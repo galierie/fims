@@ -1,7 +1,11 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 
 import { createFacultyProfileRecords, getUserPermissions } from '$lib/server/queries/db-helpers';
-import { getAllAppointmentStatuses, getAllFieldsOfInterest, getAllRanks } from '$lib/server/queries/faculty-view';
+import {
+    getAllAppointmentStatuses,
+    getAllFieldsOfInterest,
+    getAllRanks,
+} from '$lib/server/queries/faculty-view';
 import { refreshFacultyRecordSearchView } from '$lib/server/queries/faculty-list';
 
 export async function load({ locals }) {

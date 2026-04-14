@@ -1,7 +1,17 @@
 import { error, fail } from '@sveltejs/kit';
 
 import type { ChangelogRecordStructure } from '$lib/ui/ChangelogList.svelte';
-import { getAllAdminPositions, getAllCourses, getAllFacultyAcademicSemesters, getAllOffices, getAllResearches, getAllSemesterms, getFacultyEducationalAttainments, getFacultyPromotionHistory, getFacultySemestralRecords } from '$lib/server/queries/faculty-view';
+import {
+    getAllAdminPositions,
+    getAllCourses,
+    getAllFacultyAcademicSemesters,
+    getAllOffices,
+    getAllResearches,
+    getAllSemesterms,
+    getFacultyEducationalAttainments,
+    getFacultyPromotionHistory,
+    getFacultySemestralRecords,
+} from '$lib/server/queries/faculty-view';
 import { getFacultyRecordChangelogs } from '$lib/server/queries/faculty-list.js';
 import { getUserPermissions, updateSemestralRecords } from '$lib/server/queries/db-helpers';
 

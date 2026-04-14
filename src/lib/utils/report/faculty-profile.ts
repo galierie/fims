@@ -44,7 +44,7 @@ const dataStartRow = 2;
 export async function getFacultyProfileWorksheet(facultyIds: number[]) {
     const sheetName = 'Faculty Profile';
     const rawData = await Promise.all(facultyIds.map((id) => getFacultyProfileReport(id)));
-    const data = rawData.filter(datum => datum !== null);
+    const data = rawData.filter((datum) => datum !== null);
 
     if (data.length === 0) return null;
 
@@ -62,9 +62,7 @@ export async function getFacultyProfileWorksheet(facultyIds: number[]) {
     });
 
     // Widen all columns
-    for (let i = 1; i <= constantHeaderCellValues.length; i++) 
-        sheet.getColumn(i).width = 20;
-    
+    for (let i = 1; i <= constantHeaderCellValues.length; i++) sheet.getColumn(i).width = 20;
 
     // Set data cells
     let row = dataStartRow;

@@ -53,7 +53,7 @@ export async function getSubjectsByFacultyWorksheet(
     const rawData = await Promise.all(
         facultyIds.map((id) => getSubjectsByFacultyReport(id, acadYear, semNum)),
     );
-    const data = rawData.filter(datum => datum !== null);
+    const data = rawData.filter((datum) => datum !== null);
 
     if (data.length === 0) return null;
 
@@ -78,9 +78,7 @@ export async function getSubjectsByFacultyWorksheet(
     titleCell.font = { bold: true };
 
     // Widen columns
-    for (let i = 1; i <= 4; i++) 
-        sheet.getColumn(i).width = 20;
-    
+    for (let i = 1; i <= 4; i++) sheet.getColumn(i).width = 20;
 
     // Set data cells
     let row = dataStartRow;

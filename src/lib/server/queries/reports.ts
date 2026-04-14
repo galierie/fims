@@ -98,7 +98,7 @@ export async function getFacultyProfileReport(facultyid: number) {
         profileQuery,
         educationalAttainmentsQuery,
     ]);
-    return (typeof profile === 'undefined') ? null : { ...profile, ...educationalAttainments };
+    return typeof profile === 'undefined' ? null : { ...profile, ...educationalAttainments };
 }
 
 export async function getFacultyServiceRecordReport(
@@ -144,7 +144,10 @@ export async function getFacultyServiceRecordReport(
         )
         .as('existing_facultyAcademicSemester_sq');
 
-    const [existingFacultyAcademicSemester] = await db.select().from(existingFacultyAcademicSemesterSq).limit(1);
+    const [existingFacultyAcademicSemester] = await db
+        .select()
+        .from(existingFacultyAcademicSemesterSq)
+        .limit(1);
     if (typeof existingFacultyAcademicSemester === 'undefined') return null;
 
     const profileQuery = db
@@ -636,7 +639,7 @@ export async function getSubjectsByFacultyReport(
 
     const [[name], courses] = await Promise.all([nameQuery, coursesQuery]);
 
-    return (typeof name === 'undefined') ? null : { name, courses };
+    return typeof name === 'undefined' ? null : { name, courses };
 }
 
 export async function getFacultyBySubjectReport() {
@@ -708,8 +711,10 @@ export async function getFacultySETReport(facultyid: number, acadYear: number) {
         midyearCoursesQuery,
     ]);
 
-    return (typeof facultyInfo === 'undefined') ? null : {
-        facultyInfo,
-        semestralCoursesInfo: [firstSemCourses, secondSemCourses, midyearCourses],
-    };
+    return typeof facultyInfo === 'undefined'
+        ? null
+        : {
+              facultyInfo,
+              semestralCoursesInfo: [firstSemCourses, secondSemCourses, midyearCourses],
+          };
 }

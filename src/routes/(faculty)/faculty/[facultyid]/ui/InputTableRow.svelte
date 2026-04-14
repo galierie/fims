@@ -28,7 +28,7 @@
         isDeleted,
         // eslint-disable-next-line prefer-const -- bindable variable
         toggleRowDeletion,
-         
+
         hasValue = $bindable(),
         // eslint-disable-next-line prefer-const -- bindable variable
         rowNum,
@@ -71,13 +71,9 @@
                     : '';
             });
 
-            for (let i = 0; i < newValues.length; i++) 
-                values[i] = newValues[i];
-            
+            for (let i = 0; i < newValues.length; i++) values[i] = newValues[i];
 
-            for (let i = 0; i < haveChanges.length; i++) 
-                haveChanges[i] = false;
-            
+            for (let i = 0; i < haveChanges.length; i++) haveChanges[i] = false;
         }
     });
 
