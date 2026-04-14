@@ -75,6 +75,11 @@
             : `AY${startAy}_Sem${startSem}-AY${endAy}_Sem${endSem}`,
     );
 
+    interface Download {
+        name: string;
+        url: string;
+    }
+
     const selectedDownloads = $derived.by(() => {
         const links = [];
         const allFacIds = selectedFaculty.map((f) => f.facultyid || f.id).join(',');
