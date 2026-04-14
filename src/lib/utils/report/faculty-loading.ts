@@ -97,28 +97,23 @@ export async function getFacultyLoadingWorksheet(
         let col = dataStartCol;
         const facultyMember = data[i];
 
-        if (facultyMember.length === 0) continue;
-
         console.log(facultyMember);
 
-        const [
-            {
-                lastName,
-                firstName,
-                middleName,
-                appointmentStatus, // Task 16
-                designation,
-                degree,
-                coursesTaught,
-                undergradCredit, // Task 14
-                gradCredit, // Task 14
-                teachingLoadUnits,
-                adminPosition,
-                teachingLoadCredit,
-                administrativeLoadCredit,
-                researchLoadCredit,
-            },
-        ] = facultyMember;
+        const {
+            lastName,
+            firstName,
+            middleName,
+            appointmentStatus, // Task 16
+            designation,
+            degree,
+            coursesTaught,
+            undergradCredit, // Task 14
+            gradCredit, // Task 14
+            teachingLoadUnits,
+            adminPositions,
+            administrativeLoadCredit,
+            researchLoadCredit,
+        } = facultyMember;
 
         // 1. Name
         const nameCell = sheet.getCell(row, col++);
@@ -165,12 +160,12 @@ export async function getFacultyLoadingWorksheet(
 
         // 9. Admin Position
         const adminPositionCell = sheet.getCell(row, col++);
-        adminPositionCell.value = adminPosition;
+        adminPositionCell.value = adminPositions;
         adminPositionCell.border = cellBorders;
 
         // 10. TLC (Teaching Load Credit)
         const teachingLoadCreditCell = sheet.getCell(row, col++);
-        teachingLoadCreditCell.value = teachingLoadCredit;
+        teachingLoadCreditCell.value = undergradCredit + gradCredit;
         teachingLoadCreditCell.numFmt = '0.00';
         teachingLoadCreditCell.border = cellBorders;
         teachingLoadCreditCell.alignment = { horizontal: 'center' };
@@ -192,7 +187,7 @@ export async function getFacultyLoadingWorksheet(
         // 13. TOTAL Load
         const totalLoadCreditCell = sheet.getCell(row, col++);
         const totalLoadValue =
-            (teachingLoadCredit || 0) + (researchLoadCredit || 0) + (administrativeLoadCredit || 0);
+            (undergradCredit || 0) + (gradCredit || 0) + (researchLoadCredit || 0) + (administrativeLoadCredit || 0);
         totalLoadCreditCell.value = totalLoadValue;
         totalLoadCreditCell.numFmt = '0.00';
         totalLoadCreditCell.border = cellBorders;
