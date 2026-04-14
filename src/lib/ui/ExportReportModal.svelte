@@ -170,7 +170,6 @@
                     });
                 }
             }
-        }
 
         // Return only working links
         const nullableDownloads = await Promise.all(links.map(
