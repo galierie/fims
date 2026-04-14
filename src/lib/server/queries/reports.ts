@@ -302,7 +302,7 @@ export async function getFacultyServiceRecordReport(
         .select({
             academicSemesterId: existingFacultyAcademicSemesterSq.academicSemesterId,
             // Aggregating Mentee Name + Category for Task 11
-            mentoringDetails: sql<string>`COALESCE(STRING_AGG(${student.lastName} || ', ' || ${student.firstName} || ' (' || ${facultyMentoring.category} || ')', E'\n'), 'None')`,
+            mentoringDetails: sql<string>`COALESCE(STRING_AGG(${student.lastName} || ', ' || ${student.firstName} || ' (' || ${facultyMentoring.category} || ')', E'\n'), '')`,
             // Aggregating Mentoring Remarks for Task 13
             mentoringRemarks: sql<string>`COALESCE(STRING_AGG(${facultyMentoring.remarks}, E'\n'), '')`,
         })
