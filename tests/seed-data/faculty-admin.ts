@@ -14,6 +14,9 @@ export const statusRelations = [
     {
         status: 'Sabbatical',
     },
+    {
+        status: 'On Secondment'
+    }
 ];
 
 export const apppointmentStatuses = [
@@ -93,54 +96,6 @@ export const testFaculty = [
         philhealth: '123',
         pagibig: '123',
     },
-    // {
-    //     facultyid: 2,
-    //     lastname: 'Camingao',
-    //     middlename: 'B',
-    //     firstname: 'Ericsson Jake',
-    //     birthdate: new Date().toISOString(),
-    //     status: 'On Leave',
-    //     dateoforiginalappointment: new Date().toISOString(),
-    //     psiitem: '',
-    //     employeenumber: '',
-    //     tin: '',
-    //     gsis: '',
-    //     philhealth: '',
-    //     pagibig: '',
-    //     maidenname: '',
-    // },
-    // {
-    //     facultyid: 3,
-    //     lastname: 'Dela Cruz',
-    //     middlename: 'O',
-    //     firstname: 'Gabrielle Zach',
-    //     birthdate: new Date().toISOString(),
-    //     status: 'Sabbatical',
-    //     dateoforiginalappointment: new Date().toISOString(),
-    //     psiitem: '',
-    //     employeenumber: '',
-    //     tin: '',
-    //     gsis: '',
-    //     philhealth: '',
-    //     pagibig: '',
-    //     maidenname: '',
-    // },
-    // {
-    //     facultyid: 4,
-    //     lastname: 'Mandario',
-    //     middlename: 'S',
-    //     firstname: 'Maricris',
-    //     birthdate: new Date().toISOString(),
-    //     status: 'Active',
-    //     dateoforiginalappointment: new Date().toISOString(),
-    //     psiitem: '',
-    //     employeenumber: '',
-    //     tin: '',
-    //     gsis: '',
-    //     philhealth: '',
-    //     pagibig: '',
-    //     maidenname: '',
-    // },
 ];
 
 // facultyrank
@@ -215,6 +170,15 @@ export const adminRelations = [
         administrativeLoadCredit: '5',
     },
 ];
+
+// academicSemester
+export const academicSemesters = [
+    {
+        id: 1,
+        semesterNumber: 0,
+        academicYear: 2025
+    }
+]
 
 /*
 // Refresh faculty record search view

@@ -5,7 +5,7 @@ import { db } from './index';
 
 // TODO: Check if tama
 
-export const statuses = [{ status: 'Active' }, { status: 'On Leave' }, { status: 'Sabbatical' }];
+export const statuses = [{ status: 'Active' }, { status: 'On Leave' }, { status: 'Sabbatical' }, {status: 'On Secondment'}];
 
 export const ranks = [
     {

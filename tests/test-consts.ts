@@ -188,7 +188,10 @@ export async function seed() {
     await testDB.delete(schema.facultyAcademicSemester);
     await testDB.delete(schema.facultyAdminPosition);
     await testDB.delete(schema.appointmentStatus);
+
     await testDB.delete(schema.office);
+    await testDB.delete(schema.adminPosition);
+    await testDB.delete(schema.academicSemester);
 
     await testDB.execute(sql`REFRESH MATERIALIZED VIEW account_search_view`);
     await testDB.execute(sql`REFRESH MATERIALIZED VIEW faculty_record_search_view`);
@@ -198,6 +201,13 @@ export async function seed() {
         id: 1,
         name: 'Test Office',
     });
+    await testDB.insert(schema.adminPosition).values({
+        id: 1,
+        title: 'Department Head'
+    })
+
+    //push semesters
+    await testDB.insert(schema.academicSemester).values(seedData.academicSemesters)
 
     //push appointment statuses
     await testDB.insert(schema.appointmentStatus).values(seedData.apppointmentStatuses);
@@ -207,6 +217,7 @@ export async function seed() {
 
     // push faculty ranks
     await testDB.insert(schema.facultyRank).values(seedData.rankRelations);
+
 
     // push faculty semesters
     await testDB.insert(schema.facultyAcademicSemester).values(seedData.semesterRelations);
