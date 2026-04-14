@@ -4,17 +4,28 @@ import { academicSemester, adminPosition, course, degreeProgram, faculty, facult
 import { db } from '../db/index';
 
 export async function getFacultyProfileReport(facultyid: number) {
-    return await db
+    const educationalAttainmentsQuery = db
+        .select({
+            educationalAttainments: sql<string>`COALESCE(STRING_AGG(${facultyEducationalAttainment.degree} || ', ' || ${facultyEducationalAttainment.institution} || ', ' || ${facultyEducationalAttainment.graduationYear}, E'\n' ORDER BY ${desc(facultyEducationalAttainment.graduationYear)}), '')`,
+        })
+        .from(faculty)
+        .leftJoin(
+            facultyEducationalAttainment,
+            eq(faculty.id, facultyEducationalAttainment.facultyId),
+        )
+        .where(eq(faculty.id, facultyid))
+        .limit(1);
+
+    const profileQuery = db
         .select({
             lastName: faculty.lastName,
             firstName: faculty.firstName,
             middleName: faculty.middleName,
-            homeAddresses: sql<string>`STRING_AGG(${facultyHomeAddress.homeAddress}, E'\n')`,
-            contactNumbers: sql<string>`STRING_AGG(${facultyContactNumber.contactNumber}, E'\n')`,
-            emailAddresses: sql<string>`STRING_AGG(${facultyEmail.email}, E'\n')`,
-            birthDate: faculty.birthDate,
-            educationalAttainments: sql<string>`STRING_AGG(${facultyEducationalAttainment.degree} || ', ' || ${facultyEducationalAttainment.institution} || ', ' || ${facultyEducationalAttainment.graduationYear}, E'\n' ORDER BY ${desc(facultyEducationalAttainment.graduationYear)})`,
-            fieldsOfInterest: sql<string>`STRING_AGG(${fieldOfInterest.field}, ', ' ORDER BY ${asc(fieldOfInterest.field)})`,
+            homeAddresses: sql<string>`COALESCE(STRING_AGG(DISTINCT ${facultyHomeAddress.homeAddress}, E'\n'), '')`,
+            contactNumbers: sql<string>`COALESCE(STRING_AGG(DISTINCT ${facultyContactNumber.contactNumber}, E'\n'), '')`,
+            emailAddresses: sql<string>`COALESCE(STRING_AGG(DISTINCT ${facultyEmail.email}, E'\n'), '')`,
+            birthDate: sql<string>`TO_CHAR(${faculty.birthDate}, 'DD Mon YYYY')`,
+            fieldsOfInterest: sql<string>`COALESCE(STRING_AGG(DISTINCT ${fieldOfInterest.field}, ', ' ORDER BY ${asc(fieldOfInterest.field)}), '')`,
             designation: rank.title,
             salaryGrade: rank.salaryGrade,
             salaryRate: rank.salaryRate,
@@ -32,10 +43,6 @@ export async function getFacultyProfileReport(facultyid: number) {
         .leftJoin(facultyHomeAddress, eq(faculty.id, facultyHomeAddress.facultyId))
         .leftJoin(facultyContactNumber, eq(faculty.id, facultyContactNumber.facultyId))
         .leftJoin(facultyEmail, eq(faculty.id, facultyEmail.facultyId))
-        .leftJoin(
-            facultyEducationalAttainment,
-            eq(faculty.id, facultyEducationalAttainment.facultyId),
-        )
         .leftJoin(facultyFieldOfInterest, eq(faculty.id, facultyFieldOfInterest.facultyId))
         .leftJoin(fieldOfInterest, eq(facultyFieldOfInterest.fieldOfInterestId, fieldOfInterest.id))
         .leftJoin(facultyRank, eq(faculty.id, facultyRank.facultyId))
@@ -60,7 +67,11 @@ export async function getFacultyProfileReport(facultyid: number) {
             rank.salaryGrade,
             rank.salaryRate,
         )
-        .orderBy(desc(facultyRank.dateOfTenureOrRenewal));
+        .orderBy(desc(facultyRank.dateOfTenureOrRenewal))
+        .limit(1);
+
+    const [[profile], [educationalAttainments]] = await Promise.all([profileQuery, educationalAttainmentsQuery]);
+    return [{ ...profile, ...educationalAttainments }];
 }
 
 export async function getFacultyServiceRecordReport(
