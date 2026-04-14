@@ -43,7 +43,10 @@ const dataStartRow = 2;
 
 export async function getFacultyProfileWorksheet(facultyIds: number[]) {
     const sheetName = 'Faculty Profile';
-    const data = await Promise.all(facultyIds.map((id) => getFacultyProfileReport(id)));
+    const rawData = await Promise.all(facultyIds.map((id) => getFacultyProfileReport(id)));
+    const data = rawData.filter(datum => datum !== null);
+
+    if (data.length === 0) return null;
 
     // Create Workbook
     const workbook = new ExcelJS.Workbook();
@@ -69,35 +72,31 @@ export async function getFacultyProfileWorksheet(facultyIds: number[]) {
         let col = dataStartCol;
         const facultyMember = data[i];
 
-        if (facultyMember.length === 0) continue;
-
         console.log(facultyMember);
 
-        const [
-            {
-                lastName,
-                firstName,
-                middleName,
-                homeAddresses,
-                contactNumbers,
-                emailAddresses,
-                birthDate,
-                educationalAttainments,
-                fieldsOfInterest,
-                designation,
-                salaryGrade,
-                salaryRate,
-                appointmentStatus,
-                dateOfOriginalAppointment,
-                psiItem,
-                employeeNumber,
-                tin,
-                gsis,
-                philhealth,
-                pagIbig,
-                remarks,
-            },
-        ] = facultyMember;
+        const {
+            lastName,
+            firstName,
+            middleName,
+            homeAddresses,
+            contactNumbers,
+            emailAddresses,
+            birthDate,
+            educationalAttainments,
+            fieldsOfInterest,
+            designation,
+            salaryGrade,
+            salaryRate,
+            appointmentStatus,
+            dateOfOriginalAppointment,
+            psiItem,
+            employeeNumber,
+            tin,
+            gsis,
+            philhealth,
+            pagIbig,
+            remarks,
+        } = facultyMember;
 
         const nameCell = sheet.getCell(row, col);
         nameCell.value = `${lastName}, ${firstName} ${middleName[0]}.`;

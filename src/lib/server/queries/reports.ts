@@ -98,7 +98,7 @@ export async function getFacultyProfileReport(facultyid: number) {
         profileQuery,
         educationalAttainmentsQuery,
     ]);
-    return [{ ...profile, ...educationalAttainments }];
+    return (typeof profile === 'undefined') ? null : { ...profile, ...educationalAttainments };
 }
 
 export async function getFacultyServiceRecordReport(
