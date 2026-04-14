@@ -57,9 +57,12 @@ export async function getFacultyLoadingWorksheet(
     semNum: number,
 ) {
     const sheetName = 'Faculty Loading';
-    const data = await Promise.all(
+    const rawData = await Promise.all(
         facultyIds.map((id) => getFacultyLoadingReport(id, acadYear, semNum)),
     );
+    const data = rawData.filter(datum => datum !== null);
+
+    if (data.length === 0) return null;
 
     // Create Workbook
     const workbook = new ExcelJS.Workbook();

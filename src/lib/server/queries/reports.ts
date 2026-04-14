@@ -578,6 +578,8 @@ export async function getFacultyLoadingReport(facultyid: number, acadYear: numbe
             researchQuery,
         ]);
 
+    if (typeof profile === 'undefined') return null;
+
     const administrativeLoadCredit =
         (adminPositions?.administrativeLoadCredit ?? 0) +
         (commMemberships?.administrativeLoadCredit ?? 0) +
