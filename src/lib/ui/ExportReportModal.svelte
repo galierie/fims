@@ -80,7 +80,11 @@
         url: string;
     }
 
-    const selectedDownloads = $derived.by(() => {
+    let selectedDownloads: Download[] = $state([]);
+
+    function handleExport() {
+        step = 2;
+
         const links = [];
         const allFacIds = selectedFaculty.map((f) => f.facultyid || f.id).join(',');
 
@@ -168,10 +172,6 @@
             }
         
         return links;
-    });
-
-    function handleExport() {
-        step = 2;
     }
 
     function handleDownloadAll() {
@@ -510,7 +510,7 @@
                     class="rounded-3xl border-2 border-fims-green px-7 py-2 font-medium text-fims-green transition-all hover:opacity-70 active:scale-95"
                     onclick={onCancel}>Cancel</button
                 >
-                <GreenButton onclick={handleExport} disabled={isExportDisabled}>
+                <GreenButton onclick={() => { selectedDownloads = handleExport() }} disabled={isExportDisabled}>
                     <Icon icon="tabler:file-export" class="mr-2 h-5 w-5" />
                     <span>Export</span>
                 </GreenButton>
