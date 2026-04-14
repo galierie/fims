@@ -144,6 +144,9 @@ export async function getFacultyServiceRecordReport(
         )
         .as('existing_facultyAcademicSemester_sq');
 
+    const [existingFacultyAcademicSemester] = await db.select().from(existingFacultyAcademicSemesterSq).limit(1);
+    if (typeof existingFacultyAcademicSemester === 'undefined') return null;
+
     const profileQuery = db
         .select({
             lastName: faculty.lastName,
