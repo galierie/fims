@@ -636,7 +636,7 @@ export async function getSubjectsByFacultyReport(
 
     const [[name], courses] = await Promise.all([nameQuery, coursesQuery]);
 
-    return { name, courses };
+    return (typeof name === 'undefined') ? null : { name, courses };
 }
 
 export async function getFacultyBySubjectReport() {
