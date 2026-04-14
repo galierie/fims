@@ -500,7 +500,7 @@ export async function getFacultyBySubjectReport() {
         .select({
             courseTaught: course.name,
             courseLevel: sql<string>`COALESCE(${degreeProgram.name}, 'Undergraduate')`, // Task 15 Fix
-            faculty: sql<string>`COALESCE(STRING_AGG(DISTINCT ${faculty.firstName} || ' ' || ${faculty.lastName}, ', '), 'None')`,
+            faculty: sql<string>`COALESCE(STRING_AGG(DISTINCT ${faculty.firstName} || ' ' || ${faculty.lastName}, ', '), '')`,
         })
         .from(course)
         .leftJoin(degreeProgram, eq(course.degreeProgramId, degreeProgram.id)) // Task 15 Fix
