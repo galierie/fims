@@ -47,6 +47,9 @@ export async function getFacultyBySubjectWorksheet() {
     titleCell.value = 'By subject taught, faculty';
     titleCell.font = { bold: true };
 
+    // Widen second column
+    sheet.getColumn(2).width = 20;
+
     // Task 15: Define the specific order of categories
     const categories = ['Undergraduate', 'MA/PhD', 'MDE'];
 

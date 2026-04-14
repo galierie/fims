@@ -113,7 +113,7 @@
     <input 
         type="text" 
         {name} 
-        value={(!selectedOpt || selectedOpt === '-') ? '' : selectedOpt} 
+        value={(!selectedOpt || selectedOpt === '-') ? defaultSelectedOpt : selectedOpt} 
         class="pointer-events-none absolute bottom-0 left-0 -z-10 h-0 w-full opacity-0" 
         required={isRequired}
         tabindex="-1"

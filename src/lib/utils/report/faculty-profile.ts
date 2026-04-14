@@ -58,6 +58,11 @@ export async function getFacultyProfileWorksheet(facultyIds: number[]) {
         cell.font = defaultHeaderCellFont;
     });
 
+    // Widen all columns
+    for (let i = 1; i <= constantHeaderCellValues.length; i++) {
+        sheet.getColumn(i).width = 20;
+    }
+
     // Set data cells
     let row = dataStartRow;
     for (let i = 0; i < data.length; i++, row++) {
@@ -151,7 +156,7 @@ export async function getFacultyProfileWorksheet(facultyIds: number[]) {
         col++;
 
         const appointmentStatusCell = sheet.getCell(row, col);
-        appointmentStatusCell.value = appointmentStatus || 'N/A';
+        appointmentStatusCell.value = appointmentStatus || '';
         appointmentStatusCell.border = cellBorders;
         appointmentStatusCell.alignment = defaultCellAlignment;
         col++;

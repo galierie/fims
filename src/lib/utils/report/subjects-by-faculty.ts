@@ -18,9 +18,30 @@ const constantHeaderCellValues: SheetCellValue[] = [
             horizontal: 'center',
         },
     },
+    {
+        value: 'Undergraduate',
+        cellNum: 'B5',
+        alignment: {
+            horizontal: 'center',
+        },
+    },
+    {
+        value: 'MA, PhD',
+        cellNum: 'C5',
+        alignment: {
+            horizontal: 'center',
+        },
+    },
+    {
+        value: 'MDE',
+        cellNum: 'D5',
+        alignment: {
+            horizontal: 'center',
+        },
+    },
 ];
 
-const dataStartRow = 5;
+const dataStartRow = 6;
 const dataStartCol = 1;
 
 export async function getSubjectsByFacultyWorksheet(
@@ -53,16 +74,20 @@ export async function getSubjectsByFacultyWorksheet(
     titleCell.value = 'Faculty subject taught';
     titleCell.font = { bold: true };
 
+    // Widen columns
+    for (let i = 1; i <= 4; i++) {
+        sheet.getColumn(i).width = 20;
+    }
+
     // Set data cells
     let row = dataStartRow;
     for (let i = 0; i < data.length; i++, row++) {
         let col = dataStartCol;
-        const facultyMemberCourses = data[i]; // This is now an array of course objects
+        const { name, courses } = data[i];
 
-        if (facultyMemberCourses.length === 0) continue;
+        if (typeof name === 'undefined' || courses.length === 0) continue;
 
-        // Extract faculty name from the first course entry
-        const { lastName, firstName, middleName } = facultyMemberCourses[0];
+        const { lastName, firstName, middleName } = name;
 
         const nameCell = sheet.getCell(row, col);
         nameCell.value = `${lastName}, ${firstName} ${middleName[0]}.`;
@@ -70,38 +95,30 @@ export async function getSubjectsByFacultyWorksheet(
         nameCell.alignment = { vertical: 'top' };
         col++;
 
-        // --- Task 15: Sort and Category Logic ---
-        const undergrad = facultyMemberCourses
+        const undergrad = courses
             .filter((c) => c.courseLevel === 'Undergraduate')
             .map((c) => c.courseName)
             .join(', ');
 
-        const maphd = facultyMemberCourses
+        const maphd = courses
             .filter((c) => c.courseLevel === 'MA/PhD')
             .map((c) => c.courseName)
             .join(', ');
 
-        const mde = facultyMemberCourses
+        const mde = courses
             .filter((c) => c.courseLevel === 'MDE')
             .map((c) => c.courseName)
             .join(', ');
 
-        // Construct the combined string with labels
-        const displayParts = [];
-        if (undergrad) displayParts.push(`Undergraduate: ${undergrad}`);
-        if (maphd) displayParts.push(`MA/PhD: ${maphd}`);
-        if (mde) displayParts.push(`MDE: ${mde}`);
+        [undergrad, maphd, mde].forEach(level => {
+            const subjectsCell = sheet.getCell(row, col);
+            subjectsCell.value = level;
+            subjectsCell.border = cellBorders;
+            subjectsCell.alignment = { vertical: 'top' };
+            col++;
+        });
 
-        const finalSubjectsValue = displayParts.join('\n');
-        // ----------------------------------------
-
-        const subjectsCell = sheet.getCell(row, col);
-        subjectsCell.value = finalSubjectsValue;
-        subjectsCell.border = cellBorders;
-        subjectsCell.alignment = { wrapText: true, vertical: 'top' }; // wrapText is vital for \n
-
-        sheet.mergeCells(row, col, row, col + 2);
-        col += 3;
+        row++;
     }
 
     return { sheetName, model: sheet.model };
