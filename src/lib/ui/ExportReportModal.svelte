@@ -128,11 +128,30 @@
                     const fName = faculty.firstname || faculty.firstName || '';
                     const lName = faculty.lastname || faculty.lastName || 'Unknown';
                     const namePrefix = fName ? `${lName}_${fName}` : lName;
-                    const fileName = `${namePrefix}-${facReportTitle}${facSuffix}`;
-                    links.push({
-                        name: fileName,
-                        url: `/api/export?types=${facTypes.join(',')}&facultyIds=${faculty.facultyid || faculty.id}&${baseParams}&fileName=${fileName}`,
-                    });
+
+                    if (format === 'csv') {
+                        const typeToName = new Map<string, string>();
+                        typeToName.set('profile', 'Profile');
+                        typeToName.set('service-record', 'ServiceRecord');
+                        typeToName.set('loading', 'Loading');
+                        typeToName.set('set-avg', 'SETAverage');
+
+                        facTypes.forEach(type => {
+                            const fileName = `${namePrefix}-${typeToName.get(type) ?? 'Report'}${facSuffix}`;
+
+                            links.push({
+                                name: fileName,
+                                url: `/api/export?types=${type}&facultyIds=${faculty.facultyid || faculty.id}&${baseParams}&fileName=${fileName}`,
+                            });
+                        });
+                    } else {
+                        const fileName = `${namePrefix}-${facReportTitle}${facSuffix}`;
+
+                        links.push({
+                            name: fileName,
+                            url: `/api/export?types=${facTypes.join(',')}&facultyIds=${faculty.facultyid || faculty.id}&${baseParams}&fileName=${fileName}`,
+                        });
+                    }
                 }
             }
 
