@@ -83,7 +83,6 @@ export async function GET({ url, locals }: RequestEvent) {
                     sheetPromises.push(
                         getFacultyServiceRecordWorksheet(id, fromAy, fromSem, toAy, toSem).then(
                             (sheet) => {
-                                if (sheet) sheet.sheetName = `Service Record ${id}`;
                                 return sheet;
                             },
                         ),
@@ -92,16 +91,20 @@ export async function GET({ url, locals }: RequestEvent) {
                 for (const { ay, sem } of periods)
                     sheetPromises.push(
                         getFacultyLoadingWorksheet(facultyIds, ay, sem).then((sheet) => {
-                            if (sheet) sheet.sheetName = `Loading AY${ay}-${ay + 1}-${sem}`;
+                            // Convert 2023 to 23 to save tab space
+                            const shortAy = ay.toString().slice(-2);
+                            const shortNextAy = (ay + 1).toString().slice(-2);
+                            if (sheet) sheet.sheetName = `Loading AY${shortAy}-${shortNextAy} S${sem}`;
                             return sheet;
                         }),
                     );
             else if (type === 'set-avg')
-                // SET average is a yearly report
                 for (const ay of uniqueYears)
                     sheetPromises.push(
                         getFacultySETAverageWorksheet(facultyIds, ay).then((sheet) => {
-                            if (sheet) sheet.sheetName = `SET Avg AY${ay}-${ay + 1}`;
+                            const shortAy = ay.toString().slice(-2);
+                            const shortNextAy = (ay + 1).toString().slice(-2);
+                            if (sheet) sheet.sheetName = `SET Avg AY${shortAy}-${shortNextAy}`;
                             return sheet;
                         }),
                     );
@@ -109,7 +112,9 @@ export async function GET({ url, locals }: RequestEvent) {
                 for (const { ay, sem } of periods)
                     sheetPromises.push(
                         getSubjectsByFacultyWorksheet(facultyIds, ay, sem).then((sheet) => {
-                            if (sheet) sheet.sheetName = `Subjects AY${ay} Sem${sem}`;
+                            const shortAy = ay.toString().slice(-2);
+                            const shortNextAy = (ay + 1).toString().slice(-2);
+                            if (sheet) sheet.sheetName = `Subj by Fac AY${shortAy}-${shortNextAy} S${sem}`;
                             return sheet;
                         }),
                     );

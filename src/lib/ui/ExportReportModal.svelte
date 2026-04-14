@@ -69,11 +69,15 @@
 
     // Export is disabled if no reports are selected, or if date-dependent reports are selected but dates are incomplete
     const isExportDisabled = $derived(!hasAnyReport || (hasDateDependentReports && !hasRanges));
-    const rangeStr = $derived(`AY${startAy}_Sem${startSem}_to_AY${endAy}_Sem${endSem}`);
+    const rangeStr = $derived(
+        startAy === endAy && startSem === endSem
+            ? `AY${startAy}_Sem${startSem}`
+            : `AY${startAy}_Sem${startSem}-AY${endAy}_Sem${endSem}`
+    );
 
     const selectedDownloads = $derived.by(() => {
         const links = [];
-        const allFacIds = selectedFaculty.map((f) => f.facultyid).join(',');
+        const allFacIds = selectedFaculty.map((f) => f.facultyid || f.id).join(',');
 
         const safeStartAy = startAy || 0;
         const safeStartSem = startSem || 0;
@@ -97,31 +101,48 @@
         const hasCourseDateDependent = exportByFacSubj;
         const courseSuffix = hasCourseDateDependent ? `_${rangeStr}` : '';
 
+        let facReportTitle = 'CombinedReports';
+        if (facTypes.length === 1) {
+            if (exportProfile) facReportTitle = 'Profile';
+            else if (exportServiceRecord) facReportTitle = 'ServiceRecord';
+            else if (exportLoading) facReportTitle = 'Loading';
+            else if (exportSetAvg) facReportTitle = 'SETAverage';
+        }
+
         // FACULTY REPORTS ROUTING
-        if (facTypes.length > 0)
+        if (facTypes.length > 0) {
             if (aggregateFacultyReports) {
-                const fileName = `Aggregated_Faculty_Reports${facSuffix}`;
+                const fileName = `AggregatedFacultyReports${facSuffix}`;
                 links.push({
                     name: fileName,
                     url: `/api/export?types=${facTypes.join(',')}&facultyIds=${allFacIds}&${baseParams}&fileName=${fileName}`,
                 });
             } else {
                 for (const faculty of selectedFaculty) {
-                    const fileName = `${faculty.lastname}_Faculty_Reports${facSuffix}`;
+                    const fName = faculty.firstname || faculty.firstName || '';
+                    const lName = faculty.lastname || faculty.lastName || 'Unknown';
+                    const namePrefix = fName ? `${lName}_${fName}` : lName;
+                    const fileName = `${namePrefix}-${facReportTitle}${facSuffix}`;
                     links.push({
                         name: fileName,
-                        url: `/api/export?types=${facTypes.join(',')}&facultyIds=${faculty.facultyid}&${baseParams}&fileName=${fileName}`,
+                        url: `/api/export?types=${facTypes.join(',')}&facultyIds=${faculty.facultyid || faculty.id}&${baseParams}&fileName=${fileName}`,
                     });
                 }
             }
+        }
 
         // COURSE INFORMATION ROUTING
-        if (courseTypes.length > 0)
+        if (courseTypes.length > 0) {
             if (aggregateCourseReports) {
-                const fileName = `Aggregated_Course_Info_Reports${courseSuffix}`;
+                let courseReportTitle = `AggregatedCourseReports${courseSuffix}`;
+                if (courseTypes.length === 1) {
+                    if (exportBySubjFac) courseReportTitle = 'By_Subject_Faculty_Taught';
+                    if (exportByFacSubj) courseReportTitle = `SelectedFaculty_BySubjectTaught${courseSuffix}`;
+                }
+                
                 links.push({
-                    name: fileName,
-                    url: `/api/export?types=${courseTypes.join(',')}&facultyIds=${allFacIds}&${baseParams}&fileName=${fileName}`,
+                    name: courseReportTitle,
+                    url: `/api/export?types=${courseTypes.join(',')}&facultyIds=${allFacIds}&${baseParams}&fileName=${courseReportTitle}`,
                 });
             } else {
                 if (exportBySubjFac) {
@@ -132,14 +153,14 @@
                     });
                 }
                 if (exportByFacSubj) {
-                    const fileName = `By_Faculty_Subject_Taught${courseSuffix}`;
+                    const fileName = `SelectedFaculty_BySubjectTaught${courseSuffix}`;
                     links.push({
                         name: fileName,
                         url: `/api/export?types=subjects-by-faculty&facultyIds=${allFacIds}&${baseParams}&fileName=${fileName}`,
                     });
                 }
             }
-
+        }
         return links;
     });
 
