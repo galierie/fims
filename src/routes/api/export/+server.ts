@@ -155,7 +155,7 @@ export async function GET({ url, locals }: RequestEvent) {
             addedSheets++;
         });
 
-        if (addedSheets === 0) workbook.addWorksheet('No Data Generated');
+        if (addedSheets === 0) return json({ error: 'No workbook generated.' }, { status: 400 });
 
         const buf = await workbook.xlsx.writeBuffer();
 
