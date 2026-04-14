@@ -180,4 +180,29 @@ export const actions = {
             return fail(500, { error: 'Failed to delete accounts.' });
         }
     },
+
+    async resetAccount({locals, request}) {
+        const formData = await request.formData();
+        const userid = formData.get('userid') as string;
+
+        if (!userid) return fail(400, { error: "No such account"});
+        
+        try {
+            const response = await auth.api.setUserPassword({
+                body: {
+                    userId: userid,
+                    newPassword: "password",
+                }
+            })
+
+        } catch(error) {
+            return fail(500, {
+                error: error instanceof APIError ? error.message : 'Failed to reset account password.',
+            });
+        }
+        return {
+            success: true,
+            message: 'Reset account password.',
+        };
+    },
 } satisfies Actions;
