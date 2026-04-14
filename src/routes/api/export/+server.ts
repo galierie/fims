@@ -142,6 +142,7 @@ export async function GET({ url, locals }: RequestEvent) {
             const clone = workbook.addWorksheet(finalSheetName);
             clone.model = model;
             clone.name = finalSheetName;
+            model.merges.forEach(range => clone.mergeCells(range));
             addedSheets++;
         });
 
