@@ -113,7 +113,7 @@ export async function getFacultyServiceRecordReport(
             middleName: faculty.middleName,
             currentAppointment: rank.title,
             currentAppointmentStatus: facultyRank.appointmentStatus,
-            dateOfOriginalAppointment: faculty.dateOfOriginalAppointment,
+            dateOfOriginalAppointment: sql<string>`TO_CHAR(${faculty.dateOfOriginalAppointment}, 'DD Mon YYYY')`,
             highestEducationalAttainmentDegree: facultyEducationalAttainment.degree,
             highestEducationAttainmentInstitution: facultyEducationalAttainment.institution,
             highestEducationAttainmentGraduationYear: facultyEducationalAttainment.graduationYear,
@@ -153,7 +153,7 @@ export async function getFacultyServiceRecordReport(
         .select({
             adminPosition: adminPosition.title,
             office: office.name,
-            periods: sql<string>`STRING_AGG(${facultyAdminPosition.startDate} || ' - ' || ${facultyAdminPosition.endDate}, '; ' ORDER BY ${asc(facultyAdminPosition.endDate)}, ${asc(facultyAdminPosition.startDate)})`,
+            periods: sql<string>`STRING_AGG(TO_CHAR(${facultyAdminPosition.startDate}, 'DD Mon YYYY') || ' - ' || TO_CHAR(${facultyAdminPosition.endDate}, 'DD Mon YYYY'), '; ' ORDER BY ${asc(facultyAdminPosition.endDate)}, ${asc(facultyAdminPosition.startDate)})`,
         })
         .from(facultyAdminPosition)
         .innerJoin(adminPosition, eq(facultyAdminPosition.adminPositionId, adminPosition.id))
@@ -270,7 +270,7 @@ export async function getFacultyServiceRecordReport(
                     Number,
                 ),
             researchTitles: sql<string>`STRING_AGG(${research.title}, ', ' ORDER BY ${asc(research.title)})`,
-            researchPeriods: sql<string>`STRING_AGG(${research.startDate} || ' - ' || ${research.endDate}, ', ' ORDER BY ${asc(research.title)})`,
+            researchPeriods: sql<string>`STRING_AGG(TO_CHAR(${research.startDate}, 'DD Mon YYYY') || ' - ' || TO_CHAR(${research.endDate}, 'DD Mon YYYY'), ', ' ORDER BY ${asc(research.title)})`,
             researchFundings: sql<string>`STRING_AGG(${research.funding}, ', ' ORDER BY ${asc(research.title)})`,
         })
         .from(existingFacultyAcademicSemesterSq)
