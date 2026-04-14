@@ -1,6 +1,30 @@
 import { and, asc, desc, eq, gt, gte, lt, lte, or, sql } from 'drizzle-orm';
 
-import { academicSemester, adminPosition, course, degreeProgram, faculty, facultyAcademicSemester, facultyAdminPosition, facultyAdminWork, facultyCommMembership, facultyContactNumber, facultyCourse, facultyEducationalAttainment, facultyEmail, facultyFieldOfInterest, facultyHomeAddress, facultyMentoring, facultyRank, facultyResearch, fieldOfInterest, office, rank, research, student } from '../db/schema';
+import {
+    academicSemester,
+    adminPosition,
+    course,
+    degreeProgram,
+    faculty,
+    facultyAcademicSemester,
+    facultyAdminPosition,
+    facultyAdminWork,
+    facultyCommMembership,
+    facultyContactNumber,
+    facultyCourse,
+    facultyEducationalAttainment,
+    facultyEmail,
+    facultyFieldOfInterest,
+    facultyHomeAddress,
+    facultyMentoring,
+    facultyRank,
+    facultyResearch,
+    fieldOfInterest,
+    office,
+    rank,
+    research,
+    student,
+} from '../db/schema';
 import { db } from '../db/index';
 
 export async function getFacultyProfileReport(facultyid: number) {
@@ -70,7 +94,10 @@ export async function getFacultyProfileReport(facultyid: number) {
         .orderBy(desc(facultyRank.dateOfTenureOrRenewal))
         .limit(1);
 
-    const [[profile], [educationalAttainments]] = await Promise.all([profileQuery, educationalAttainmentsQuery]);
+    const [[profile], [educationalAttainments]] = await Promise.all([
+        profileQuery,
+        educationalAttainmentsQuery,
+    ]);
     return [{ ...profile, ...educationalAttainments }];
 }
 
@@ -389,7 +416,10 @@ export async function getFacultyLoadingReport(facultyid: number, acadYear: numbe
         .leftJoin(rank, eq(facultyRank.rankId, rank.id))
         .leftJoin(
             facultyEducationalAttainment,
-            eq(facultyAcademicSemester.currentHighestEducationalAttainmentId, facultyEducationalAttainment.id),
+            eq(
+                facultyAcademicSemester.currentHighestEducationalAttainmentId,
+                facultyEducationalAttainment.id,
+            ),
         )
         .where(
             and(
@@ -399,7 +429,7 @@ export async function getFacultyLoadingReport(facultyid: number, acadYear: numbe
             ),
         )
         .limit(1);
-    
+
     const coursesQuery = db
         .select({
             coursesTaught: sql<string>`STRING_AGG(${course.name}, ', ' ORDER BY ${course.name})`,
@@ -432,7 +462,7 @@ export async function getFacultyLoadingReport(facultyid: number, acadYear: numbe
             ),
         )
         .limit(1);
-    
+
     const adminPositionsQuery = db
         .select({
             administrativeLoadCredit:
@@ -472,7 +502,10 @@ export async function getFacultyLoadingReport(facultyid: number, acadYear: numbe
             academicSemester,
             eq(facultyAcademicSemester.academicSemesterId, academicSemester.id),
         )
-        .leftJoin(facultyCommMembership, eq(facultyAcademicSemester.id, facultyCommMembership.facultyAcademicSemesterId))
+        .leftJoin(
+            facultyCommMembership,
+            eq(facultyAcademicSemester.id, facultyCommMembership.facultyAcademicSemesterId),
+        )
         .where(
             and(
                 eq(facultyAcademicSemester.facultyId, facultyid),
@@ -481,7 +514,7 @@ export async function getFacultyLoadingReport(facultyid: number, acadYear: numbe
             ),
         )
         .limit(1);
-        
+
     const adminWorksQuery = db
         .select({
             administrativeLoadCredit:
@@ -506,7 +539,7 @@ export async function getFacultyLoadingReport(facultyid: number, acadYear: numbe
             ),
         )
         .limit(1);
-    
+
     const researchQuery = db
         .select({
             researchLoadCredit:
@@ -531,20 +564,21 @@ export async function getFacultyLoadingReport(facultyid: number, acadYear: numbe
             ),
         )
         .limit(1);
-    
-    const [[profile], [courses], [adminPositions], [commMemberships], [adminWorks], [research]] = await Promise.all([
-        profileQuery,
-        coursesQuery,
-        adminPositionsQuery,
-        commMembershipsQuery,
-        adminWorksQuery,
-        researchQuery
-    ]);
+
+    const [[profile], [courses], [adminPositions], [commMemberships], [adminWorks], [research]] =
+        await Promise.all([
+            profileQuery,
+            coursesQuery,
+            adminPositionsQuery,
+            commMembershipsQuery,
+            adminWorksQuery,
+            researchQuery,
+        ]);
 
     const administrativeLoadCredit =
-        (adminPositions?.administrativeLoadCredit ?? 0)
-        + (commMemberships?.administrativeLoadCredit ?? 0)
-        + (adminWorks?.administrativeLoadCredit ?? 0)
+        (adminPositions?.administrativeLoadCredit ?? 0) +
+        (commMemberships?.administrativeLoadCredit ?? 0) +
+        (adminWorks?.administrativeLoadCredit ?? 0);
 
     return {
         ...profile,
@@ -552,7 +586,7 @@ export async function getFacultyLoadingReport(facultyid: number, acadYear: numbe
         administrativeLoadCredit,
         adminPositions: adminPositions?.adminPositions,
         ...research,
-    }
+    };
 }
 
 export async function getSubjectsByFacultyReport(
@@ -594,7 +628,7 @@ export async function getSubjectsByFacultyReport(
             ),
         )
         .orderBy(asc(degreeProgram.name), asc(course.name));
-    
+
     const [[name], courses] = await Promise.all([nameQuery, coursesQuery]);
 
     return { name, courses };

@@ -75,9 +75,9 @@ export async function getSubjectsByFacultyWorksheet(
     titleCell.font = { bold: true };
 
     // Widen columns
-    for (let i = 1; i <= 4; i++) {
+    for (let i = 1; i <= 4; i++) 
         sheet.getColumn(i).width = 20;
-    }
+    
 
     // Set data cells
     let row = dataStartRow;
@@ -110,7 +110,7 @@ export async function getSubjectsByFacultyWorksheet(
             .map((c) => c.courseName)
             .join(', ');
 
-        [undergrad, maphd, mde].forEach(level => {
+        [undergrad, maphd, mde].forEach((level) => {
             const subjectsCell = sheet.getCell(row, col);
             subjectsCell.value = level;
             subjectsCell.border = cellBorders;

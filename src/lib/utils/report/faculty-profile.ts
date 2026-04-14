@@ -59,9 +59,9 @@ export async function getFacultyProfileWorksheet(facultyIds: number[]) {
     });
 
     // Widen all columns
-    for (let i = 1; i <= constantHeaderCellValues.length; i++) {
+    for (let i = 1; i <= constantHeaderCellValues.length; i++) 
         sheet.getColumn(i).width = 20;
-    }
+    
 
     // Set data cells
     let row = dataStartRow;
