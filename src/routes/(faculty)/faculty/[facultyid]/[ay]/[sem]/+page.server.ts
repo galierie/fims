@@ -83,13 +83,20 @@ export async function load({ params, parent }) {
         'researchTitles',
         researches.map(({ title }) => title),
     );
+    const formatDate = (dateObj: Date | null | undefined): string => {
+        if (!dateObj) return '';
+        const year = dateObj.getFullYear();
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
     dependencyMaps.set(
         'researchTitlesToResearchStartDates',
-        new Map(researches.map(({ title, startDate }) => [title, startDate])),
+        new Map(researches.map(({ title, startDate }) => [title, formatDate(startDate)])),
     );
     dependencyMaps.set(
         'researchTitlesToResearchEndDates',
-        new Map(researches.map(({ title, endDate }) => [title, endDate])),
+        new Map(researches.map(({ title, endDate }) => [title, formatDate(endDate)])),
     );
     dependencyMaps.set(
         'researchTitlesToResearchFunding',
