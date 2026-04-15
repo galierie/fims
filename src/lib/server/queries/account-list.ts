@@ -17,6 +17,7 @@ import type { FilterColumn } from '$lib/types/filter';
 
 import { accountSearchView, changelog, profile, profileInfo, role } from '../db/schema';
 import { db } from '../db';
+import { logChange } from './db-helpers';
 
 const pageSize = 50;
 
@@ -163,4 +164,24 @@ export async function getAllRoles() {
 
     const uniqueValues = uniqueRows.map(({ role }) => role);
     return uniqueValues;
+}
+
+export async function changeRole(operatorId: string, id: string, role: string) {
+    // Actual action
+    const returnedIds = await db
+        .update(profileInfo)
+        .set({
+            role: role,
+        })
+        .where(eq(profileInfo.profileId, id))
+        .returning();
+
+    if (returnedIds.length === 0) return { success: false };
+
+    // Log!
+    returnedIds.forEach(async ({ id: tupleId }) => {
+        await logChange(operatorId, tupleId, 'Chnaged account role.');
+    });
+
+    return { success: true };
 }
