@@ -225,14 +225,13 @@ export const appointmentStatuses = [
 
 async function seedStatusTable() {
     // Don't proceed if table is already seeded
-    // note: check is too weak
-    const rows = await db.select().from(status).limit(4);
-    if (rows.length == 4) return { success: true };
+    const rows = await db.select().from(status).limit(1);
+    if (rows.length > 0) return { success: true };
 
     const response = await db.insert(status).values(statuses).returning();
 
     // Check response
-    return { success: response.length === 4 };
+    return { success: response.length === statuses.length };
 }
 
 async function seedRankTable() {
@@ -243,7 +242,7 @@ async function seedRankTable() {
     const response = await db.insert(rank).values(ranks).returning();
 
     // Check response
-    return { success: response.length === 3 };
+    return { success: response.length === ranks.length };
 }
 
 async function seedCourseTable() {
@@ -254,7 +253,7 @@ async function seedCourseTable() {
     const response = await db.insert(course).values(courses).returning();
 
     // Check response
-    return { success: response.length === 3 };
+    return { success: response.length === courses.length };
 }
 
 async function seedRoleTable() {
@@ -265,7 +264,7 @@ async function seedRoleTable() {
     const response = await db.insert(role).values(roles).returning();
 
     // Check response
-    return { success: response.length === 3 };
+    return { success: response.length === roles.length };
 }
 
 async function seedFieldOfInterestTable() {
@@ -273,7 +272,7 @@ async function seedFieldOfInterestTable() {
     if (rows.length > 0) return { success: true };
 
     const response = await db.insert(fieldOfInterest).values(fieldsOfInterest).returning();
-    return { success: response.length > 0 };
+    return { success: response.length === fieldsOfInterest.length };
 }
 
 async function seedAppointmentStatusTable() {
@@ -281,7 +280,7 @@ async function seedAppointmentStatusTable() {
     if (rows.length > 0) return { success: true };
 
     const response = await db.insert(appointmentStatus).values(appointmentStatuses).returning();
-    return { success: response.length > 0 };
+    return { success: response.length === appointmentStatuses.length };
 }
 
 export async function seedDatabase() {
