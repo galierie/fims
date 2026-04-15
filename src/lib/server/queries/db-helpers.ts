@@ -655,14 +655,14 @@ export async function updateSemestralRecords(
                 category: m['mentee-category'],
                 startDate: parseDate(m['mentee-start-date']),
                 endDate: parseDate(m['mentee-end-date']),
-                teachingLoadCredit: parseNumStr(m['mentee-load-credit']),
+                remarks: m['mentee-remarks'],
             }),
             (m) => ({
                 studentId: m.resolvedStudentId,
                 category: m['mentee-category'],
                 startDate: parseDate(m['mentee-start-date']),
                 endDate: parseDate(m['mentee-end-date']),
-                teachingLoadCredit: parseNumStr(m['mentee-load-credit']),
+                remarks: m['mentee-remarks'],
             }),
         );
 

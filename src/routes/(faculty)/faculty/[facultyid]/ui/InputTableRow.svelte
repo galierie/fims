@@ -174,10 +174,10 @@
                     bind:checked={values[columnNum]}
                     defaultChecked={defaultChecked ?? false}
                     onchange={() => {
-                        haveChanges[columnNum] = values[columnNum] !== defaultChecked;
+                        haveChanges[columnNum] = values[columnNum] !== (defaultChecked ?? false);
                     }}
                 />
-                <input type="hidden" {name} defaultValue={false} />
+                <input type="hidden" {name} value="false" />
             </div>
         {:else if type === 'datalist' && opts !== undefined && !(defaultValue instanceof Date)}
             <div
