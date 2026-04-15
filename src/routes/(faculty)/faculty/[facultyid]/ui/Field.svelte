@@ -13,10 +13,10 @@
         immutable?: boolean;
         required?: boolean;
         opts?: string[];
+        hasChange?: boolean;
     }
 
-    const { label, name, type, defaultValue, colStart, colSpan, immutable, required, opts }: Props =
-        $props();
+    let { label, name, type, defaultValue, colStart, colSpan, immutable, required, opts, hasChange = $bindable(false) }: Props = $props();
 
     const colStartClass = $derived(colStart === undefined ? '' : `col-start-${colStart}`);
     const colSpanClass = $derived(colSpan === undefined ? '' : `col-span-${colSpan}`);
@@ -30,6 +30,15 @@
     const isLocked = $derived(
         viewState.isEditing && immutable && defaultValue !== undefined && defaultValue !== '',
     );
+
+    // svelte-ignore state_referenced_locally
+    let currentValue = $state(defaultValue ?? '');
+    $effect(() => {
+        if (!viewState.isEditing) {
+            currentValue = defaultValue ?? '';
+        }
+        hasChange = immutable ? false : String(currentValue) !== String(defaultValue ?? '');
+    });
 
     // Safelist Tailwind classes
     // col-span-2
@@ -60,13 +69,13 @@
             {name}
             class="h-8 w-45 rounded-sm border-0 bg-white p-1 text-black focus:ring-0 disabled:text-black 2xl:w-75"
             disabled={!viewState.isEditing || isLocked}
+            bind:value={currentValue}
             {required}
         >
             <option value="" disabled selected={!defaultValue}>-</option>
             {#if opts}
                 {#each opts as opt}
-                    <option value={opt} selected={defaultValue === opt}>{opt}</option>
-                {/each}
+                    <option value={opt}>{opt}</option> {/each}
             {/if}
         </select>
     {:else}
@@ -75,7 +84,7 @@
             {name}
             class="h-8 w-45 rounded-sm border-0 bg-white p-1 placeholder-fims-gray focus:ring-0 2xl:w-75"
             placeholder="-"
-            defaultValue={defaultValue ?? ''}
+            bind:value={currentValue}
             disabled={!viewState.isEditing || isLocked}
             {required}
         />

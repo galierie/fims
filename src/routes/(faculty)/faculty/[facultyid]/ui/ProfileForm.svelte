@@ -39,8 +39,23 @@
     }
 
     // Check for changes
-    const haveChanges: boolean[] = $state(Array(6).fill(false));
-    const hasChange = $derived(haveChanges.some((e) => e === true));
+    const haveChanges: boolean[] = $state(Array(6).fill(false)); // Tables
+    const basicHaveChanges: boolean[] = $state(Array(15).fill(false)); // Basic fields
+    // svelte-ignore state_referenced_locally
+    let remarksValue = $state(profile?.remarks ?? '');
+    let remarksChanged = $derived(remarksValue !== (profile?.remarks ?? ''));
+
+    $effect(() => {
+        if (!viewState.isEditing) {
+            remarksValue = profile?.remarks ?? '';
+        }
+    });
+
+    const hasChange = $derived(
+        haveChanges.some((e) => e === true) || 
+        basicHaveChanges.some((e) => e === true) || 
+        remarksChanged
+    );
 
     $effect(() => {
         console.log(`Ping from ProfileForm! hasChange = ${hasChange}`);
@@ -328,20 +343,28 @@
                 name="last-name"
                 defaultValue={profile?.lastName}
                 required={true}
+                bind:hasChange={basicHaveChanges[0]}
             />
             <Field
                 label="First Name"
                 name="first-name"
                 defaultValue={profile?.firstName}
                 required={true}
+                bind:hasChange={basicHaveChanges[1]}
             />
             <Field
                 label="Middle Name"
                 name="middle-name"
                 defaultValue={profile?.middleName}
                 required={true}
+                bind:hasChange={basicHaveChanges[2]}
             />
-            <Field label="Suffix" name="suffix" defaultValue={profile?.suffix ?? undefined} />
+            <Field
+                label="Suffix"
+                name="suffix"
+                defaultValue={profile?.suffix ?? undefined}
+                bind:hasChange={basicHaveChanges[3]}
+            />
         </div>
         <div class="mt-4 grid w-full grid-cols-4">
             <Field
@@ -350,6 +373,7 @@
                 type="date"
                 defaultValue={toDateString(profile?.birthDate)}
                 required={true}
+                bind:hasChange={basicHaveChanges[4]}
             />
             <Field
                 label="Biological Sex"
@@ -360,11 +384,13 @@
                     ? biologicalSexMapToFull[profile.biologicalSex]
                     : ''}
                 required={true}
+                bind:hasChange={basicHaveChanges[5]}
             />
             <Field
                 label="Maiden Name"
                 name="maiden-name"
                 defaultValue={profile?.maidenName ?? undefined}
+                bind:hasChange={basicHaveChanges[6]}
             />
         </div>
 
@@ -424,6 +450,7 @@
                 immutable={!isCreating}
                 defaultValue={profile?.philhealth}
                 required={true}
+                bind:hasChange={basicHaveChanges[7]}
             />
             <Field
                 label="Pag-IBIG No."
@@ -431,6 +458,7 @@
                 immutable={!isCreating}
                 defaultValue={profile?.pagibig}
                 required={true}
+                bind:hasChange={basicHaveChanges[8]}
             />
             <Field
                 label="PSI Item No."
@@ -438,6 +466,7 @@
                 immutable={!isCreating}
                 defaultValue={profile?.psiItem}
                 required={true}
+                bind:hasChange={basicHaveChanges[9]}
             />
         </div>
         <div class="mt-4 grid w-full grid-cols-4">
@@ -447,6 +476,7 @@
                 immutable={!isCreating}
                 defaultValue={profile?.tin}
                 required={true}
+                bind:hasChange={basicHaveChanges[10]}
             />
             <Field
                 label="GSIS BP No."
@@ -454,6 +484,7 @@
                 immutable={!isCreating}
                 defaultValue={profile?.gsis}
                 required={true}
+                bind:hasChange={basicHaveChanges[11]}
             />
             <Field
                 label="Employee No."
@@ -461,6 +492,7 @@
                 immutable={!isCreating}
                 defaultValue={profile?.employeeNumber}
                 required={true}
+                bind:hasChange={basicHaveChanges[12]}
             />
         </div>
         <div class="mt-4 grid w-full grid-cols-4">
@@ -470,6 +502,7 @@
                 type="dropdown"
                 opts={['Active', 'On Leave', 'Sabbatical', 'On Secondment']}
                 defaultValue={profile?.status ?? ''}
+                bind:hasChange={basicHaveChanges[13]}
             />
             <Field
                 label="Date of Original Appointment"
@@ -478,6 +511,7 @@
                 colSpan={2}
                 defaultValue={toDateString(profile?.dateOfOriginalAppointment)}
                 required={true}
+                bind:hasChange={basicHaveChanges[14]}
             />
         </div>
 
@@ -503,7 +537,7 @@
                 id="remarks"
                 class="mt-4 h-fit min-h-90 w-full rounded-2xl border-0 bg-white p-1.5 placeholder-fims-gray focus:ring-0"
                 disabled={!viewState.isEditing}
-                defaultValue={profile?.remarks ?? ''}
+                bind:value={remarksValue}
             ></textarea>
         </div>
     </div>

@@ -39,17 +39,18 @@
     let haveChanges: boolean[] = $state(Array(rows.length).fill(false));
 
     $effect(() => {
-        hasChange = haveChanges.some((e) => e === true);
+        hasChange = haveChanges.some((e) => e === true) || deletedRows.length > 0;
     });
 
     let deletedRows: number[] = $state([]);
 
     function toggleRowDeletion(rowNum: number) {
         const [row] = actualRows.filter((r) => r.rowNum === rowNum);
-        if (deletedRows.includes(rowNum)) deletedRows = deletedRows.filter((r) => r !== rowNum);
-        else if (haveValues[rowNum] || row.tupleid !== undefined)
-            deletedRows = [...deletedRows, rowNum];
-        else actualRows = actualRows.filter((r) => r.rowNum !== rowNum);
+        if (haveValues[rowNum] || row.tupleid !== undefined) {
+            if (!deletedRows.includes(rowNum)) deletedRows = [...deletedRows, rowNum];
+        } else {
+            actualRows = actualRows.filter((r) => r.rowNum !== rowNum);
+        }
     }
 
     function addRow() {
