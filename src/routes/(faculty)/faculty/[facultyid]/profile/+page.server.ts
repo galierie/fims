@@ -83,8 +83,7 @@ export const actions = {
         if (typeof roleObj === 'undefined') throw redirect(307, '/login');
 
         const { canModifyFaculty } = roleObj;
-        if (!canModifyFaculty)
-            return fail(403, { error: 'Insufficient permissions.' });
+        if (!canModifyFaculty) return fail(403, { error: 'Insufficient permissions.' });
 
         const formData = await request.formData();
         const facultyidStr = formData.get('facultyid') as string;
@@ -107,8 +106,7 @@ export const actions = {
         if (typeof roleObj === 'undefined') throw redirect(307, '/login');
 
         const { canModifyFaculty } = roleObj;
-        if (!canModifyFaculty)
-            return fail(403, { error: 'Insufficient permissions.' });
+        if (!canModifyFaculty) return fail(403, { error: 'Insufficient permissions.' });
 
         const formData = await request.formData();
         const facultyidStr = params.facultyid;

@@ -1,6 +1,9 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 
-import { createFacultyProfileRecords, getUserRoleAndPermissions } from '$lib/server/queries/db-helpers';
+import {
+    createFacultyProfileRecords,
+    getUserRoleAndPermissions,
+} from '$lib/server/queries/db-helpers';
 import {
     getAllAppointmentStatuses,
     getAllFieldsOfInterest,

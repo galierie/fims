@@ -110,7 +110,6 @@ export async function getUserRoleAndPermissions(profileId: string) {
         .limit(1);
 }
 
-
 export async function areYouHere(email: string) {
     const you = await db.select().from(profile).where(eq(profile.email, email));
 

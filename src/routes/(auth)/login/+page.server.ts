@@ -24,7 +24,7 @@ export async function load({ locals }) {
     const canViewAccount = canAddAccount || canModifyAccount;
     if (canViewAccount) throw redirect(303, '/accounts');
 
-    return {}
+    return {};
 }
 
 export const actions = {

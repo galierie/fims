@@ -150,8 +150,7 @@ export const actions = {
         if (typeof roleObj === 'undefined') throw redirect(307, '/login');
 
         const { canModifyAccount } = roleObj;
-        if (!canModifyAccount)
-            return fail(403, { error: 'Insufficient permissions.' });
+        if (!canModifyAccount) return fail(403, { error: 'Insufficient permissions.' });
 
         const data = await request.formData();
         const userid = data.get('userid') as string;
@@ -188,8 +187,7 @@ export const actions = {
         if (typeof roleObj === 'undefined') throw redirect(307, '/login');
 
         const { canModifyAccount } = roleObj;
-        if (!canModifyAccount)
-            return fail(403, { error: 'Insufficient permissions.' });
+        if (!canModifyAccount) return fail(403, { error: 'Insufficient permissions.' });
 
         const formData = await request.formData();
         const useridsStr = formData.get('userids') as string;
@@ -237,8 +235,7 @@ export const actions = {
         if (typeof roleObj === 'undefined') throw redirect(307, '/login');
 
         const { canModifyAccount } = roleObj;
-        if (!canModifyAccount)
-            return fail(403, { error: 'Insufficient permissions.' });
+        if (!canModifyAccount) return fail(403, { error: 'Insufficient permissions.' });
 
         const formData = await request.formData();
         const role = formData.get('role') as string;
