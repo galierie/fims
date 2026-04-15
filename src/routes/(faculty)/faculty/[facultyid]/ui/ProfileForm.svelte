@@ -274,7 +274,8 @@
 <form
     method="POST"
     action="?/{isCreating ? 'create' : 'update'}"
-    onreset={() => {
+    onreset={(e) => {
+        e.preventDefault();
         resetViewState();
         willDiscardChanges = false;
     }}
@@ -561,6 +562,6 @@
         onCancel={() => {
             willDiscardChanges = false;
         }}
-        text="Are you sure you want to cancel creating this record?"
+        text={isCreating ? "Are you sure you want to cancel creating this record?" : "You have unsaved changes. Do you want to discard them?"}
     />
 {/if}

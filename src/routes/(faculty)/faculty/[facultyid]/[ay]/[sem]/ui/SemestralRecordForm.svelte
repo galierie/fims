@@ -108,14 +108,12 @@
     id={semestralRecordFormId}
     bind:this={semestralRecordForm}
     onreset={async (e) => {
+        e.preventDefault();
+
         if (semestralRecord === null) {
-            e.preventDefault();
             isLoading = true;
 
-            semestralRecordForm?.reset();
-
             const { goto } = await import('$app/navigation');
-
             // If "discard changes" is clicked for a new sem record, go to prev URL
             if (previousUrl) await goto(previousUrl);
             else await goto(`/faculty/${facultyid}/profile`);
