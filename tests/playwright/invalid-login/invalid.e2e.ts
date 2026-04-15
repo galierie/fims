@@ -1,8 +1,6 @@
-import dotenv from 'dotenv';
 import { expect, test } from '@playwright/test';
 
 import * as consts from '../../test-consts';
-dotenv.config({ path: '.env.e2e' });
 
 /*
 

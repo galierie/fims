@@ -4,10 +4,10 @@
 import { expect, test } from '@playwright/test';
 
 import * as testConsts from '../../../test-consts';
-const dummyEmail = process.env.DUMMY_EMAIL!;
-const dummyEmail1 = process.env.DUMMY_EMAIL1!;
-const dummyEmail2 = process.env.DUMMY_EMAIL2!;
-const dummyPw = process.env.DUMMY_PASS!;
+const dummyEmail = testConsts.DummyEmail;
+const dummyEmail1 = testConsts.DummyEmail0;
+const dummyEmail2 = testConsts.DummyEmail1;
+const dummyPw = testConsts.DummyPass;
 
 test.describe('batch deletion', async () => {
     test.use({ storageState: testConsts.ITConfig });

@@ -6,11 +6,10 @@ test.use({ storageState: 'playwright/.auth/it.json' });
 
 // NOTE: Account type is 'Admin'
 
-const dummyEmail = process.env.DUMMY_EMAIL!;
-const dummyPw = process.env.DUMMY_PASS!;
-
-const dummyEmail1 = process.env.DUMMY_EMAIL1!;
-const dummyEmail2 = process.env.DUMMY_EMAIL2!;
+const dummyEmail = testConsts.DummyEmail;
+const dummyEmail1 = testConsts.DummyEmail0;
+const dummyEmail2 = testConsts.DummyEmail1;
+const dummyPw = testConsts.DummyPass;
 
 test.describe('unsuccessful adding of accounts', () => {
     test.use({ storageState: testConsts.ITConfig });
