@@ -53,9 +53,9 @@
     let remarksValue = $state(semestralRecord?.remarks ?? '');
     let remarksChanged = $derived(remarksValue !== (semestralRecord?.remarks ?? ''));
     const hasChange = $derived(
-        haveChanges.some((e) => e === true) || 
-        basicHaveChanges.some((e) => e === true) || 
-        remarksChanged
+        haveChanges.some((e) => e === true) ||
+            basicHaveChanges.some((e) => e === true) ||
+            remarksChanged,
     );
 
     $effect(() => {

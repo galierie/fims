@@ -16,7 +16,18 @@
         hasChange?: boolean;
     }
 
-    let { label, name, type, defaultValue, colStart, colSpan, immutable, required, opts, hasChange = $bindable(false) }: Props = $props();
+    let {
+        label,
+        name,
+        type,
+        defaultValue,
+        colStart,
+        colSpan,
+        immutable,
+        required,
+        opts,
+        hasChange = $bindable(false),
+    }: Props = $props();
 
     const colStartClass = $derived(colStart === undefined ? '' : `col-start-${colStart}`);
     const colSpanClass = $derived(colSpan === undefined ? '' : `col-span-${colSpan}`);
@@ -75,7 +86,8 @@
             <option value="" disabled selected={!defaultValue}>-</option>
             {#if opts}
                 {#each opts as opt}
-                    <option value={opt}>{opt}</option> {/each}
+                    <option value={opt}>{opt}</option>
+                {/each}
             {/if}
         </select>
     {:else}

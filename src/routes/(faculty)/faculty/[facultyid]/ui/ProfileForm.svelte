@@ -52,9 +52,9 @@
     });
 
     const hasChange = $derived(
-        haveChanges.some((e) => e === true) || 
-        basicHaveChanges.some((e) => e === true) || 
-        remarksChanged
+        haveChanges.some((e) => e === true) ||
+            basicHaveChanges.some((e) => e === true) ||
+            remarksChanged,
     );
 
     $effect(() => {
@@ -562,7 +562,9 @@
         onCancel={() => {
             willDiscardChanges = false;
         }}
-        text={isCreating ? "Do you want to discard this new record?" : "You have unsaved changes. Do you want to discard them?"}
+        text={isCreating
+            ? 'Do you want to discard this new record?'
+            : 'You have unsaved changes. Do you want to discard them?'}
         confirmText="Discard"
         cancelText="Keep"
     />
