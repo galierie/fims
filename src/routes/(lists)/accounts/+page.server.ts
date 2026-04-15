@@ -252,40 +252,43 @@ export const actions = {
         }
     },
 
-    async resetAccount({locals, request}) {
+    async resetAccount({ locals, request }) {
         const formData = await request.formData();
         const userid = formData.get('userid') as string;
 
-        if (!userid) return fail(400, { error: "No such account"});
+        if (!userid) return fail(400, { error: 'No such account' });
 
         //permissions check
         const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
         if (typeof roleObj === 'undefined') return fail(403, 'Insufficient Permissions');
-        
-        if (!roleObj.canModifyAccount) return fail(403, 'Insufficient Permissions')
-        
+
+        if (!roleObj.canModifyAccount) return fail(403, 'Insufficient Permissions');
+
         try {
             const response = await auth.api.setUserPassword({
                 body: {
                     userId: userid,
-                    newPassword: "password",
+                    newPassword: 'password',
                 },
-                headers: request.headers
-            })
+                headers: request.headers,
+            });
 
             if (!response.status) {
-                return fail(400, 'Failed to reset account password')
+                return fail(400, 'Failed to reset account password');
             }
-        } catch(error) {
+        } catch (error) {
             console.log(error);
             return fail(500, {
-                error: error instanceof APIError ? error.message : 'Failed to reset account password. (Unknown error)',
+                error:
+                    error instanceof APIError
+                        ? error.message
+                        : 'Failed to reset account password. (Unknown error)',
             });
         }
         return {
             success: true,
             message: 'Reset account password.',
-        }
+        };
     },
 
     async changeRole({ locals, request }) {

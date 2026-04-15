@@ -206,7 +206,9 @@
             <input
                 {type}
                 {name}
-                step={type === 'number' && columns[columnNum].name === 'course-section-set' ? 'any' : null}
+                step={type === 'number' && columns[columnNum].name === 'course-section-set'
+                    ? 'any'
+                    : null}
                 class="{colSpanClass} h-8 w-full border-0 focus:ring-0 {isDeleted
                     ? 'text-fims-gray'
                     : ''} py-0"
@@ -220,7 +222,8 @@
                     ((tupleid === undefined && hasValue) || (tupleid !== undefined && hasChange))}
                 onchange={() => {
                     if (type === 'number') {
-                        haveChanges[columnNum] = Number(values[columnNum]) !== Number(formattedDefault);
+                        haveChanges[columnNum] =
+                            Number(values[columnNum]) !== Number(formattedDefault);
                     } else {
                         haveChanges[columnNum] = values[columnNum] !== formattedDefault;
                     }

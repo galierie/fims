@@ -30,16 +30,19 @@
     }: Props = $props();
 
     $effect(() => {
-        teachingLoadCredit = coursesTaught.reduce((acc, curr) => acc + Number(curr.teachingLoadCredit ?? 0), 0);
+        teachingLoadCredit = coursesTaught.reduce(
+            (acc, curr) => acc + Number(curr.teachingLoadCredit ?? 0),
+            0,
+        );
     });
 
     const setAverage = $derived(() => {
         const coursesWithSet = coursesTaught.filter(
-            (c) => c.sectionSET !== null && c.sectionSET !== undefined && c.sectionSET !== ''
+            (c) => c.sectionSET !== null && c.sectionSET !== undefined && c.sectionSET !== '',
         );
-        
+
         if (coursesWithSet.length === 0) return 'N/A';
-        
+
         const sum = coursesWithSet.reduce((acc, curr) => acc + Number(curr.sectionSET), 0);
         return (sum / coursesWithSet.length).toFixed(3);
     });

@@ -63,11 +63,7 @@
         </div>
         <div class="w-66 2xl:w-132"><span>{email}</span></div>
         <div class="w-50 justify-center">
-            <form
-                method="POST"
-                action="?/resetAccount"
-                class="flex items-center justify-center"
-            >
+            <form method="POST" action="?/resetAccount" class="flex items-center justify-center">
                 <RedButton type="submit" name="userid" value={id}>
                     <Icon icon="tabler:refresh" class="mr-2 h-6 w-6" />
                     <span>Reset</span>

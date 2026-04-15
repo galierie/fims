@@ -1,6 +1,18 @@
 import { sql } from 'drizzle-orm';
 
-import { adminPosition, appointmentStatus, course, degreeProgram, fieldOfInterest, office, profileInfo, rank, research, role, status } from './schema';
+import {
+    adminPosition,
+    appointmentStatus,
+    course,
+    degreeProgram,
+    fieldOfInterest,
+    office,
+    profileInfo,
+    rank,
+    research,
+    role,
+    status,
+} from './schema';
 import { db } from './index';
 import { auth } from '$lib/server/auth';
 import { refreshAccountSearchView } from '$lib/server/queries/account-list';

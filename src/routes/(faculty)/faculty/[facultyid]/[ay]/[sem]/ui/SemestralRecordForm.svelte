@@ -85,7 +85,7 @@
     );
 
     const loadStatus = $derived(
-        totalCredit < 12 ? 'Underload' : totalCredit <= 18 ? 'Normal' : 'Overload'
+        totalCredit < 12 ? 'Underload' : totalCredit <= 18 ? 'Normal' : 'Overload',
     );
 
     // Handle tab exit with unsaved changes
@@ -129,7 +129,7 @@
         resetViewState();
         isLoading = true;
         return async ({ update }) => {
-            await update({ reset: false }); 
+            await update({ reset: false });
             isLoading = false;
         };
     }}

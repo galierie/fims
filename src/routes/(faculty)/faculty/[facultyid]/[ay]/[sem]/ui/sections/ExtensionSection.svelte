@@ -17,7 +17,10 @@
     }: Props = $props();
 
     $effect(() => {
-        extensionLoadCredit = extensionWork.reduce((acc, curr) => acc + Number(curr.extensionLoadCredit ?? 0), 0);
+        extensionLoadCredit = extensionWork.reduce(
+            (acc, curr) => acc + Number(curr.extensionLoadCredit ?? 0),
+            0,
+        );
     });
 
     // Input Table Columns
