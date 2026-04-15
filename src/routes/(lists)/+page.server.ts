@@ -1,7 +1,7 @@
-import { fail } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 
 import { adminPosition, faculty, rank } from '$lib/server/db/schema';
-import { deleteFacultyRecords, getUserPermissions } from '$lib/server/queries/db-helpers';
+import { deleteFacultyRecords, getUserRoleAndPermissions } from '$lib/server/queries/db-helpers';
 import type { FilterColumn, FilterObject } from '$lib/types/filter';
 import {
     getAllAdminPositions,
@@ -12,9 +12,16 @@ import {
 } from '$lib/server/queries/faculty-list';
 
 export async function load({ url, locals }) {
-    const permissions = await getUserPermissions(locals.user.id);
-    const canViewAccounts = permissions?.canAddAccount || permissions?.canModifyAccount || false;
-    const canViewChangelogs = permissions?.canViewChangelogs ?? false;
+    // Check existing session
+    if (typeof locals.user === 'undefined') throw redirect(307, '/login');
+
+    // Check Permissions
+    const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
+    if (typeof roleObj === 'undefined') throw redirect(307, '/login');
+
+    const { canAddFaculty, canModifyFaculty, canViewChangelogs } = roleObj;
+    const canViewFaculty = canAddFaculty || canModifyFaculty;
+    if (!canViewFaculty) throw error(403, { message: 'Insufficient permissions.' });
 
     // Extract queries
 
@@ -85,16 +92,20 @@ export async function load({ url, locals }) {
         hasNext,
         filters,
         searchTerm, // We send this back to the UI
-        canViewAccounts, // Added here
         canViewChangelogs, // Added here
     };
 }
 export const actions = {
     async delete({ locals, request }) {
-        // Security Guard
-        const permissions = await getUserPermissions(locals.user.id);
-        if (!permissions?.canModifyFaculty)
-            return fail(403, { error: 'Insufficient permissions.' });
+        // Check existing session
+        if (typeof locals.user === 'undefined') throw redirect(307, '/login');
+
+        // Check Permissions
+        const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
+        if (typeof roleObj === 'undefined') throw redirect(307, '/login');
+
+        const { canModifyFaculty } = roleObj;
+        if (!canModifyFaculty) return fail(403, { error: 'Insufficient permissions.' });
 
         const formData = await request.formData();
         const idsString = formData.get('ids') as string;

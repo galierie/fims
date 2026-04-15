@@ -94,20 +94,20 @@ export async function deleteUsersInfo(operatorId: string, userids: string[]) {
     return { success: true };
 }
 
-export async function getRole(id: string) {
-    const [fetchedUser] = await db
-        .select()
-        .from(profileInfo)
-        .where(eq(profileInfo.profileId, id))
+export async function getUserRoleAndPermissions(profileId: string) {
+    return await db
+        .select({
+            role: role.role,
+            canAddAccount: role.canAddAccount,
+            canModifyAccount: role.canModifyAccount,
+            canAddFaculty: role.canAddFaculty,
+            canModifyFaculty: role.canModifyFaculty,
+            canViewChangelogs: role.canViewChangelogs,
+        })
+        .from(role)
+        .innerJoin(profileInfo, eq(profileInfo.role, role.role))
+        .where(eq(profileInfo.profileId, profileId))
         .limit(1);
-
-    return fetchedUser.role;
-}
-
-export async function getPermissions(userRole: string) {
-    const [fetchedRole] = await db.select().from(role).where(eq(role.role, userRole)).limit(1);
-
-    return fetchedRole;
 }
 
 export async function areYouHere(email: string) {
@@ -710,10 +710,4 @@ export async function updateSemestralRecords(
     } catch {
         return { success: false };
     }
-}
-
-export async function getUserPermissions(userId: string) {
-    const userRole = await getRole(userId);
-    if (!userRole) return null;
-    return await getPermissions(userRole);
 }

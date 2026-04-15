@@ -1,6 +1,7 @@
 import ExcelJS from '@protobi/exceljs';
 import { json, type RequestEvent } from '@sveltejs/kit';
 
+import { getUserRoleAndPermissions } from '$lib/server/queries/db-helpers';
 import { getFacultyBySubjectWorksheet } from '$lib/utils/report/faculty-by-subject';
 import { getFacultyLoadingWorksheet } from '$lib/utils/report/faculty-loading';
 import { getFacultyProfileWorksheet } from '$lib/utils/report/faculty-profile';
@@ -9,21 +10,41 @@ import { getFacultySETAverageWorksheet } from '$lib/utils/report/faculty-set-ave
 import { getSubjectsByFacultyWorksheet } from '$lib/utils/report/subjects-by-faculty';
 
 export async function GET({ url, locals }: RequestEvent) {
-    if (!locals.user)
+    // Check existing session
+    if (typeof locals.user === 'undefined')
         return json({ error: 'Unauthorized. Please log in to export.' }, { status: 401 });
+
+    // Check Permissions
+    const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
+    if (typeof roleObj === 'undefined')
+        return json({ error: 'Unauthorized. Please log in to export.' }, { status: 401 });
+
+    const { canAddFaculty, canModifyFaculty } = roleObj;
+    const canViewFaculty = canAddFaculty || canModifyFaculty;
+    if (!canViewFaculty)
+        return json({ error: 'Unauthorized. Insufficient permissions.' }, { status: 401 });
 
     // Extract and Validate Parameters
     const typesStr = url.searchParams.get('types');
     if (!typesStr) return json({ error: 'No report type specified' }, { status: 400 });
     const types = typesStr.split(',');
 
-    const needsFacultyIds = !(new Set(types)).isDisjointFrom(new Set(['profile', 'service-record', 'loading', 'set-avg', 'subjects-by-faculty']));
+    const format = url.searchParams.get('format');
+    if (format === null || (format !== 'csv' && format !== 'xlsx'))
+        return json({ error: 'No report format specified' }, { status: 400 });
+
+    const needsFacultyIds = !new Set(types).isDisjointFrom(
+        new Set(['profile', 'service-record', 'loading', 'set-avg', 'subjects-by-faculty']),
+    );
 
     const facultyIdsStr = url.searchParams.get('facultyIds') ?? '';
-    if (needsFacultyIds && facultyIdsStr === '') return json({ error: 'No faculty member specified' }, { status: 400 });
+    if (needsFacultyIds && facultyIdsStr === '')
+        return json({ error: 'No faculty member specified' }, { status: 400 });
     const facultyIds = facultyIdsStr.split(',').map((idStr: string) => parseInt(idStr, 10));
 
-    const needsPeriods = !(new Set(types)).isDisjointFrom(new Set(['service-record', 'loading', 'set-avg', 'subjects-by-faculty']));
+    const needsPeriods = !new Set(types).isDisjointFrom(
+        new Set(['service-record', 'loading', 'set-avg', 'subjects-by-faculty']),
+    );
 
     const rawFromAy = parseInt(url.searchParams.get('fromAy') || '0', 10);
     const rawFromSem = parseInt(url.searchParams.get('fromSem') || '0', 10);
@@ -157,18 +178,22 @@ export async function GET({ url, locals }: RequestEvent) {
 
         if (addedSheets === 0) return json({ error: 'No workbook generated.' }, { status: 400 });
 
-        const buf = await workbook.xlsx.writeBuffer();
+        const buf =
+            format === 'csv' ? await workbook.csv.writeBuffer() : await workbook.xlsx.writeBuffer();
 
         const customFileName = url.searchParams.get('fileName');
         const finalName = customFileName
-            ? `${customFileName}.xlsx`
+            ? `${customFileName}.${format}`
             : needsPeriods
-                ? `Export-AY${fromAy}-S${fromSem}-to-AY${toAy}-S${toSem}.xlsx`
-                : 'Faculty_Profile.xlsx';
+              ? `Export-AY${fromAy}-S${fromSem}-to-AY${toAy}-S${toSem}.${format}`
+              : `Faculty_Profile.${format}`;
 
         return new Response(buf, {
             headers: {
-                'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'Content-Type':
+                    format === 'csv'
+                        ? 'text/csv'
+                        : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                 'Content-Disposition': `attachment; filename="${finalName}"`,
             },
         });

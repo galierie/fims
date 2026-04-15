@@ -33,10 +33,7 @@ export async function getFacultyRecordList(
             academicSemesterid: academicSemester.id,
         })
         .from(academicSemester)
-        .orderBy(
-            desc(academicSemester.academicYear), 
-            desc(academicSemester.semesterNumber)
-        )
+        .orderBy(desc(academicSemester.academicYear), desc(academicSemester.semesterNumber))
         .limit(1);
 
     // fallback ID in case there are no entries for current AcademicSemester
@@ -86,34 +83,34 @@ export async function getFacultyRecordList(
 
     // Get faculty records from database
     const facultyRecordCountSq = await db
-    .select({
-        id: faculty.id,
-        lastName: faculty.lastName,
-        firstName: faculty.firstName,
-        status: faculty.status,
-        rankTitle: rank.title,
-        adminPosition: adminPositionSq.title,
-        latestChangelogId: faculty.latestChangelogId,
-    })
-    .from(faculty)
-    .rightJoin(searchSq, eq(searchSq.id, faculty.id)) 
-    .leftJoin(
-        facultyAcademicSemester,
-        and(
-            eq(facultyAcademicSemester.facultyId, faculty.id),
-            eq(facultyAcademicSemester.academicSemesterId, currentAcademicSemesterId)
+        .select({
+            id: faculty.id,
+            lastName: faculty.lastName,
+            firstName: faculty.firstName,
+            status: faculty.status,
+            rankTitle: rank.title,
+            adminPosition: adminPositionSq.title,
+            latestChangelogId: faculty.latestChangelogId,
+        })
+        .from(faculty)
+        .rightJoin(searchSq, eq(searchSq.id, faculty.id))
+        .leftJoin(
+            facultyAcademicSemester,
+            and(
+                eq(facultyAcademicSemester.facultyId, faculty.id),
+                eq(facultyAcademicSemester.academicSemesterId, currentAcademicSemesterId),
+            ),
         )
-    )
-    .leftJoin(facultyRank, eq(facultyRank.id, facultyAcademicSemester.currentRankId))
-    .leftJoin(rank, eq(rank.id, facultyRank.rankId))
-    .leftJoin(
-        adminPositionSq,
-        eq(adminPositionSq.facultyAcademicSemesterId, facultyAcademicSemester.id),
-    )
-    .where(and(cursorFilter, and(...filterQueries)))
-    .orderBy(isNext ? asc(faculty.id) : desc(faculty.id))
-    .limit(pageSize + 1)
-    .as('faculty_record_count_sq');
+        .leftJoin(facultyRank, eq(facultyRank.id, facultyAcademicSemester.currentRankId))
+        .leftJoin(rank, eq(rank.id, facultyRank.rankId))
+        .leftJoin(
+            adminPositionSq,
+            eq(adminPositionSq.facultyAcademicSemesterId, facultyAcademicSemester.id),
+        )
+        .where(and(cursorFilter, and(...filterQueries)))
+        .orderBy(isNext ? asc(faculty.id) : desc(faculty.id))
+        .limit(pageSize + 1)
+        .as('faculty_record_count_sq');
 
     // Check if there is a previous/next page
     let hasPrev = !initLoad;

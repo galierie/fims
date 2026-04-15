@@ -1,7 +1,6 @@
 // contains adminpositions and offices for seeding
 // doing this for organizational purposes
 
-
 // delete all entries in the table muna
 
 export const statusRelations = [
@@ -15,15 +14,15 @@ export const statusRelations = [
         status: 'Sabbatical',
     },
     {
-        status: 'On Secondment'
-    }
+        status: 'On Secondment',
+    },
 ];
 
 export const apppointmentStatuses = [
-    {appointmentStatus:'Permanent'},
-    {appointmentStatus:'Temporary'},
-    {appointmentStatus:'Part-Time'},
-    {appointmentStatus:'Full-Time'},
+    { appointmentStatus: 'Permanent' },
+    { appointmentStatus: 'Temporary' },
+    { appointmentStatus: 'Part-Time' },
+    { appointmentStatus: 'Full-Time' },
 ];
 
 // faculty
@@ -176,9 +175,9 @@ export const academicSemesters = [
     {
         id: 1,
         semesterNumber: 0,
-        academicYear: 2025
-    }
-]
+        academicYear: 2025,
+    },
+];
 
 /*
 // Refresh faculty record search view

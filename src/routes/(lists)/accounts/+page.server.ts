@@ -1,17 +1,33 @@
-import { type Actions, error, fail } from '@sveltejs/kit';
+import { type Actions, error, fail, redirect } from '@sveltejs/kit';
 import { APIError } from 'better-auth';
 
-import { areYouHere, deleteUsersInfo, getUserPermissions, makeProfileInfo } from '$lib/server/queries/db-helpers';
+import {
+    areYouHere,
+    deleteUsersInfo,
+    getUserRoleAndPermissions,
+    makeProfileInfo,
+} from '$lib/server/queries/db-helpers';
 import { auth } from '$lib/server/auth';
 import type { FilterColumn, FilterObject } from '$lib/types/filter';
-import { getAccountList, getAllRoles, refreshAccountSearchView } from '$lib/server/queries/account-list';
+import {
+    changeRole,
+    getAccountList,
+    getAllRoles,
+    refreshAccountSearchView,
+} from '$lib/server/queries/account-list';
 import { profileInfo } from '$lib/server/db/schema';
 
 export async function load({ locals, url }) {
-    const permissions = await getUserPermissions(locals.user.id);
-    const canViewAccounts = permissions?.canAddAccount || permissions?.canModifyAccount || false;
+    // Check existing session
+    if (typeof locals.user === 'undefined') throw redirect(307, '/login');
 
-    if (!canViewAccounts) throw error(404, { message: 'Insufficient permissions.' });
+    // Check Permissions
+    const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
+    if (typeof roleObj === 'undefined') throw redirect(307, '/login');
+
+    const { canAddAccount, canModifyAccount } = roleObj;
+    const canViewAccounts = canAddAccount || canModifyAccount;
+    if (!canViewAccounts) throw error(403, { message: 'Insufficient permissions.' });
 
     const userRoles = await getAllRoles();
 
@@ -71,8 +87,15 @@ export async function load({ locals, url }) {
 
 export const actions = {
     async makeAccount({ locals, request }) {
-        const permissions = await getUserPermissions(locals.user.id);
-        if (!permissions?.canAddAccount) return fail(403, { error: 'Insufficient permissions.' });
+        // Check existing session
+        if (typeof locals.user === 'undefined') throw redirect(307, '/login');
+
+        // Check Permissions
+        const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
+        if (typeof roleObj === 'undefined') throw redirect(307, '/login');
+
+        const { canAddAccount } = roleObj;
+        if (!canAddAccount) return fail(403, { error: 'Insufficient permissions.' });
 
         const data = await request.formData();
         const email = data.get('email') as string;
@@ -119,9 +142,15 @@ export const actions = {
     },
 
     async deleteAccount({ locals, request }) {
-        const permissions = await getUserPermissions(locals.user.id);
-        if (!permissions?.canModifyAccount)
-            return fail(403, { error: 'Insufficient permissions.' });
+        // Check existing session
+        if (typeof locals.user === 'undefined') throw redirect(307, '/login');
+
+        // Check Permissions
+        const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
+        if (typeof roleObj === 'undefined') throw redirect(307, '/login');
+
+        const { canModifyAccount } = roleObj;
+        if (!canModifyAccount) return fail(403, { error: 'Insufficient permissions.' });
 
         const data = await request.formData();
         const userid = data.get('userid') as string;
@@ -150,9 +179,15 @@ export const actions = {
     },
 
     async deleteAccounts({ locals, request }) {
-        const permissions = await getUserPermissions(locals.user.id);
-        if (!permissions?.canModifyAccount)
-            return fail(403, { error: 'Insufficient permissions.' });
+        // Check existing session
+        if (typeof locals.user === 'undefined') throw redirect(307, '/login');
+
+        // Check Permissions
+        const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
+        if (typeof roleObj === 'undefined') throw redirect(307, '/login');
+
+        const { canModifyAccount } = roleObj;
+        if (!canModifyAccount) return fail(403, { error: 'Insufficient permissions.' });
 
         const formData = await request.formData();
         const useridsStr = formData.get('userids') as string;
@@ -189,5 +224,43 @@ export const actions = {
         } catch {
             return fail(500, { error: 'Failed to delete accounts.' });
         }
+    },
+
+    async changeRole({ locals, request }) {
+        // Check existing session
+        if (typeof locals.user === 'undefined') throw redirect(307, '/login');
+
+        // Check Permissions
+        const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
+        if (typeof roleObj === 'undefined') throw redirect(307, '/login');
+
+        const { canModifyAccount } = roleObj;
+        if (!canModifyAccount) return fail(403, { error: 'Insufficient permissions.' });
+
+        const formData = await request.formData();
+        const role = formData.get('role') as string;
+        const userId = formData.get('userId') as string;
+
+        // Validate input
+        if (!role) return fail(400, { error: 'No role selected.' });
+        if (!userId) return fail(400, { error: 'No user selected.' });
+
+        // Elevate user as admin in better-auth
+        await auth.api.adminUpdateUser({
+            body: {
+                userId,
+                data: {
+                    role: role === 'IT' ? 'admin' : 'user',
+                },
+            },
+            headers: request.headers,
+        });
+
+        const { success } = await changeRole(locals.user.id, userId, role);
+
+        return {
+            success,
+            message: success ? 'Changed user role.' : 'Failed to change user role',
+        };
     },
 } satisfies Actions;

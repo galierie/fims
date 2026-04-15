@@ -83,8 +83,6 @@
     let selectedDownloads: Download[] = $state([]);
 
     async function handleExport() {
-        step = 2;
-
         const links = [];
         const allFacIds = selectedFaculty.map((f) => f.facultyid || f.id).join(',');
 
@@ -111,15 +109,14 @@
         const courseSuffix = hasCourseDateDependent ? `_${rangeStr}` : '';
 
         let facReportTitle = 'CombinedReports';
-        if (facTypes.length === 1) 
+        if (facTypes.length === 1)
             if (exportProfile) facReportTitle = 'Profile';
             else if (exportServiceRecord) facReportTitle = 'ServiceRecord';
             else if (exportLoading) facReportTitle = 'Loading';
             else if (exportSetAvg) facReportTitle = 'SETAverage';
-        
 
         // FACULTY REPORTS ROUTING
-        if (facTypes.length > 0) 
+        if (facTypes.length > 0)
             if (aggregateFacultyReports) {
                 const fileName = `AggregatedFacultyReports${facSuffix}`;
                 links.push({
@@ -131,17 +128,35 @@
                     const fName = faculty.firstname || faculty.firstName || '';
                     const lName = faculty.lastname || faculty.lastName || 'Unknown';
                     const namePrefix = fName ? `${lName}_${fName}` : lName;
-                    const fileName = `${namePrefix}-${facReportTitle}${facSuffix}`;
-                    links.push({
-                        name: fileName,
-                        url: `/api/export?types=${facTypes.join(',')}&facultyIds=${faculty.facultyid || faculty.id}&${baseParams}&fileName=${fileName}`,
-                    });
+
+                    if (format === 'csv') {
+                        const typeToName = new Map<string, string>();
+                        typeToName.set('profile', 'Profile');
+                        typeToName.set('service-record', 'ServiceRecord');
+                        typeToName.set('loading', 'Loading');
+                        typeToName.set('set-avg', 'SETAverage');
+
+                        facTypes.forEach((type) => {
+                            const fileName = `${namePrefix}-${typeToName.get(type) ?? 'Report'}${facSuffix}`;
+
+                            links.push({
+                                name: fileName,
+                                url: `/api/export?types=${type}&facultyIds=${faculty.facultyid || faculty.id}&${baseParams}&fileName=${fileName}`,
+                            });
+                        });
+                    } else {
+                        const fileName = `${namePrefix}-${facReportTitle}${facSuffix}`;
+
+                        links.push({
+                            name: fileName,
+                            url: `/api/export?types=${facTypes.join(',')}&facultyIds=${faculty.facultyid || faculty.id}&${baseParams}&fileName=${fileName}`,
+                        });
+                    }
                 }
             }
-        
 
         // COURSE INFORMATION ROUTING
-        if (courseTypes.length > 0) 
+        if (courseTypes.length > 0)
             if (aggregateCourseReports) {
                 let courseReportTitle = `AggregatedCourseReports${courseSuffix}`;
                 if (courseTypes.length === 1) {
@@ -159,7 +174,7 @@
                     const fileName = `By_Subject_Faculty_Taught`;
                     links.push({
                         name: fileName,
-                        url: `/api/export?types=faculty-by-subject&fileName=${fileName}`,
+                        url: `/api/export?types=faculty-by-subject&fileName=${fileName}&format=${format}`,
                     });
                 }
                 if (exportByFacSubj) {
@@ -172,18 +187,18 @@
             }
 
         // Return only working links
-        const nullableDownloads = await Promise.all(links.map(
-            async download => {
+        const nullableDownloads = await Promise.all(
+            links.map(async (download) => {
                 try {
                     const response = await fetch(download.url, { method: 'HEAD' });
-                    return (response.ok) ? download : null;
+                    return response.ok ? download : null;
                 } catch {
                     return null;
                 }
-            }
-        ));
+            }),
+        );
 
-        const workingLinks = nullableDownloads.filter(download => download !== null);
+        const workingLinks = nullableDownloads.filter((download) => download !== null);
 
         return workingLinks;
     }
@@ -524,7 +539,13 @@
                     class="rounded-3xl border-2 border-fims-green px-7 py-2 font-medium text-fims-green transition-all hover:opacity-70 active:scale-95"
                     onclick={onCancel}>Cancel</button
                 >
-                <GreenButton onclick={async () => { selectedDownloads = await handleExport() }} disabled={isExportDisabled}>
+                <GreenButton
+                    onclick={async () => {
+                        selectedDownloads = await handleExport();
+                        step = 2;
+                    }}
+                    disabled={isExportDisabled}
+                >
                     <Icon icon="tabler:file-export" class="mr-2 h-5 w-5" />
                     <span>Export</span>
                 </GreenButton>

@@ -60,7 +60,7 @@ export async function getFacultyLoadingWorksheet(
     const rawData = await Promise.all(
         facultyIds.map((id) => getFacultyLoadingReport(id, acadYear, semNum)),
     );
-    const data = rawData.filter(datum => datum !== null);
+    const data = rawData.filter((datum) => datum !== null);
 
     if (data.length === 0) return null;
 
@@ -97,9 +97,7 @@ export async function getFacultyLoadingWorksheet(
     });
 
     // Widen all cells
-    for (let i = 1; i <= usedColumns; i++) 
-        sheet.getColumn(i).width = i === 1 ? 40 : 20;
-    
+    for (let i = 1; i <= usedColumns; i++) sheet.getColumn(i).width = i === 1 ? 40 : 20;
 
     // Set data cells
     let row = dataStartRow;

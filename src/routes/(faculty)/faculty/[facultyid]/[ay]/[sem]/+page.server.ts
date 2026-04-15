@@ -1,19 +1,37 @@
-import { error, fail } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 
 import type { ChangelogRecordStructure } from '$lib/ui/ChangelogList.svelte';
-import { getAllAdminPositions, getAllCourses, getAllFacultyAcademicSemesters, getAllOffices, getAllResearches, getAllSemesterms, getFacultyEducationalAttainments, getFacultyPromotionHistory, getFacultySemestralRecords } from '$lib/server/queries/faculty-view';
+import {
+    getAllAdminPositions,
+    getAllCourses,
+    getAllFacultyAcademicSemesters,
+    getAllOffices,
+    getAllResearches,
+    getAllSemesterms,
+    getFacultyEducationalAttainments,
+    getFacultyPromotionHistory,
+    getFacultySemestralRecords,
+} from '$lib/server/queries/faculty-view';
 import { getFacultyRecordChangelogs } from '$lib/server/queries/faculty-list.js';
-import { getUserPermissions, updateSemestralRecords } from '$lib/server/queries/db-helpers';
+import { getUserRoleAndPermissions, updateSemestralRecords } from '$lib/server/queries/db-helpers';
 
 export async function load({ params, locals }) {
+    // Check existing session
+    if (typeof locals.user === 'undefined') throw redirect(307, '/login');
+
+    // Check Permissions
+    const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
+    if (typeof roleObj === 'undefined') throw redirect(307, '/login');
+
+    const { canAddFaculty, canModifyFaculty, canViewChangelogs } = roleObj;
+    const canViewFaculty = canAddFaculty || canModifyFaculty;
+    if (!canViewFaculty) return fail(403, { error: 'Insufficient permissions.' });
+
     const { facultyid: facultyidStr, ay: acadYearStr, sem: semNumStr } = params;
 
     const facultyid = parseInt(facultyidStr, 10);
     const acadYear = parseInt(acadYearStr, 10);
     const semNum = parseInt(semNumStr, 10);
-
-    const permissions = await getUserPermissions(locals.user.id);
-    const canViewChangelogs = permissions?.canViewChangelogs ?? false;
 
     let fetchedChangelogs: ChangelogRecordStructure[] | null = null;
 
@@ -109,9 +127,15 @@ export async function load({ params, locals }) {
 
 export const actions = {
     async update({ request, params, locals }) {
-        const permissions = await getUserPermissions(locals.user.id);
-        if (!permissions?.canModifyFaculty)
-            return fail(403, { error: 'Insufficient permissions.' });
+        // Check existing session
+        if (typeof locals.user === 'undefined') throw redirect(307, '/login');
+
+        // Check Permissions
+        const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
+        if (typeof roleObj === 'undefined') throw redirect(307, '/login');
+
+        const { canModifyFaculty } = roleObj;
+        if (!canModifyFaculty) return fail(403, { error: 'Insufficient permissions.' });
 
         const formData = await request.formData();
 
