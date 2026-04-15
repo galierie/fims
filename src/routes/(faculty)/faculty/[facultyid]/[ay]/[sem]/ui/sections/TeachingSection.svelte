@@ -222,7 +222,7 @@
                     numOfColumns={22}
                     bind:hasChange={haveChanges[0]}
                 />
-                <p class="mt-2 pl-4 text-sm font-medium">SET Average: {setAverage()}</p>
+                <p class="mt-2 pl-3.5">SET Average: {setAverage()}</p>
             </div>
 
             <div class="mt-4">

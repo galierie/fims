@@ -41,10 +41,10 @@
 </script>
 
 <SemestralRecordForm
-    {acadYearOpts}
-    {allSemStrs}
-    {existingOpts}
-    {facultyid}
+    acadYearOpts={acadYearOpts ?? []}
+    allSemStrs={allSemStrs ?? []}
+    existingOpts={existingOpts ?? []}
+    facultyid={facultyid ?? 0}
     {semestralRecord}
     {opts}
     {dependencyMaps}
