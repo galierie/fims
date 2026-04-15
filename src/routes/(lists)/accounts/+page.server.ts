@@ -63,8 +63,7 @@ export async function load({ locals, url }) {
     const searchTerm = url.searchParams.get('search');
 
     // Sort
-    const sortByStr = url.searchParams.get('sort-by');
-    const sortBys = sortByStr === null ? [] : sortByStr.split(',');
+    const sortBys = url.searchParams.getAll('sort-by');
 
     // Get account list
     const { accountList, prevCursor, nextCursor, hasPrev, hasNext } = await getAccountList(
