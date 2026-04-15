@@ -1,16 +1,4 @@
-import {
-    and,
-    asc,
-    desc,
-    eq,
-    gt,
-    ilike,
-    lt,
-    ne,
-    or,
-    type SQL,
-    type SQLWrapper,
-} from 'drizzle-orm';
+import { and, asc, desc, eq, gt, ilike, lt, ne, or, type SQL, type SQLWrapper } from 'drizzle-orm';
 
 import type { FilterColumn } from '$lib/types/filter';
 
@@ -59,7 +47,7 @@ export async function getAccountList(
 
     // Process sorting order
     let sortOrder: Array<SQL> = [];
-    sortBys.forEach(rawSortKey => {
+    sortBys.forEach((rawSortKey) => {
         let sortKey = rawSortKey;
 
         if (!isNext) {
@@ -67,7 +55,7 @@ export async function getAccountList(
             if (typeof keyOrder === 'undefined') return;
             if (keyArr.length === 0) return;
 
-            const flipOrder = (keyOrder === 'asc') ? 'desc' : 'asc';
+            const flipOrder = keyOrder === 'asc' ? 'desc' : 'asc';
             sortKey = [flipOrder, ...keyArr].join('-');
         }
 
@@ -113,15 +101,14 @@ export async function getAccountList(
     const profileCount = shownFields.length;
     const isTooMuch = profileCount > pageSize;
 
-    const hasPrev = (isNext) ? !initLoad : isTooMuch;
-    const hasNext = (isNext) ? isTooMuch : true;
+    const hasPrev = isNext ? !initLoad : isTooMuch;
+    const hasNext = isNext ? isTooMuch : true;
 
     // Reverse faculty list if previous page
     if (!isNext) shownFields.reverse();
 
     // Chop off the extra record if isTooMuch
-    if (isTooMuch)
-        shownFields.pop();
+    if (isTooMuch) shownFields.pop();
 
     // Get cursors
     const [firstId, , lastId] = shownFields;

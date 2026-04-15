@@ -22,11 +22,19 @@ const pageSize = 50;
 // Sort keywords
 const sortMaps: Map<string, SQL[]> = new Map();
 
-sortMaps.set('asc-full-name', [asc(faculty.lastName), asc(faculty.firstName), asc(faculty.middleName)]);
-sortMaps.set('desc-full-name', [desc(faculty.lastName), desc(faculty.firstName), desc(faculty.middleName)]);
+sortMaps.set('asc-full-name', [
+    asc(faculty.lastName),
+    asc(faculty.firstName),
+    asc(faculty.middleName),
+]);
+sortMaps.set('desc-full-name', [
+    desc(faculty.lastName),
+    desc(faculty.firstName),
+    desc(faculty.middleName),
+]);
 
-sortMaps.set('asc-status', [asc(faculty.status)])
-sortMaps.set('desc-status', [desc(faculty.status)])
+sortMaps.set('asc-status', [asc(faculty.status)]);
+sortMaps.set('desc-status', [desc(faculty.status)]);
 
 sortMaps.set('asc-rank', [asc(rank.title)]);
 sortMaps.set('desc-rank', [desc(rank.title)]);
@@ -100,7 +108,7 @@ export async function getFacultyRecordList(
 
     // Process sorting order
     let sortOrder: Array<SQL> = [];
-    sortBys.forEach(rawSortKey => {
+    sortBys.forEach((rawSortKey) => {
         let sortKey = rawSortKey;
 
         if (!isNext) {
@@ -108,7 +116,7 @@ export async function getFacultyRecordList(
             if (typeof keyOrder === 'undefined') return;
             if (keyArr.length === 0) return;
 
-            const flipOrder = (keyOrder === 'asc') ? 'desc' : 'asc';
+            const flipOrder = keyOrder === 'asc' ? 'desc' : 'asc';
             sortKey = [flipOrder, ...keyArr].join('-');
         }
 
@@ -157,15 +165,14 @@ export async function getFacultyRecordList(
     const facultyRecordCount = shownFields.length;
     const isTooMuch = facultyRecordCount > pageSize;
 
-    const hasPrev = (isNext) ? !initLoad : isTooMuch;
-    const hasNext = (isNext) ? isTooMuch : true;
+    const hasPrev = isNext ? !initLoad : isTooMuch;
+    const hasNext = isNext ? isTooMuch : true;
 
     // Reverse faculty list if previous page
     if (!isNext) shownFields.reverse();
 
     // Chop off the extra record if isTooMuch
-    if (isTooMuch)
-        shownFields.pop();
+    if (isTooMuch) shownFields.pop();
 
     // Get cursors
     const [firstId, , lastId] = shownFields;

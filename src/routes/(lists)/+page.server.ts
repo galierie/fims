@@ -76,7 +76,7 @@ export async function load({ url, locals }) {
 
     // Sort
     const sortByStr = url.searchParams.get('sort-by');
-    const sortBys = (sortByStr === null) ? [] : sortByStr.split(',');
+    const sortBys = sortByStr === null ? [] : sortByStr.split(',');
 
     // Get faculty record list
     const { facultyRecordList, prevCursor, nextCursor, hasPrev, hasNext } =

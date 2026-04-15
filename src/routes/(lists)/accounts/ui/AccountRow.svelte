@@ -15,8 +15,7 @@
     }
 
     const { account, isSelected, onToggle }: Props = $props();
-    const { email, role, id, logTimestamp, logOperation, logMaker }: AccountDTO =
-        $derived(account);
+    const { email, role, id, logTimestamp, logOperation, logMaker }: AccountDTO = $derived(account);
 
     const userRoles = ['Admin', 'IT'];
     let isLoading = $state(false);
