@@ -119,7 +119,7 @@ export async function getFacultyRecordList(
     sortOrder.push(isNext ? asc(faculty.id) : desc(faculty.id));
 
     // Get faculty records from database
-    const facultyRecordCountSq = await db
+    const shownFields = await db
         .select({
             id: faculty.id,
             lastName: faculty.lastName,
@@ -127,7 +127,9 @@ export async function getFacultyRecordList(
             status: faculty.status,
             rankTitle: rank.title,
             adminPosition: adminPositionSq.title,
-            latestChangelogId: faculty.latestChangelogId,
+            logTimestamp: changelog.timestamp,
+            logMaker: profile.email,
+            logOperation: changelog.operation,
         })
         .from(faculty)
         .rightJoin(searchSq, eq(searchSq.id, faculty.id))
@@ -144,72 +146,34 @@ export async function getFacultyRecordList(
             adminPositionSq,
             eq(adminPositionSq.facultyAcademicSemesterId, facultyAcademicSemester.id),
         )
+        .leftJoin(changelog, eq(changelog.id, faculty.latestChangelogId))
+        .leftJoin(profile, eq(profile.id, changelog.operatorId))
         .where(and(cursorFilter, and(...filterQueries)))
         .orderBy(...sortOrder)
-        .limit(pageSize + 1)
-        .as('faculty_record_count_sq');
+        .limit(pageSize + 1);
 
     // Check if there is a previous/next page
-    let hasPrev = !initLoad;
-    let hasNext = true;
 
-    const facultyRecordCount = (await db.select().from(facultyRecordCountSq)).length;
+    const facultyRecordCount = shownFields.length;
+    const isTooMuch = facultyRecordCount > pageSize;
 
-    if (isNext) hasNext = facultyRecordCount > pageSize;
-    else hasPrev = facultyRecordCount > pageSize;
+    const hasPrev = (isNext) ? !initLoad : isTooMuch;
+    const hasNext = (isNext) ? isTooMuch : true;
 
-    // Chop off the extra record
-    const facultyRecordSq = await db
-        .select()
-        .from(facultyRecordCountSq)
-        .orderBy(isNext ? asc(facultyRecordCountSq.id) : desc(facultyRecordCountSq.id))
-        .limit(pageSize)
-        .as('user_sq');
+    // Reverse faculty list if previous page
+    if (!isNext) shownFields.reverse();
+
+    // Chop off the extra record if isTooMuch
+    if (isTooMuch)
+        shownFields.pop();
 
     // Get cursors
-    let [firstId] = await db
-        .select({
-            value: facultyRecordSq.id,
-        })
-        .from(facultyRecordSq)
-        .orderBy(asc(facultyRecordSq.id))
-        .limit(1);
-
-    let [lastId] = await db
-        .select({
-            value: facultyRecordSq.id,
-        })
-        .from(facultyRecordSq)
-        .orderBy(desc(facultyRecordSq.id))
-        .limit(1);
-
-    // Get changelogs
-    const shownFields = await db
-        .select({
-            id: facultyRecordSq.id,
-            lastName: facultyRecordSq.lastName,
-            firstName: facultyRecordSq.firstName,
-            status: facultyRecordSq.status,
-            rankTitle: facultyRecordSq.rankTitle,
-            adminPosition: facultyRecordSq.adminPosition,
-            logTimestamp: changelog.timestamp,
-            logMaker: profile.email,
-            logOperation: changelog.operation,
-        })
-        .from(facultyRecordSq)
-        .leftJoin(changelog, eq(changelog.id, facultyRecordSq.latestChangelogId))
-        .leftJoin(profile, eq(profile.id, changelog.operatorId));
-
-    // Reverse account list and cursors if previous page
-    if (!isNext) {
-        [lastId, firstId] = [firstId, lastId];
-        shownFields.reverse();
-    }
+    const [firstId, , lastId] = shownFields;
 
     return {
         facultyRecordList: shownFields,
-        prevCursor: firstId?.value,
-        nextCursor: lastId?.value,
+        prevCursor: firstId?.id,
+        nextCursor: lastId?.id,
         hasPrev,
         hasNext,
     };
