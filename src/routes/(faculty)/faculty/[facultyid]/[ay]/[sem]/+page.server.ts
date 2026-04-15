@@ -126,6 +126,36 @@ export async function load({ params, locals }) {
 }
 
 export const actions = {
+    async delete({ locals, params, request }) {
+        // Check existing session
+        if (typeof locals.user === 'undefined') throw redirect(307, '/login');
+
+        // Check Permissions
+        const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
+        if (typeof roleObj === 'undefined') throw redirect(307, '/login');
+
+        const { canModifyFaculty } = roleObj;
+        if (!canModifyFaculty) return fail(403, { error: 'Insufficient permissions.' });
+
+        const formData = await request.formData();
+
+        // Extract URL parameters
+        const facultyidStr = params.facultyid;
+        const facultyid = parseInt(facultyidStr, 10);
+        const acadYearStr = params.ay;
+        const acadYear = parseInt(acadYearStr, 10);
+        const semNumStr = params.sem;
+        const semNum = parseInt(semNumStr, 10);
+
+        if (Number.isNaN(facultyid) || Number.isNaN(acadYear) || Number.isNaN(semNum))
+            return fail(400, { error: 'Invalid URL parameters.' });
+
+        const { success } = await deleteSemestralRecord(locals.user.id, facultyid, acadYear, semNum);
+        await refreshFacultyRecordSearchView();
+        if (success) redirect(308, `/${facultyid}/profile`);
+        return fail(500, { error: 'Failed to delete record.' });
+    },
+
     async update({ request, params, locals }) {
         // Check existing session
         if (typeof locals.user === 'undefined') throw redirect(307, '/login');
