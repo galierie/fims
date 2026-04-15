@@ -142,104 +142,106 @@
         {/if}
     </div>
 
-    <!-- Account List Table -->
-    <div class="custom-scrollbar mt-2.5 w-full overflow-x-auto">
-        <div class="w-full min-w-[1024px] pb-4">
-            <!-- Header -->
-            <div
-                class="flex justify-center [&>*>span]:text-center [&>*>span]:font-semibold [&>*>span]:text-white [&>div]:flex [&>div]:h-12 [&>div]:items-center [&>div]:bg-fims-red [&>div]:px-6"
-            >
-                <div class="w-25 justify-center"><span>Select</span></div>
-                <div class="w-66 2xl:w-132">
-                    <span>Email</span>
-                    <Icon icon="tabler:arrow-up" class="ml-3 h-5 w-5 text-white" />
-                </div>
-                <div class="w-50 justify-center"><span>Reset Password?</span></div>
-                <div class="w-40 justify-center">
-                    <span>Type</span>
-                </div>
-                <div class="w-85 justify-center 2xl:w-100"><span>Change Logs</span></div>
-                <div class="w-50 justify-center"><span>Account Action</span></div>
-            </div>
-
-            <!-- Rows -->
-            {#each accountList as account (account.userid)}
-                <AccountRow
-                    {account}
-                    isSelected={selectedIds.includes(account.userid)}
-                    onToggle={() => toggleSelection(account.userid)}
-                />
-            {/each}
-
-            <!-- Account Creation Form -->
-            {#if isMakingAccount}
-                <form
-                    method="POST"
-                    action="?/makeAccount"
-                    class="flex justify-center [&>div]:flex [&>div]:h-12 [&>div]:items-center [&>div]:border-b [&>div]:border-fims-gray [&>div]:bg-white [&>div]:px-6"
-                    bind:this={makeForm}
-                    use:enhance={({ cancel }) => {
-                        if (willMake) {
-                            isMakingAccount = false;
-                            willMake = false;
-                            isLoading = true;
-                            return async ({ update }) => {
-                                await update();
-                                isLoading = false;
-                            };
-                        }
-                        willMake = true;
-                        cancel();
-                    }}
+    <div class="overflow-x-auto whitespace-nowrap pb-50">
+        <!-- Account List Table -->
+        <div class="custom-scrollbar mt-2.5 w-full">
+            <div class="w-full min-w-[1024px] pb-4">
+                <!-- Header -->
+                <div
+                    class="flex justify-center [&>*>span]:text-center [&>*>span]:font-semibold [&>*>span]:text-white [&>div]:flex [&>div]:h-12 [&>div]:items-center [&>div]:bg-fims-red [&>div]:px-6"
                 >
-                    <div class="w-25"></div>
+                    <div class="w-25 justify-center"><span>Select</span></div>
                     <div class="w-66 2xl:w-132">
-                        <input
-                            type="email"
-                            name="email"
-                            placeholder="Enter email here"
-                            class="h-full w-full border-0 p-2 focus:ring-0"
-                        />
+                        <span>Email</span>
+                        <Icon icon="tabler:arrow-up" class="ml-3 h-5 w-5 text-white" />
                     </div>
-                    <div class="w-50">
-                        <input
-                            type="password"
-                            name="password"
-                            placeholder="Set initial password"
-                            class="h-full w-full border-0 p-2 focus:ring-0"
-                        />
+                    <div class="w-50 justify-center"><span>Reset Password?</span></div>
+                    <div class="w-40 justify-center">
+                        <span>Type</span>
                     </div>
-                    <div class="w-40">
-                        <SelectDropdownCell
-                            name="role"
-                            opts={userRoles}
-                            defaultSelectedOpt={userRoles[0]}
-                            isEditable={true}
-                        />
-                    </div>
-                    <div class="w-85 2xl:w-100"></div>
-                    <div class="w-50 justify-center">
-                        <GreenButton type="submit">
-                            <Icon icon="tabler:device-floppy" class="mr-2 h-6 w-6" />
-                            <span>Save</span>
-                        </GreenButton>
-                    </div>
-                </form>
-            {/if}
-        </div>
-    </div>
+                    <div class="w-85 justify-center 2xl:w-100"><span>Change Logs</span></div>
+                    <div class="w-50 justify-center"><span>Account Action</span></div>
+                </div>
 
-    <!-- Pagination Controls -->
-    <div class="mt-2 flex justify-center">
-        <div class="flex w-315 items-center justify-between 2xl:w-432">
-            <GreenButton onclick={() => goToPage(false)} type="button" disabled={!hasPrev}>
-                <Icon icon="line-md:arrow-left-circle" class="mr-2 h-5 w-5" />
-                <span>Previous</span>
-            </GreenButton>
-            <GreenButton onclick={() => goToPage(true)} type="button" disabled={!hasNext}>
-                <span>Next</span>
-                <Icon icon="line-md:arrow-right-circle" class="ml-2 h-5 w-5" />
-            </GreenButton>
+                <!-- Rows -->
+                {#each accountList as account (account.userid)}
+                    <AccountRow
+                        {account}
+                        isSelected={selectedIds.includes(account.userid)}
+                        onToggle={() => toggleSelection(account.userid)}
+                    />
+                {/each}
+
+                <!-- Account Creation Form -->
+                {#if isMakingAccount}
+                    <form
+                        method="POST"
+                        action="?/makeAccount"
+                        class="flex justify-center [&>div]:flex [&>div]:h-12 [&>div]:items-center [&>div]:border-b [&>div]:border-fims-gray [&>div]:bg-white [&>div]:px-6"
+                        bind:this={makeForm}
+                        use:enhance={({ cancel }) => {
+                            if (willMake) {
+                                isMakingAccount = false;
+                                willMake = false;
+                                isLoading = true;
+                                return async ({ update }) => {
+                                    await update();
+                                    isLoading = false;
+                                };
+                            }
+                            willMake = true;
+                            cancel();
+                        }}
+                    >
+                        <div class="w-25"></div>
+                        <div class="w-66 2xl:w-132">
+                            <input
+                                type="email"
+                                name="email"
+                                placeholder="Enter email here"
+                                class="h-full w-full border-0 p-2 focus:ring-0"
+                            />
+                        </div>
+                        <div class="w-50">
+                            <input
+                                type="password"
+                                name="password"
+                                placeholder="Set initial password"
+                                class="h-full w-full border-0 p-2 focus:ring-0"
+                            />
+                        </div>
+                        <div class="w-40">
+                            <SelectDropdownCell
+                                name="role"
+                                opts={userRoles}
+                                defaultSelectedOpt={userRoles[0]}
+                                isEditable={true}
+                            />
+                        </div>
+                        <div class="w-85 2xl:w-100"></div>
+                        <div class="w-50 justify-center">
+                            <GreenButton type="submit">
+                                <Icon icon="tabler:device-floppy" class="mr-2 h-6 w-6" />
+                                <span>Save</span>
+                            </GreenButton>
+                        </div>
+                    </form>
+                {/if}
+            </div>
+        </div>
+
+        <!-- Pagination Controls -->
+        <div class="mt-2 flex justify-center">
+            <div class="flex w-315 items-center justify-between 2xl:w-432">
+                <GreenButton onclick={() => goToPage(false)} type="button" disabled={!hasPrev}>
+                    <Icon icon="line-md:arrow-left-circle" class="mr-2 h-5 w-5" />
+                    <span>Previous</span>
+                </GreenButton>
+                <GreenButton onclick={() => goToPage(true)} type="button" disabled={!hasNext}>
+                    <span>Next</span>
+                    <Icon icon="line-md:arrow-right-circle" class="ml-2 h-5 w-5" />
+                </GreenButton>
+            </div>
         </div>
     </div>
 </div>
