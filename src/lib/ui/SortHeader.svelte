@@ -36,7 +36,7 @@
 </script>
 
 <button
-    class="h-full text-center font-semibold text-white flex items-center"
+    class="flex h-full items-center text-center font-semibold text-white"
     type="button"
     onclick={async () => {
         await sortRows();

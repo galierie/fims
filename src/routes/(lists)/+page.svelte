@@ -167,7 +167,11 @@
                     <SortHeader name="Rank" key="rank" bind:isSorting={isLoading} />
                 </div>
                 <div class="w-62.5 justify-center 2xl:w-75">
-                    <SortHeader name="Administrative Position" key="admin-position" bind:isSorting={isLoading} />
+                    <SortHeader
+                        name="Administrative Position"
+                        key="admin-position"
+                        bind:isSorting={isLoading}
+                    />
                 </div>
                 {#if canViewChangelogs}
                     <div class="w-50 justify-center"><span>Change Logs</span></div>
