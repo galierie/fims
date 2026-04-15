@@ -1,6 +1,6 @@
 import { sql } from 'drizzle-orm';
 
-import { adminPosition, appointmentStatus, course, degreeProgram, fieldOfInterest, office, rank, role, status } from './schema';
+import { adminPosition, appointmentStatus, course, degreeProgram, fieldOfInterest, office, rank, research, role, status } from './schema';
 import { db } from './index';
 
 export const appointmentStatuses = [
@@ -305,6 +305,21 @@ export const offices = [
     { name: 'Office of the Vice Chancellor for Student Affairs' },
 ];
 
+export const researches = [
+    {
+        title: 'Project BUHAY',
+        startDate: new Date('2020-12-25'),
+        endDate: new Date('2021-03-12'),
+        funding: null,
+    },
+    {
+        title: 'Project NOAH',
+        startDate: new Date('2023-08-23'),
+        endDate: new Date('2025-04-09'),
+        funding: null,
+    },
+];
+
 async function seedAppointmentStatusTable() {
     const rows = await db.select().from(appointmentStatus).limit(1);
     if (rows.length > 0) return { success: true };
@@ -396,6 +411,17 @@ async function seedOfficeTable() {
 
     // Check response
     return { success: response.length === offices.length };
+}
+
+async function seedResearchTable() {
+    // Don't proceed if table is already seeded
+    const rows = await db.select().from(research).limit(1);
+    if (rows.length > 0) return { success: true };
+
+    const response = await db.insert(research).values(researches).returning();
+
+    // Check response
+    return { success: response.length === researches.length };
 }
 
 export async function seedDatabase() {
