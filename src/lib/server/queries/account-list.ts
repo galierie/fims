@@ -21,6 +21,12 @@ import { logChange } from './db-helpers';
 
 const pageSize = 50;
 
+// Sort keywords
+const sortMaps: Map<string, SQL[]> = new Map();
+
+sortMaps.set('asc-email', [asc(profile.email)]);
+sortMaps.set('desc-email', [desc(profile.email)]);
+
 export async function getAccountList(
     currentUserId: string,
     searchTerm: string | null,
