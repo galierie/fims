@@ -31,6 +31,7 @@ export async function getAccountList(
     currentUserId: string,
     searchTerm: string | null,
     filterMap: FilterColumn[],
+    sortBys: string[],
     cursor?: number,
     isNext: boolean = true,
     initLoad: boolean = false,
@@ -56,6 +57,26 @@ export async function getAccountList(
         if (sameColumnQueries.length) filterQueries.push(or(...sameColumnQueries));
     });
 
+    // Process sorting order
+    let sortOrder: Array<SQL> = [];
+    sortBys.forEach(rawSortKey => {
+        let sortKey = rawSortKey;
+
+        if (!isNext) {
+            const [keyOrder, ...keyArr] = sortKey.split('-');
+            if (typeof keyOrder === 'undefined') return;
+            if (keyArr.length === 0) return;
+
+            const flipOrder = (keyOrder === 'asc') ? 'desc' : 'asc';
+            sortKey = [flipOrder, ...keyArr].join('-');
+        }
+
+        const orders = sortMaps.get(sortKey);
+        if (typeof orders === 'undefined') return;
+        sortOrder = [...sortOrder, ...orders];
+    });
+    sortOrder.push(isNext ? asc(profileInfo.id) : desc(profileInfo.id));
+
     // Get accounts from database
     const userCountSq = await db
         .select({
@@ -80,7 +101,7 @@ export async function getAccountList(
                 and(...filterQueries),
             ),
         )
-        .orderBy(isNext ? asc(profileInfo.id) : desc(profileInfo.id))
+        .orderBy(...sortOrder)
         .limit(pageSize + 1)
         .as('usercount_sq');
 

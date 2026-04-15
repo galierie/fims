@@ -67,6 +67,7 @@ export async function load({ locals, url }) {
         locals.user.id,
         searchTerm,
         filterMap,
+        [],
         newCursor,
         isNext,
         !newCursorStr && !isNextStr,
