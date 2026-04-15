@@ -1,6 +1,6 @@
 import { sql } from 'drizzle-orm';
 
-import { appointmentStatus, course, degreeProgram, fieldOfInterest, rank, role, status } from './schema';
+import { adminPosition, appointmentStatus, course, degreeProgram, fieldOfInterest, rank, role, status } from './schema';
 import { db } from './index';
 
 export const appointmentStatuses = [
@@ -222,6 +222,11 @@ export const statuses = [
     { status: 'On Secondment' },
 ];
 
+export const adminPositions = [
+    { title: 'Department Chair' },
+    { title: 'Assistant Chair for Student Affairs' },
+    { title: 'Assistant Chair for Linkages and Partnerships' },
+];
 
 export const courses = [
     {
@@ -290,6 +295,17 @@ async function seedStatusTable() {
 
     // Check response
     return { success: response.length === statuses.length };
+}
+
+async function seedAdminPositionTable() {
+    // Don't proceed if table is already seeded
+    const rows = await db.select().from(adminPosition).limit(1);
+    if (rows.length > 0) return { success: true };
+
+    const response = await db.insert(adminPosition).values(adminPositions).returning();
+
+    // Check response
+    return { success: response.length === adminPositions.length };
 }
 
 async function seedCourseTable() {
