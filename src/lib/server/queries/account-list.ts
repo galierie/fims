@@ -10,7 +10,6 @@ import {
     or,
     type SQL,
     type SQLWrapper,
-    sql,
 } from 'drizzle-orm';
 
 import type { FilterColumn } from '$lib/types/filter';
@@ -18,6 +17,7 @@ import type { FilterColumn } from '$lib/types/filter';
 import { accountSearchView, changelog, profile, profileInfo, role } from '../db/schema';
 import { db } from '../db';
 import { logChange } from './db-helpers';
+import { alias } from 'drizzle-orm/pg-core';
 
 const pageSize = 50;
 
@@ -78,17 +78,22 @@ export async function getAccountList(
     sortOrder.push(isNext ? asc(profileInfo.id) : desc(profileInfo.id));
 
     // Get accounts from database
-    const userCountSq = await db
+    const operator = alias(profile, 'operator');
+    const shownFields = await db
         .select({
             userid: searchSq.id,
             profileInfoId: sql<string>`${profileInfo.id}`.as('profile_info_id'),
             email: profile.email,
             role: profileInfo.role,
-            latestChangelogId: profileInfo.latestChangelogId,
+            logTimestamp: changelog.timestamp,
+            logMaker: operator.email,
+            logOperation: changelog.operation,
         })
         .from(profile)
         .rightJoin(searchSq, eq(searchSq.id, profile.id))
         .leftJoin(profileInfo, eq(profileInfo.profileId, profile.id))
+        .leftJoin(changelog, eq(changelog.id, profileInfo.latestChangelogId))
+        .leftJoin(operator, eq(operator.id, changelog.operatorId))
         .where(
             and(
                 ne(profile.id, currentUserId),
@@ -102,62 +107,25 @@ export async function getAccountList(
             ),
         )
         .orderBy(...sortOrder)
-        .limit(pageSize + 1)
-        .as('usercount_sq');
+        .limit(pageSize + 1);
 
     // Check if there is a previous/next page
-    let hasPrev = !initLoad;
-    let hasNext = true;
 
-    const userCount = (await db.select().from(userCountSq)).length;
+    const profileCount = shownFields.length;
+    const isTooMuch = profileCount > pageSize;
 
-    if (isNext) hasNext = userCount > pageSize;
-    else hasPrev = userCount > pageSize;
+    const hasPrev = (isNext) ? !initLoad : isTooMuch;
+    const hasNext = (isNext) ? isTooMuch : true;
 
-    // Chop off the extra record
-    const userSq = await db
-        .select()
-        .from(userCountSq)
-        .orderBy(isNext ? asc(userCountSq.profileInfoId) : desc(userCountSq.profileInfoId))
-        .limit(pageSize)
-        .as('user_sq');
+    // Reverse faculty list if previous page
+    if (!isNext) shownFields.reverse();
+
+    // Chop off the extra record if isTooMuch
+    if (isTooMuch)
+        shownFields.pop();
 
     // Get cursors
-    let [firstId] = await db
-        .select({
-            value: userSq.profileInfoId,
-        })
-        .from(userSq)
-        .orderBy(asc(userSq.profileInfoId))
-        .limit(1);
-
-    let [lastId] = await db
-        .select({
-            value: userSq.profileInfoId,
-        })
-        .from(userSq)
-        .orderBy(desc(userSq.profileInfoId))
-        .limit(1);
-
-    // Get changelogs
-    const shownFields = await db
-        .select({
-            userid: userSq.userid,
-            email: userSq.email,
-            role: userSq.role,
-            logTimestamp: changelog.timestamp,
-            logMaker: profile.email,
-            logOperation: changelog.operation,
-        })
-        .from(userSq)
-        .leftJoin(changelog, eq(changelog.id, userSq.latestChangelogId))
-        .leftJoin(profile, eq(profile.id, changelog.operatorId));
-
-    // Reverse account list and cursors if previous page
-    if (!isNext) {
-        [lastId, firstId] = [firstId, lastId];
-        shownFields.reverse();
-    }
+    const [firstId, , lastId] = shownFields;
 
     return {
         accountList: shownFields,
