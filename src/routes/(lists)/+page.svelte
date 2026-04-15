@@ -150,7 +150,7 @@
 
     <!-- Faculty Record List Table -->
     <div class="custom-scrollbar mt-2.5 w-full overflow-x-auto">
-        <div class="w-full min-w-[1024px] pb-4">
+        <div class="w-full min-w-5xl pb-4">
             <!-- Header -->
             <div
                 class="flex justify-center [&>*>span]:text-center [&>*>span]:font-semibold [&>*>span]:text-white [&>div]:flex [&>div]:h-12 [&>div]:items-center [&>div]:bg-fims-green [&>div]:px-6"
