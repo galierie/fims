@@ -152,12 +152,14 @@
             name: 'mentee-start-date',
             colSpan: 3,
             type: 'date',
+            isRequired: true,
         },
         {
             label: 'End Date',
             name: 'mentee-end-date',
             colSpan: 3,
             type: 'date',
+            isRequired: true,
         },
         {
             label: 'Remarks',

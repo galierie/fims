@@ -24,12 +24,14 @@
             name: 'study-load-degree',
             colSpan: 8,
             type: 'text',
+            isRequired: true,
         },
         {
             label: 'University',
             name: 'study-load-university',
             colSpan: 8,
             type: 'text',
+            isRequired: true,
         },
         {
             label: 'Study Load Units',

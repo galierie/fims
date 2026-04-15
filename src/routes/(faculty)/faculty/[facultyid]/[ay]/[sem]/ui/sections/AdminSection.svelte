@@ -66,12 +66,14 @@
             name: 'administrative-position-start-date',
             colSpan: 3,
             type: 'date',
+            isRequired: true,
         },
         {
             label: 'End Date',
             name: 'administrative-position-end-date',
             colSpan: 3,
             type: 'date',
+            isRequired: true,
         },
         {
             label: 'Load Credit',
@@ -118,12 +120,14 @@
             name: 'committee-membership-start-date',
             colSpan: 3,
             type: 'date',
+            isRequired: true,
         },
         {
             label: 'End Date',
             name: 'committee-membership-end-date',
             colSpan: 3,
             type: 'date',
+            isRequired: true,
         },
         {
             label: 'Load Credit',
@@ -171,12 +175,14 @@
             name: 'administrative-work-start-date',
             colSpan: 3,
             type: 'date',
+            isRequired: true,
         },
         {
             label: 'End Date',
             name: 'administrative-work-end-date',
             colSpan: 3,
             type: 'date',
+            isRequired: true,
         },
         {
             label: 'Load Credit',
