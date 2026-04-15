@@ -25,7 +25,7 @@ test.describe('search functions', () => {
         await searchButton.click();
 
         // Expect that only the searched dummy is visible
-        await expect(page.getByText(process.env.ADMIN_EMAIL!)).toBeVisible();
+        await expect(page.getByText(testConsts.AdminAcc!)).toBeVisible();
         await expect(page.getByText(dummyEmail)).toBeVisible();
         await expect(page.getByText(dummyEmail1)).toBeVisible();
         await expect(page.getByText(dummyEmail2)).toBeVisible();
@@ -46,7 +46,7 @@ test.describe('search functions', () => {
         await searchButton.click();
 
         // Expect that no accounts are visible
-        await expect(page.getByText(process.env.ADMIN_EMAIL!)).toBeVisible();
+        await expect(page.getByText(testConsts.AdminAcc!)).toBeVisible();
         await expect(page.getByText(dummyEmail)).toBeVisible();
         await expect(page.getByText(dummyEmail1)).toBeVisible();
         await expect(page.getByText(dummyEmail2)).toBeVisible();
@@ -58,7 +58,7 @@ test.describe('search functions', () => {
         await expect(page).toHaveURL('/accounts');
 
         // Expect all dummies are visible
-        const adminCell = page.getByText(process.env.ADMIN_EMAIL!);
+        const adminCell = page.getByText(testConsts.AdminAcc);
         await expect(adminCell).toBeVisible();
 
         const cell = page.getByText(dummyEmail);
