@@ -535,7 +535,7 @@ export async function updateSemestralRecords(
         await processDynamicTable(
             facultyAdminPosition,
             facultyAdminPosition.id,
-            dynamicTables.AdminPositions,
+            dynamicTables.adminPositions,
             (a) => ({
                 facultyAcademicSemesterId,
                 adminPositionId: getAdminPosId(a['administrative-position-title']),
@@ -577,7 +577,7 @@ export async function updateSemestralRecords(
         await processDynamicTable(
             facultyAdminWork,
             facultyAdminWork.id,
-            dynamicTables.AdminWorks,
+            dynamicTables.adminWorks,
             (aw) => ({
                 facultyAcademicSemesterId,
                 natureOfWork: aw['administrative-work-nature'],

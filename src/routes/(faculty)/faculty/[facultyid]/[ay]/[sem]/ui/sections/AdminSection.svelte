@@ -231,7 +231,7 @@
             <div>
                 <span class="pl-4">Administrative Positions</span>
                 <InputTable
-                    tableName="adminstrative-positions"
+                    tableName="administrative-positions"
                     rowLabel="Position"
                     columns={administrativePositionColumns}
                     rows={administrativePositionValues}
