@@ -16,6 +16,10 @@
         hasChange = $bindable(),
     }: Props = $props();
 
+    $effect(() => {
+        extensionLoadCredit = extensionWork.reduce((acc, curr) => acc + Number(curr.extensionLoadCredit ?? 0), 0);
+    });
+
     // Input Table Columns
     const extensionColumns: InputColumnType[] = [
         {
