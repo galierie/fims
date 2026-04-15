@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { Snippet } from 'svelte';
-    import ChangelogEntry from '$lib/ui/ChanglogEntry.svelte';
+    import ChangelogEntry from '$lib/ui/ChangelogEntry.svelte';
 
     export type ChangelogRecordStructure = {
         timestamp: Date;
