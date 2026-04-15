@@ -2,10 +2,10 @@
     import NavBar from './ui/NavBar.svelte';
 
     const { data, children } = $props();
-    const { canViewAccounts, accountColor } = $derived(data);
+    const { accountColor } = $derived(data);
 </script>
 
-<NavBar {canViewAccounts} {accountColor} />
+<NavBar {accountColor} />
 <main class="min-h-screen bg-[#e9e9e9]">
     {@render children()}
 </main>
