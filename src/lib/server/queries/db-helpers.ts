@@ -418,6 +418,57 @@ export async function createFacultyProfileRecords(operatorId: string, basicProfi
     }
 }
 
+export async function deleteSemestralRecord(
+    operatorId: string,
+    facultyId: number,
+    acadYear: number,
+    semNum: number,
+) {
+    // Get academic semester
+    const [academicSemesterRecord] = await db
+        .select({
+            id: academicSemester.id,
+        })
+        .from(academicSemester)
+        .where(
+            and(
+                eq(academicSemester.academicYear, acadYear),
+                eq(academicSemester.semesterNumber, semNum),
+            )
+        )
+        .limit(1);
+
+    if (typeof academicSemesterRecord === 'undefined') return { success: false };
+    const { id: academicSemesterId } = academicSemesterRecord;
+
+    // Actual action
+    const returnedIds = await db
+        .delete(facultyAcademicSemester)
+        .where(
+            and(
+                eq(facultyAcademicSemester.facultyId, facultyId),
+                eq(facultyAcademicSemester.academicSemesterId, academicSemesterId)
+            )
+        )
+        .returning();
+
+    if (returnedIds.length === 0) return { success: false };
+
+    // Log!
+    const [{ id: tupleId }, _] = returnedIds;
+
+    const logid = await logChange(operatorId, tupleId, `Deleted semestral record for AY ${acadYear}-${acadYear + 1} Sem ${semNum}.`);
+
+    await db
+        .update(faculty)
+        .set({
+            latestChangelogId: logid,
+        })
+        .where(eq(faculty.id, facultyId));
+
+    return { success: true };
+}
+
 export async function updateSemestralRecords(
     operatorId: string,
     facultyId: number,
