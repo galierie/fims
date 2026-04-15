@@ -112,10 +112,15 @@
 
     <input
         type="text"
-        {name}
-        value={!selectedOpt || selectedOpt === '-' ? defaultSelectedOpt : selectedOpt}
-        class="pointer-events-none absolute bottom-0 left-0 -z-10 h-0 w-full opacity-0"
+        value={!selectedOpt || selectedOpt === '-' ? '' : selectedOpt}
+        class="sr-only"
         required={isRequired}
         tabindex="-1"
+    />
+
+    <input
+        type="hidden"
+        {name}
+        value={!selectedOpt || selectedOpt === '-' ? defaultSelectedOpt : selectedOpt}
     />
 </div>
