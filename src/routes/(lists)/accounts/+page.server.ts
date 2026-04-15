@@ -213,6 +213,17 @@ export const actions = {
         // Validate input
         if (!role) return fail(400, { error: 'No role selected.' });
         if (!userId) return fail(400, { error: 'No user selected.' });
+
+        // Elevate user as admin in better-auth
+        await auth.api.adminUpdateUser({
+            body: {
+                userId,
+                data: {
+                    role: (role === 'IT') ? 'admin' : 'user',
+                }
+            },
+            headers: request.headers,
+        });
         
         const { success } = await changeRole(locals.user.id, userId, role);
 
