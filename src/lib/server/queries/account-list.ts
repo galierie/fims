@@ -173,3 +173,20 @@ export async function changeRole(operatorId: string, id: string, role: string) {
 
     return { success: true };
 }
+
+export async function getAccountChangelogs(operatorId: string, limit: number, offset: number) {
+    const changelogs = await db
+        .select({
+            timestamp: changelog.timestamp,
+            email: profile.email,
+            info: changelog.operation,
+        })
+        .from(changelog)
+        .innerJoin(profile, eq(profile.id, changelog.operatorId))
+        .where(eq(changelog.operatorId, operatorId))
+        .limit(limit)
+        .offset(offset) // for pages if needed.
+        .orderBy(desc(changelog.timestamp));
+
+    return changelogs;
+}
