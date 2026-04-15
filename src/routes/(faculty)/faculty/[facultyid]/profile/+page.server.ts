@@ -5,6 +5,7 @@ import {
     deleteFacultyRecords,
     getUserRoleAndPermissions,
     updateFacultyProfileRecords,
+    logChange,
 } from '$lib/server/queries/db-helpers';
 import {
     getAllAppointmentStatuses,
@@ -20,6 +21,9 @@ import {
 export async function load({ params, locals }) {
     // Check existing session
     if (typeof locals.user === 'undefined') throw redirect(307, '/login');
+
+    // Log action
+    await logChange(locals.user.id, null, 'Action: Attempt to access faculty profile.');
 
     // Check Permissions
     const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
@@ -78,6 +82,9 @@ export const actions = {
         // Check existing session
         if (typeof locals.user === 'undefined') throw redirect(307, '/login');
 
+        // Log action
+        await logChange(locals.user.id, null, 'Action: Delete faculty record.');
+
         // Check Permissions
         const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
         if (typeof roleObj === 'undefined') throw redirect(307, '/login');
@@ -100,6 +107,9 @@ export const actions = {
     async update({ locals, request, params }) {
         // Check existing session
         if (typeof locals.user === 'undefined') throw redirect(307, '/login');
+
+        // Log action
+        await logChange(locals.user.id, null, 'Action: Update faculty profile.');
 
         // Check Permissions
         const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
@@ -219,6 +229,7 @@ export const actions = {
 
         // Execute database update
         const { success } = await updateFacultyProfileRecords(
+            locals.user.id,
             facultyid,
             basicProfile,
             dynamicTables,

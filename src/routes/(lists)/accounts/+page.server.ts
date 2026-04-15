@@ -4,14 +4,16 @@ import { BETTER_AUTH_SECRET } from '$env/static/private';
 
 import {
     areYouHere,
-    deleteUsersInfo,
+    deleteProfileInfo,
     getUserRoleAndPermissions,
+    logChange,
     makeProfileInfo,
 } from '$lib/server/queries/db-helpers';
 import { auth } from '$lib/server/auth';
 import type { FilterColumn, FilterObject } from '$lib/types/filter';
 import {
     changeRole,
+    getAccountChangelogs,
     getAccountList,
     getAllRoles,
     refreshAccountSearchView,
@@ -23,11 +25,14 @@ export async function load({ locals, url }) {
     // Check existing session
     if (typeof locals.user === 'undefined') throw redirect(307, '/login');
 
+    // Log action
+    await logChange(locals.user.id, null, 'Action: Attempt to access account list.');
+
     // Check Permissions
     const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
     if (typeof roleObj === 'undefined') throw redirect(307, '/login');
 
-    const { canAddAccount, canModifyAccount } = roleObj;
+    const { canAddAccount, canModifyAccount, canViewChangelogs } = roleObj;
     const canViewAccounts = canAddAccount || canModifyAccount;
     if (!canViewAccounts) throw error(403, { message: 'Insufficient permissions.' });
 
@@ -78,6 +83,11 @@ export async function load({ locals, url }) {
         !newCursorStr && !isNextStr,
     );
 
+    // Get changelogs that they did
+    const fetchedChangelogs = canViewChangelogs
+        ? await getAccountChangelogs(locals.user.id, 20, 0)
+        : null;
+
     return {
         accountList,
         prevCursor,
@@ -88,6 +98,7 @@ export async function load({ locals, url }) {
         userRoles,
         searchTerm,
         canViewAccounts, // Added here
+        fetchedChangelogs,
     };
 }
 
@@ -95,6 +106,9 @@ export const actions = {
     async makeAccount({ locals, request }) {
         // Check existing session
         if (typeof locals.user === 'undefined') throw redirect(307, '/login');
+
+        // Log action
+        await logChange(locals.user.id, null, 'Action: Make account.');
 
         // Check Permissions
         const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
@@ -151,6 +165,9 @@ export const actions = {
         // Check existing session
         if (typeof locals.user === 'undefined') throw redirect(307, '/login');
 
+        // Log action
+        await logChange(locals.user.id, null, 'Action: Delete account.');
+
         // Check Permissions
         const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
         if (typeof roleObj === 'undefined') throw redirect(307, '/login');
@@ -165,7 +182,7 @@ export const actions = {
         if (!userid) return fail(400, { error: 'Failed to delete account.' });
 
         // Delete user info
-        await deleteUsersInfo(locals.user.id, [userid]);
+        await deleteProfileInfo(locals.user.id, [userid]);
 
         // Delete!
         const response = await auth.api.removeUser({
@@ -188,6 +205,9 @@ export const actions = {
         // Check existing session
         if (typeof locals.user === 'undefined') throw redirect(307, '/login');
 
+        // Log action
+        await logChange(locals.user.id, null, 'Action: Delete accounts.');
+
         // Check Permissions
         const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
         if (typeof roleObj === 'undefined') throw redirect(307, '/login');
@@ -205,7 +225,7 @@ export const actions = {
             const userids: string[] = JSON.parse(useridsStr);
 
             // Delete user info
-            await deleteUsersInfo(locals.user.id, userids);
+            await deleteProfileInfo(locals.user.id, userids);
 
             // Delete!
             let success = true;
@@ -271,6 +291,9 @@ export const actions = {
     async changeRole({ locals, request }) {
         // Check existing session
         if (typeof locals.user === 'undefined') throw redirect(307, '/login');
+
+        // Log action
+        await logChange(locals.user.id, null, 'Action: Change user role.');
 
         // Check Permissions
         const [roleObj] = await getUserRoleAndPermissions(locals.user.id);

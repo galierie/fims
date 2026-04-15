@@ -1,4 +1,4 @@
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, eq, getTableName, inArray } from 'drizzle-orm';
 
 import {
     academicSemester,
@@ -32,7 +32,7 @@ import {
 } from '../db/schema';
 import { db } from '../db';
 
-export async function logChange(operatorId: string, tupleId: number, operation: string) {
+export async function logChange(operatorId: string, tupleId: number | null, operation: string) {
     const logids = await db
         .insert(changelog)
         .values({
@@ -75,7 +75,7 @@ export async function makeProfileInfo(operatorId: string, id: string, role: stri
     return { success: true };
 }
 
-export async function deleteUsersInfo(operatorId: string, userids: string[]) {
+export async function deleteProfileInfo(operatorId: string, userids: string[]) {
     if (!userids || userids.length === 0) return { success: false };
 
     // Actual action
@@ -134,21 +134,44 @@ export async function deleteFacultyRecords(operatorId: string, ids: number[]) {
 
 // Helper function to sequentially process dynamic table operations
 async function processDynamicTable(
+    operatorId: string,
+    facultyId: number,
     tableRef: any,
     idColumn: any,
     data: { create: any[]; update: any[]; delete: number[] },
     mapCreate: (item: any) => any,
     mapUpdate: (item: any) => any,
 ) {
-    if (data.delete.length > 0) await db.delete(tableRef).where(inArray(idColumn, data.delete));
+    if (data.delete.length > 0) {
+        await Promise.all([
+            await db.delete(tableRef).where(inArray(idColumn, data.delete)),
+            await logChange(
+                operatorId,
+                facultyId,
+                `Deleted records with IDs ${data.delete.join(', ')} from ${getTableName(tableRef)}.`,
+            ),
+        ]);
+    }
 
     for (const item of data.update)
-        await db.update(tableRef).set(mapUpdate(item)).where(eq(idColumn, item.tupleid));
+        await Promise.all([
+            await db.update(tableRef).set(mapUpdate(item)).where(eq(idColumn, item.tupleid)),
+            await logChange(
+                operatorId,
+                facultyId,
+                `Updated ${item.tupleid} from ${getTableName(tableRef)}.`,
+            ),
+        ]);
 
-    if (data.create.length > 0) await db.insert(tableRef).values(data.create.map(mapCreate));
+    if (data.create.length > 0)
+        await Promise.all([
+            await db.insert(tableRef).values(data.create.map(mapCreate)),
+            await logChange(operatorId, facultyId, `Created tuples in ${getTableName(tableRef)}.`),
+        ]);
 }
 
 export async function updateFacultyProfileRecords(
+    operatorId: string,
     facultyId: number,
     basicProfile: any,
     dynamicTables: any,
@@ -159,6 +182,8 @@ export async function updateFacultyProfileRecords(
         await db.update(faculty).set(basicProfile).where(eq(faculty.id, facultyId));
 
         await processDynamicTable(
+            operatorId,
+            facultyId,
             facultyEmail,
             facultyEmail.id,
             dynamicTables.emails,
@@ -167,6 +192,8 @@ export async function updateFacultyProfileRecords(
         );
 
         await processDynamicTable(
+            operatorId,
+            facultyId,
             facultyContactNumber,
             facultyContactNumber.id,
             dynamicTables.contactNumbers,
@@ -175,6 +202,8 @@ export async function updateFacultyProfileRecords(
         );
 
         await processDynamicTable(
+            operatorId,
+            facultyId,
             facultyHomeAddress,
             facultyHomeAddress.id,
             dynamicTables.homeAddresses,
@@ -183,6 +212,8 @@ export async function updateFacultyProfileRecords(
         );
 
         await processDynamicTable(
+            operatorId,
+            facultyId,
             facultyEducationalAttainment,
             facultyEducationalAttainment.id,
             dynamicTables.educationalAttainments,
@@ -224,6 +255,8 @@ export async function updateFacultyProfileRecords(
             dbFieldsOfInterest.find((f) => f.field === fieldName)?.id || null;
 
         await processDynamicTable(
+            operatorId,
+            facultyId,
             facultyFieldOfInterest,
             facultyFieldOfInterest.id,
             dynamicTables.fieldsOfInterest,
@@ -239,6 +272,8 @@ export async function updateFacultyProfileRecords(
             typeof val === 'string' && val.trim() !== '' ? new Date(val) : new Date();
 
         await processDynamicTable(
+            operatorId,
+            facultyId,
             facultyRank,
             facultyRank.id,
             dynamicTables.promotionHistory,
@@ -263,7 +298,11 @@ export async function updateFacultyProfileRecords(
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export async function createFacultyProfileRecords(basicProfile: any, dynamicTables: any) {
+export async function createFacultyProfileRecords(
+    operatorId: string,
+    basicProfile: any,
+    dynamicTables: any,
+) {
     /* eslint-enable @typescript-eslint/no-explicit-any */
     try {
         function parseNum(val: unknown) {
@@ -276,6 +315,8 @@ export async function createFacultyProfileRecords(basicProfile: any, dynamicTabl
         const { id: facultyId } = newFaculty;
 
         await processDynamicTable(
+            operatorId,
+            facultyId,
             facultyEmail,
             facultyEmail.id,
             dynamicTables.emails,
@@ -284,6 +325,8 @@ export async function createFacultyProfileRecords(basicProfile: any, dynamicTabl
         );
 
         await processDynamicTable(
+            operatorId,
+            facultyId,
             facultyContactNumber,
             facultyContactNumber.id,
             dynamicTables.contactNumbers,
@@ -292,6 +335,8 @@ export async function createFacultyProfileRecords(basicProfile: any, dynamicTabl
         );
 
         await processDynamicTable(
+            operatorId,
+            facultyId,
             facultyHomeAddress,
             facultyHomeAddress.id,
             dynamicTables.homeAddresses,
@@ -300,6 +345,8 @@ export async function createFacultyProfileRecords(basicProfile: any, dynamicTabl
         );
 
         await processDynamicTable(
+            operatorId,
+            facultyId,
             facultyEducationalAttainment,
             facultyEducationalAttainment.id,
             dynamicTables.educationalAttainments,
@@ -340,6 +387,8 @@ export async function createFacultyProfileRecords(basicProfile: any, dynamicTabl
             dbFieldsOfInterest.find((f) => f.field === fieldName)?.id || null;
 
         await processDynamicTable(
+            operatorId,
+            facultyId,
             facultyFieldOfInterest,
             facultyFieldOfInterest.id,
             dynamicTables.fieldsOfInterest,
@@ -356,6 +405,8 @@ export async function createFacultyProfileRecords(basicProfile: any, dynamicTabl
             typeof val === 'string' && val.trim() !== '' ? new Date(val) : new Date();
 
         await processDynamicTable(
+            operatorId,
+            facultyId,
             facultyRank,
             facultyRank.id,
             dynamicTables.promotionHistory,
@@ -379,7 +430,63 @@ export async function createFacultyProfileRecords(basicProfile: any, dynamicTabl
     }
 }
 
+export async function deleteSemestralRecord(
+    operatorId: string,
+    facultyId: number,
+    acadYear: number,
+    semNum: number,
+) {
+    // Get academic semester
+    const [academicSemesterRecord] = await db
+        .select({
+            id: academicSemester.id,
+        })
+        .from(academicSemester)
+        .where(
+            and(
+                eq(academicSemester.academicYear, acadYear),
+                eq(academicSemester.semesterNumber, semNum),
+            ),
+        )
+        .limit(1);
+
+    if (typeof academicSemesterRecord === 'undefined') return { success: false };
+    const { id: academicSemesterId } = academicSemesterRecord;
+
+    // Actual action
+    const returnedIds = await db
+        .delete(facultyAcademicSemester)
+        .where(
+            and(
+                eq(facultyAcademicSemester.facultyId, facultyId),
+                eq(facultyAcademicSemester.academicSemesterId, academicSemesterId),
+            ),
+        )
+        .returning();
+
+    if (returnedIds.length === 0) return { success: false };
+
+    // Log!
+    const [{ id: tupleId }, _] = returnedIds;
+
+    const logid = await logChange(
+        operatorId,
+        tupleId,
+        `Deleted semestral record for AY ${acadYear}-${acadYear + 1} Sem ${semNum}.`,
+    );
+
+    await db
+        .update(faculty)
+        .set({
+            latestChangelogId: logid,
+        })
+        .where(eq(faculty.id, facultyId));
+
+    return { success: true };
+}
+
 export async function updateSemestralRecords(
+    operatorId: string,
     facultyId: number,
     acadYear: number,
     semNum: number,
@@ -558,6 +665,8 @@ export async function updateSemestralRecords(
 
         // Admin
         await processDynamicTable(
+            operatorId,
+            facultyId,
             facultyAdminPosition,
             facultyAdminPosition.id,
             dynamicTables.adminPositions,
@@ -579,6 +688,8 @@ export async function updateSemestralRecords(
         );
 
         await processDynamicTable(
+            operatorId,
+            facultyId,
             facultyCommMembership,
             facultyCommMembership.id,
             dynamicTables.committees,
@@ -600,6 +711,8 @@ export async function updateSemestralRecords(
         );
 
         await processDynamicTable(
+            operatorId,
+            facultyId,
             facultyAdminWork,
             facultyAdminWork.id,
             dynamicTables.adminWorks,
@@ -621,6 +734,8 @@ export async function updateSemestralRecords(
         );
         // Teaching
         await processDynamicTable(
+            operatorId,
+            facultyId,
             facultyCourse,
             facultyCourse.id,
             dynamicTables.courses,
@@ -646,6 +761,8 @@ export async function updateSemestralRecords(
         );
 
         await processDynamicTable(
+            operatorId,
+            facultyId,
             facultyMentoring,
             facultyMentoring.id,
             dynamicTables.mentees,
@@ -668,6 +785,8 @@ export async function updateSemestralRecords(
 
         // Research
         await processDynamicTable(
+            operatorId,
+            facultyId,
             facultyResearch,
             facultyResearch.id,
             dynamicTables.research,
@@ -686,6 +805,8 @@ export async function updateSemestralRecords(
 
         // Extension
         await processDynamicTable(
+            operatorId,
+            facultyId,
             facultyExtension,
             facultyExtension.id,
             dynamicTables.extension,
@@ -708,6 +829,8 @@ export async function updateSemestralRecords(
 
         // Study load
         await processDynamicTable(
+            operatorId,
+            facultyId,
             facultyStudyLoad,
             facultyStudyLoad.id,
             dynamicTables.studyLoad,

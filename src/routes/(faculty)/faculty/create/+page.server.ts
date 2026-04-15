@@ -3,6 +3,7 @@ import { error, fail, redirect } from '@sveltejs/kit';
 import {
     createFacultyProfileRecords,
     getUserRoleAndPermissions,
+    logChange,
 } from '$lib/server/queries/db-helpers';
 import {
     getAllAppointmentStatuses,
@@ -14,6 +15,13 @@ import { refreshFacultyRecordSearchView } from '$lib/server/queries/faculty-list
 export async function load({ locals }) {
     // Check existing session
     if (typeof locals.user === 'undefined') throw redirect(307, '/login');
+
+    // Log action
+    await logChange(
+        locals.user.id,
+        null,
+        'Action: Attempt to access faculty profile creation route.',
+    );
 
     // Check Permissions
     const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
@@ -53,6 +61,9 @@ export const actions = {
     async create({ request, locals }) {
         // Check existing session
         if (typeof locals.user === 'undefined') throw redirect(307, '/login');
+
+        // Log action
+        await logChange(locals.user.id, null, 'Action: Create faculty profile.');
 
         // Check Permissions
         const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
@@ -169,6 +180,7 @@ export const actions = {
 
         // Execute database creation
         const { success, facultyId } = await createFacultyProfileRecords(
+            locals.user.id,
             basicProfile,
             dynamicTables,
         );
