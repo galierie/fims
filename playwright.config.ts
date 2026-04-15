@@ -1,6 +1,4 @@
-import dotenv from 'dotenv';
 import { defineConfig } from '@playwright/test';
-dotenv.config({ path: '.env.e2e' }); //change this to desired .env file
 
 export default defineConfig({
     webServer: {

@@ -4,10 +4,10 @@
 import { expect, test } from '@playwright/test';
 
 import * as testConsts from '../../../test-consts';
-const dummyEmail = process.env.DUMMY_EMAIL!;
-const dummyEmail1 = process.env.DUMMY_EMAIL1!;
-const dummyEmail2 = process.env.DUMMY_EMAIL2!;
-const dummyPw = process.env.DUMMY_PASS!;
+const dummyEmail = testConsts.DummyEmail;
+const dummyEmail1 = testConsts.DummyEmail0;
+const dummyEmail2 = testConsts.DummyEmail1;
+const dummyPw = testConsts.DummyPass;
 
 test.describe('batch deletion', async () => {
     test.use({ storageState: testConsts.ITConfig });
@@ -50,7 +50,7 @@ test.describe('batch deletion', async () => {
         await page.getByRole('button', { name: 'Cancel', exact: true }).click();
 
         // The new records should still be visible
-        const cell = page.getByText(process.env.ADMIN_EMAIL!);
+        const cell = page.getByText(testConsts.AdminAcc!);
         await expect(cell).toBeVisible();
 
         const cell1 = page.getByText(dummyEmail);
@@ -107,7 +107,7 @@ test.describe('batch deletion', async () => {
         await checkbox1.click();
         await expect(checkbox1).not.toBeChecked();
 
-        const cell = page.getByText(process.env.ADMIN_EMAIL!);
+        const cell = page.getByText(testConsts.AdminAcc!);
         const cell1 = page.getByText(dummyEmail);
         const cell2 = page.getByText(dummyEmail1);
         const cell3 = page.getByText(dummyEmail2);

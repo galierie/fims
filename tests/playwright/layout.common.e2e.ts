@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 
+import * as consts from '../test-consts';
+
 // NOTE: Log-out button will be checked in some other test
 // TODO: Add first footer section
 
@@ -19,7 +21,7 @@ test.describe('check header and footer as admin', () => {
         const websiteTitle = await header.getByText('Faculty Information Management System');
         await expect(websiteTitle).toBeVisible();
 
-        const loggedInEmail = header.getByText(process.env.ADMIN_EMAIL!);
+        const loggedInEmail = header.getByText(consts.AdminAcc!);
         await expect(loggedInEmail).toBeVisible();
     });
 
@@ -57,7 +59,7 @@ test.describe('check header and footer as it', () => {
         const websiteTitle = await header.getByText('Faculty Information Management System');
         await expect(websiteTitle).toBeVisible();
 
-        const loggedInEmail = header.getByText(process.env.IT_EMAIL!);
+        const loggedInEmail = header.getByText(consts.ITAcc!);
         await expect(loggedInEmail).toBeVisible();
     });
 

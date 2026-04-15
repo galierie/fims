@@ -1,10 +1,10 @@
 import { expect, test } from '@playwright/test';
 
 import * as testConsts from '../../../test-consts';
-const dummyEmail = process.env.DUMMY_EMAIL!;
-const dummyEmail1 = process.env.DUMMY_EMAIL1!;
-const dummyEmail2 = process.env.DUMMY_EMAIL2!;
-const dummyPw = process.env.DUMMY_PASS!;
+const dummyEmail = testConsts.DummyEmail;
+const dummyEmail1 = testConsts.DummyEmail0;
+const dummyEmail2 = testConsts.DummyEmail1;
+const dummyPw = testConsts.DummyPass;
 
 test.describe('search functions', () => {
     test.use({ storageState: testConsts.ITConfig });
@@ -25,7 +25,7 @@ test.describe('search functions', () => {
         await searchButton.click();
 
         // Expect that only the searched dummy is visible
-        await expect(page.getByText(process.env.ADMIN_EMAIL!)).toBeVisible();
+        await expect(page.getByText(testConsts.AdminAcc!)).toBeVisible();
         await expect(page.getByText(dummyEmail)).toBeVisible();
         await expect(page.getByText(dummyEmail1)).toBeVisible();
         await expect(page.getByText(dummyEmail2)).toBeVisible();
@@ -46,7 +46,7 @@ test.describe('search functions', () => {
         await searchButton.click();
 
         // Expect that no accounts are visible
-        await expect(page.getByText(process.env.ADMIN_EMAIL!)).toBeVisible();
+        await expect(page.getByText(testConsts.AdminAcc!)).toBeVisible();
         await expect(page.getByText(dummyEmail)).toBeVisible();
         await expect(page.getByText(dummyEmail1)).toBeVisible();
         await expect(page.getByText(dummyEmail2)).toBeVisible();
@@ -58,7 +58,7 @@ test.describe('search functions', () => {
         await expect(page).toHaveURL('/accounts');
 
         // Expect all dummies are visible
-        const adminCell = page.getByText(process.env.ADMIN_EMAIL!);
+        const adminCell = page.getByText(testConsts.AdminAcc);
         await expect(adminCell).toBeVisible();
 
         const cell = page.getByText(dummyEmail);
