@@ -4,6 +4,7 @@
     import RedButton from '$lib/ui/RedButton.svelte';
     import Icon from '@iconify/svelte';
     import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
+    import SaveConfirmation from '$lib/ui/SaveConfirmation.svelte';
     import DeleteConfirmation from '$lib/ui/DeleteConfirmation.svelte';
     import SelectDropdownCell from '$lib/ui/SelectDropdownCell.svelte';
 
@@ -20,11 +21,26 @@
     const userRoles = ['Admin', 'IT'];
     let isLoading = $state(false);
 
+    let selectedOpt = $state(null);
+    let willChangeRole = $state(false);
+    function toggleSaveModal() {
+        willChangeRole = !willChangeRole;
+        selectedOpt = null;
+    }
+    $effect(() => {
+        if (selectedOpt !== null && userRoles.includes(selectedOpt) && selectedOpt !== role && !willChangeRole) {
+            if (changeRoleForm !== null) {
+                changeRoleForm.requestSubmit();
+            }
+        }
+    });
+
     let willDelete = $state(false);
     function toggleDeleteModal() {
         willDelete = !willDelete;
     }
 
+    let changeRoleForm: HTMLFormElement | null = $state(null);
     let deleteForm: HTMLFormElement | null = $state(null);
 </script>
 
@@ -51,13 +67,44 @@
             </form>
         </div>
         <div class="w-40">
-            <form method="POST" action="" class="w-full">
+            <form
+                method="POST"
+                action="?/changeRole"
+                class="w-full"
+                bind:this={changeRoleForm}
+                use:enhance={({ cancel }) => {
+                    if (willChangeRole) {
+                        isLoading = true;
+                        return async ({ update }) => {
+                            await update();
+                            selectedOpt = null;
+                            willChangeRole = false;
+                            isLoading = false;
+                        };
+                    }
+                    willChangeRole = true;
+                    cancel();
+                }}
+            >
                 <SelectDropdownCell
                     name="role"
                     opts={userRoles}
                     defaultSelectedOpt={role}
                     isEditable={true}
+                    bind:selectedOpt
                 />
+
+                <input type="hidden" name="userId" value={userid} />
+
+                {#if willChangeRole}
+                    <SaveConfirmation
+                        onSave={() => {
+                            if (changeRoleForm) changeRoleForm.requestSubmit();
+                        }}
+                        onCancel={toggleSaveModal}
+                        text="Are you sure you want to change the account role?"
+                    />
+                {/if}
             </form>
         </div>
         <div class="w-85 2xl:w-100">
