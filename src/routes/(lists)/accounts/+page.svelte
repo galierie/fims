@@ -142,7 +142,7 @@
         {/if}
     </div>
 
-    <div class="overflow-x-auto whitespace-nowrap pb-50">
+    <div class="overflow-x-auto pb-50 whitespace-nowrap">
         <!-- Account List Table -->
         <div class="custom-scrollbar mt-2.5 w-full">
             <div class="w-full min-w-[1024px] pb-4">

@@ -219,17 +219,17 @@ export const actions = {
             body: {
                 userId,
                 data: {
-                    role: (role === 'IT') ? 'admin' : 'user',
-                }
+                    role: role === 'IT' ? 'admin' : 'user',
+                },
             },
             headers: request.headers,
         });
-        
+
         const { success } = await changeRole(locals.user.id, userId, role);
 
         return {
             success,
             message: success ? 'Changed user role.' : 'Failed to change user role',
-        }
-    }
+        };
+    },
 } satisfies Actions;

@@ -136,7 +136,7 @@
                         typeToName.set('loading', 'Loading');
                         typeToName.set('set-avg', 'SETAverage');
 
-                        facTypes.forEach(type => {
+                        facTypes.forEach((type) => {
                             const fileName = `${namePrefix}-${typeToName.get(type) ?? 'Report'}${facSuffix}`;
 
                             links.push({

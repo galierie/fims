@@ -28,7 +28,12 @@
         selectedOpt = null;
     }
     $effect(() => {
-        if (selectedOpt !== null && userRoles.includes(selectedOpt) && selectedOpt !== role && !willChangeRole) {
+        if (
+            selectedOpt !== null &&
+            userRoles.includes(selectedOpt) &&
+            selectedOpt !== role &&
+            !willChangeRole
+        ) {
             if (changeRoleForm !== null) {
                 changeRoleForm.requestSubmit();
             }

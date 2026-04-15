@@ -18,7 +18,8 @@ export async function GET({ url, locals }: RequestEvent) {
     const types = typesStr.split(',');
 
     const format = url.searchParams.get('format');
-    if (format === null || (format !== 'csv' && format !== 'xlsx')) return json({ error: 'No report format specified' }, { status: 400 });
+    if (format === null || (format !== 'csv' && format !== 'xlsx'))
+        return json({ error: 'No report format specified' }, { status: 400 });
 
     const needsFacultyIds = !new Set(types).isDisjointFrom(
         new Set(['profile', 'service-record', 'loading', 'set-avg', 'subjects-by-faculty']),
@@ -165,22 +166,22 @@ export async function GET({ url, locals }: RequestEvent) {
 
         if (addedSheets === 0) return json({ error: 'No workbook generated.' }, { status: 400 });
 
-        const buf = (format === 'csv')
-            ? await workbook.csv.writeBuffer()
-            : await workbook.xlsx.writeBuffer();
+        const buf =
+            format === 'csv' ? await workbook.csv.writeBuffer() : await workbook.xlsx.writeBuffer();
 
         const customFileName = url.searchParams.get('fileName');
         const finalName = customFileName
             ? `${customFileName}.${format}`
             : needsPeriods
-                ? `Export-AY${fromAy}-S${fromSem}-to-AY${toAy}-S${toSem}.${format}`
-                : `Faculty_Profile.${format}`;
+              ? `Export-AY${fromAy}-S${fromSem}-to-AY${toAy}-S${toSem}.${format}`
+              : `Faculty_Profile.${format}`;
 
         return new Response(buf, {
             headers: {
-                'Content-Type': (format === 'csv')
-                    ? 'text/csv'
-                    : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'Content-Type':
+                    format === 'csv'
+                        ? 'text/csv'
+                        : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                 'Content-Disposition': `attachment; filename="${finalName}"`,
             },
         });
