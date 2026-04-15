@@ -74,12 +74,16 @@ export async function load({ url, locals }) {
     // Search
     const searchTerm = url.searchParams.get('search');
 
+    // Sort
+    const sortByStr = url.searchParams.get('sort-by');
+    const sortBys = (sortByStr === null) ? [] : sortByStr.split(',');
+
     // Get faculty record list
     const { facultyRecordList, prevCursor, nextCursor, hasPrev, hasNext } =
         await getFacultyRecordList(
             searchTerm,
             filterMap,
-            [],
+            sortBys,
             newCursor,
             isNext,
             !newCursorStr && !isNextStr,
