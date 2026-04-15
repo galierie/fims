@@ -41,7 +41,7 @@
         if (coursesWithSet.length === 0) return 'N/A';
         
         const sum = coursesWithSet.reduce((acc, curr) => acc + Number(curr.sectionSET), 0);
-        return (sum / coursesWithSet.length).toFixed(2);
+        return (sum / coursesWithSet.length).toFixed(3);
     });
 
     const haveChanges: boolean[] = $state(Array(2).fill(false));
