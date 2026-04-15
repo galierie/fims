@@ -9,6 +9,7 @@
     import DeleteConfirmation from '$lib/ui/DeleteConfirmation.svelte';
     import SearchBar from '$lib/ui/SearchBar.svelte';
     import SelectDropdownCell from '$lib/ui/SelectDropdownCell.svelte';
+    import SortHeader from '$lib/ui/SortHeader.svelte';
     import { enhance } from '$app/forms';
     import { goto } from '$app/navigation';
     import { page } from '$app/state';
@@ -152,8 +153,7 @@
                 >
                     <div class="w-25 justify-center"><span>Select</span></div>
                     <div class="w-66 2xl:w-132">
-                        <span>Email</span>
-                        <Icon icon="tabler:arrow-up" class="ml-3 h-5 w-5 text-white" />
+                        <SortHeader name="Email" key="email" bind:isSorting={isLoading} />
                     </div>
                     <div class="w-50 justify-center"><span>Reset Password?</span></div>
                     <div class="w-40 justify-center">
