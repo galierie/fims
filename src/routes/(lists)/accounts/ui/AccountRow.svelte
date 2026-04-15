@@ -68,7 +68,7 @@
                 action="?/resetAccount"
                 class="flex items-center justify-center"
             >
-                <RedButton type="submit" name="userid" value={userid}>
+                <RedButton type="submit" name="userid" value={id}>
                     <Icon icon="tabler:refresh" class="mr-2 h-6 w-6" />
                     <span>Reset</span>
                 </RedButton>

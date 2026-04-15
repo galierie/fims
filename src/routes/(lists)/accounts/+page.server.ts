@@ -1,5 +1,6 @@
 import { type Actions, error, fail, redirect } from '@sveltejs/kit';
 import { APIError } from 'better-auth';
+import { BETTER_AUTH_SECRET } from '$env/static/private';
 
 import {
     areYouHere,
@@ -16,6 +17,7 @@ import {
     refreshAccountSearchView,
 } from '$lib/server/queries/account-list';
 import { profileInfo } from '$lib/server/db/schema';
+import { getHeaders } from 'better-auth/client';
 
 export async function load({ locals, url }) {
     // Check existing session
@@ -235,18 +237,29 @@ export const actions = {
         const userid = formData.get('userid') as string;
 
         if (!userid) return fail(400, { error: "No such account"});
+
+        //permissions check
+        const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
+        if (typeof roleObj === 'undefined') return fail(403, 'Insufficient Permissions');
+        
+        if (!roleObj.canModifyAccount) return fail(403, 'Insufficient Permissions')
         
         try {
             const response = await auth.api.setUserPassword({
                 body: {
                     userId: userid,
                     newPassword: "password",
-                }
+                },
+                headers: request.headers
             })
 
+            if (!response.status) {
+                return fail(400, 'Failed to reset account password')
+            }
         } catch(error) {
+            console.log(error);
             return fail(500, {
-                error: error instanceof APIError ? error.message : 'Failed to reset account password.',
+                error: error instanceof APIError ? error.message : 'Failed to reset account password. (Unknown error)',
             });
         }
         return {
