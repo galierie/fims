@@ -219,6 +219,7 @@ export const actions = {
 
         // Execute database update
         const { success } = await updateFacultyProfileRecords(
+            locals.user.id,
             facultyid,
             basicProfile,
             dynamicTables,

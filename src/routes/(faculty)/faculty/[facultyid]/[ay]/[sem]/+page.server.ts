@@ -281,6 +281,7 @@ export const actions = {
 
         // Database update calls
         const { success } = await updateSemestralRecords(
+            locals.user.id,
             facultyid,
             acadYear,
             semNum,

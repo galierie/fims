@@ -169,6 +169,7 @@ export const actions = {
 
         // Execute database creation
         const { success, facultyId } = await createFacultyProfileRecords(
+            locals.user.id,
             basicProfile,
             dynamicTables,
         );
