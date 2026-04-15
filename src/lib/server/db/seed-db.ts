@@ -1,6 +1,6 @@
 import { sql } from 'drizzle-orm';
 
-import { adminPosition, appointmentStatus, course, degreeProgram, fieldOfInterest, rank, role, status } from './schema';
+import { adminPosition, appointmentStatus, course, degreeProgram, fieldOfInterest, office, rank, role, status } from './schema';
 import { db } from './index';
 
 export const appointmentStatuses = [
@@ -299,6 +299,12 @@ export const fieldsOfInterest = [
     { field: 'Information Systems' },
 ];
 
+export const offices = [
+    { name: 'Department of Computer Science' },
+    { name: 'College of Engineering' },
+    { name: 'Office of the Vice Chancellor for Student Affairs' },
+];
+
 async function seedAppointmentStatusTable() {
     const rows = await db.select().from(appointmentStatus).limit(1);
     if (rows.length > 0) return { success: true };
@@ -379,6 +385,17 @@ async function seedFieldOfInterestTable() {
 
     const response = await db.insert(fieldOfInterest).values(fieldsOfInterest).returning();
     return { success: response.length === fieldsOfInterest.length };
+}
+
+async function seedOfficeTable() {
+    // Don't proceed if table is already seeded
+    const rows = await db.select().from(office).limit(1);
+    if (rows.length > 0) return { success: true };
+
+    const response = await db.insert(office).values(offices).returning();
+
+    // Check response
+    return { success: response.length === offices.length };
 }
 
 export async function seedDatabase() {
