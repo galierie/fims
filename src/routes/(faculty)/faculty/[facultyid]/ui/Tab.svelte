@@ -14,14 +14,14 @@
     </p>
 {:else if disabled}
     <p
-        class="w-fit cursor-not-allowed opacity-60 rounded-t-lg border-t-2 border-r-2 border-b-2 border-l-2 border-fims-gray border-b-fims-green px-6 py-1.5 text-3xl text-nowrap text-fims-gray"
+        class="w-fit cursor-not-allowed rounded-t-lg border-t-2 border-r-2 border-b-2 border-l-2 border-fims-gray border-b-fims-green px-6 py-1.5 text-3xl text-nowrap text-fims-gray opacity-60"
     >
         {name}
     </p>
 {:else}
     <a
         {href}
-        class="w-fit cursor-pointer rounded-t-lg border-t-2 border-r-2 border-b-2 border-l-2 border-fims-green px-6 py-1.5 text-3xl text-nowrap text-fims-green hover:bg-fims-green hover:text-white transition-colors"
+        class="w-fit cursor-pointer rounded-t-lg border-t-2 border-r-2 border-b-2 border-l-2 border-fims-green px-6 py-1.5 text-3xl text-nowrap text-fims-green transition-colors hover:bg-fims-green hover:text-white"
         >{name}</a
     >
 {/if}

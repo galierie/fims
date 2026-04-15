@@ -16,7 +16,17 @@
     }
 
     // eslint-disable-next-line prefer-const -- changing value
-    let { label, name, opts, selectedOpt, colStart, colSpan, immutable, hasChange = $bindable(false), initialOpt = selectedOpt }: Props = $props();
+    let {
+        label,
+        name,
+        opts,
+        selectedOpt,
+        colStart,
+        colSpan,
+        immutable,
+        hasChange = $bindable(false),
+        initialOpt = selectedOpt,
+    }: Props = $props();
     let isDropdownOpen = $state(false);
 
     const colStartClass = $derived(colStart === undefined ? '' : `col-start-${colStart}`);
