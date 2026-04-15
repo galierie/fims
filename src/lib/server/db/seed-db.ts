@@ -3,13 +3,29 @@ import { sql } from 'drizzle-orm';
 import { appointmentStatus, course, degreeProgram, fieldOfInterest, rank, role, status } from './schema';
 import { db } from './index';
 
-// TODO: Check if tama
+export const appointmentStatuses = [
+    { appointmentStatus: 'Permanent' },
+    { appointmentStatus: 'Full-Time' },
+    { appointmentStatus: 'Temporary' },
+    { appointmentStatus: 'Part-Time' },
+];
 
-export const statuses = [
-    { status: 'Active' },
-    { status: 'On Leave' },
-    { status: 'Sabbatical' },
-    { status: 'On Secondment' },
+export const degreePrograms = [
+    {
+        id: 1,
+        name: 'Undergraduate',
+        isGraduateLevel: false,
+    },
+    {
+        id: 2,
+        name: 'MA/PhD',
+        isGraduateLevel: true,
+    },
+    {
+        id: 3,
+        name: 'MDE',
+        isGraduateLevel: true,
+    },
 ];
 
 export const ranks = [
@@ -180,32 +196,6 @@ export const ranks = [
     },
 ];
 
-export const degreePrograms = [
-    {
-        id: 1,
-        name: 'Undergraduate',
-        isGraduateLevel: false,
-    },
-    {
-        id: 2,
-        name: 'MA/PhD',
-        isGraduateLevel: true,
-    },
-    {
-        id: 3,
-        name: 'MDE',
-        isGraduateLevel: true,
-    },
-]
-
-export const courses = [
-    {
-        name: 'Econ 11',
-        units: 3,
-        degreeProgramId: 1,
-    },
-];
-
 export const roles = [
     {
         role: 'Admin',
@@ -225,6 +215,22 @@ export const roles = [
     },
 ];
 
+export const statuses = [
+    { status: 'Active' },
+    { status: 'On Leave' },
+    { status: 'Sabbatical' },
+    { status: 'On Secondment' },
+];
+
+
+export const courses = [
+    {
+        name: 'Econ 11',
+        units: 3,
+        degreeProgramId: 1,
+    },
+];
+
 // dummy, needs to be changed
 export const fieldsOfInterest = [
     { field: 'Software Engineering' },
@@ -234,34 +240,12 @@ export const fieldsOfInterest = [
     { field: 'Information Systems' },
 ];
 
-// Final appointment status
-export const appointmentStatuses = [
-    { appointmentStatus: 'Permanent' },
-    { appointmentStatus: 'Full-Time' },
-    { appointmentStatus: 'Temporary' },
-    { appointmentStatus: 'Part-Time' },
-];
-
-async function seedStatusTable() {
-    // Don't proceed if table is already seeded
-    const rows = await db.select().from(status).limit(1);
+async function seedAppointmentStatusTable() {
+    const rows = await db.select().from(appointmentStatus).limit(1);
     if (rows.length > 0) return { success: true };
 
-    const response = await db.insert(status).values(statuses).returning();
-
-    // Check response
-    return { success: response.length === statuses.length };
-}
-
-async function seedRankTable() {
-    // Don't proceed if table is already seeded
-    const rows = await db.select().from(rank).limit(1);
-    if (rows.length > 0) return { success: true };
-
-    const response = await db.insert(rank).values(ranks).returning();
-
-    // Check response
-    return { success: response.length === ranks.length };
+    const response = await db.insert(appointmentStatus).values(appointmentStatuses).returning();
+    return { success: response.length === appointmentStatuses.length };
 }
 
 async function seedDegreeProgramTable() {
@@ -275,15 +259,15 @@ async function seedDegreeProgramTable() {
     return { success: response.length === degreePrograms.length };
 }
 
-async function seedCourseTable() {
+async function seedRankTable() {
     // Don't proceed if table is already seeded
-    const rows = await db.select().from(course).limit(1);
+    const rows = await db.select().from(rank).limit(1);
     if (rows.length > 0) return { success: true };
 
-    const response = await db.insert(course).values(courses).returning();
+    const response = await db.insert(rank).values(ranks).returning();
 
     // Check response
-    return { success: response.length === courses.length };
+    return { success: response.length === ranks.length };
 }
 
 async function seedRoleTable() {
@@ -297,20 +281,34 @@ async function seedRoleTable() {
     return { success: response.length === roles.length };
 }
 
+async function seedStatusTable() {
+    // Don't proceed if table is already seeded
+    const rows = await db.select().from(status).limit(1);
+    if (rows.length > 0) return { success: true };
+
+    const response = await db.insert(status).values(statuses).returning();
+
+    // Check response
+    return { success: response.length === statuses.length };
+}
+
+async function seedCourseTable() {
+    // Don't proceed if table is already seeded
+    const rows = await db.select().from(course).limit(1);
+    if (rows.length > 0) return { success: true };
+
+    const response = await db.insert(course).values(courses).returning();
+
+    // Check response
+    return { success: response.length === courses.length };
+}
+
 async function seedFieldOfInterestTable() {
     const rows = await db.select().from(fieldOfInterest).limit(1);
     if (rows.length > 0) return { success: true };
 
     const response = await db.insert(fieldOfInterest).values(fieldsOfInterest).returning();
     return { success: response.length === fieldsOfInterest.length };
-}
-
-async function seedAppointmentStatusTable() {
-    const rows = await db.select().from(appointmentStatus).limit(1);
-    if (rows.length > 0) return { success: true };
-
-    const response = await db.insert(appointmentStatus).values(appointmentStatuses).returning();
-    return { success: response.length === appointmentStatuses.length };
 }
 
 export async function seedDatabase() {
