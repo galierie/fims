@@ -18,11 +18,10 @@
         $derived(account);
 
     const userRoles = ['Admin', 'IT'];
+    let isLoading = $state(false);
 
     let willDelete = $state(false);
-    let isDeleting = $state(false);
-
-    function toggleModal() {
+    function toggleDeleteModal() {
         willDelete = !willDelete;
     }
 
@@ -72,11 +71,11 @@
                 bind:this={deleteForm}
                 use:enhance={({ cancel }) => {
                     if (willDelete) {
-                        willDelete = false;
-                        isDeleting = true;
+                        isLoading = true;
                         return async ({ update }) => {
                             await update();
-                            isDeleting = false;
+                            willDelete = false;
+                            isLoading = false;
                         };
                     }
                     willDelete = true;
@@ -95,7 +94,7 @@
                         onDelete={() => {
                             if (deleteForm) deleteForm.requestSubmit();
                         }}
-                        onCancel={toggleModal}
+                        onCancel={toggleDeleteModal}
                         text="Are you sure you want to delete the account?"
                     />
                 {/if}
@@ -103,7 +102,7 @@
         </div>
     </div>
 
-    {#if isDeleting}
+    {#if isLoading}
         <LoadingScreen />
     {/if}
 {/if}
