@@ -30,18 +30,18 @@
         if (!dateObj) return undefined;
         const d = new Date(dateObj);
         if (isNaN(d.getTime())) return undefined;
-        
+
         const year = d.getFullYear();
         const month = String(d.getMonth() + 1).padStart(2, '0');
         const day = String(d.getDate()).padStart(2, '0');
-        
+
         return `${year}-${month}-${day}`;
     }
 
     // Check for changes
-    let haveChanges: boolean[] = $state(Array(6).fill(false));
-    let hasChange = $derived(haveChanges.some((e) => e === true));
-    
+    const haveChanges: boolean[] = $state(Array(6).fill(false));
+    const hasChange = $derived(haveChanges.some((e) => e === true));
+
     $effect(() => {
         console.log(`Ping from ProfileForm! hasChange = ${hasChange}`);
     });
@@ -51,8 +51,11 @@
         if (isCreating) setToEdit();
     });
 
-    const biologicalSexMapToFull: Record<string, string> = { 
-        M: 'Male', F: 'Female', I: 'Intersex', U: 'Unknown' 
+    const biologicalSexMapToFull: Record<string, string> = {
+        M: 'Male',
+        F: 'Female',
+        I: 'Intersex',
+        U: 'Unknown',
     };
 
     // Input Table Columns
@@ -208,8 +211,19 @@
     ]);
 
     const promotionHistoryValues: InputRowValue[] | undefined = $derived(
-        profile?.promotionHistory.map(
-            ({ tupleid, rankTitle, appointmentStatus, dateOfTenureOrRenewal }, index) => ({
+        profile?.promotionHistory
+            // sort array before mapping
+            .slice() // Create copy to avoid mutating array
+            .sort((a, b) => {
+                const dateA = a.dateOfTenureOrRenewal
+                    ? new Date(a.dateOfTenureOrRenewal).getTime()
+                    : 0;
+                const dateB = b.dateOfTenureOrRenewal
+                    ? new Date(b.dateOfTenureOrRenewal).getTime()
+                    : 0;
+                return dateB - dateA;
+            })
+            .map(({ tupleid, rankTitle, appointmentStatus, dateOfTenureOrRenewal }, index) => ({
                 rowNum: index,
                 row: [
                     { columnNum: 0, defaultValue: rankTitle ?? undefined },
@@ -219,8 +233,7 @@
                     { columnNum: 4, defaultValue: toDateString(dateOfTenureOrRenewal) },
                 ],
                 tupleid,
-            }),
-        ),
+            })),
     );
 
     let isLoading = $state(false);
@@ -245,7 +258,7 @@
 
 <form
     method="POST"
-    action="?/{isCreating ? 'create' : 'update'}" 
+    action="?/{isCreating ? 'create' : 'update'}"
     onreset={() => {
         resetViewState();
         willDiscardChanges = false;
@@ -255,13 +268,13 @@
     use:enhance={() => {
         isLoading = true;
         return async ({ update, result }) => {
-            await update({ reset: false }); 
+            await update({ reset: false });
             isLoading = false;
-            
+
             if (result.type === 'success' || result.type === 'redirect') {
                 if (!isCreating) resetViewState();
             } else {
-                alert("Failed to save!");
+                alert('Failed to save!');
             }
         };
     }}
@@ -277,7 +290,7 @@
                 <Icon icon="tabler:device-floppy" class="mr-2 h-5 w-5" />
                 <span>Save Record</span>
             </GreenButton>
-            
+
             {#if !isCreating}
                 <RedButton
                     type="button"
@@ -294,7 +307,7 @@
                 <RedButton
                     type="button"
                     onclick={() => {
-                        willDiscardChanges = true; 
+                        willDiscardChanges = true;
                     }}
                 >
                     <span>Cancel</span>
@@ -310,9 +323,24 @@
 
     <div>
         <div class="mt-4 grid w-full grid-cols-4">
-            <Field label="Last Name" name="last-name" defaultValue={profile?.lastName} required={true} />
-            <Field label="First Name" name="first-name" defaultValue={profile?.firstName} required={true} />
-            <Field label="Middle Name" name="middle-name" defaultValue={profile?.middleName} required={true} />
+            <Field
+                label="Last Name"
+                name="last-name"
+                defaultValue={profile?.lastName}
+                required={true}
+            />
+            <Field
+                label="First Name"
+                name="first-name"
+                defaultValue={profile?.firstName}
+                required={true}
+            />
+            <Field
+                label="Middle Name"
+                name="middle-name"
+                defaultValue={profile?.middleName}
+                required={true}
+            />
             <Field label="Suffix" name="suffix" defaultValue={profile?.suffix ?? undefined} />
         </div>
         <div class="mt-4 grid w-full grid-cols-4">
@@ -328,7 +356,9 @@
                 name="biological-sex"
                 type="dropdown"
                 opts={['Male', 'Female', 'Intersex', 'Unknown']}
-                defaultValue={profile?.biologicalSex ? biologicalSexMapToFull[profile.biologicalSex] : ''}
+                defaultValue={profile?.biologicalSex
+                    ? biologicalSexMapToFull[profile.biologicalSex]
+                    : ''}
                 required={true}
             />
             <Field
@@ -411,8 +441,20 @@
             />
         </div>
         <div class="mt-4 grid w-full grid-cols-4">
-            <Field label="TIN" name="tin" immutable={!isCreating} defaultValue={profile?.tin} required={true} />
-            <Field label="GSIS BP No." name="gsis" immutable={!isCreating} defaultValue={profile?.gsis} required={true} />
+            <Field
+                label="TIN"
+                name="tin"
+                immutable={!isCreating}
+                defaultValue={profile?.tin}
+                required={true}
+            />
+            <Field
+                label="GSIS BP No."
+                name="gsis"
+                immutable={!isCreating}
+                defaultValue={profile?.gsis}
+                required={true}
+            />
             <Field
                 label="Employee No."
                 name="employee-number"
@@ -422,12 +464,12 @@
             />
         </div>
         <div class="mt-4 grid w-full grid-cols-4">
-            <Field 
-                label="Status" 
-                name="status" 
+            <Field
+                label="Status"
+                name="status"
                 type="dropdown"
                 opts={['Active', 'On Leave', 'Sabbatical', 'On Secondment']}
-                defaultValue={profile?.status ?? ''} 
+                defaultValue={profile?.status ?? ''}
             />
             <Field
                 label="Date of Original Appointment"
@@ -474,12 +516,12 @@
 {#if willDiscardChanges}
     <DeleteConfirmation
         onDelete={async () => {
-            willDiscardChanges = false; 
+            willDiscardChanges = false;
             if (profileForm) profileForm.reset();
-            
+
             if (isCreating) {
-                isLoading = true; 
-                await goto('/'); 
+                isLoading = true;
+                await goto('/');
             }
         }}
         onCancel={() => {

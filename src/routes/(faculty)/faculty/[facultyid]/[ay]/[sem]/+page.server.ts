@@ -1,4 +1,4 @@
-import { error, fail } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 
 import type { ChangelogRecordStructure } from '$lib/ui/ChangelogList.svelte';
 import {
@@ -13,10 +13,20 @@ import {
     getFacultySemestralRecords,
 } from '$lib/server/queries/faculty-view';
 import { getFacultyRecordChangelogs } from '$lib/server/queries/faculty-list.js';
-import { updateSemestralRecords } from '$lib/server/queries/db-helpers';
+import { getUserRoleAndPermissions, updateSemestralRecords } from '$lib/server/queries/db-helpers';
 
-export async function load({ params, parent }) {
-    const layoutData = await parent();
+export async function load({ params, locals }) {
+    // Check existing session
+    if (typeof locals.user === 'undefined') throw redirect(307, '/login');
+
+    // Check Permissions
+    const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
+    if (typeof roleObj === 'undefined') throw redirect(307, '/login');
+
+    const { canAddFaculty, canModifyFaculty, canViewChangelogs } = roleObj;
+    const canViewFaculty = canAddFaculty || canModifyFaculty;
+    if (!canViewFaculty) return fail(403, { error: 'Insufficient permissions.' });
+
     const { facultyid: facultyidStr, ay: acadYearStr, sem: semNumStr } = params;
 
     const facultyid = parseInt(facultyidStr, 10);
@@ -25,8 +35,7 @@ export async function load({ params, parent }) {
 
     let fetchedChangelogs: ChangelogRecordStructure[] | null = null;
 
-    if (layoutData.canViewChangelogs)
-        fetchedChangelogs = await getFacultyRecordChangelogs(facultyid, 3, 0);
+    if (canViewChangelogs) fetchedChangelogs = await getFacultyRecordChangelogs(facultyid, 3, 0);
 
     // Validate parameters
     if (Number.isNaN(facultyid)) throw error(400, { message: 'Invalid record identifier.' });
@@ -83,13 +92,20 @@ export async function load({ params, parent }) {
         'researchTitles',
         researches.map(({ title }) => title),
     );
+    const formatDate = (dateObj: Date | null | undefined): string => {
+        if (!dateObj) return '';
+        const year = dateObj.getFullYear();
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
     dependencyMaps.set(
         'researchTitlesToResearchStartDates',
-        new Map(researches.map(({ title, startDate }) => [title, startDate])),
+        new Map(researches.map(({ title, startDate }) => [title, formatDate(startDate)])),
     );
     dependencyMaps.set(
         'researchTitlesToResearchEndDates',
-        new Map(researches.map(({ title, endDate }) => [title, endDate])),
+        new Map(researches.map(({ title, endDate }) => [title, formatDate(endDate)])),
     );
     dependencyMaps.set(
         'researchTitlesToResearchFunding',
@@ -105,11 +121,22 @@ export async function load({ params, parent }) {
         opts,
         dependencyMaps,
         fetchedChangelogs,
+        canViewChangelogs,
     };
 }
 
 export const actions = {
-    async update({ request, params }) {
+    async update({ request, params, locals }) {
+        // Check existing session
+        if (typeof locals.user === 'undefined') throw redirect(307, '/login');
+
+        // Check Permissions
+        const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
+        if (typeof roleObj === 'undefined') throw redirect(307, '/login');
+
+        const { canModifyFaculty } = roleObj;
+        if (!canModifyFaculty) return fail(403, { error: 'Insufficient permissions.' });
+
         const formData = await request.formData();
 
         // Extract URL parameters

@@ -57,9 +57,12 @@ export async function getFacultyLoadingWorksheet(
     semNum: number,
 ) {
     const sheetName = 'Faculty Loading';
-    const data = await Promise.all(
+    const rawData = await Promise.all(
         facultyIds.map((id) => getFacultyLoadingReport(id, acadYear, semNum)),
     );
+    const data = rawData.filter((datum) => datum !== null);
+
+    if (data.length === 0) return null;
 
     // Create Workbook
     const workbook = new ExcelJS.Workbook();
@@ -94,9 +97,7 @@ export async function getFacultyLoadingWorksheet(
     });
 
     // Widen all cells
-    for (let i = 1; i <= usedColumns; i++) {
-        sheet.getColumn(i).width = (i === 1) ? 40 : 20;
-    }
+    for (let i = 1; i <= usedColumns; i++) sheet.getColumn(i).width = i === 1 ? 40 : 20;
 
     // Set data cells
     let row = dataStartRow;
@@ -193,7 +194,8 @@ export async function getFacultyLoadingWorksheet(
 
         // 13. TOTAL Load
         const totalLoadCreditCell = sheet.getCell(row, col++);
-        const totalLoadValue = undergradCredit + gradCredit + researchLoadCredit + administrativeLoadCredit;
+        const totalLoadValue =
+            undergradCredit + gradCredit + researchLoadCredit + administrativeLoadCredit;
         totalLoadCreditCell.value = totalLoadValue;
         totalLoadCreditCell.numFmt = '0.00';
         totalLoadCreditCell.border = cellBorders;

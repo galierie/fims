@@ -1,8 +1,20 @@
-import { error } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 
+import { getUserRoleAndPermissions } from '$lib/server/queries/db-helpers.js';
 import { getAllFacultyAcademicSemesters, getFacultyName } from '$lib/server/queries/faculty-view';
 
-export async function load({ params }) {
+export async function load({ locals, params }) {
+    // Check existing session
+    if (typeof locals.user === 'undefined') throw redirect(307, '/login');
+
+    // Check Permissions
+    const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
+    if (typeof roleObj === 'undefined') throw redirect(307, '/login');
+
+    const { canAddFaculty, canModifyFaculty } = roleObj;
+    const canViewFaculty = canAddFaculty || canModifyFaculty;
+    if (!canViewFaculty) throw error(403, { message: 'Insufficient permissions.' });
+
     const { facultyid: facultyidStr } = params;
     const facultyid = parseInt(facultyidStr, 10);
 

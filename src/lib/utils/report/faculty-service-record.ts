@@ -50,6 +50,16 @@ export async function getFacultyServiceRecordWorksheet(
     toAcadYear: number,
     toSemNum: number,
 ) {
+    const data = await getFacultyServiceRecordReport(
+        facultyid,
+        fromAcadYear,
+        fromSemNum,
+        toAcadYear,
+        toSemNum,
+    );
+
+    if (data === null) return null;
+
     const {
         profile,
         originalTenure,
@@ -62,13 +72,8 @@ export async function getFacultyServiceRecordWorksheet(
         currentAdminWorks,
         currentResearch,
         currentMentoring,
-    } = await getFacultyServiceRecordReport(
-        facultyid,
-        fromAcadYear,
-        fromSemNum,
-        toAcadYear,
-        toSemNum,
-    );
+    } = data;
+
     const sheetName = `SR - ${profile[0].lastName}`.substring(0, 31);
 
     // Create Workbook
@@ -94,9 +99,8 @@ export async function getFacultyServiceRecordWorksheet(
     sheet.mergeCells('A4:P4');
 
     // Widen all columns
-    for (let i = 1; i <= constantSemestralRecordHeaderCellValues.length; i++) {
+    for (let i = 1; i <= constantSemestralRecordHeaderCellValues.length; i++)
         sheet.getColumn(i).width = 20;
-    }
 
     // Populate admin positions
     let adminPositionRow = adminPositionsStartRow;
@@ -212,7 +216,7 @@ export async function getFacultyServiceRecordWorksheet(
         headerCell.value = header;
         headerCell.border = cellBorders;
         headerCell.alignment = {
-            horizontal: (header === 'Semester AY') ? 'left' : 'center',
+            horizontal: header === 'Semester AY' ? 'left' : 'center',
             vertical: 'top',
             wrapText: true,
         };
@@ -292,7 +296,8 @@ export async function getFacultyServiceRecordWorksheet(
             semestralRecordDataRow,
             semestralRecordDataCol++,
         );
-        if (typeof curCoursesTaught?.teachingLoadCredit !== 'undefined') teachingLoadCreditCell.value = curCoursesTaught?.teachingLoadCredit;
+        if (typeof curCoursesTaught?.teachingLoadCredit !== 'undefined')
+            teachingLoadCreditCell.value = curCoursesTaught?.teachingLoadCredit;
         teachingLoadCreditCell.numFmt = '0.00';
         teachingLoadCreditCell.border = cellBorders;
         teachingLoadCreditCell.alignment = defaultTableCellAlignment;
@@ -315,10 +320,11 @@ export async function getFacultyServiceRecordWorksheet(
             typeof curAdminPositions?.administrativeLoadCredit !== 'undefined' ||
             typeof curCommMemberships?.administrativeLoadCredit !== 'undefined' ||
             typeof curAdminWorks?.administrativeLoadCredit !== 'undefined'
-        ) administrativeLoadCreditCell.value =
-            (curAdminPositions?.administrativeLoadCredit ?? 0) + 
-            (curCommMemberships?.administrativeLoadCredit ?? 0) +
-            (curAdminWorks?.administrativeLoadCredit ?? 0);
+        )
+            administrativeLoadCreditCell.value =
+                (curAdminPositions?.administrativeLoadCredit ?? 0) +
+                (curCommMemberships?.administrativeLoadCredit ?? 0) +
+                (curAdminWorks?.administrativeLoadCredit ?? 0);
         administrativeLoadCreditCell.numFmt = '0.00';
         administrativeLoadCreditCell.border = cellBorders;
         administrativeLoadCreditCell.alignment = defaultTableCellAlignment;
@@ -352,7 +358,8 @@ export async function getFacultyServiceRecordWorksheet(
             semestralRecordDataRow,
             semestralRecordDataCol++,
         );
-        if (typeof curResearch?.researchLoadCredit !== 'undefined') researchLoadCreditCell.value = curResearch?.researchLoadCredit;
+        if (typeof curResearch?.researchLoadCredit !== 'undefined')
+            researchLoadCreditCell.value = curResearch?.researchLoadCredit;
         researchLoadCreditCell.numFmt = '0.00';
         researchLoadCreditCell.border = cellBorders;
         researchLoadCreditCell.alignment = defaultTableCellAlignment;
@@ -398,7 +405,8 @@ export async function getFacultyServiceRecordWorksheet(
 
         // 15. Course Units (Task 12)
         const courseUnitsCell = sheet.getCell(semestralRecordDataRow, semestralRecordDataCol++);
-        if (typeof curCoursesTaught?.courseUnits !== 'undefined') courseUnitsCell.value = curCoursesTaught?.courseUnits;
+        if (typeof curCoursesTaught?.courseUnits !== 'undefined')
+            courseUnitsCell.value = curCoursesTaught?.courseUnits;
         courseUnitsCell.numFmt = '0.00';
         courseUnitsCell.border = cellBorders;
         courseUnitsCell.alignment = defaultTableCellAlignment;

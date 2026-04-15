@@ -1,13 +1,18 @@
 import { redirect } from '@sveltejs/kit';
 
-import { getPermissions, getRole } from '$lib/server/queries/db-helpers';
+import { getUserRoleAndPermissions } from '$lib/server/queries/db-helpers';
 import { seedDatabase } from '$lib/server/db/seed-db.js';
 
 export async function load({ locals, url }) {
-    if (locals.user) {
-        const userRole = await getRole(locals.user.id);
-        const { canAddAccount, canModifyAccount, canViewChangelogs } =
-            await getPermissions(userRole);
+    if (typeof locals.user !== 'undefined') {
+        // Check Permissions
+        const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
+        if (typeof roleObj === 'undefined') throw redirect(307, '/login');
+
+        const { role, canAddFaculty, canModifyFaculty, canAddAccount, canModifyAccount } = roleObj;
+        const canViewFaculty = canAddFaculty || canModifyFaculty;
+        const canViewAccounts = canAddAccount || canModifyAccount;
+        const canViewNavBar = canViewFaculty && canViewAccounts;
 
         const accountColorMap = new Map();
         accountColorMap.set('IT', 'fims-red');
@@ -17,11 +22,9 @@ export async function load({ locals, url }) {
 
         return {
             isLoggedIn: true, // if it's not, then this line shouldn't have been reached
+            canViewNavBar,
             email: locals.user.email,
-            canViewAccounts: canAddAccount || canModifyAccount,
-            isViewingRecord: url.pathname.startsWith('/record'),
-            canViewChangelogs,
-            accountColor: accountColorMap.get(userRole),
+            accountColor: accountColorMap.get(role),
         };
     }
     if (!url.pathname.startsWith('/login') && !url.pathname.startsWith('/api/auth'))
@@ -29,10 +32,8 @@ export async function load({ locals, url }) {
     else
         return {
             isLoggedIn: false,
-            isViewingRecord: false,
+            canViewNavBar: false,
             email: '',
-            canViewAccounts: false,
-            canViewChangelogs: false,
             accountColor: '',
         };
 }

@@ -39,12 +39,12 @@
             class="flex justify-center [&>div]:flex [&>div]:h-12 [&>div]:items-center [&>div]:border-b [&>div]:border-fims-gray [&>div]:bg-white [&>div]:px-6"
         >
             <div class={canViewChangelogs ? 'w-66 2xl:w-132' : 'w-116 2xl:w-182'}>
-                <span>{lastName}, {firstName}</span>
+                <span class="truncate">{lastName}, {firstName}</span>
             </div>
             <div class="w-50 justify-center 2xl:w-75"><span>{status}</span></div>
             <div class="w-62.5 justify-center 2xl:w-75"><span>{rankTitle}</span></div>
             <div class="w-62.5 justify-center 2xl:w-75">
-                <span>{adminPosition ? adminPosition : '-'}</span>
+                <span class="truncate">{adminPosition ? adminPosition : '-'}</span>
             </div>
         </a>
         {#if canViewChangelogs}

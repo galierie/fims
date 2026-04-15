@@ -1,29 +1,25 @@
-import {
-    and,
-    asc,
-    desc,
-    eq,
-    gt,
-    ilike,
-    lt,
-    ne,
-    or,
-    type SQL,
-    type SQLWrapper,
-    sql,
-} from 'drizzle-orm';
+import { and, asc, desc, eq, gt, ilike, lt, ne, or, type SQL, type SQLWrapper } from 'drizzle-orm';
 
 import type { FilterColumn } from '$lib/types/filter';
 
 import { accountSearchView, changelog, profile, profileInfo, role } from '../db/schema';
 import { db } from '../db';
+import { logChange } from './db-helpers';
+import { alias } from 'drizzle-orm/pg-core';
 
 const pageSize = 50;
+
+// Sort keywords
+const sortMaps: Map<string, SQL[]> = new Map();
+
+sortMaps.set('asc-email', [asc(profile.email)]);
+sortMaps.set('desc-email', [desc(profile.email)]);
 
 export async function getAccountList(
     currentUserId: string,
     searchTerm: string | null,
     filterMap: FilterColumn[],
+    sortBys: string[],
     cursor?: number,
     isNext: boolean = true,
     initLoad: boolean = false,
@@ -49,18 +45,42 @@ export async function getAccountList(
         if (sameColumnQueries.length) filterQueries.push(or(...sameColumnQueries));
     });
 
+    // Process sorting order
+    let sortOrder: Array<SQL> = [];
+    sortBys.forEach((rawSortKey) => {
+        let sortKey = rawSortKey;
+
+        if (!isNext) {
+            const [keyOrder, ...keyArr] = sortKey.split('-');
+            if (typeof keyOrder === 'undefined') return;
+            if (keyArr.length === 0) return;
+
+            const flipOrder = keyOrder === 'asc' ? 'desc' : 'asc';
+            sortKey = [flipOrder, ...keyArr].join('-');
+        }
+
+        const orders = sortMaps.get(sortKey);
+        if (typeof orders === 'undefined') return;
+        sortOrder = [...sortOrder, ...orders];
+    });
+    sortOrder.push(isNext ? asc(profileInfo.id) : desc(profileInfo.id));
+
     // Get accounts from database
-    const userCountSq = await db
+    const operator = alias(profile, 'operator');
+    const shownFields = await db
         .select({
-            userid: searchSq.id,
-            profileInfoId: sql<string>`${profileInfo.id}`.as('profile_info_id'),
+            id: searchSq.id,
             email: profile.email,
             role: profileInfo.role,
-            latestChangelogId: profileInfo.latestChangelogId,
+            logTimestamp: changelog.timestamp,
+            logMaker: operator.email,
+            logOperation: changelog.operation,
         })
         .from(profile)
         .rightJoin(searchSq, eq(searchSq.id, profile.id))
         .leftJoin(profileInfo, eq(profileInfo.profileId, profile.id))
+        .leftJoin(changelog, eq(changelog.id, profileInfo.latestChangelogId))
+        .leftJoin(operator, eq(operator.id, changelog.operatorId))
         .where(
             and(
                 ne(profile.id, currentUserId),
@@ -73,68 +93,30 @@ export async function getAccountList(
                 and(...filterQueries),
             ),
         )
-        .orderBy(isNext ? asc(profileInfo.id) : desc(profileInfo.id))
-        .limit(pageSize + 1)
-        .as('usercount_sq');
+        .orderBy(...sortOrder)
+        .limit(pageSize + 1);
 
     // Check if there is a previous/next page
-    let hasPrev = !initLoad;
-    let hasNext = true;
 
-    const userCount = (await db.select().from(userCountSq)).length;
+    const profileCount = shownFields.length;
+    const isTooMuch = profileCount > pageSize;
 
-    if (isNext) hasNext = userCount > pageSize;
-    else hasPrev = userCount > pageSize;
+    const hasPrev = isNext ? !initLoad : isTooMuch;
+    const hasNext = isNext ? isTooMuch : true;
 
-    // Chop off the extra record
-    const userSq = await db
-        .select()
-        .from(userCountSq)
-        .orderBy(isNext ? asc(userCountSq.profileInfoId) : desc(userCountSq.profileInfoId))
-        .limit(pageSize)
-        .as('user_sq');
+    // Reverse faculty list if previous page
+    if (!isNext) shownFields.reverse();
+
+    // Chop off the extra record if isTooMuch
+    if (isTooMuch) shownFields.pop();
 
     // Get cursors
-    let [firstId] = await db
-        .select({
-            value: userSq.profileInfoId,
-        })
-        .from(userSq)
-        .orderBy(asc(userSq.profileInfoId))
-        .limit(1);
-
-    let [lastId] = await db
-        .select({
-            value: userSq.profileInfoId,
-        })
-        .from(userSq)
-        .orderBy(desc(userSq.profileInfoId))
-        .limit(1);
-
-    // Get changelogs
-    const shownFields = await db
-        .select({
-            userid: userSq.userid,
-            email: userSq.email,
-            role: userSq.role,
-            logTimestamp: changelog.timestamp,
-            logMaker: profile.email,
-            logOperation: changelog.operation,
-        })
-        .from(userSq)
-        .leftJoin(changelog, eq(changelog.id, userSq.latestChangelogId))
-        .leftJoin(profile, eq(profile.id, changelog.operatorId));
-
-    // Reverse account list and cursors if previous page
-    if (!isNext) {
-        [lastId, firstId] = [firstId, lastId];
-        shownFields.reverse();
-    }
+    const [firstId, , lastId] = shownFields;
 
     return {
         accountList: shownFields,
-        prevCursor: firstId?.value,
-        nextCursor: lastId?.value,
+        prevCursor: firstId?.id,
+        nextCursor: lastId?.id,
         hasPrev,
         hasNext,
     };
@@ -143,7 +125,7 @@ export async function getAccountList(
 export interface AccountDTO {
     email: string | null;
     role: string | null;
-    userid: string;
+    id: string;
     logTimestamp: Date | null;
     logOperation: string | null;
     logMaker: string | null;
@@ -163,4 +145,24 @@ export async function getAllRoles() {
 
     const uniqueValues = uniqueRows.map(({ role }) => role);
     return uniqueValues;
+}
+
+export async function changeRole(operatorId: string, id: string, role: string) {
+    // Actual action
+    const returnedIds = await db
+        .update(profileInfo)
+        .set({
+            role: role,
+        })
+        .where(eq(profileInfo.profileId, id))
+        .returning();
+
+    if (returnedIds.length === 0) return { success: false };
+
+    // Log!
+    returnedIds.forEach(async ({ id: tupleId }) => {
+        await logChange(operatorId, tupleId, 'Chnaged account role.');
+    });
+
+    return { success: true };
 }

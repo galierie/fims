@@ -57,11 +57,11 @@
         for (let c = 0; c < columns.length; c++) newRow.push({ columnNum: c });
 
         actualRows = [...actualRows, { rowNum: nextRowNum, row: newRow }];
-        
+
         // expand the arrays so the new row's binding doesn't go out of bounds
         haveValues[nextRowNum] = false;
         haveChanges[nextRowNum] = false;
-        
+
         nextRowNum++;
     }
 

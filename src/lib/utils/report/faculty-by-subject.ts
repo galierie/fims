@@ -27,6 +27,8 @@ export async function getFacultyBySubjectWorksheet() {
     const sheetName = 'By Subject Taught, Faculty';
     const data = await getFacultyBySubjectReport();
 
+    if (data.length === 0) return null;
+
     // Create Workbook
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet(sheetName);

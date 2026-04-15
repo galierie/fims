@@ -19,28 +19,42 @@ import { db } from '../db';
 
 const pageSize = 50;
 
+// Sort keywords
+const sortMaps: Map<string, SQL[]> = new Map();
+
+sortMaps.set('asc-full-name', [
+    asc(faculty.lastName),
+    asc(faculty.firstName),
+    asc(faculty.middleName),
+]);
+sortMaps.set('desc-full-name', [
+    desc(faculty.lastName),
+    desc(faculty.firstName),
+    desc(faculty.middleName),
+]);
+
+sortMaps.set('asc-status', [asc(faculty.status)]);
+sortMaps.set('desc-status', [desc(faculty.status)]);
+
+sortMaps.set('asc-rank', [asc(rank.title)]);
+sortMaps.set('desc-rank', [desc(rank.title)]);
+
 export async function getFacultyRecordList(
     searchTerm: string | null,
     filterMap: FilterColumn[],
+    sortBys: string[],
     cursor?: number,
     isNext: boolean = true,
     initLoad: boolean = false,
 ) {
     // Get entries for the current AcademicSemester
-    // TODO: Find a better way to know current AcademicSemester
-    const currentAcademicYear = 2026;
-    const currentAcademicSemester = 2;
+    // Get latest AcademicSemester (including Midyear) from relation academic_semester
     const [latestAcademicSemester] = await db
         .select({
             academicSemesterid: academicSemester.id,
         })
         .from(academicSemester)
-        .where(
-            and(
-                eq(academicSemester.academicYear, currentAcademicYear),
-                eq(academicSemester.semesterNumber, currentAcademicSemester),
-            ),
-        )
+        .orderBy(desc(academicSemester.academicYear), desc(academicSemester.semesterNumber))
         .limit(1);
 
     // fallback ID in case there are no entries for current AcademicSemester
@@ -88,16 +102,42 @@ export async function getFacultyRecordList(
     let cursorFilter: SQL | undefined;
     if (cursor) cursorFilter = isNext ? gt(faculty.id, cursor) : lt(faculty.id, cursor);
 
+    // Adding missing sort mappings
+    sortMaps.set('asc-admin-position', [asc(adminPositionSq.title)]);
+    sortMaps.set('desc-admin-position', [desc(adminPositionSq.title)]);
+
+    // Process sorting order
+    let sortOrder: Array<SQL> = [];
+    sortBys.forEach((rawSortKey) => {
+        let sortKey = rawSortKey;
+
+        if (!isNext) {
+            const [keyOrder, ...keyArr] = sortKey.split('-');
+            if (typeof keyOrder === 'undefined') return;
+            if (keyArr.length === 0) return;
+
+            const flipOrder = keyOrder === 'asc' ? 'desc' : 'asc';
+            sortKey = [flipOrder, ...keyArr].join('-');
+        }
+
+        const orders = sortMaps.get(sortKey);
+        if (typeof orders === 'undefined') return;
+        sortOrder = [...sortOrder, ...orders];
+    });
+    sortOrder.push(isNext ? asc(faculty.id) : desc(faculty.id));
+
     // Get faculty records from database
-    const facultyRecordCountSq = await db
+    const shownFields = await db
         .select({
-            id: searchSq.id,
+            id: faculty.id,
             lastName: faculty.lastName,
             firstName: faculty.firstName,
             status: faculty.status,
             rankTitle: rank.title,
             adminPosition: adminPositionSq.title,
-            latestChangelogId: faculty.latestChangelogId,
+            logTimestamp: changelog.timestamp,
+            logMaker: profile.email,
+            logOperation: changelog.operation,
         })
         .from(faculty)
         .rightJoin(searchSq, eq(searchSq.id, faculty.id))
@@ -105,7 +145,7 @@ export async function getFacultyRecordList(
             facultyAcademicSemester,
             and(
                 eq(facultyAcademicSemester.facultyId, faculty.id),
-                eq(facultyAcademicSemester.academicSemesterId, currentAcademicSemesterId), // Match only the current AcademicSemester
+                eq(facultyAcademicSemester.academicSemesterId, currentAcademicSemesterId),
             ),
         )
         .leftJoin(facultyRank, eq(facultyRank.id, facultyAcademicSemester.currentRankId))
@@ -114,72 +154,33 @@ export async function getFacultyRecordList(
             adminPositionSq,
             eq(adminPositionSq.facultyAcademicSemesterId, facultyAcademicSemester.id),
         )
+        .leftJoin(changelog, eq(changelog.id, faculty.latestChangelogId))
+        .leftJoin(profile, eq(profile.id, changelog.operatorId))
         .where(and(cursorFilter, and(...filterQueries)))
-        .orderBy(isNext ? asc(faculty.id) : desc(faculty.id))
-        .limit(pageSize + 1)
-        .as('faculty_record_count_sq');
+        .orderBy(...sortOrder)
+        .limit(pageSize + 1);
 
     // Check if there is a previous/next page
-    let hasPrev = !initLoad;
-    let hasNext = true;
 
-    const facultyRecordCount = (await db.select().from(facultyRecordCountSq)).length;
+    const facultyRecordCount = shownFields.length;
+    const isTooMuch = facultyRecordCount > pageSize;
 
-    if (isNext) hasNext = facultyRecordCount > pageSize;
-    else hasPrev = facultyRecordCount > pageSize;
+    const hasPrev = isNext ? !initLoad : isTooMuch;
+    const hasNext = isNext ? isTooMuch : true;
 
-    // Chop off the extra record
-    const facultyRecordSq = await db
-        .select()
-        .from(facultyRecordCountSq)
-        .orderBy(isNext ? asc(facultyRecordCountSq.id) : desc(facultyRecordCountSq.id))
-        .limit(pageSize)
-        .as('user_sq');
+    // Reverse faculty list if previous page
+    if (!isNext) shownFields.reverse();
+
+    // Chop off the extra record if isTooMuch
+    if (isTooMuch) shownFields.pop();
 
     // Get cursors
-    let [firstId] = await db
-        .select({
-            value: facultyRecordSq.id,
-        })
-        .from(facultyRecordSq)
-        .orderBy(asc(facultyRecordSq.id))
-        .limit(1);
-
-    let [lastId] = await db
-        .select({
-            value: facultyRecordSq.id,
-        })
-        .from(facultyRecordSq)
-        .orderBy(desc(facultyRecordSq.id))
-        .limit(1);
-
-    // Get changelogs
-    const shownFields = await db
-        .select({
-            id: facultyRecordSq.id,
-            lastName: facultyRecordSq.lastName,
-            firstName: facultyRecordSq.firstName,
-            status: facultyRecordSq.status,
-            rankTitle: facultyRecordSq.rankTitle,
-            adminPosition: facultyRecordSq.adminPosition,
-            logTimestamp: changelog.timestamp,
-            logMaker: profile.email,
-            logOperation: changelog.operation,
-        })
-        .from(facultyRecordSq)
-        .leftJoin(changelog, eq(changelog.id, facultyRecordSq.latestChangelogId))
-        .leftJoin(profile, eq(profile.id, changelog.operatorId));
-
-    // Reverse account list and cursors if previous page
-    if (!isNext) {
-        [lastId, firstId] = [firstId, lastId];
-        shownFields.reverse();
-    }
+    const [firstId, , lastId] = shownFields;
 
     return {
         facultyRecordList: shownFields,
-        prevCursor: firstId?.value,
-        nextCursor: lastId?.value,
+        prevCursor: firstId?.id,
+        nextCursor: lastId?.id,
         hasPrev,
         hasNext,
     };

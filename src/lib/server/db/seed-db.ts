@@ -5,7 +5,12 @@ import { db } from './index';
 
 // TODO: Check if tama
 
-export const statuses = [{ status: 'Active' }, { status: 'On Leave' }, { status: 'Sabbatical' }];
+export const statuses = [
+    { status: 'Active' },
+    { status: 'On Leave' },
+    { status: 'Sabbatical' },
+    { status: 'On Secondment' },
+];
 
 export const ranks = [
     {
@@ -220,13 +225,14 @@ export const appointmentStatuses = [
 
 async function seedStatusTable() {
     // Don't proceed if table is already seeded
-    const rows = await db.select().from(status).limit(1);
-    if (rows.length > 0) return { success: true };
+    // note: check is too weak
+    const rows = await db.select().from(status).limit(4);
+    if (rows.length == 4) return { success: true };
 
     const response = await db.insert(status).values(statuses).returning();
 
     // Check response
-    return { success: response.length === 3 };
+    return { success: response.length === 4 };
 }
 
 async function seedRankTable() {

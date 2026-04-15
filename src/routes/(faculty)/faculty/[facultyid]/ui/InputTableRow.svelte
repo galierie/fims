@@ -28,7 +28,7 @@
         isDeleted,
         // eslint-disable-next-line prefer-const -- bindable variable
         toggleRowDeletion,
-        // eslint-disable-next-line no-useless-assignment -- used in parent component
+
         hasValue = $bindable(),
         // eslint-disable-next-line prefer-const -- bindable variable
         rowNum,
@@ -38,16 +38,21 @@
     }: Props = $props();
 
     // svelte-ignore state_referenced_locally
-    let values: any[] = $state(
+    const values: any[] = $state(
         row.map((r) => {
             if (columns[r.columnNum].type === 'checkbox') return r.defaultChecked ?? false;
             return r.defaultValue !== undefined && r.defaultValue !== null ? r.defaultValue : '';
-        })
+        }),
     );
 
     $effect(() => {
         hasValue = values.some(
-            (v) => v !== undefined && v !== null && v !== '' && v !== false && String(v) !== 'undefined'
+            (v) =>
+                v !== undefined &&
+                v !== null &&
+                v !== '' &&
+                v !== false &&
+                String(v) !== 'undefined',
         );
     });
 
@@ -61,16 +66,14 @@
         if (!viewState.isEditing) {
             const newValues = row.map((r) => {
                 if (columns[r.columnNum].type === 'checkbox') return r.defaultChecked ?? false;
-                return r.defaultValue !== undefined && r.defaultValue !== null ? r.defaultValue : '';
+                return r.defaultValue !== undefined && r.defaultValue !== null
+                    ? r.defaultValue
+                    : '';
             });
-            
-            for (let i = 0; i < newValues.length; i++) {
-                values[i] = newValues[i];
-            }
-            
-            for (let i = 0; i < haveChanges.length; i++) {
-                haveChanges[i] = false;
-            }
+
+            for (let i = 0; i < newValues.length; i++) values[i] = newValues[i];
+
+            for (let i = 0; i < haveChanges.length; i++) haveChanges[i] = false;
         }
     });
 
@@ -120,7 +123,10 @@
                         (!isImmutable || defaultValue === undefined || defaultValue === '') &&
                         !isDeleted}
                     bind:hasChange={haveChanges[columnNum]}
-                    isRequired={isRequired && hasValue && (tupleid === undefined || hasChange) && !isDeleted}
+                    isRequired={isRequired &&
+                        hasValue &&
+                        (tupleid === undefined || hasChange) &&
+                        !isDeleted}
                 />
             </div>
         {:else if type === 'expandable' && !(defaultValue instanceof Date)}
@@ -145,7 +151,8 @@
                     >{dependentOnValue === undefined || dependentOnValue === ''
                         ? ''
                         : dependencyMap.get(dependentOnValue as string)}</span
-                > </div>
+                >
+            </div>
         {:else if type === 'checkbox'}
             <div class="{colSpanClass} flex h-8 w-full items-center justify-center bg-white py-0">
                 <input
@@ -178,9 +185,12 @@
                         (!isImmutable || defaultValue === undefined || defaultValue === '') &&
                         !isDeleted}
                     bind:hasChange={haveChanges[columnNum]}
-                    isRequired={isRequired && !isDeleted && ((tupleid === undefined && hasValue) || (tupleid !== undefined && hasChange))}
-                    
-                    isCombobox={true} />
+                    isRequired={isRequired &&
+                        !isDeleted &&
+                        ((tupleid === undefined && hasValue) ||
+                            (tupleid !== undefined && hasChange))}
+                    isCombobox={true}
+                />
             </div>
         {:else if type !== 'dropdown'}
             <input
@@ -194,7 +204,9 @@
                     isDeleted}
                 defaultValue={(defaultValue as string) ?? ''}
                 bind:value={values[columnNum]}
-                required={isRequired && !isDeleted && ((tupleid === undefined && hasValue) || (tupleid !== undefined && hasChange))}
+                required={isRequired &&
+                    !isDeleted &&
+                    ((tupleid === undefined && hasValue) || (tupleid !== undefined && hasChange))}
                 onchange={() => {
                     haveChanges[columnNum] = values[columnNum] !== defaultValue;
                 }}

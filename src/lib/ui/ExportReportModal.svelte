@@ -72,10 +72,17 @@
     const rangeStr = $derived(
         startAy === endAy && startSem === endSem
             ? `AY${startAy}_Sem${startSem}`
-            : `AY${startAy}_Sem${startSem}-AY${endAy}_Sem${endSem}`
+            : `AY${startAy}_Sem${startSem}-AY${endAy}_Sem${endSem}`,
     );
 
-    const selectedDownloads = $derived.by(() => {
+    interface Download {
+        name: string;
+        url: string;
+    }
+
+    let selectedDownloads: Download[] = $state([]);
+
+    async function handleExport() {
         const links = [];
         const allFacIds = selectedFaculty.map((f) => f.facultyid || f.id).join(',');
 
@@ -102,15 +109,14 @@
         const courseSuffix = hasCourseDateDependent ? `_${rangeStr}` : '';
 
         let facReportTitle = 'CombinedReports';
-        if (facTypes.length === 1) {
+        if (facTypes.length === 1)
             if (exportProfile) facReportTitle = 'Profile';
             else if (exportServiceRecord) facReportTitle = 'ServiceRecord';
             else if (exportLoading) facReportTitle = 'Loading';
             else if (exportSetAvg) facReportTitle = 'SETAverage';
-        }
 
         // FACULTY REPORTS ROUTING
-        if (facTypes.length > 0) {
+        if (facTypes.length > 0)
             if (aggregateFacultyReports) {
                 const fileName = `AggregatedFacultyReports${facSuffix}`;
                 links.push({
@@ -122,24 +128,43 @@
                     const fName = faculty.firstname || faculty.firstName || '';
                     const lName = faculty.lastname || faculty.lastName || 'Unknown';
                     const namePrefix = fName ? `${lName}_${fName}` : lName;
-                    const fileName = `${namePrefix}-${facReportTitle}${facSuffix}`;
-                    links.push({
-                        name: fileName,
-                        url: `/api/export?types=${facTypes.join(',')}&facultyIds=${faculty.facultyid || faculty.id}&${baseParams}&fileName=${fileName}`,
-                    });
+
+                    if (format === 'csv') {
+                        const typeToName = new Map<string, string>();
+                        typeToName.set('profile', 'Profile');
+                        typeToName.set('service-record', 'ServiceRecord');
+                        typeToName.set('loading', 'Loading');
+                        typeToName.set('set-avg', 'SETAverage');
+
+                        facTypes.forEach((type) => {
+                            const fileName = `${namePrefix}-${typeToName.get(type) ?? 'Report'}${facSuffix}`;
+
+                            links.push({
+                                name: fileName,
+                                url: `/api/export?types=${type}&facultyIds=${faculty.facultyid || faculty.id}&${baseParams}&fileName=${fileName}`,
+                            });
+                        });
+                    } else {
+                        const fileName = `${namePrefix}-${facReportTitle}${facSuffix}`;
+
+                        links.push({
+                            name: fileName,
+                            url: `/api/export?types=${facTypes.join(',')}&facultyIds=${faculty.facultyid || faculty.id}&${baseParams}&fileName=${fileName}`,
+                        });
+                    }
                 }
             }
-        }
 
         // COURSE INFORMATION ROUTING
-        if (courseTypes.length > 0) {
+        if (courseTypes.length > 0)
             if (aggregateCourseReports) {
                 let courseReportTitle = `AggregatedCourseReports${courseSuffix}`;
                 if (courseTypes.length === 1) {
                     if (exportBySubjFac) courseReportTitle = 'By_Subject_Faculty_Taught';
-                    if (exportByFacSubj) courseReportTitle = `SelectedFaculty_BySubjectTaught${courseSuffix}`;
+                    if (exportByFacSubj)
+                        courseReportTitle = `SelectedFaculty_BySubjectTaught${courseSuffix}`;
                 }
-                
+
                 links.push({
                     name: courseReportTitle,
                     url: `/api/export?types=${courseTypes.join(',')}&facultyIds=${allFacIds}&${baseParams}&fileName=${courseReportTitle}`,
@@ -149,7 +174,7 @@
                     const fileName = `By_Subject_Faculty_Taught`;
                     links.push({
                         name: fileName,
-                        url: `/api/export?types=faculty-by-subject&facultyIds=${allFacIds}&${baseParams}&fileName=${fileName}`,
+                        url: `/api/export?types=faculty-by-subject&fileName=${fileName}&format=${format}`,
                     });
                 }
                 if (exportByFacSubj) {
@@ -160,12 +185,22 @@
                     });
                 }
             }
-        }
-        return links;
-    });
 
-    function handleExport() {
-        step = 2;
+        // Return only working links
+        const nullableDownloads = await Promise.all(
+            links.map(async (download) => {
+                try {
+                    const response = await fetch(download.url, { method: 'HEAD' });
+                    return response.ok ? download : null;
+                } catch {
+                    return null;
+                }
+            }),
+        );
+
+        const workingLinks = nullableDownloads.filter((download) => download !== null);
+
+        return workingLinks;
     }
 
     function handleDownloadAll() {
@@ -206,12 +241,16 @@
                 <div class="rounded-xl border border-fims-green/20 bg-white p-6 shadow-sm">
                     <h3 class="mb-4 text-lg font-bold text-fims-green">Overview Reports</h3>
                     <div class="flex flex-col gap-3 pl-2">
-                        <label class="flex items-start gap-3 {noFacultySelected ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}">
+                        <label
+                            class="flex items-start gap-3 {noFacultySelected
+                                ? 'cursor-not-allowed opacity-50'
+                                : 'cursor-pointer'}"
+                        >
                             <input
                                 type="checkbox"
                                 bind:checked={exportProfile}
                                 disabled={noFacultySelected}
-                                class="mt-0.5 h-5 w-5 rounded border-fims-green text-fims-green focus:ring-fims-green disabled:bg-gray-200 disabled:border-gray-300"
+                                class="mt-0.5 h-5 w-5 rounded border-fims-green text-fims-green focus:ring-fims-green disabled:border-gray-300 disabled:bg-gray-200"
                             />
                             <span class="text-base text-black"
                                 >Faculty Profile <span class="text-sm text-gray-400"
@@ -239,39 +278,55 @@
 
                     <div class="grid grid-cols-1 gap-6 md:grid-cols-12">
                         <div class="flex flex-col gap-3 pl-2 md:col-span-5">
-                            <label class="flex items-start gap-3 {noFacultySelected ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}">
+                            <label
+                                class="flex items-start gap-3 {noFacultySelected
+                                    ? 'cursor-not-allowed opacity-50'
+                                    : 'cursor-pointer'}"
+                            >
                                 <input
                                     type="checkbox"
                                     bind:checked={exportServiceRecord}
                                     disabled={noFacultySelected}
-                                    class="mt-0.5 h-5 w-5 rounded border-fims-green text-fims-green focus:ring-fims-green disabled:bg-gray-200 disabled:border-gray-300"
+                                    class="mt-0.5 h-5 w-5 rounded border-fims-green text-fims-green focus:ring-fims-green disabled:border-gray-300 disabled:bg-gray-200"
                                 />
                                 <span class="text-base text-black">Faculty Service Record</span>
                             </label>
-                            <label class="flex items-start gap-3 {noFacultySelected ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}">
+                            <label
+                                class="flex items-start gap-3 {noFacultySelected
+                                    ? 'cursor-not-allowed opacity-50'
+                                    : 'cursor-pointer'}"
+                            >
                                 <input
                                     type="checkbox"
                                     bind:checked={exportLoading}
                                     disabled={noFacultySelected}
-                                    class="mt-0.5 h-5 w-5 rounded border-fims-green text-fims-green focus:ring-fims-green disabled:bg-gray-200 disabled:border-gray-300"
+                                    class="mt-0.5 h-5 w-5 rounded border-fims-green text-fims-green focus:ring-fims-green disabled:border-gray-300 disabled:bg-gray-200"
                                 />
                                 <span class="text-base text-black">Faculty Loading</span>
                             </label>
-                            <label class="flex items-start gap-3 {noFacultySelected ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}">
+                            <label
+                                class="flex items-start gap-3 {noFacultySelected
+                                    ? 'cursor-not-allowed opacity-50'
+                                    : 'cursor-pointer'}"
+                            >
                                 <input
                                     type="checkbox"
                                     bind:checked={exportSetAvg}
                                     disabled={noFacultySelected}
-                                    class="mt-0.5 h-5 w-5 rounded border-fims-green text-fims-green focus:ring-fims-green disabled:bg-gray-200 disabled:border-gray-300"
+                                    class="mt-0.5 h-5 w-5 rounded border-fims-green text-fims-green focus:ring-fims-green disabled:border-gray-300 disabled:bg-gray-200"
                                 />
                                 <span class="text-base text-black">Faculty SET Average</span>
                             </label>
-                            <label class="flex items-start gap-3 {noFacultySelected ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}">
+                            <label
+                                class="flex items-start gap-3 {noFacultySelected
+                                    ? 'cursor-not-allowed opacity-50'
+                                    : 'cursor-pointer'}"
+                            >
                                 <input
                                     type="checkbox"
                                     bind:checked={exportByFacSubj}
                                     disabled={noFacultySelected}
-                                    class="mt-0.5 h-5 w-5 rounded border-fims-green text-fims-green focus:ring-fims-green disabled:bg-gray-200 disabled:border-gray-300"
+                                    class="mt-0.5 h-5 w-5 rounded border-fims-green text-fims-green focus:ring-fims-green disabled:border-gray-300 disabled:bg-gray-200"
                                 />
                                 <span class="text-base text-black">By Faculty, Subject Taught</span>
                             </label>
@@ -411,12 +466,16 @@
                     class="flex flex-col gap-5 rounded-xl border border-fims-green/20 bg-white p-6 shadow-sm"
                 >
                     <div class="flex flex-col gap-3">
-                        <label class="flex items-start gap-3 {format === 'csv' || noFacultySelected ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}">
+                        <label
+                            class="flex items-start gap-3 {format === 'csv' || noFacultySelected
+                                ? 'cursor-not-allowed opacity-50'
+                                : 'cursor-pointer'}"
+                        >
                             <input
                                 type="checkbox"
                                 bind:checked={aggregateFacultyReports}
                                 disabled={format === 'csv' || noFacultySelected}
-                                class="mt-0.5 h-5 w-5 rounded border-fims-green text-fims-green focus:ring-fims-green disabled:bg-gray-200 disabled:border-gray-300"
+                                class="mt-0.5 h-5 w-5 rounded border-fims-green text-fims-green focus:ring-fims-green disabled:border-gray-300 disabled:bg-gray-200"
                             />
                             <span class="text-base font-semibold text-fims-green"
                                 >Aggregate Faculty Reports <span
@@ -426,13 +485,17 @@
                                 ></span
                             >
                         </label>
-                        
-                        <label class="flex items-start gap-3 {format === 'csv' || noFacultySelected ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}">
+
+                        <label
+                            class="flex items-start gap-3 {format === 'csv' || noFacultySelected
+                                ? 'cursor-not-allowed opacity-50'
+                                : 'cursor-pointer'}"
+                        >
                             <input
                                 type="checkbox"
                                 bind:checked={aggregateCourseReports}
                                 disabled={format === 'csv' || noFacultySelected}
-                                class="mt-0.5 h-5 w-5 rounded border-fims-green text-fims-green focus:ring-fims-green disabled:bg-gray-200 disabled:border-gray-300"
+                                class="mt-0.5 h-5 w-5 rounded border-fims-green text-fims-green focus:ring-fims-green disabled:border-gray-300 disabled:bg-gray-200"
                             />
                             <span class="text-base font-semibold text-fims-green"
                                 >Aggregate Course Info Reports <span
@@ -476,7 +539,13 @@
                     class="rounded-3xl border-2 border-fims-green px-7 py-2 font-medium text-fims-green transition-all hover:opacity-70 active:scale-95"
                     onclick={onCancel}>Cancel</button
                 >
-                <GreenButton onclick={handleExport} disabled={isExportDisabled}>
+                <GreenButton
+                    onclick={async () => {
+                        selectedDownloads = await handleExport();
+                        step = 2;
+                    }}
+                    disabled={isExportDisabled}
+                >
                     <Icon icon="tabler:file-export" class="mr-2 h-5 w-5" />
                     <span>Export</span>
                 </GreenButton>
@@ -500,6 +569,14 @@
                             <Icon icon="tabler:download" class="h-5 w-5" />
                             <span>Download</span>
                         </a>
+                    </div>
+                {:else}
+                    <div
+                        class="flex items-center justify-between rounded-xl border-fims-red border-2 bg-fims-red-50 p-4"
+                    >
+                        <span class="font-medium break-all text-fims-red"
+                            >There are no available spreadsheets for download.</span
+                        >
                     </div>
                 {/each}
             </div>

@@ -44,7 +44,10 @@ const dataStartCol = 1;
 
 export async function getFacultySETAverageWorksheet(facultyIds: number[], acadYear: number) {
     const sheetName = 'Faculty SET Average';
-    const data = await Promise.all(facultyIds.map((id) => getFacultySETReport(id, acadYear)));
+    const rawData = await Promise.all(facultyIds.map((id) => getFacultySETReport(id, acadYear)));
+    const data = rawData.filter((datum) => datum !== null);
+
+    if (data.length === 0) return null;
 
     // Create Workbook
     const workbook = new ExcelJS.Workbook();
@@ -67,9 +70,7 @@ export async function getFacultySETAverageWorksheet(facultyIds: number[], acadYe
     titleCell.font = { bold: true };
 
     // Widen all columns
-    for (let i = 1; i <= constantHeaderCellValues.length; i++) {
-        sheet.getColumn(i).width = 20;
-    }
+    for (let i = 1; i <= constantHeaderCellValues.length; i++) sheet.getColumn(i).width = 20;
 
     // Set data cells
     let row = dataStartRow;

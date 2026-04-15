@@ -4,6 +4,7 @@
     import RedButton from '$lib/ui/RedButton.svelte';
     import Icon from '@iconify/svelte';
     import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
+    import SaveConfirmation from '$lib/ui/SaveConfirmation.svelte';
     import DeleteConfirmation from '$lib/ui/DeleteConfirmation.svelte';
     import SelectDropdownCell from '$lib/ui/SelectDropdownCell.svelte';
 
@@ -14,18 +15,36 @@
     }
 
     const { account, isSelected, onToggle }: Props = $props();
-    const { email, role, userid, logTimestamp, logOperation, logMaker }: AccountDTO =
-        $derived(account);
+    const { email, role, id, logTimestamp, logOperation, logMaker }: AccountDTO = $derived(account);
 
     const userRoles = ['Admin', 'IT'];
+    let isLoading = $state(false);
+
+    let selectedOpt = $state(null);
+    let willChangeRole = $state(false);
+    function toggleSaveModal() {
+        willChangeRole = !willChangeRole;
+        selectedOpt = null;
+    }
+    $effect(() => {
+        if (
+            selectedOpt !== null &&
+            userRoles.includes(selectedOpt) &&
+            selectedOpt !== role &&
+            !willChangeRole
+        ) {
+            if (changeRoleForm !== null) {
+                changeRoleForm.requestSubmit();
+            }
+        }
+    });
 
     let willDelete = $state(false);
-    let isDeleting = $state(false);
-
-    function toggleModal() {
+    function toggleDeleteModal() {
         willDelete = !willDelete;
     }
 
+    let changeRoleForm: HTMLFormElement | null = $state(null);
     let deleteForm: HTMLFormElement | null = $state(null);
 </script>
 
@@ -56,13 +75,44 @@
             </form>
         </div>
         <div class="w-40">
-            <form method="POST" action="" class="w-full">
+            <form
+                method="POST"
+                action="?/changeRole"
+                class="w-full"
+                bind:this={changeRoleForm}
+                use:enhance={({ cancel }) => {
+                    if (willChangeRole) {
+                        isLoading = true;
+                        return async ({ update }) => {
+                            await update();
+                            selectedOpt = null;
+                            willChangeRole = false;
+                            isLoading = false;
+                        };
+                    }
+                    willChangeRole = true;
+                    cancel();
+                }}
+            >
                 <SelectDropdownCell
                     name="role"
                     opts={userRoles}
                     defaultSelectedOpt={role}
                     isEditable={true}
+                    bind:selectedOpt
                 />
+
+                <input type="hidden" name="userId" value={id} />
+
+                {#if willChangeRole}
+                    <SaveConfirmation
+                        onSave={() => {
+                            if (changeRoleForm) changeRoleForm.requestSubmit();
+                        }}
+                        onCancel={toggleSaveModal}
+                        text="Are you sure you want to change the account role?"
+                    />
+                {/if}
             </form>
         </div>
         <div class="w-85 2xl:w-100">
@@ -76,11 +126,11 @@
                 bind:this={deleteForm}
                 use:enhance={({ cancel }) => {
                     if (willDelete) {
-                        willDelete = false;
-                        isDeleting = true;
+                        isLoading = true;
                         return async ({ update }) => {
                             await update();
-                            isDeleting = false;
+                            willDelete = false;
+                            isLoading = false;
                         };
                     }
                     willDelete = true;
@@ -92,14 +142,14 @@
                     <span>Delete</span>
                 </RedButton>
 
-                <input type="hidden" name="userid" value={userid} />
+                <input type="hidden" name="userid" value={id} />
 
                 {#if willDelete}
                     <DeleteConfirmation
                         onDelete={() => {
                             if (deleteForm) deleteForm.requestSubmit();
                         }}
-                        onCancel={toggleModal}
+                        onCancel={toggleDeleteModal}
                         text="Are you sure you want to delete the account?"
                     />
                 {/if}
@@ -107,7 +157,7 @@
         </div>
     </div>
 
-    {#if isDeleting}
+    {#if isLoading}
         <LoadingScreen />
     {/if}
 {/if}

@@ -15,7 +15,8 @@
         opts?: string[];
     }
 
-    const { label, name, type, defaultValue, colStart, colSpan, immutable, required, opts }: Props = $props();
+    const { label, name, type, defaultValue, colStart, colSpan, immutable, required, opts }: Props =
+        $props();
 
     const colStartClass = $derived(colStart === undefined ? '' : `col-start-${colStart}`);
     const colSpanClass = $derived(colSpan === undefined ? '' : `col-span-${colSpan}`);
@@ -26,7 +27,9 @@
         if (domContainer) domContainer.classList.remove('hidden');
     });
 
-    const isLocked = $derived(viewState.isEditing && immutable && defaultValue !== undefined && defaultValue !== '');
+    const isLocked = $derived(
+        viewState.isEditing && immutable && defaultValue !== undefined && defaultValue !== '',
+    );
 
     // Safelist Tailwind classes
     // col-span-2
@@ -46,7 +49,7 @@
 >
     <span class="mr-2 w-fit text-right">
         {label}
-        
+
         {#if required && viewState.isEditing}
             <span class="text-fims-red">*</span>
         {/if}
@@ -55,9 +58,9 @@
     {#if type === 'dropdown'}
         <select
             {name}
-            class="h-8 w-45 rounded-sm border-0 bg-white p-1 text-black focus:ring-0 2xl:w-75 disabled:text-black"
+            class="h-8 w-45 rounded-sm border-0 bg-white p-1 text-black focus:ring-0 disabled:text-black 2xl:w-75"
             disabled={!viewState.isEditing || isLocked}
-            required={required}
+            {required}
         >
             <option value="" disabled selected={!defaultValue}>-</option>
             {#if opts}
@@ -74,7 +77,7 @@
             placeholder="-"
             defaultValue={defaultValue ?? ''}
             disabled={!viewState.isEditing || isLocked}
-            required={required}
+            {required}
         />
     {/if}
 
