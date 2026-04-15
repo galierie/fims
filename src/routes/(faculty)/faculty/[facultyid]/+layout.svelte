@@ -17,13 +17,19 @@
     import { viewState } from './states/view-state.svelte.js';
 
     const { data, children } = $props();
-    const { facultyid, lastName, firstName, latestAcadYear, latestSemNum } = $derived(data);
+    const { facultyid, lastName, firstName, latestAcadYear, latestSemNum, hasSemestralRecords } = $derived(data);
 
     let willDelete = $state(false);
     let isLoading = $state(false);
     let isExportModalOpen = $state(false);
 
     let deleteForm: HTMLFormElement | null = $state(null);
+
+    const semestralTabHref = $derived(
+        hasSemestralRecords || page.url.pathname.match(new RegExp(`/faculty/${facultyid}/\\d+/\\d+`))
+            ? `/faculty/${facultyid}/${chosenSemestralRecord.acadYear}/${chosenSemestralRecord.semNum}`
+            : `/faculty/${facultyid}/create`
+    );
 
     $effect(() => {
         if (page.params.ay && page.params.sem)
@@ -68,8 +74,7 @@
         <div class="mt-5 mb-1 flex w-full items-end justify-start">
             <Tab href="/faculty/{facultyid}/profile" name="Profile" />
             <Tab
-                href="/faculty/{facultyid}/{chosenSemestralRecord.acadYear}/{chosenSemestralRecord.semNum}"
-                name="Semestral Records"
+                href={semestralTabHref} name="Semestral Records"
             />
             <div class="w-full border-b-2 border-fims-green"></div>
         </div>

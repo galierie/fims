@@ -58,6 +58,7 @@
                     class="flex w-full rounded-sm p-3 hover:bg-[#e9e9e9]"
                     onclick={() => {
                         selectedOpt = null;
+                        isDropdownOpen = false;
                     }}
                 >
                     <Icon icon="tabler:check" class="h-6 w-8 pr-2 text-fims-green" />
@@ -69,6 +70,7 @@
                     class="flex w-full rounded-sm p-3 hover:bg-[#e9e9e9]"
                     onclick={() => {
                         selectedOpt = opt;
+                        isDropdownOpen = false;
                     }}
                 >
                     <div class="w-8 pr-2"></div>

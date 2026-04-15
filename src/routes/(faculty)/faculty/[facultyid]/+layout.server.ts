@@ -28,19 +28,9 @@ export async function load({ locals, params }) {
 
     const semesters = await getAllFacultyAcademicSemesters(facultyid);
 
-    // Fallback: Actual current Academic Year and Semester
-    const now = new Date();
-    const currentMonth = now.getMonth(); // 0 is Jan, 11 is Dec
-    const currentYear = now.getFullYear();
-
-    // Month 0-6, 2nd sem so minus 1 to the currentYear
-    let latestAcadYear = currentMonth < 7 ? currentYear - 1 : currentYear;
-
-    // Guess current semester based on the month
-    let latestSemNum = 1; // Default to 1st Sem (Aug-Dec)
-    if (currentMonth >= 0 && currentMonth <= 4)
-        latestSemNum = 2; // 2nd Sem (Jan-May)
-    else if (currentMonth === 5 || currentMonth === 6) latestSemNum = 3; // Midyear (Jun-Jul)
+    // default to 0 for new faculty (they will be sent to /create anyway)
+    let latestAcadYear = 0;
+    let latestSemNum = 0;
 
     if (semesters.length > 0) {
         // Sort: highest year first, then highest semester first
@@ -54,8 +44,9 @@ export async function load({ locals, params }) {
             return semB - semA;
         });
 
-        latestAcadYear = semesters[0].acadYear ?? latestAcadYear;
-        latestSemNum = semesters[0].semNum ?? latestSemNum;
+        // get latest record
+        latestAcadYear = semesters[0].acadYear ?? 0;
+        latestSemNum = semesters[0].semNum ?? 0;
     }
 
     return {
@@ -63,5 +54,6 @@ export async function load({ locals, params }) {
         ...name,
         latestAcadYear,
         latestSemNum,
+        hasSemestralRecords: semesters.length > 0,
     };
 }
