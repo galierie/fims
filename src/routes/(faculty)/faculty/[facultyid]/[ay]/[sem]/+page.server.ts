@@ -46,7 +46,7 @@ export async function load({ params, locals }) {
 
     let fetchedChangelogs: ChangelogRecordStructure[] | null = null;
 
-    if (canViewChangelogs) fetchedChangelogs = await getFacultyRecordChangelogs(facultyid, 3, 0);
+    if (canViewChangelogs) fetchedChangelogs = await getFacultyRecordChangelogs(facultyid, 20, 0);
 
     // Validate parameters
     if (Number.isNaN(facultyid)) throw error(400, { message: 'Invalid record identifier.' });

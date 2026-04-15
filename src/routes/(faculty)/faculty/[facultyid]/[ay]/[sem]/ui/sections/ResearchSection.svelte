@@ -21,7 +21,10 @@
     }: Props = $props();
 
     $effect(() => {
-        researchLoadCredit = researchWork.reduce((acc, curr) => acc + Number(curr.researchLoadCredit ?? 0), 0);
+        researchLoadCredit = researchWork.reduce(
+            (acc, curr) => acc + Number(curr.researchLoadCredit ?? 0),
+            0,
+        );
     });
 
     // Input Table Columns

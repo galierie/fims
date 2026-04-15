@@ -14,7 +14,10 @@
     let { studyLoadCredit = $bindable(), studyLoad, hasChange = $bindable() }: Props = $props();
 
     $effect(() => {
-        studyLoadCredit = studyLoad.reduce((acc, curr) => acc + Number(curr.studyLoadCredit ?? 0), 0);
+        studyLoadCredit = studyLoad.reduce(
+            (acc, curr) => acc + Number(curr.studyLoadCredit ?? 0),
+            0,
+        );
     });
 
     // Input Table Columns

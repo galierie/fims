@@ -48,7 +48,7 @@ export async function load({ params, locals }) {
 
     //get changelogs if possible
     if (canViewChangelogs) {
-        fetchedChangelogs = await getFacultyRecordChangelogs(facultyid, 3, 0);
+        fetchedChangelogs = await getFacultyRecordChangelogs(facultyid, 20, 0);
     }
 
     // Get input dropdown options and dependency mappings

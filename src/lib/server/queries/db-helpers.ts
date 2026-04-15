@@ -179,7 +179,10 @@ export async function updateFacultyProfileRecords(
     try {
         const parseNum = (val: any) => (val ? parseInt(val, 10) || null : null);
 
-        await db.update(faculty).set(basicProfile).where(eq(faculty.id, facultyId));
+        await Promise.all([
+            await db.update(faculty).set(basicProfile).where(eq(faculty.id, facultyId)),
+            await logChange(operatorId, facultyId, `Updated faculty record ${facultyId}.`),
+        ]);
 
         await processDynamicTable(
             operatorId,
@@ -313,6 +316,8 @@ export async function createFacultyProfileRecords(
 
         const [newFaculty] = await db.insert(faculty).values(basicProfile).returning();
         const { id: facultyId } = newFaculty;
+
+        await logChange(operatorId, facultyId, `Created new faculty record (ID: ${facultyId}).`);
 
         await processDynamicTable(
             operatorId,
@@ -495,9 +500,9 @@ export async function updateSemestralRecords(
 ) {
     try {
         const parseNumStr = (val: any) => {
-            if (val === null || val === undefined || val === '' || val === false) return "0";
+            if (val === null || val === undefined || val === '' || val === false) return '0';
             const parsed = parseFloat(val);
-            return isNaN(parsed) ? "0" : parsed.toString();
+            return isNaN(parsed) ? '0' : parsed.toString();
         };
 
         const parseSetScore = (val: any) => {
@@ -582,14 +587,21 @@ export async function updateSemestralRecords(
 
         if (existingFacSem.length > 0) {
             facultyAcademicSemesterId = existingFacSem[0].id;
-            await db
-                .update(facultyAcademicSemester)
-                .set({
-                    currentRankId,
-                    currentHighestEducationalAttainmentId,
-                    remarks: basicSemestralData.remarks,
-                })
-                .where(eq(facultyAcademicSemester.id, facultyAcademicSemesterId));
+            await Promise.all([
+                await db
+                    .update(facultyAcademicSemester)
+                    .set({
+                        currentRankId,
+                        currentHighestEducationalAttainmentId,
+                        remarks: basicSemestralData.remarks,
+                    })
+                    .where(eq(facultyAcademicSemester.id, facultyAcademicSemesterId)),
+                await logChange(
+                    operatorId,
+                    facultyId,
+                    `Updated faculty academic semester for ${facultyId}.`,
+                ),
+            ]);
         } else {
             const newFacSem = await db
                 .insert(facultyAcademicSemester)
@@ -602,31 +614,50 @@ export async function updateSemestralRecords(
                 })
                 .returning();
             facultyAcademicSemesterId = newFacSem[0].id;
+            await logChange(
+                operatorId,
+                facultyId,
+                `Updated faculty academic semester for ${facultyId}.`,
+            );
         }
 
         // Fetch foreign key mappings
         const dbAdminPositions = await db.select().from(adminPosition);
         const getAdminPosId = (name: string) => {
             if (!name || name === '-') return null;
-            return dbAdminPositions.find((a) => a.title.trim().toLowerCase() === name.trim().toLowerCase())?.id || null;
+            return (
+                dbAdminPositions.find(
+                    (a) => a.title.trim().toLowerCase() === name.trim().toLowerCase(),
+                )?.id || null
+            );
         };
 
         const dbOffices = await db.select().from(office);
         const getOfficeId = (name: string) => {
             if (!name || name === '-') return null;
-            return dbOffices.find((o) => o.name.trim().toLowerCase() === name.trim().toLowerCase())?.id || null;
+            return (
+                dbOffices.find((o) => o.name.trim().toLowerCase() === name.trim().toLowerCase())
+                    ?.id || null
+            );
         };
 
         const dbCourses = await db.select().from(course);
         const getCourseId = (name: string) => {
             if (!name || name === '-') return null;
-            return dbCourses.find((c) => c.name.trim().toLowerCase() === name.trim().toLowerCase())?.id || null;
+            return (
+                dbCourses.find((c) => c.name.trim().toLowerCase() === name.trim().toLowerCase())
+                    ?.id || null
+            );
         };
 
         const dbResearches = await db.select().from(research);
         const getResearchId = (title: string) => {
             if (!title || title === '-') return null;
-            return dbResearches.find((r) => r.title.trim().toLowerCase() === title.trim().toLowerCase())?.id || null;
+            return (
+                dbResearches.find(
+                    (r) => r.title.trim().toLowerCase() === title.trim().toLowerCase(),
+                )?.id || null
+            );
         };
 
         // Find or Create Student for Mentoring
@@ -855,7 +886,7 @@ export async function updateSemestralRecords(
 
         return { success: true };
     } catch (error) {
-        console.error("DB UPDATE ERROR in updateSemestralRecords:", error);
+        console.error('DB UPDATE ERROR in updateSemestralRecords:', error);
         return { success: false };
     }
 }

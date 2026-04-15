@@ -31,9 +31,18 @@
     }: Props = $props();
 
     $effect(() => {
-        const posSum = adminPositions.reduce((acc, curr) => acc + Number(curr.administrativeLoadCredit ?? 0), 0);
-        const comSum = committees.reduce((acc, curr) => acc + Number(curr.administrativeLoadCredit ?? 0), 0);
-        const workSum = adminWorks.reduce((acc, curr) => acc + Number(curr.administrativeLoadCredit ?? 0), 0);
+        const posSum = adminPositions.reduce(
+            (acc, curr) => acc + Number(curr.administrativeLoadCredit ?? 0),
+            0,
+        );
+        const comSum = committees.reduce(
+            (acc, curr) => acc + Number(curr.administrativeLoadCredit ?? 0),
+            0,
+        );
+        const workSum = adminWorks.reduce(
+            (acc, curr) => acc + Number(curr.administrativeLoadCredit ?? 0),
+            0,
+        );
         administrativeLoadCredit = posSum + comSum + workSum;
     });
 
