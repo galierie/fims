@@ -17,16 +17,20 @@
     const { changelogFetcher }: Props = $props();
 </script>
 
-<div data-testid="changelog-component" class="flex w-90 flex-col">
-    <!-- Header -->
-    <div class="rounded-t-4xl bg-fims-green text-white">
-        <h1 class="w-full py-3 text-center text-3xl font-semibold">Change Logs</h1>
-    </div>
+<div class="flex justify-center w-full pt-15 pb-50">
+    <div data-testid="changelog-component" class="flex w-7xl flex-col">
+        <!-- Header -->
+        <div class="rounded-t-4xl bg-fims-green text-white">
+            <h1 class="w-full py-3 text-center text-3xl font-semibold">Change Logs</h1>
+        </div>
 
-    <!-- Entries -->
-    <div>
-        {#each changelogFetcher() as log}
-            <ChangelogEntry timestamp={log.timestamp} email={log.email} info={log.info} />
-        {/each}
+        <!-- Entries -->
+        <div>
+            {#each changelogFetcher() as log}
+                <ChangelogEntry timestamp={log.timestamp} email={log.email} info={log.info} />
+            {:else}
+                <div class="h-12.5 bg-gray-100 flex items-center justify-center"><span>No actions done yet.</span></div>
+            {/each}
+        </div>
     </div>
 </div>
