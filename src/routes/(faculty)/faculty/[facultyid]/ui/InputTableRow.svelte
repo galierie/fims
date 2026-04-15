@@ -229,13 +229,9 @@
         {/if}
     {/each}
 
-    {#if viewState.isEditing}
+    {#if viewState.isEditing && !isDeleted}
         <button type="button" class="absolute top-1.5 -right-5.5 ml-1" onclick={toggleRowDeletion}>
-            {#if isDeleted}
-                <Icon icon="tabler:arrow-back-up-double" class="h-5 w-5 text-fims-green" />
-            {:else}
-                <Icon icon="tabler:trash" class="h-5 w-5 text-fims-red" />
-            {/if}
+            <Icon icon="tabler:trash" class="h-5 w-5 text-fims-red" />
         </button>
     {/if}
 </div>
