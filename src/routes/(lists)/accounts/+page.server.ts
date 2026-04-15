@@ -10,6 +10,7 @@ import {
 import { auth } from '$lib/server/auth';
 import type { FilterColumn, FilterObject } from '$lib/types/filter';
 import {
+    changeRole,
     getAccountList,
     getAllRoles,
     refreshAccountSearchView,
@@ -199,4 +200,25 @@ export const actions = {
             return fail(500, { error: 'Failed to delete accounts.' });
         }
     },
+
+    async changeRole({ locals, request }) {
+        const permissions = await getUserPermissions(locals.user.id);
+        if (!permissions?.canModifyAccount)
+            return fail(403, { error: 'Insufficient permissions.' });
+
+        const formData = await request.formData();
+        const role = formData.get('role') as string;
+        const userId = formData.get('userId') as string;
+
+        // Validate input
+        if (!role) return fail(400, { error: 'No role selected.' });
+        if (!userId) return fail(400, { error: 'No user selected.' });
+        
+        const { success } = await changeRole(locals.user.id, userId, role);
+
+        return {
+            success,
+            message: success ? 'Changed user role.' : 'Failed to change user role',
+        }
+    }
 } satisfies Actions;
