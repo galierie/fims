@@ -1,6 +1,6 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 
-import { createFacultyProfileRecords, getUserPermissions } from '$lib/server/queries/db-helpers';
+import { createFacultyProfileRecords, getUserRoleAndPermissions } from '$lib/server/queries/db-helpers';
 import {
     getAllAppointmentStatuses,
     getAllFieldsOfInterest,
@@ -9,8 +9,15 @@ import {
 import { refreshFacultyRecordSearchView } from '$lib/server/queries/faculty-list';
 
 export async function load({ locals }) {
-    const permissions = await getUserPermissions(locals.user.id);
-    if (!permissions?.canAddFaculty) throw error(403, { message: 'Insufficient permissions.' });
+    // Check existing session
+    if (typeof locals.user === 'undefined') throw redirect(307, '/login');
+
+    // Check Permissions
+    const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
+    if (typeof roleObj === 'undefined') throw redirect(307, '/login');
+
+    const { canAddFaculty } = roleObj;
+    if (!canAddFaculty) throw error(403, { message: 'Insufficient permissions.' });
 
     // Get input dropdown options and dependency mappings
     const opts: Map<string, Array<string>> = new Map();
@@ -41,8 +48,15 @@ export async function load({ locals }) {
 export const actions = {
     // Renamed to 'create' to match dynamic form action
     async create({ request, locals }) {
-        const permissions = await getUserPermissions(locals.user.id);
-        if (!permissions?.canAddFaculty) return fail(403, { error: 'Insufficient permissions.' });
+        // Check existing session
+        if (typeof locals.user === 'undefined') throw redirect(307, '/login');
+
+        // Check Permissions
+        const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
+        if (typeof roleObj === 'undefined') throw redirect(307, '/login');
+
+        const { canAddFaculty } = roleObj;
+        if (!canAddFaculty) return fail(403, { error: 'Insufficient permissions.' });
 
         const formData = await request.formData();
 

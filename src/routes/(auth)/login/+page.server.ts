@@ -2,17 +2,29 @@ import { APIError } from 'better-auth';
 import { fail, redirect } from '@sveltejs/kit';
 
 import { auth } from '$lib/server/auth';
+import { getUserRoleAndPermissions } from '$lib/server/queries/db-helpers.js';
 
 import type { Actions } from './$types';
 
 const validProviders = ['google'];
 
-export function load({ locals }) {
-    if (locals.user)
-        // then there's a logged in user
-        throw redirect(303, '/');
+export async function load({ locals }) {
+    // Check existing session
+    if (typeof locals.user === 'undefined') return {};
 
-    return {};
+    // Check Permissions
+    const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
+    if (typeof roleObj === 'undefined') return {};
+
+    const { canAddFaculty, canModifyFaculty, canAddAccount, canModifyAccount } = roleObj;
+
+    const canViewFaculty = canAddFaculty || canModifyFaculty;
+    if (canViewFaculty) throw redirect(303, '/');
+
+    const canViewAccount = canAddAccount || canModifyAccount;
+    if (canViewAccount) throw redirect(303, '/accounts');
+
+    return {}
 }
 
 export const actions = {

@@ -1,6 +1,7 @@
 import ExcelJS from '@protobi/exceljs';
 import { json, type RequestEvent } from '@sveltejs/kit';
 
+import { getUserRoleAndPermissions } from '$lib/server/queries/db-helpers';
 import { getFacultyBySubjectWorksheet } from '$lib/utils/report/faculty-by-subject';
 import { getFacultyLoadingWorksheet } from '$lib/utils/report/faculty-loading';
 import { getFacultyProfileWorksheet } from '$lib/utils/report/faculty-profile';
@@ -9,8 +10,19 @@ import { getFacultySETAverageWorksheet } from '$lib/utils/report/faculty-set-ave
 import { getSubjectsByFacultyWorksheet } from '$lib/utils/report/subjects-by-faculty';
 
 export async function GET({ url, locals }: RequestEvent) {
-    if (!locals.user)
+    // Check existing session
+    if (typeof locals.user === 'undefined')
         return json({ error: 'Unauthorized. Please log in to export.' }, { status: 401 });
+
+    // Check Permissions
+    const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
+    if (typeof roleObj === 'undefined')
+        return json({ error: 'Unauthorized. Please log in to export.' }, { status: 401 });
+
+    const { canAddFaculty, canModifyFaculty } = roleObj;
+    const canViewFaculty = canAddFaculty || canModifyFaculty;
+    if (!canViewFaculty)
+        return json({ error: 'Unauthorized. Insufficient permissions.' }, { status: 401 });
 
     // Extract and Validate Parameters
     const typesStr = url.searchParams.get('types');
