@@ -6,6 +6,7 @@ import {
     areYouHere,
     deleteProfileInfo,
     getUserRoleAndPermissions,
+    logChange,
     makeProfileInfo,
 } from '$lib/server/queries/db-helpers';
 import { auth } from '$lib/server/auth';
@@ -22,6 +23,9 @@ import { getHeaders } from 'better-auth/client';
 export async function load({ locals, url }) {
     // Check existing session
     if (typeof locals.user === 'undefined') throw redirect(307, '/login');
+
+    // Log action
+    await logChange(locals.user.id, null, 'Action: Attempt to access account list.');
 
     // Check Permissions
     const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
@@ -96,6 +100,9 @@ export const actions = {
         // Check existing session
         if (typeof locals.user === 'undefined') throw redirect(307, '/login');
 
+        // Log action
+        await logChange(locals.user.id, null, 'Action: Make account.');
+
         // Check Permissions
         const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
         if (typeof roleObj === 'undefined') throw redirect(307, '/login');
@@ -151,6 +158,9 @@ export const actions = {
         // Check existing session
         if (typeof locals.user === 'undefined') throw redirect(307, '/login');
 
+        // Log action
+        await logChange(locals.user.id, null, 'Action: Delete account.');
+
         // Check Permissions
         const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
         if (typeof roleObj === 'undefined') throw redirect(307, '/login');
@@ -187,6 +197,9 @@ export const actions = {
     async deleteAccounts({ locals, request }) {
         // Check existing session
         if (typeof locals.user === 'undefined') throw redirect(307, '/login');
+
+        // Log action
+        await logChange(locals.user.id, null, 'Action: Delete accounts.');
 
         // Check Permissions
         const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
@@ -271,6 +284,9 @@ export const actions = {
     async changeRole({ locals, request }) {
         // Check existing session
         if (typeof locals.user === 'undefined') throw redirect(307, '/login');
+
+        // Log action
+        await logChange(locals.user.id, null, 'Action: Change user role.');
 
         // Check Permissions
         const [roleObj] = await getUserRoleAndPermissions(locals.user.id);

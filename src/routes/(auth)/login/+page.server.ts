@@ -2,7 +2,7 @@ import { APIError } from 'better-auth';
 import { fail, redirect } from '@sveltejs/kit';
 
 import { auth } from '$lib/server/auth';
-import { getUserRoleAndPermissions } from '$lib/server/queries/db-helpers.js';
+import { getUserRoleAndPermissions, logChange } from '$lib/server/queries/db-helpers.js';
 
 import type { Actions } from './$types';
 
@@ -11,6 +11,9 @@ const validProviders = ['google'];
 export async function load({ locals }) {
     // Check existing session
     if (typeof locals.user === 'undefined') return {};
+
+    // Log action
+    await logChange(locals.user.id, null, 'Action: Attempt to access log-in server load.');
 
     // Check Permissions
     const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
@@ -51,6 +54,9 @@ export const actions = {
             });
 
             if (response.url) responseUrl = response.url;
+
+            // Log action
+            await logChange(response.user.id, null, 'Action: Successfully logged-in.');
         } catch (error) {
             console.log(error);
             return fail(500, {
@@ -77,6 +83,10 @@ export const actions = {
                 callbackURL,
             },
         });
+
+        // Log action
+        if ('user' in response)
+            await logChange(response.user.id, null, 'Action: Attempt to access log-in server load.');
 
         if (response.url) throw redirect(303, response.url);
 

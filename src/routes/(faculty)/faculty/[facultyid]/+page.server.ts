@@ -1,9 +1,12 @@
 import { error, redirect } from '@sveltejs/kit';
-import { getUserRoleAndPermissions } from '$lib/server/queries/db-helpers';
+import { getUserRoleAndPermissions, logChange } from '$lib/server/queries/db-helpers';
 
 export async function load({ locals, parent }) {
     // Check existing session
     if (typeof locals.user === 'undefined') throw redirect(307, '/login');
+
+    // Log action
+    await logChange(locals.user.id, null, 'Action: Attempt to access faculty route.');
 
     // Check Permissions
     const [roleObj] = await getUserRoleAndPermissions(locals.user.id);

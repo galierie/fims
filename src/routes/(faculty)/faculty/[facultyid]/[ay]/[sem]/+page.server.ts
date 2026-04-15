@@ -12,12 +12,15 @@ import {
     getFacultyPromotionHistory,
     getFacultySemestralRecords,
 } from '$lib/server/queries/faculty-view';
-import { getFacultyRecordChangelogs } from '$lib/server/queries/faculty-list.js';
-import { getUserRoleAndPermissions, updateSemestralRecords } from '$lib/server/queries/db-helpers';
+import { getFacultyRecordChangelogs, refreshFacultyRecordSearchView } from '$lib/server/queries/faculty-list.js';
+import { getUserRoleAndPermissions, logChange, deleteSemestralRecord, updateSemestralRecords } from '$lib/server/queries/db-helpers';
 
 export async function load({ params, locals }) {
     // Check existing session
     if (typeof locals.user === 'undefined') throw redirect(307, '/login');
+
+    // Log action
+    await logChange(locals.user.id, null, 'Action: Attempt to access faculty semestral record.');
 
     // Check Permissions
     const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
@@ -130,6 +133,9 @@ export const actions = {
         // Check existing session
         if (typeof locals.user === 'undefined') throw redirect(307, '/login');
 
+        // Log action
+        await logChange(locals.user.id, null, 'Action: Update faculty semestral record.');
+
         // Check Permissions
         const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
         if (typeof roleObj === 'undefined') throw redirect(307, '/login');
@@ -159,6 +165,9 @@ export const actions = {
     async update({ request, params, locals }) {
         // Check existing session
         if (typeof locals.user === 'undefined') throw redirect(307, '/login');
+
+        // Log action
+        await logChange(locals.user.id, null, 'Action: Update faculty semestral record.');
 
         // Check Permissions
         const [roleObj] = await getUserRoleAndPermissions(locals.user.id);

@@ -1,7 +1,7 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 
 import { adminPosition, faculty, rank } from '$lib/server/db/schema';
-import { deleteFacultyRecords, getUserRoleAndPermissions } from '$lib/server/queries/db-helpers';
+import { deleteFacultyRecords, getUserRoleAndPermissions, logChange } from '$lib/server/queries/db-helpers';
 import type { FilterColumn, FilterObject } from '$lib/types/filter';
 import {
     getAllAdminPositions,
@@ -14,6 +14,9 @@ import {
 export async function load({ url, locals }) {
     // Check existing session
     if (typeof locals.user === 'undefined') throw redirect(307, '/login');
+
+    // Log action
+    await logChange(locals.user.id, null, 'Action: Attempt to access faculty record list.');
 
     // Check Permissions
     const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
@@ -103,6 +106,9 @@ export const actions = {
     async delete({ locals, request }) {
         // Check existing session
         if (typeof locals.user === 'undefined') throw redirect(307, '/login');
+
+        // Log action
+        await logChange(locals.user.id, null, 'Action: Delete faculty record.');
 
         // Check Permissions
         const [roleObj] = await getUserRoleAndPermissions(locals.user.id);

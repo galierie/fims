@@ -1,7 +1,7 @@
 import ExcelJS from '@protobi/exceljs';
 import { json, type RequestEvent } from '@sveltejs/kit';
 
-import { getUserRoleAndPermissions } from '$lib/server/queries/db-helpers';
+import { getUserRoleAndPermissions, logChange } from '$lib/server/queries/db-helpers';
 import { getFacultyBySubjectWorksheet } from '$lib/utils/report/faculty-by-subject';
 import { getFacultyLoadingWorksheet } from '$lib/utils/report/faculty-loading';
 import { getFacultyProfileWorksheet } from '$lib/utils/report/faculty-profile';
@@ -13,6 +13,9 @@ export async function GET({ url, locals }: RequestEvent) {
     // Check existing session
     if (typeof locals.user === 'undefined')
         return json({ error: 'Unauthorized. Please log in to export.' }, { status: 401 });
+
+    // Log action
+    await logChange(locals.user.id, null, 'Action: Attempt to export reports.');
 
     // Check Permissions
     const [roleObj] = await getUserRoleAndPermissions(locals.user.id);

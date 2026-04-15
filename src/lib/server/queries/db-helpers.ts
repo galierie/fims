@@ -32,7 +32,7 @@ import {
 } from '../db/schema';
 import { db } from '../db';
 
-export async function logChange(operatorId: string, tupleId: number, operation: string) {
+export async function logChange(operatorId: string, tupleId: number | null, operation: string) {
     const logids = await db
         .insert(changelog)
         .values({
