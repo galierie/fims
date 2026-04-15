@@ -4,7 +4,7 @@ import { BETTER_AUTH_SECRET } from '$env/static/private';
 
 import {
     areYouHere,
-    deleteUsersInfo,
+    deleteProfileInfo,
     getUserRoleAndPermissions,
     makeProfileInfo,
 } from '$lib/server/queries/db-helpers';
@@ -165,7 +165,7 @@ export const actions = {
         if (!userid) return fail(400, { error: 'Failed to delete account.' });
 
         // Delete user info
-        await deleteUsersInfo(locals.user.id, [userid]);
+        await deleteProfileInfo(locals.user.id, [userid]);
 
         // Delete!
         const response = await auth.api.removeUser({
@@ -205,7 +205,7 @@ export const actions = {
             const userids: string[] = JSON.parse(useridsStr);
 
             // Delete user info
-            await deleteUsersInfo(locals.user.id, userids);
+            await deleteProfileInfo(locals.user.id, userids);
 
             // Delete!
             let success = true;

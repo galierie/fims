@@ -75,7 +75,7 @@ export async function makeProfileInfo(operatorId: string, id: string, role: stri
     return { success: true };
 }
 
-export async function deleteUsersInfo(operatorId: string, userids: string[]) {
+export async function deleteProfileInfo(operatorId: string, userids: string[]) {
     if (!userids || userids.length === 0) return { success: false };
 
     // Actual action
