@@ -160,9 +160,16 @@ export async function changeRole(operatorId: string, id: string, role: string) {
     if (returnedIds.length === 0) return { success: false };
 
     // Log!
-    returnedIds.forEach(async ({ id: tupleId }) => {
-        await logChange(operatorId, tupleId, 'Chnaged account role.');
-    });
+    const [{ id: tupleId }, _] = returnedIds;
+
+    const logid = await logChange(operatorId, tupleId, 'Changed account role.');
+
+    await db
+        .update(profileInfo)
+        .set({
+            latestChangelogId: logid,
+        })
+        .where(eq(profileInfo.id, tupleId));
 
     return { success: true };
 }
