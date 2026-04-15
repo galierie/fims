@@ -34,6 +34,7 @@ sortMaps.set('desc-rank', [desc(rank.title)]);
 export async function getFacultyRecordList(
     searchTerm: string | null,
     filterMap: FilterColumn[],
+    sortBys: string[],
     cursor?: number,
     isNext: boolean = true,
     initLoad: boolean = false,
@@ -97,6 +98,26 @@ export async function getFacultyRecordList(
     sortMaps.set('asc-admin-position', [asc(adminPositionSq.title)]);
     sortMaps.set('desc-admin-position', [desc(adminPositionSq.title)]);
 
+    // Process sorting order
+    let sortOrder: Array<SQL> = [];
+    sortBys.forEach(rawSortKey => {
+        let sortKey = rawSortKey;
+
+        if (!isNext) {
+            const [keyOrder, ...keyArr] = sortKey.split('-');
+            if (typeof keyOrder === 'undefined') return;
+            if (keyArr.length === 0) return;
+
+            const flipOrder = (keyOrder === 'asc') ? 'desc' : 'asc';
+            sortKey = [flipOrder, ...keyArr].join('-');
+        }
+
+        const orders = sortMaps.get(sortKey);
+        if (typeof orders === 'undefined') return;
+        sortOrder = [...sortOrder, ...orders];
+    });
+    sortOrder.push(isNext ? asc(faculty.id) : desc(faculty.id));
+
     // Get faculty records from database
     const facultyRecordCountSq = await db
         .select({
@@ -124,7 +145,7 @@ export async function getFacultyRecordList(
             eq(adminPositionSq.facultyAcademicSemesterId, facultyAcademicSemester.id),
         )
         .where(and(cursorFilter, and(...filterQueries)))
-        .orderBy(isNext ? asc(faculty.id) : desc(faculty.id))
+        .orderBy(...sortOrder)
         .limit(pageSize + 1)
         .as('faculty_record_count_sq');
 

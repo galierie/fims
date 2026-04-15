@@ -79,6 +79,7 @@ export async function load({ url, locals }) {
         await getFacultyRecordList(
             searchTerm,
             filterMap,
+            [],
             newCursor,
             isNext,
             !newCursorStr && !isNextStr,
