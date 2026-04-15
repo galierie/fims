@@ -1,6 +1,6 @@
 import { sql } from 'drizzle-orm';
 
-import { appointmentStatus, course, fieldOfInterest, rank, role, status } from './schema';
+import { appointmentStatus, course, degreeProgram, fieldOfInterest, rank, role, status } from './schema';
 import { db } from './index';
 
 // TODO: Check if tama
@@ -180,10 +180,29 @@ export const ranks = [
     },
 ];
 
+export const degreePrograms = [
+    {
+        id: 1,
+        name: 'Undergraduate',
+        isGraduateLevel: false,
+    },
+    {
+        id: 2,
+        name: 'MA/PhD',
+        isGraduateLevel: true,
+    },
+    {
+        id: 3,
+        name: 'MDE',
+        isGraduateLevel: true,
+    },
+]
+
 export const courses = [
     {
         name: 'Econ 11',
         units: 3,
+        degreeProgramId: 1,
     },
 ];
 
@@ -245,6 +264,17 @@ async function seedRankTable() {
     return { success: response.length === ranks.length };
 }
 
+async function seedDegreeProgramTable() {
+    // Don't proceed if table is already seeded
+    const rows = await db.select().from(degreeProgram).limit(1);
+    if (rows.length > 0) return { success: true };
+
+    const response = await db.insert(degreeProgram).values(degreePrograms).returning();
+
+    // Check response
+    return { success: response.length === degreePrograms.length };
+}
+
 async function seedCourseTable() {
     // Don't proceed if table is already seeded
     const rows = await db.select().from(course).limit(1);
@@ -290,6 +320,7 @@ export async function seedDatabase() {
     // Insert into
     await seedStatusTable(); // status
     await seedRankTable(); // rank
+    await seedDegreeProgramTable(); // course
     await seedCourseTable(); // course
     await seedRoleTable(); // role
     await seedFieldOfInterestTable(); // field of interest
