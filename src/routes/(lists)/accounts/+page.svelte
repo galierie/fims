@@ -9,6 +9,7 @@
     import DeleteConfirmation from '$lib/ui/DeleteConfirmation.svelte';
     import SearchBar from '$lib/ui/SearchBar.svelte';
     import SelectDropdownCell from '$lib/ui/SelectDropdownCell.svelte';
+    import SortHeader from '$lib/ui/SortHeader.svelte';
     import { enhance } from '$app/forms';
     import { goto } from '$app/navigation';
     import { page } from '$app/state';
@@ -42,7 +43,7 @@
     }
 
     function selectAll() {
-        selectedIds = accountList.map(({ userid }) => userid);
+        selectedIds = accountList.map(({ id }) => id);
     }
 
     function deselectAll() {
@@ -145,15 +146,14 @@
     <div class="overflow-x-auto pb-50 whitespace-nowrap">
         <!-- Account List Table -->
         <div class="custom-scrollbar mt-2.5 w-full">
-            <div class="w-full min-w-[1024px] pb-4">
+            <div class="w-full min-w-5xl pb-4">
                 <!-- Header -->
                 <div
                     class="flex justify-center [&>*>span]:text-center [&>*>span]:font-semibold [&>*>span]:text-white [&>div]:flex [&>div]:h-12 [&>div]:items-center [&>div]:bg-fims-red [&>div]:px-6"
                 >
                     <div class="w-25 justify-center"><span>Select</span></div>
                     <div class="w-66 2xl:w-132">
-                        <span>Email</span>
-                        <Icon icon="tabler:arrow-up" class="ml-3 h-5 w-5 text-white" />
+                        <SortHeader name="Email" key="email" bind:isSorting={isLoading} />
                     </div>
                     <div class="w-50 justify-center"><span>Reset Password?</span></div>
                     <div class="w-40 justify-center">
@@ -164,11 +164,11 @@
                 </div>
 
                 <!-- Rows -->
-                {#each accountList as account (account.userid)}
+                {#each accountList as account (account.id)}
                     <AccountRow
                         {account}
-                        isSelected={selectedIds.includes(account.userid)}
-                        onToggle={() => toggleSelection(account.userid)}
+                        isSelected={selectedIds.includes(account.id)}
+                        onToggle={() => toggleSelection(account.id)}
                     />
                 {/each}
 

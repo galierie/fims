@@ -11,6 +11,7 @@
     import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
     import SearchBar from '$lib/ui/SearchBar.svelte';
     import ExportReportModal from '$lib/ui/ExportReportModal.svelte';
+    import SortHeader from '$lib/ui/SortHeader.svelte';
 
     const { data, form } = $props();
     const {
@@ -150,27 +151,27 @@
 
     <!-- Faculty Record List Table -->
     <div class="custom-scrollbar mt-2.5 w-full overflow-x-auto">
-        <div class="w-full min-w-[1024px] pb-4">
+        <div class="w-full min-w-5xl pb-4">
             <!-- Header -->
             <div
                 class="flex justify-center [&>*>span]:text-center [&>*>span]:font-semibold [&>*>span]:text-white [&>div]:flex [&>div]:h-12 [&>div]:items-center [&>div]:bg-fims-green [&>div]:px-6"
             >
                 <div class="w-25 justify-center"><span>Select</span></div>
                 <div class={canViewChangelogs ? 'w-66 2xl:w-132' : 'w-116 2xl:w-182'}>
-                    <span>Full Name</span>
-                    <Icon icon="tabler:arrow-up" class="ml-3 h-5 w-5 text-white" />
+                    <SortHeader name="Full Name" key="full-name" bind:isSorting={isLoading} />
                 </div>
                 <div class="w-50 justify-center 2xl:w-75">
-                    <span>Status</span>
-                    <Icon icon="tabler:arrow-up" class="ml-3 h-5 w-5 text-white" />
+                    <SortHeader name="Status" key="status" bind:isSorting={isLoading} />
                 </div>
                 <div class="w-62.5 justify-center 2xl:w-75">
-                    <span>Rank</span>
-                    <Icon icon="tabler:arrow-up" class="ml-3 h-5 w-5 text-white" />
+                    <SortHeader name="Rank" key="rank" bind:isSorting={isLoading} />
                 </div>
                 <div class="w-62.5 justify-center 2xl:w-75">
-                    <span>Administrative Position</span>
-                    <Icon icon="tabler:arrow-up" class="ml-3 h-5 w-5 text-white" />
+                    <SortHeader
+                        name="Administrative Position"
+                        key="admin-position"
+                        bind:isSorting={isLoading}
+                    />
                 </div>
                 {#if canViewChangelogs}
                     <div class="w-50 justify-center"><span>Change Logs</span></div>
