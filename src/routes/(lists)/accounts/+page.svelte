@@ -10,6 +10,7 @@
     import SearchBar from '$lib/ui/SearchBar.svelte';
     import SelectDropdownCell from '$lib/ui/SelectDropdownCell.svelte';
     import SortHeader from '$lib/ui/SortHeader.svelte';
+    import ChangelogList from '$lib/ui/ChangelogList.svelte';
     import { enhance } from '$app/forms';
     import { goto } from '$app/navigation';
     import { page } from '$app/state';
@@ -23,6 +24,7 @@
         filters,
         userRoles,
         searchTerm,
+        fetchedChangelogs,
     } = $derived(data);
 
     let isMakingAccount = $state(false);
@@ -244,6 +246,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Changelogs -->
+    <ChangelogList changelogFetcher={() => (fetchedChangelogs ?? [])} />
 </div>
 
 {#if willMake}

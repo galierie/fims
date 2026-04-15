@@ -13,6 +13,7 @@ import { auth } from '$lib/server/auth';
 import type { FilterColumn, FilterObject } from '$lib/types/filter';
 import {
     changeRole,
+    getAccountChangelogs,
     getAccountList,
     getAllRoles,
     refreshAccountSearchView,
@@ -31,7 +32,7 @@ export async function load({ locals, url }) {
     const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
     if (typeof roleObj === 'undefined') throw redirect(307, '/login');
 
-    const { canAddAccount, canModifyAccount } = roleObj;
+    const { canAddAccount, canModifyAccount, canViewChangelogs } = roleObj;
     const canViewAccounts = canAddAccount || canModifyAccount;
     if (!canViewAccounts) throw error(403, { message: 'Insufficient permissions.' });
 
@@ -82,6 +83,9 @@ export async function load({ locals, url }) {
         !newCursorStr && !isNextStr,
     );
 
+    // Get changelogs that they did
+    const fetchedChangelogs = (canViewChangelogs) ? await getAccountChangelogs(locals.user.id, 20, 0) : null;
+
     return {
         accountList,
         prevCursor,
@@ -92,6 +96,7 @@ export async function load({ locals, url }) {
         userRoles,
         searchTerm,
         canViewAccounts, // Added here
+        fetchedChangelogs,
     };
 }
 
