@@ -42,7 +42,7 @@
     }
 
     function selectAll() {
-        selectedIds = accountList.map(({ userid }) => userid);
+        selectedIds = accountList.map(({ id }) => id);
     }
 
     function deselectAll() {
@@ -164,11 +164,11 @@
                 </div>
 
                 <!-- Rows -->
-                {#each accountList as account (account.userid)}
+                {#each accountList as account (account.id)}
                     <AccountRow
                         {account}
-                        isSelected={selectedIds.includes(account.userid)}
-                        onToggle={() => toggleSelection(account.userid)}
+                        isSelected={selectedIds.includes(account.id)}
+                        onToggle={() => toggleSelection(account.id)}
                     />
                 {/each}
 

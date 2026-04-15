@@ -15,7 +15,7 @@
     }
 
     const { account, isSelected, onToggle }: Props = $props();
-    const { email, role, userid, logTimestamp, logOperation, logMaker }: AccountDTO =
+    const { email, role, id, logTimestamp, logOperation, logMaker }: AccountDTO =
         $derived(account);
 
     const userRoles = ['Admin', 'IT'];
@@ -65,7 +65,7 @@
         <div class="w-66 2xl:w-132"><span>{email}</span></div>
         <div class="w-50 justify-center">
             <form method="POST" action="?/deleteAccount" class="flex items-center justify-center">
-                <RedButton type="submit" name="userid" value={userid}>
+                <RedButton type="submit" name="userid" value={id}>
                     <Icon icon="tabler:refresh" class="mr-2 h-6 w-6" />
                     <span>Reset</span>
                 </RedButton>
@@ -99,7 +99,7 @@
                     bind:selectedOpt
                 />
 
-                <input type="hidden" name="userId" value={userid} />
+                <input type="hidden" name="userId" value={id} />
 
                 {#if willChangeRole}
                     <SaveConfirmation
@@ -139,7 +139,7 @@
                     <span>Delete</span>
                 </RedButton>
 
-                <input type="hidden" name="userid" value={userid} />
+                <input type="hidden" name="userid" value={id} />
 
                 {#if willDelete}
                     <DeleteConfirmation

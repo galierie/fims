@@ -81,8 +81,7 @@ export async function getAccountList(
     const operator = alias(profile, 'operator');
     const shownFields = await db
         .select({
-            userid: searchSq.id,
-            profileInfoId: sql<string>`${profileInfo.id}`.as('profile_info_id'),
+            id: searchSq.id,
             email: profile.email,
             role: profileInfo.role,
             logTimestamp: changelog.timestamp,
@@ -129,8 +128,8 @@ export async function getAccountList(
 
     return {
         accountList: shownFields,
-        prevCursor: firstId?.value,
-        nextCursor: lastId?.value,
+        prevCursor: firstId?.id,
+        nextCursor: lastId?.id,
         hasPrev,
         hasNext,
     };
@@ -139,7 +138,7 @@ export async function getAccountList(
 export interface AccountDTO {
     email: string | null;
     role: string | null;
-    userid: string;
+    id: string;
     logTimestamp: Date | null;
     logOperation: string | null;
     logMaker: string | null;
