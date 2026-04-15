@@ -19,6 +19,18 @@ import { db } from '../db';
 
 const pageSize = 50;
 
+// Sort keywords
+const sortMaps: Map<string, SQL[]> = new Map();
+
+sortMaps.set('asc-full-name', [asc(faculty.lastName), asc(faculty.firstName), asc(faculty.middleName)]);
+sortMaps.set('desc-full-name', [desc(faculty.lastName), desc(faculty.firstName), desc(faculty.middleName)]);
+
+sortMaps.set('asc-status', [asc(faculty.status)])
+sortMaps.set('desc-status', [desc(faculty.status)])
+
+sortMaps.set('asc-rank', [asc(rank.title)]);
+sortMaps.set('desc-rank', [desc(rank.title)]);
+
 export async function getFacultyRecordList(
     searchTerm: string | null,
     filterMap: FilterColumn[],
@@ -80,6 +92,10 @@ export async function getFacultyRecordList(
 
     let cursorFilter: SQL | undefined;
     if (cursor) cursorFilter = isNext ? gt(faculty.id, cursor) : lt(faculty.id, cursor);
+
+    // Adding missing sort mappings
+    sortMaps.set('asc-admin-position', [asc(adminPositionSq.title)]);
+    sortMaps.set('desc-admin-position', [desc(adminPositionSq.title)]);
 
     // Get faculty records from database
     const facultyRecordCountSq = await db
