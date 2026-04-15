@@ -12,8 +12,16 @@ import {
     getFacultyPromotionHistory,
     getFacultySemestralRecords,
 } from '$lib/server/queries/faculty-view';
-import { getFacultyRecordChangelogs, refreshFacultyRecordSearchView } from '$lib/server/queries/faculty-list.js';
-import { getUserRoleAndPermissions, logChange, deleteSemestralRecord, updateSemestralRecords } from '$lib/server/queries/db-helpers';
+import {
+    getFacultyRecordChangelogs,
+    refreshFacultyRecordSearchView,
+} from '$lib/server/queries/faculty-list.js';
+import {
+    getUserRoleAndPermissions,
+    logChange,
+    deleteSemestralRecord,
+    updateSemestralRecords,
+} from '$lib/server/queries/db-helpers';
 
 export async function load({ params, locals }) {
     // Check existing session
@@ -156,7 +164,12 @@ export const actions = {
         if (Number.isNaN(facultyid) || Number.isNaN(acadYear) || Number.isNaN(semNum))
             return fail(400, { error: 'Invalid URL parameters.' });
 
-        const { success } = await deleteSemestralRecord(locals.user.id, facultyid, acadYear, semNum);
+        const { success } = await deleteSemestralRecord(
+            locals.user.id,
+            facultyid,
+            acadYear,
+            semNum,
+        );
         await refreshFacultyRecordSearchView();
         if (success) redirect(308, `/${facultyid}/profile`);
         return fail(500, { error: 'Failed to delete record.' });

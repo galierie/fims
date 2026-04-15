@@ -17,7 +17,11 @@ export async function load({ locals }) {
     if (typeof locals.user === 'undefined') throw redirect(307, '/login');
 
     // Log action
-    await logChange(locals.user.id, null, 'Action: Attempt to access faculty profile creation route.');
+    await logChange(
+        locals.user.id,
+        null,
+        'Action: Attempt to access faculty profile creation route.',
+    );
 
     // Check Permissions
     const [roleObj] = await getUserRoleAndPermissions(locals.user.id);

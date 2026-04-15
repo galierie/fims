@@ -17,7 +17,7 @@
     const { changelogFetcher }: Props = $props();
 </script>
 
-<div class="flex justify-center w-full pt-15 pb-50">
+<div class="flex w-full justify-center pt-15 pb-50">
     <div data-testid="changelog-component" class="flex w-7xl flex-col">
         <!-- Header -->
         <div class="rounded-t-4xl bg-fims-green text-white">
@@ -29,7 +29,9 @@
             {#each changelogFetcher() as log}
                 <ChangelogEntry timestamp={log.timestamp} email={log.email} info={log.info} />
             {:else}
-                <div class="h-12.5 bg-gray-100 flex items-center justify-center"><span>No actions done yet.</span></div>
+                <div class="h-12.5 bg-gray-100 flex items-center justify-center">
+                    <span>No actions done yet.</span>
+                </div>
             {/each}
         </div>
     </div>

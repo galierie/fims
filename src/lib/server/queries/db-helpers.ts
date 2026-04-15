@@ -145,20 +145,28 @@ async function processDynamicTable(
     if (data.delete.length > 0) {
         await Promise.all([
             await db.delete(tableRef).where(inArray(idColumn, data.delete)),
-            await logChange(operatorId, facultyId, `Deleted records with IDs ${data.delete.join(', ')} from ${getTableName(tableRef)}.`),
+            await logChange(
+                operatorId,
+                facultyId,
+                `Deleted records with IDs ${data.delete.join(', ')} from ${getTableName(tableRef)}.`,
+            ),
         ]);
     }
 
     for (const item of data.update)
         await Promise.all([
             await db.update(tableRef).set(mapUpdate(item)).where(eq(idColumn, item.tupleid)),
-            await logChange(operatorId, facultyId, `Updated ${item.tupleid} from ${getTableName(tableRef)}.`),
+            await logChange(
+                operatorId,
+                facultyId,
+                `Updated ${item.tupleid} from ${getTableName(tableRef)}.`,
+            ),
         ]);
 
     if (data.create.length > 0)
         await Promise.all([
             await db.insert(tableRef).values(data.create.map(mapCreate)),
-            await logChange(operatorId, facultyId, `Created tuples in ${getTableName(tableRef)}.`)
+            await logChange(operatorId, facultyId, `Created tuples in ${getTableName(tableRef)}.`),
         ]);
 }
 
@@ -290,7 +298,11 @@ export async function updateFacultyProfileRecords(
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export async function createFacultyProfileRecords(operatorId: string, basicProfile: any, dynamicTables: any) {
+export async function createFacultyProfileRecords(
+    operatorId: string,
+    basicProfile: any,
+    dynamicTables: any,
+) {
     /* eslint-enable @typescript-eslint/no-explicit-any */
     try {
         function parseNum(val: unknown) {
@@ -434,7 +446,7 @@ export async function deleteSemestralRecord(
             and(
                 eq(academicSemester.academicYear, acadYear),
                 eq(academicSemester.semesterNumber, semNum),
-            )
+            ),
         )
         .limit(1);
 
@@ -447,8 +459,8 @@ export async function deleteSemestralRecord(
         .where(
             and(
                 eq(facultyAcademicSemester.facultyId, facultyId),
-                eq(facultyAcademicSemester.academicSemesterId, academicSemesterId)
-            )
+                eq(facultyAcademicSemester.academicSemesterId, academicSemesterId),
+            ),
         )
         .returning();
 
@@ -457,7 +469,11 @@ export async function deleteSemestralRecord(
     // Log!
     const [{ id: tupleId }, _] = returnedIds;
 
-    const logid = await logChange(operatorId, tupleId, `Deleted semestral record for AY ${acadYear}-${acadYear + 1} Sem ${semNum}.`);
+    const logid = await logChange(
+        operatorId,
+        tupleId,
+        `Deleted semestral record for AY ${acadYear}-${acadYear + 1} Sem ${semNum}.`,
+    );
 
     await db
         .update(faculty)

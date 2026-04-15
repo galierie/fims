@@ -1,7 +1,11 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 
 import { adminPosition, faculty, rank } from '$lib/server/db/schema';
-import { deleteFacultyRecords, getUserRoleAndPermissions, logChange } from '$lib/server/queries/db-helpers';
+import {
+    deleteFacultyRecords,
+    getUserRoleAndPermissions,
+    logChange,
+} from '$lib/server/queries/db-helpers';
 import type { FilterColumn, FilterObject } from '$lib/types/filter';
 import {
     getAllAdminPositions,

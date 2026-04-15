@@ -86,7 +86,11 @@ export const actions = {
 
         // Log action
         if ('user' in response)
-            await logChange(response.user.id, null, 'Action: Attempt to access log-in server load.');
+            await logChange(
+                response.user.id,
+                null,
+                'Action: Attempt to access log-in server load.',
+            );
 
         if (response.url) throw redirect(303, response.url);
 

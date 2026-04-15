@@ -84,7 +84,9 @@ export async function load({ locals, url }) {
     );
 
     // Get changelogs that they did
-    const fetchedChangelogs = (canViewChangelogs) ? await getAccountChangelogs(locals.user.id, 20, 0) : null;
+    const fetchedChangelogs = canViewChangelogs
+        ? await getAccountChangelogs(locals.user.id, 20, 0)
+        : null;
 
     return {
         accountList,

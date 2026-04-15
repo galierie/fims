@@ -248,7 +248,7 @@
     </div>
 
     <!-- Changelogs -->
-    <ChangelogList changelogFetcher={() => (fetchedChangelogs ?? [])} />
+    <ChangelogList changelogFetcher={() => fetchedChangelogs ?? []} />
 </div>
 
 {#if willMake}
