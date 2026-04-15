@@ -1,7 +1,11 @@
 import { sql } from 'drizzle-orm';
 
-import { adminPosition, appointmentStatus, course, degreeProgram, fieldOfInterest, office, rank, research, role, status } from './schema';
+import { adminPosition, appointmentStatus, course, degreeProgram, fieldOfInterest, office, profileInfo, rank, research, role, status } from './schema';
 import { db } from './index';
+import { auth } from '$lib/server/auth';
+import { refreshAccountSearchView } from '$lib/server/queries/account-list';
+
+import { ADMIN_EMAIL, ADMIN_PASS, IT_EMAIL, IT_PASS } from '$env/static/private';
 
 export const appointmentStatuses = [
     { appointmentStatus: 'Permanent' },
@@ -422,6 +426,48 @@ async function seedResearchTable() {
 
     // Check response
     return { success: response.length === researches.length };
+}
+
+async function seedDummyProfiles() {
+    // Don't proceed if table is already seeded
+    const rows = await db.select().from(profileInfo).limit(1);
+    if (rows.length > 0) return { success: true };
+
+    const { user: adminUser } = await auth.api.createUser({
+        body: {
+            email: ADMIN_EMAIL,
+            password: ADMIN_PASS,
+            name: 'Admin',
+            role: 'user',
+        },
+    });
+    const { user: itUser } = await auth.api.createUser({
+        body: {
+            email: IT_EMAIL,
+            password: IT_PASS,
+            name: 'IT',
+            role: 'admin',
+        },
+    });
+
+    await Promise.all([
+        await db
+            .insert(profileInfo)
+            .values({
+                profileId: adminUser.id,
+                role: 'Admin',
+            })
+            .returning(),
+        await db
+            .insert(profileInfo)
+            .values({
+                profileId: itUser.id,
+                role: 'IT',
+            })
+            .returning(),
+    ]);
+
+    await refreshAccountSearchView();
 }
 
 export async function seedDatabase() {
