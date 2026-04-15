@@ -234,9 +234,63 @@ export const courses = [
         units: 3,
         degreeProgramId: 1,
     },
+    {
+        name: 'CS 11',
+        units: 3,
+        degreeProgramId: 1,
+    },
+    {
+        name: 'CS 12',
+        units: 3,
+        degreeProgramId: 1,
+    },
+    {
+        name: 'CS 32',
+        units: 3,
+        degreeProgramId: 1,
+    },
+    {
+        name: 'CS 33',
+        units: 3,
+        degreeProgramId: 1,
+    },
+    {
+        name: 'CS 191',
+        units: 3,
+        degreeProgramId: 1,
+    },
+    {
+        name: 'CS 192',
+        units: 3,
+        degreeProgramId: 1,
+    },
+    {
+        name: 'CS 195',
+        units: 3,
+        degreeProgramId: 1,
+    },
+    {
+        name: 'CS 200',
+        units: 3,
+        degreeProgramId: 2,
+    },
+    {
+        name: 'CS 211',
+        units: 3,
+        degreeProgramId: 2,
+    },
+    {
+        name: 'DE 100',
+        units: 3,
+        degreeProgramId: 3,
+    },
+    {
+        name: 'DE 236',
+        units: 3,
+        degreeProgramId: 3,
+    },
 ];
 
-// dummy, needs to be changed
 export const fieldsOfInterest = [
     { field: 'Software Engineering' },
     { field: 'Data Science' },
