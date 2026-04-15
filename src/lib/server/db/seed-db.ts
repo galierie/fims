@@ -474,12 +474,24 @@ export async function seedDatabase() {
     // Enable pg_trgm extension
     await db.execute(sql`CREATE EXTENSION IF NOT EXISTS pg_trgm;`);
 
-    // Insert into
-    await seedStatusTable(); // status
-    await seedRankTable(); // rank
-    await seedDegreeProgramTable(); // course
-    await seedCourseTable(); // course
-    await seedRoleTable(); // role
-    await seedFieldOfInterestTable(); // field of interest
-    await seedAppointmentStatusTable(); // appointment status
+    // Insert into the most likely constant tables
+    await Promise.all([
+        await seedAppointmentStatusTable(), // appointment status
+        await seedDegreeProgramTable(), // degree program
+        await seedRankTable(), // rank
+        await seedRoleTable(), // role
+        await seedStatusTable(), // status
+    ]);
+
+    // Insert the dummy data tables
+    await Promise.all([
+        await seedAdminPositionTable(), // administrative position
+        await seedCourseTable(), // course
+        await seedFieldOfInterestTable(), // field of interest
+        await seedOfficeTable(), // office
+        await seedResearchTable(), // research
+        await seedDummyProfiles(), // accounts
+    ]);
 }
+
+await seedDatabase();
