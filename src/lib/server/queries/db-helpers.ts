@@ -179,7 +179,14 @@ export async function updateFacultyProfileRecords(
     try {
         const parseNum = (val: any) => (val ? parseInt(val, 10) || null : null);
 
-        await db.update(faculty).set(basicProfile).where(eq(faculty.id, facultyId));
+        await Promise.all([
+            await db.update(faculty).set(basicProfile).where(eq(faculty.id, facultyId)),
+            await logChange(
+                operatorId,
+                facultyId,
+                `Updated faculty record ${facultyId}.`,
+            ),
+        ]);
 
         await processDynamicTable(
             operatorId,
@@ -313,6 +320,12 @@ export async function createFacultyProfileRecords(
 
         const [newFaculty] = await db.insert(faculty).values(basicProfile).returning();
         const { id: facultyId } = newFaculty;
+
+        await logChange(
+            operatorId,
+            facultyId,
+            `Created new faculty record (ID: ${facultyId}).`,
+        );
 
         await processDynamicTable(
             operatorId,
@@ -582,14 +595,17 @@ export async function updateSemestralRecords(
 
         if (existingFacSem.length > 0) {
             facultyAcademicSemesterId = existingFacSem[0].id;
-            await db
-                .update(facultyAcademicSemester)
-                .set({
-                    currentRankId,
-                    currentHighestEducationalAttainmentId,
-                    remarks: basicSemestralData.remarks,
-                })
-                .where(eq(facultyAcademicSemester.id, facultyAcademicSemesterId));
+            await Promise.all([
+                await db
+                    .update(facultyAcademicSemester)
+                    .set({
+                        currentRankId,
+                        currentHighestEducationalAttainmentId,
+                        remarks: basicSemestralData.remarks,
+                    })
+                    .where(eq(facultyAcademicSemester.id, facultyAcademicSemesterId)),
+                await logChange(operatorId, facultyId, `Updated faculty academic semester for ${facultyId}.`),
+            ]);
         } else {
             const newFacSem = await db
                 .insert(facultyAcademicSemester)
@@ -602,6 +618,7 @@ export async function updateSemestralRecords(
                 })
                 .returning();
             facultyAcademicSemesterId = newFacSem[0].id;
+            await logChange(operatorId, facultyId, `Updated faculty academic semester for ${facultyId}.`);
         }
 
         // Fetch foreign key mappings
