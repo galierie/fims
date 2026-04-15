@@ -13,6 +13,10 @@
     // eslint-disable-next-line prefer-const -- bindable variable
     let { studyLoadCredit = $bindable(), studyLoad, hasChange = $bindable() }: Props = $props();
 
+    $effect(() => {
+        studyLoadCredit = studyLoad.reduce((acc, curr) => acc + Number(curr.studyLoadCredit ?? 0), 0);
+    });
+
     // Input Table Columns
     const studyLoadColumns: InputColumnType[] = [
         {
@@ -20,12 +24,14 @@
             name: 'study-load-degree',
             colSpan: 8,
             type: 'text',
+            isRequired: true,
         },
         {
             label: 'University',
             name: 'study-load-university',
             colSpan: 8,
             type: 'text',
+            isRequired: true,
         },
         {
             label: 'Study Load Units',

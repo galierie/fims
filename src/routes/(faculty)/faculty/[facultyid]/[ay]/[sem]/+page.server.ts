@@ -250,7 +250,7 @@ export const actions = {
                 'mentee-category',
                 'mentee-start-date',
                 'mentee-end-date',
-                'mentee-load-credit',
+                'mentee-remarks',
             ]),
 
             // Research, extension, study

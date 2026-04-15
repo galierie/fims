@@ -30,6 +30,13 @@
         hasChange = $bindable(),
     }: Props = $props();
 
+    $effect(() => {
+        const posSum = adminPositions.reduce((acc, curr) => acc + Number(curr.administrativeLoadCredit ?? 0), 0);
+        const comSum = committees.reduce((acc, curr) => acc + Number(curr.administrativeLoadCredit ?? 0), 0);
+        const workSum = adminWorks.reduce((acc, curr) => acc + Number(curr.administrativeLoadCredit ?? 0), 0);
+        administrativeLoadCredit = posSum + comSum + workSum;
+    });
+
     // Check for changes
     const haveChanges: boolean[] = $state(Array(3).fill(false));
     $effect(() => {
@@ -59,12 +66,14 @@
             name: 'administrative-position-start-date',
             colSpan: 3,
             type: 'date',
+            isRequired: true,
         },
         {
             label: 'End Date',
             name: 'administrative-position-end-date',
             colSpan: 3,
             type: 'date',
+            isRequired: true,
         },
         {
             label: 'Load Credit',
@@ -111,12 +120,14 @@
             name: 'committee-membership-start-date',
             colSpan: 3,
             type: 'date',
+            isRequired: true,
         },
         {
             label: 'End Date',
             name: 'committee-membership-end-date',
             colSpan: 3,
             type: 'date',
+            isRequired: true,
         },
         {
             label: 'Load Credit',
@@ -164,12 +175,14 @@
             name: 'administrative-work-start-date',
             colSpan: 3,
             type: 'date',
+            isRequired: true,
         },
         {
             label: 'End Date',
             name: 'administrative-work-end-date',
             colSpan: 3,
             type: 'date',
+            isRequired: true,
         },
         {
             label: 'Load Credit',
@@ -224,7 +237,7 @@
             <div>
                 <span class="pl-4">Administrative Positions</span>
                 <InputTable
-                    tableName="adminstrative-positions"
+                    tableName="administrative-positions"
                     rowLabel="Position"
                     columns={administrativePositionColumns}
                     rows={administrativePositionValues}

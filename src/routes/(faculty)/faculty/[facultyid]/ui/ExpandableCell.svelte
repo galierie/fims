@@ -31,9 +31,9 @@
         defaultValue={defaultValue ?? ''}
         class="h-8 w-full truncate border-0 focus:ring-0 {isDeleted ? 'text-fims-gray' : ''}"
         disabled
-        {name}
         bind:value
     />
+    <input type="hidden" {name} {value} />
     <button
         type="button"
         class="h-8 w-fit bg-white pr-2 text-right text-fims-gray hover:text-black"

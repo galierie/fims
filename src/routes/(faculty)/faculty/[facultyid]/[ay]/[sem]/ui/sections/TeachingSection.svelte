@@ -29,6 +29,21 @@
         hasChange = $bindable(),
     }: Props = $props();
 
+    $effect(() => {
+        teachingLoadCredit = coursesTaught.reduce((acc, curr) => acc + Number(curr.teachingLoadCredit ?? 0), 0);
+    });
+
+    const setAverage = $derived(() => {
+        const coursesWithSet = coursesTaught.filter(
+            (c) => c.sectionSET !== null && c.sectionSET !== undefined && c.sectionSET !== ''
+        );
+        
+        if (coursesWithSet.length === 0) return 'N/A';
+        
+        const sum = coursesWithSet.reduce((acc, curr) => acc + Number(curr.sectionSET), 0);
+        return (sum / coursesWithSet.length).toFixed(3);
+    });
+
     const haveChanges: boolean[] = $state(Array(2).fill(false));
     $effect(() => {
         hasChange = haveChanges.some((e) => e === true);
@@ -137,12 +152,14 @@
             name: 'mentee-start-date',
             colSpan: 3,
             type: 'date',
+            isRequired: true,
         },
         {
             label: 'End Date',
             name: 'mentee-end-date',
             colSpan: 3,
             type: 'date',
+            isRequired: true,
         },
         {
             label: 'Remarks',
@@ -207,6 +224,7 @@
                     numOfColumns={22}
                     bind:hasChange={haveChanges[0]}
                 />
+                <p class="mt-2 pl-3.5">SET Average: {setAverage()}</p>
             </div>
 
             <div class="mt-4">

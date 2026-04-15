@@ -16,6 +16,10 @@
         hasChange = $bindable(),
     }: Props = $props();
 
+    $effect(() => {
+        extensionLoadCredit = extensionWork.reduce((acc, curr) => acc + Number(curr.extensionLoadCredit ?? 0), 0);
+    });
+
     // Input Table Columns
     const extensionColumns: InputColumnType[] = [
         {
@@ -23,24 +27,28 @@
             name: 'extension-nature',
             colSpan: 8,
             type: 'text',
+            isRequired: true,
         },
         {
             label: 'Agency',
             name: 'extension-agency',
             colSpan: 8,
             type: 'text',
+            isRequired: true,
         },
         {
             label: 'Start Date',
             name: 'extension-start-date',
             colSpan: 3,
             type: 'date',
+            isRequired: true,
         },
         {
             label: 'End Date',
             name: 'extension-end-date',
             colSpan: 3,
             type: 'date',
+            isRequired: true,
         },
         {
             label: 'Load Credit',

@@ -70,6 +70,10 @@
             studyLoadCredit,
     );
 
+    const loadStatus = $derived(
+        totalCredit < 12 ? 'Underload' : totalCredit <= 18 ? 'Normal' : 'Overload'
+    );
+
     // Handle tab exit with unsaved changes
     function beforeExit(event: BeforeUnloadEvent) {
         if (viewState.isEditing && hasChange) event.preventDefault();
@@ -167,7 +171,7 @@
         <div class="mt-4 grid w-full grid-cols-8">
             <p class="flex w-full items-center">
                 <span class="text-align-right mr-2 w-fit">Load Status:</span>
-                <span>{totalCredit}</span>
+                <span>{loadStatus}</span>
             </p>
             <FieldDropdown
                 label="Current Highest Educational Attainment"

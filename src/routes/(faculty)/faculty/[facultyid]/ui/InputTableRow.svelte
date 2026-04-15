@@ -37,11 +37,22 @@
         hasChange = $bindable(),
     }: Props = $props();
 
+    // helper function to format database Date obj to HTML standard YYYY-MM-DD
+    function getFormattedDefault(val: any) {
+        if (val instanceof Date) {
+            const year = val.getFullYear();
+            const month = String(val.getMonth() + 1).padStart(2, '0');
+            const day = String(val.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        return val !== undefined && val !== null ? val : '';
+    }
+
     // svelte-ignore state_referenced_locally
     const values: any[] = $state(
         row.map((r) => {
             if (columns[r.columnNum].type === 'checkbox') return r.defaultChecked ?? false;
-            return r.defaultValue !== undefined && r.defaultValue !== null ? r.defaultValue : '';
+            return getFormattedDefault(r.defaultValue);
         }),
     );
 
@@ -66,9 +77,7 @@
         if (!viewState.isEditing) {
             const newValues = row.map((r) => {
                 if (columns[r.columnNum].type === 'checkbox') return r.defaultChecked ?? false;
-                return r.defaultValue !== undefined && r.defaultValue !== null
-                    ? r.defaultValue
-                    : '';
+                return getFormattedDefault(r.defaultValue);
             });
 
             for (let i = 0; i < newValues.length; i++) values[i] = newValues[i];
@@ -165,10 +174,10 @@
                     bind:checked={values[columnNum]}
                     defaultChecked={defaultChecked ?? false}
                     onchange={() => {
-                        haveChanges[columnNum] = values[columnNum] !== defaultChecked;
+                        haveChanges[columnNum] = values[columnNum] !== (defaultChecked ?? false);
                     }}
                 />
-                <input type="hidden" {name} defaultValue={false} />
+                <input type="hidden" {name} value="false" />
             </div>
         {:else if type === 'datalist' && opts !== undefined && !(defaultValue instanceof Date)}
             <div
@@ -193,22 +202,28 @@
                 />
             </div>
         {:else if type !== 'dropdown'}
+            {@const formattedDefault = getFormattedDefault(defaultValue)}
             <input
                 {type}
                 {name}
+                step={type === 'number' && columns[columnNum].name === 'course-section-set' ? 'any' : null}
                 class="{colSpanClass} h-8 w-full border-0 focus:ring-0 {isDeleted
                     ? 'text-fims-gray'
                     : ''} py-0"
                 disabled={!viewState.isEditing ||
-                    (isImmutable && defaultValue !== undefined && defaultValue !== '') ||
+                    (isImmutable && formattedDefault !== '') ||
                     isDeleted}
-                defaultValue={(defaultValue as string) ?? ''}
+                defaultValue={formattedDefault as string}
                 bind:value={values[columnNum]}
                 required={isRequired &&
                     !isDeleted &&
                     ((tupleid === undefined && hasValue) || (tupleid !== undefined && hasChange))}
                 onchange={() => {
-                    haveChanges[columnNum] = values[columnNum] !== defaultValue;
+                    if (type === 'number') {
+                        haveChanges[columnNum] = Number(values[columnNum]) !== Number(formattedDefault);
+                    } else {
+                        haveChanges[columnNum] = values[columnNum] !== formattedDefault;
+                    }
                 }}
             />
         {/if}

@@ -387,7 +387,22 @@ export async function updateSemestralRecords(
     dynamicTables: any,
 ) {
     try {
-        const parseNum = (val: any) => (val ? parseFloat(val) || 0 : 0);
+        const parseNumStr = (val: any) => {
+            if (val === null || val === undefined || val === '' || val === false) return "0";
+            const parsed = parseFloat(val);
+            return isNaN(parsed) ? "0" : parsed.toString();
+        };
+
+        const parseSetScore = (val: any) => {
+            if (val === null || val === undefined || val === '' || val === false) return null;
+            const parsed = parseFloat(val);
+            return isNaN(parsed) ? null : parsed.toString();
+        };
+
+        const parseDate = (val: any) => {
+            if (typeof val === 'string' && val.trim() !== '') return new Date(val);
+            return null;
+        };
 
         let academicSemesterId: number;
         const existingAcademicSemester = await db
@@ -484,18 +499,28 @@ export async function updateSemestralRecords(
 
         // Fetch foreign key mappings
         const dbAdminPositions = await db.select().from(adminPosition);
-        const getAdminPosId = (name: string) =>
-            dbAdminPositions.find((a) => a.title === name)?.id || null;
+        const getAdminPosId = (name: string) => {
+            if (!name || name === '-') return null;
+            return dbAdminPositions.find((a) => a.title.trim().toLowerCase() === name.trim().toLowerCase())?.id || null;
+        };
 
         const dbOffices = await db.select().from(office);
-        const getOfficeId = (name: string) => dbOffices.find((o) => o.name === name)?.id || null;
+        const getOfficeId = (name: string) => {
+            if (!name || name === '-') return null;
+            return dbOffices.find((o) => o.name.trim().toLowerCase() === name.trim().toLowerCase())?.id || null;
+        };
 
         const dbCourses = await db.select().from(course);
-        const getCourseId = (name: string) => dbCourses.find((c) => c.name === name)?.id || null;
+        const getCourseId = (name: string) => {
+            if (!name || name === '-') return null;
+            return dbCourses.find((c) => c.name.trim().toLowerCase() === name.trim().toLowerCase())?.id || null;
+        };
 
         const dbResearches = await db.select().from(research);
-        const getResearchId = (title: string) =>
-            dbResearches.find((r) => r.title === title)?.id || null;
+        const getResearchId = (title: string) => {
+            if (!title || title === '-') return null;
+            return dbResearches.find((r) => r.title.trim().toLowerCase() === title.trim().toLowerCase())?.id || null;
+        };
 
         // Find or Create Student for Mentoring
         const resolveStudent = async (last: string, first: string, middle: string) => {
@@ -535,21 +560,21 @@ export async function updateSemestralRecords(
         await processDynamicTable(
             facultyAdminPosition,
             facultyAdminPosition.id,
-            dynamicTables.AdminPositions,
+            dynamicTables.adminPositions,
             (a) => ({
                 facultyAcademicSemesterId,
                 adminPositionId: getAdminPosId(a['administrative-position-title']),
                 officeId: getOfficeId(a['administrative-position-office']),
-                startDate: a['administrative-position-start-date'] || null,
-                endDate: a['administrative-position-end-date'] || null,
-                administrativeLoadCredit: parseNum(a['administrative-position-load-credit']),
+                startDate: parseDate(a['administrative-position-start-date']),
+                endDate: parseDate(a['administrative-position-end-date']),
+                administrativeLoadCredit: parseNumStr(a['administrative-position-load-credit']),
             }),
             (a) => ({
                 adminPositionId: getAdminPosId(a['administrative-position-title']),
                 officeId: getOfficeId(a['administrative-position-office']),
-                startDate: a['administrative-position-start-date'] || null,
-                endDate: a['administrative-position-end-date'] || null,
-                administrativeLoadCredit: parseNum(a['administrative-position-load-credit']),
+                startDate: parseDate(a['administrative-position-start-date']),
+                endDate: parseDate(a['administrative-position-end-date']),
+                administrativeLoadCredit: parseNumStr(a['administrative-position-load-credit']),
             }),
         );
 
@@ -561,40 +586,39 @@ export async function updateSemestralRecords(
                 facultyAcademicSemesterId,
                 membership: c['committee-membership-nature'],
                 committee: c['committee-membership-committee'],
-                startDate: c['committee-membership-start-date'] || null,
-                endDate: c['committee-membership-end-date'] || null,
-                administrativeLoadCredit: parseNum(c['committee-membership-load-credit']),
+                startDate: parseDate(c['committee-membership-start-date']),
+                endDate: parseDate(c['committee-membership-end-date']),
+                administrativeLoadCredit: parseNumStr(c['committee-membership-load-credit']),
             }),
             (c) => ({
                 membership: c['committee-membership-nature'],
                 committee: c['committee-membership-committee'],
-                startDate: c['committee-membership-start-date'] || null,
-                endDate: c['committee-membership-end-date'] || null,
-                administrativeLoadCredit: parseNum(c['committee-membership-load-credit']),
+                startDate: parseDate(c['committee-membership-start-date']),
+                endDate: parseDate(c['committee-membership-end-date']),
+                administrativeLoadCredit: parseNumStr(c['committee-membership-load-credit']),
             }),
         );
 
         await processDynamicTable(
             facultyAdminWork,
             facultyAdminWork.id,
-            dynamicTables.AdminWorks,
+            dynamicTables.adminWorks,
             (aw) => ({
                 facultyAcademicSemesterId,
                 natureOfWork: aw['administrative-work-nature'],
                 officeId: getOfficeId(aw['administrative-work-committee']),
-                startDate: aw['administrative-work-start-date'] || null,
-                endDate: aw['administrative-work-end-date'] || null,
-                administrativeLoadCredit: parseNum(aw['administrative-work-load-credit']),
+                startDate: parseDate(aw['administrative-work-start-date']),
+                endDate: parseDate(aw['administrative-work-end-date']),
+                administrativeLoadCredit: parseNumStr(aw['administrative-work-load-credit']),
             }),
             (aw) => ({
                 natureOfWork: aw['administrative-work-nature'],
                 officeId: getOfficeId(aw['administrative-work-committee']),
-                startDate: aw['administrative-work-start-date'] || null,
-                endDate: aw['administrative-work-end-date'] || null,
-                administrativeLoadCredit: parseNum(aw['administrative-work-load-credit']),
+                startDate: parseDate(aw['administrative-work-start-date']),
+                endDate: parseDate(aw['administrative-work-end-date']),
+                administrativeLoadCredit: parseNumStr(aw['administrative-work-load-credit']),
             }),
         );
-
         // Teaching
         await processDynamicTable(
             facultyCourse,
@@ -607,8 +631,8 @@ export async function updateSemestralRecords(
                 numberOfStudents: c['course-num-of-students']
                     ? parseInt(c['course-num-of-students'], 10)
                     : null,
-                teachingLoadCredit: parseNum(c['course-load-credit']),
-                sectionSET: parseNum(c['course-section-set']) || null,
+                teachingLoadCredit: parseNumStr(c['course-load-credit']),
+                sectionSET: parseSetScore(c['course-section-set']),
             }),
             (c) => ({
                 courseId: getCourseId(c['course-title']),
@@ -616,8 +640,8 @@ export async function updateSemestralRecords(
                 numberOfStudents: c['course-num-of-students']
                     ? parseInt(c['course-num-of-students'], 10)
                     : null,
-                teachingLoadCredit: parseNum(c['course-load-credit']),
-                sectionSET: parseNum(c['course-section-set']) || null,
+                teachingLoadCredit: parseNumStr(c['course-load-credit']),
+                sectionSET: parseSetScore(c['course-section-set']),
             }),
         );
 
@@ -629,16 +653,16 @@ export async function updateSemestralRecords(
                 facultyAcademicSemesterId,
                 studentId: m.resolvedStudentId,
                 category: m['mentee-category'],
-                startDate: m['mentee-start-date'] || null,
-                endDate: m['mentee-end-date'] || null,
-                teachingLoadCredit: parseNum(m['mentee-load-credit']),
+                startDate: parseDate(m['mentee-start-date']),
+                endDate: parseDate(m['mentee-end-date']),
+                remarks: m['mentee-remarks'],
             }),
             (m) => ({
                 studentId: m.resolvedStudentId,
                 category: m['mentee-category'],
-                startDate: m['mentee-start-date'] || null,
-                endDate: m['mentee-end-date'] || null,
-                teachingLoadCredit: parseNum(m['mentee-load-credit']),
+                startDate: parseDate(m['mentee-start-date']),
+                endDate: parseDate(m['mentee-end-date']),
+                remarks: m['mentee-remarks'],
             }),
         );
 
@@ -650,12 +674,12 @@ export async function updateSemestralRecords(
             (r) => ({
                 facultyAcademicSemesterId,
                 researchId: getResearchId(r['research-title']),
-                researchLoadCredit: parseNum(r['research-load-credit']),
+                researchLoadCredit: parseNumStr(r['research-load-credit']),
                 remarks: r['research-remarks'],
             }),
             (r) => ({
                 researchId: getResearchId(r['research-title']),
-                researchLoadCredit: parseNum(r['research-load-credit']),
+                researchLoadCredit: parseNumStr(r['research-load-credit']),
                 remarks: r['research-remarks'],
             }),
         );
@@ -669,16 +693,16 @@ export async function updateSemestralRecords(
                 facultyAcademicSemesterId,
                 natureOfExtension: e['extension-nature'],
                 agency: e['extension-agency'],
-                startDate: e['extension-start-date'] || null,
-                endDate: e['extension-end-date'] || null,
-                extensionLoadCredit: parseNum(e['extension-load-credit']),
+                startDate: parseDate(e['extension-start-date']),
+                endDate: parseDate(e['extension-end-date']),
+                extensionLoadCredit: parseNumStr(e['extension-load-credit']),
             }),
             (e) => ({
                 natureOfExtension: e['extension-nature'],
                 agency: e['extension-agency'],
-                startDate: e['extension-start-date'] || null,
-                endDate: e['extension-end-date'] || null,
-                extensionLoadCredit: parseNum(e['extension-load-credit']),
+                startDate: parseDate(e['extension-start-date']),
+                endDate: parseDate(e['extension-end-date']),
+                extensionLoadCredit: parseNumStr(e['extension-load-credit']),
             }),
         );
 
@@ -691,23 +715,24 @@ export async function updateSemestralRecords(
                 facultyAcademicSemesterId,
                 degreeProgram: s['study-load-degree'],
                 university: s['study-load-university'],
-                studyLoadUnits: parseNum(s['study-load-units']),
-                onFullTimeLeaveWithPay: s['study-load-on-leave-with-pay'],
-                isFacultyFellowshipRecipient: s['study-load-fellowship-recipient'],
-                studyLoadCredit: parseNum(s['study-load-credit']),
+                studyLoadUnits: parseNumStr(s['study-load-units']),
+                onFullTimeLeaveWithPay: s['study-load-on-leave-with-pay'] === true,
+                isFacultyFellowshipRecipient: s['study-load-fellowship-recipient'] === true,
+                studyLoadCredit: parseNumStr(s['study-load-credit']),
             }),
             (s) => ({
                 degreeProgram: s['study-load-degree'],
                 university: s['study-load-university'],
-                studyLoadUnits: parseNum(s['study-load-units']),
-                onFullTimeLeaveWithPay: s['study-load-on-leave-with-pay'],
-                isFacultyFellowshipRecipient: s['study-load-fellowship-recipient'],
-                studyLoadCredit: parseNum(s['study-load-credit']),
+                studyLoadUnits: parseNumStr(s['study-load-units']),
+                onFullTimeLeaveWithPay: s['study-load-on-leave-with-pay'] === true,
+                isFacultyFellowshipRecipient: s['study-load-fellowship-recipient'] === true,
+                studyLoadCredit: parseNumStr(s['study-load-credit']),
             }),
         );
 
         return { success: true };
-    } catch {
+    } catch (error) {
+        console.error("DB UPDATE ERROR in updateSemestralRecords:", error);
         return { success: false };
     }
 }

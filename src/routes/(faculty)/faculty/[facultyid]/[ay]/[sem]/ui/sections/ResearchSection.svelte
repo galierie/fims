@@ -20,6 +20,10 @@
         hasChange = $bindable(),
     }: Props = $props();
 
+    $effect(() => {
+        researchLoadCredit = researchWork.reduce((acc, curr) => acc + Number(curr.researchLoadCredit ?? 0), 0);
+    });
+
     // Input Table Columns
     const researchTitles = $derived(opts?.get('researchTitles'));
     const researchTitlesToResearchStartDates = $derived(
