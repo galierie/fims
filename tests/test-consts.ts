@@ -192,7 +192,6 @@ export async function seed() {
     await testDB.delete(schema.facultyRank);
     await testDB.delete(schema.facultyAcademicSemester);
     await testDB.delete(schema.facultyAdminPosition);
-    await testDB.delete(schema.appointmentStatus);
 
     await testDB.delete(schema.office);
     await testDB.delete(schema.adminPosition);
@@ -213,9 +212,6 @@ export async function seed() {
 
     //push semesters
     await testDB.insert(schema.academicSemester).values(seedData.academicSemesters);
-
-    //push appointment statuses
-    await testDB.insert(schema.appointmentStatus).values(seedData.apppointmentStatuses);
 
     // push faculty
     await testDB.insert(schema.faculty).values(seedData.testFaculty);

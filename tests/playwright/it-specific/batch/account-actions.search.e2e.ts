@@ -75,11 +75,11 @@ test.describe('search functions', () => {
         await page.getByRole('button', { name: 'IT' }).first().click();
         await page.getByRole('button', { name: 'Role' }).first().click();
 
-        // Expect all dummies except for admin are visible
+        // Expect all dummies are not visible
         await expect(adminCell).not.toBeVisible();
-        await expect(cell).toBeVisible();
-        await expect(cell1).toBeVisible();
-        await expect(cell2).toBeVisible();
+        await expect(cell).not.toBeVisible();
+        await expect(cell1).not.toBeVisible();
+        await expect(cell2).not.toBeVisible();
 
         // Unselect role filter
         await page.getByRole('button', { name: 'Role' }).first().click();
@@ -91,6 +91,35 @@ test.describe('search functions', () => {
         await expect(cell).toBeVisible();
         await expect(cell1).toBeVisible();
         await expect(cell2).toBeVisible();
+    });
+
+    test('sort', async ({ page }) => {
+        // No redirection since user is logged-in
+        page.goto('/accounts');
+        await expect(page).toHaveURL('/accounts');
+
+        // Expect all dummies are visible
+        const adminCell = page.getByText(testConsts.AdminAcc);
+        await expect(adminCell).toBeVisible();
+
+        const cell = page.getByText(dummyEmail);
+        await expect(cell).toBeVisible();
+
+        const cell1 = page.getByText(dummyEmail1);
+        await expect(cell1).toBeVisible();
+
+        const cell2 = page.getByText(dummyEmail2);
+        await expect(cell2).toBeVisible();
+
+        // Sort
+        await page.getByRole('button', { name: 'Email' }).first().click();
+        await expect(page).toHaveURL('/accounts?sort-by=asc-email');
+
+        await page.getByRole('button', { name: 'Email' }).first().click();
+        await expect(page).toHaveURL('/accounts?sort-by=desc-email');
+
+        await page.getByRole('button', { name: 'Email' }).first().click();
+        await expect(page).toHaveURL('/accounts');
     });
 
     test('check selection', async ({ page }) => {

@@ -1,33 +1,8 @@
-import { drizzle as neonDrizzle } from 'drizzle-orm/neon-http';
-import { drizzle as pgDrizzle } from 'drizzle-orm/node-postgres';
-import { error } from '@sveltejs/kit';
 import { expect, test } from '@playwright/test';
-import { neon } from '@neondatabase/serverless';
-import { Pool as PgPool } from 'pg';
-import { sql } from 'drizzle-orm';
-
-import * as schema from '$lib/server/db/schema';
 
 import * as fieldHelp from '../test-helpers/field-test';
 import * as testConsts from '../test-consts';
-
-// Database stuff
-function initializeDbClient() {
-    switch (process.env.MODE!) {
-        case 'LOCAL': {
-            return pgDrizzle(new PgPool({ connectionString: process.env.DATABASE_URL! }), {
-                schema,
-            });
-        }
-        case 'NEON': {
-            return neonDrizzle(neon(process.env.DATABASE_URL!), { schema });
-        }
-        default:
-            throw error(500, { message: 'Cannot initialize database client.' });
-    }
-}
-
-const testDb = initializeDbClient();
+import * as seedData from '../seed-data/faculty-admin';
 
 // Actual tests
 
@@ -118,6 +93,75 @@ test.describe('viewing and searching records as it', () => {
         await expect(page.getByText('Camingao, Ericsson Jake')).not.toBeVisible();
         await expect(page.getByText('Dela Cruz, Gabrielle Zach')).not.toBeVisible();
         await expect(page.getByText('Mandario, Maricris')).not.toBeVisible();
+    });
+
+    test('filter', async ({ page }) => {
+        // No redirection since user is logged-in
+        page.goto('/');
+        await expect(page).toHaveURL('/');
+
+        // Expect all dummies are visible
+        const facultyLastNames = seedData.testFaculty.map(({ lastName }) => lastName);
+        await facultyLastNames.forEach(async (lastName) => {
+            const cell = await page.getByText(lastName);
+            await expect(cell).toBeVisible();
+        });
+
+        // Select status filter
+        await page.getByRole('button', { name: 'Status: All', exact: true }).first().click();
+        await page.getByRole('button', { name: 'Active', exact: true }).first().click();
+        await expect(
+            page.getByRole('button', { name: 'Status: Active', exact: true }).first(),
+        ).toBeVisible();
+        await page.getByRole('button', { name: 'Status: Active', exact: true }).first().click();
+
+        // Expect only two dummies are visible
+        await expect(page).toHaveURL('/?status=Active');
+        await facultyLastNames.forEach(async (lastName) => {
+            const cell = await page.getByText(lastName);
+            if (lastName === 'Galinato' || lastName === 'Mandario') {
+                await expect(cell).toBeVisible();
+            } else {
+                await expect(cell).not.toBeVisible();
+            }
+        });
+
+        // Unselect status filter
+        await page.getByRole('button', { name: 'Status: Active', exact: true }).first().click();
+        await page.getByRole('button', { name: 'Active', exact: true }).first().click();
+        await expect(
+            await page.getByRole('button', { name: 'Status: All', exact: true }).first(),
+        ).toBeVisible();
+        await page.getByRole('button', { name: 'Status: All', exact: true }).first().click();
+
+        // Expect all dummies are visible
+        await expect(page).toHaveURL('/');
+    });
+
+    test('sort', async ({ page }) => {
+        // No redirection since user is logged-in
+        page.goto('/');
+        await expect(page).toHaveURL('/');
+
+        // Expect all dummies are visible
+        const facultyLastNames = seedData.testFaculty.map(({ lastName }) => lastName);
+        await facultyLastNames.forEach(async (lastName) => {
+            const cell = page.getByText(lastName);
+            await expect(cell).toBeVisible();
+        });
+
+        // Sort
+        await page.getByRole('button', { name: 'Full Name', exact: true }).first().click();
+        await expect(page).toHaveURL('/?sort-by=asc-full-name');
+
+        await page.getByRole('button', { name: 'Status', exact: true }).first().click();
+        await expect(page).toHaveURL('/?sort-by=asc-status');
+
+        await page.getByRole('button', { name: 'Status', exact: true }).first().click();
+        await expect(page).toHaveURL('/?sort-by=desc-status');
+
+        await page.getByRole('button', { name: 'Full Name', exact: true }).first().click();
+        await expect(page).toHaveURL('/?sort-by=desc-full-name');
     });
 
     test('viewing expected record', async ({ page }) => {
