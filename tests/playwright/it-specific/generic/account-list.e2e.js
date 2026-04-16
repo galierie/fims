@@ -25,5 +25,5 @@ test('view account list', async ({ page }) => {
   });
   */
     for (const field of accountTable)
-        await expect(page.getByText(field, { exact: true })).toBeVisible();
+        await expect(page.getByText(field, { exact: true }).first()).toBeVisible();
 });

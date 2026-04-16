@@ -3,28 +3,6 @@
 
 // delete all entries in the table muna
 
-export const statusRelations = [
-    {
-        status: 'Active',
-    },
-    {
-        status: 'On Leave',
-    },
-    {
-        status: 'Sabbatical',
-    },
-    {
-        status: 'On Secondment',
-    },
-];
-
-export const apppointmentStatuses = [
-    { appointmentStatus: 'Permanent' },
-    { appointmentStatus: 'Temporary' },
-    { appointmentStatus: 'Part-Time' },
-    { appointmentStatus: 'Full-Time' },
-];
-
 // faculty
 export const testFaculty = [
     {
