@@ -17,7 +17,7 @@
 			action="?/changePassword"
 			class='mt-5 flex flex-col gap-5 items-center'
 		>
-			<label for="newpass">New Password: <input name="newpass" type="password"></label>
+			<label for="newpass">New Password: <input name="newpass" type="password" required></label>
 			<div class='flex justify-around gap-20'>
 				<RedButton type='button' onclick={async () => {await goto('/accounts')}}>Cancel</RedButton>
 				<GreenButton type='submit' name="userid" value={userid}>Confirm</GreenButton>
