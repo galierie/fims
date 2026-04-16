@@ -52,17 +52,24 @@
     // svelte-ignore state_referenced_locally
     let remarksValue = $state(semestralRecord?.remarks ?? '');
     let remarksChanged = $derived(remarksValue !== (semestralRecord?.remarks ?? ''));
-    const hasChange = $derived(
-        haveChanges.some((e) => e === true) ||
-            basicHaveChanges.some((e) => e === true) ||
-            remarksChanged,
-    );
-
+    // svelte-ignore state_referenced_locally
+    let lastRemarks = $state(semestralRecord?.remarks ?? '');
+    
     $effect(() => {
+        if ((semestralRecord?.remarks ?? '') !== lastRemarks) {
+            remarksValue = semestralRecord?.remarks ?? '';
+            lastRemarks = semestralRecord?.remarks ?? '';
+        }
         if (!viewState.isEditing) {
             remarksValue = semestralRecord?.remarks ?? '';
         }
     });
+
+    const hasChange = $derived(
+        haveChanges.some((e) => e === true) || 
+        basicHaveChanges.some((e) => e === true) || 
+        remarksChanged
+    );
 
     let isLoading = $state(false);
     let willDiscardChanges = $state(false);
@@ -176,7 +183,7 @@
                 label="Current Rank"
                 name="current-rank"
                 opts={opts?.get('rankTitles') ?? []}
-                selectedOpt={semestralRecord?.currentRankTitle ?? ''}
+                defaultSelectedOpt={semestralRecord?.currentRankTitle ?? ''}
                 colSpan={3}
                 bind:hasChange={basicHaveChanges[0]}
             />
@@ -190,7 +197,7 @@
                 label="Current Highest Educational Attainment"
                 name="current-highest-educational-attainment"
                 opts={opts?.get('degrees') ?? []}
-                selectedOpt={semestralRecord?.currentHighestDegree ?? ''}
+                defaultSelectedOpt={semestralRecord?.currentHighestDegree ?? ''}
                 colSpan={3}
                 bind:hasChange={basicHaveChanges[1]}
             />
