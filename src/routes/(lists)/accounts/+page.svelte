@@ -162,7 +162,7 @@
                         <span>Type</span>
                     </div>
                     <div class="w-85 justify-center 2xl:w-100"><span>Change Logs</span></div>
-                    <div class="w-50 justify-center"><span>Account Action</span></div>
+                    <div class="w-90 justify-center"><span>Account Action</span></div>
                 </div>
 
                 <!-- Rows -->

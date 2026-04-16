@@ -1,6 +1,5 @@
 import { type Actions, error, fail, redirect } from '@sveltejs/kit';
 import { APIError } from 'better-auth';
-import { BETTER_AUTH_SECRET } from '$env/static/private';
 
 import {
     areYouHere,

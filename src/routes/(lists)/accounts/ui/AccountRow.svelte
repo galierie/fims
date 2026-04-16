@@ -7,6 +7,7 @@
     import SaveConfirmation from '$lib/ui/SaveConfirmation.svelte';
     import DeleteConfirmation from '$lib/ui/DeleteConfirmation.svelte';
     import SelectDropdownCell from '$lib/ui/SelectDropdownCell.svelte';
+    import { goto } from '$app/navigation';
 
     interface Props {
         account: AccountDTO;
@@ -150,6 +151,11 @@
                     />
                 {/if}
             </form>
+        </div>
+        <div class="w-40 justify center">
+            <RedButton onclick={async () => {await goto(`/accounts/changePass/${id}`)}}>
+                <span>Edit</span>
+            </RedButton>
         </div>
     </div>
 
