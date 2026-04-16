@@ -1,5 +1,5 @@
 <script>
-    const { onDelete, onCancel, text } = $props();
+    const { onDelete, onCancel, text, confirmText = 'Delete', cancelText = 'Cancel' } = $props();
 </script>
 
 <div
@@ -11,11 +11,11 @@
         <div class="flex justify-around gap-5">
             <button
                 class="cursor-pointer rounded-3xl border-2 border-solid border-fims-green px-7.5 py-2.5 text-base text-fims-green transition-opacity duration-200 hover:opacity-70"
-                onclick={onCancel}>Cancel</button
+                onclick={onCancel}>{cancelText}</button
             >
             <button
                 class="cursor-pointer rounded-3xl border-2 border-solid border-fims-red px-7.5 py-2.5 text-base text-fims-red transition-opacity duration-200 hover:opacity-70"
-                onclick={onDelete}>Delete</button
+                onclick={onDelete}>{confirmText}</button
             >
         </div>
     </div>

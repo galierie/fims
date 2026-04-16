@@ -1,15 +1,47 @@
 import { sql } from 'drizzle-orm';
 
-import { appointmentStatus, course, fieldOfInterest, rank, role, status } from './schema';
+import {
+    adminPosition,
+    appointmentStatus,
+    course,
+    degreeProgram,
+    fieldOfInterest,
+    office,
+    profileInfo,
+    rank,
+    research,
+    role,
+    status,
+} from './schema';
 import { db } from './index';
+import { auth } from '$lib/server/auth';
+import { refreshAccountSearchView } from '$lib/server/queries/account-list';
 
-// TODO: Check if tama
+import { ADMIN_EMAIL, ADMIN_PASS, IT_EMAIL, IT_PASS } from '$env/static/private';
 
-export const statuses = [
-    { status: 'Active' },
-    { status: 'On Leave' },
-    { status: 'Sabbatical' },
-    { status: 'On Secondment' },
+export const appointmentStatuses = [
+    { appointmentStatus: 'Permanent' },
+    { appointmentStatus: 'Full-Time' },
+    { appointmentStatus: 'Temporary' },
+    { appointmentStatus: 'Part-Time' },
+];
+
+export const degreePrograms = [
+    {
+        id: 1,
+        name: 'Undergraduate',
+        isGraduateLevel: false,
+    },
+    {
+        id: 2,
+        name: 'MA/PhD',
+        isGraduateLevel: true,
+    },
+    {
+        id: 3,
+        name: 'MDE',
+        isGraduateLevel: true,
+    },
 ];
 
 export const ranks = [
@@ -180,13 +212,6 @@ export const ranks = [
     },
 ];
 
-export const courses = [
-    {
-        name: 'Econ 11',
-        units: 3,
-    },
-];
-
 export const roles = [
     {
         role: 'Admin',
@@ -206,7 +231,82 @@ export const roles = [
     },
 ];
 
-// dummy, needs to be changed
+export const statuses = [
+    { status: 'Active' },
+    { status: 'On Leave' },
+    { status: 'Sabbatical' },
+    { status: 'On Secondment' },
+];
+
+export const adminPositions = [
+    { title: 'Department Chair' },
+    { title: 'Assistant Chair for Student Affairs' },
+    { title: 'Assistant Chair for Linkages and Partnerships' },
+];
+
+export const courses = [
+    {
+        name: 'Econ 11',
+        units: 3,
+        degreeProgramId: 1,
+    },
+    {
+        name: 'CS 11',
+        units: 3,
+        degreeProgramId: 1,
+    },
+    {
+        name: 'CS 12',
+        units: 3,
+        degreeProgramId: 1,
+    },
+    {
+        name: 'CS 32',
+        units: 3,
+        degreeProgramId: 1,
+    },
+    {
+        name: 'CS 33',
+        units: 3,
+        degreeProgramId: 1,
+    },
+    {
+        name: 'CS 191',
+        units: 3,
+        degreeProgramId: 1,
+    },
+    {
+        name: 'CS 192',
+        units: 3,
+        degreeProgramId: 1,
+    },
+    {
+        name: 'CS 195',
+        units: 3,
+        degreeProgramId: 1,
+    },
+    {
+        name: 'CS 200',
+        units: 3,
+        degreeProgramId: 2,
+    },
+    {
+        name: 'CS 211',
+        units: 3,
+        degreeProgramId: 2,
+    },
+    {
+        name: 'DE 100',
+        units: 3,
+        degreeProgramId: 3,
+    },
+    {
+        name: 'DE 236',
+        units: 3,
+        degreeProgramId: 3,
+    },
+];
+
 export const fieldsOfInterest = [
     { field: 'Software Engineering' },
     { field: 'Data Science' },
@@ -215,24 +315,44 @@ export const fieldsOfInterest = [
     { field: 'Information Systems' },
 ];
 
-// Final appointment status
-export const appointmentStatuses = [
-    { appointmentStatus: 'Permanent' },
-    { appointmentStatus: 'Full-Time' },
-    { appointmentStatus: 'Temporary' },
-    { appointmentStatus: 'Part-Time' },
+export const offices = [
+    { name: 'Department of Computer Science' },
+    { name: 'College of Engineering' },
+    { name: 'Office of the Vice Chancellor for Student Affairs' },
 ];
 
-async function seedStatusTable() {
-    // Don't proceed if table is already seeded
-    // note: check is too weak
-    const rows = await db.select().from(status).limit(4);
-    if (rows.length == 4) return { success: true };
+export const researches = [
+    {
+        title: 'Project BUHAY',
+        startDate: new Date('2020-12-25'),
+        endDate: new Date('2021-03-12'),
+        funding: null,
+    },
+    {
+        title: 'Project NOAH',
+        startDate: new Date('2023-08-23'),
+        endDate: new Date('2025-04-09'),
+        funding: null,
+    },
+];
 
-    const response = await db.insert(status).values(statuses).returning();
+async function seedAppointmentStatusTable() {
+    const rows = await db.select().from(appointmentStatus).limit(1);
+    if (rows.length > 0) return { success: true };
+
+    const response = await db.insert(appointmentStatus).values(appointmentStatuses).returning();
+    return { success: response.length === appointmentStatuses.length };
+}
+
+async function seedDegreeProgramTable() {
+    // Don't proceed if table is already seeded
+    const rows = await db.select().from(degreeProgram).limit(1);
+    if (rows.length > 0) return { success: true };
+
+    const response = await db.insert(degreeProgram).values(degreePrograms).returning();
 
     // Check response
-    return { success: response.length === 4 };
+    return { success: response.length === degreePrograms.length };
 }
 
 async function seedRankTable() {
@@ -243,18 +363,7 @@ async function seedRankTable() {
     const response = await db.insert(rank).values(ranks).returning();
 
     // Check response
-    return { success: response.length === 3 };
-}
-
-async function seedCourseTable() {
-    // Don't proceed if table is already seeded
-    const rows = await db.select().from(course).limit(1);
-    if (rows.length > 0) return { success: true };
-
-    const response = await db.insert(course).values(courses).returning();
-
-    // Check response
-    return { success: response.length === 3 };
+    return { success: response.length === ranks.length };
 }
 
 async function seedRoleTable() {
@@ -265,7 +374,40 @@ async function seedRoleTable() {
     const response = await db.insert(role).values(roles).returning();
 
     // Check response
-    return { success: response.length === 3 };
+    return { success: response.length === roles.length };
+}
+
+async function seedStatusTable() {
+    // Don't proceed if table is already seeded
+    const rows = await db.select().from(status).limit(1);
+    if (rows.length > 0) return { success: true };
+
+    const response = await db.insert(status).values(statuses).returning();
+
+    // Check response
+    return { success: response.length === statuses.length };
+}
+
+async function seedAdminPositionTable() {
+    // Don't proceed if table is already seeded
+    const rows = await db.select().from(adminPosition).limit(1);
+    if (rows.length > 0) return { success: true };
+
+    const response = await db.insert(adminPosition).values(adminPositions).returning();
+
+    // Check response
+    return { success: response.length === adminPositions.length };
+}
+
+async function seedCourseTable() {
+    // Don't proceed if table is already seeded
+    const rows = await db.select().from(course).limit(1);
+    if (rows.length > 0) return { success: true };
+
+    const response = await db.insert(course).values(courses).returning();
+
+    // Check response
+    return { success: response.length === courses.length };
 }
 
 async function seedFieldOfInterestTable() {
@@ -273,26 +415,95 @@ async function seedFieldOfInterestTable() {
     if (rows.length > 0) return { success: true };
 
     const response = await db.insert(fieldOfInterest).values(fieldsOfInterest).returning();
-    return { success: response.length > 0 };
+    return { success: response.length === fieldsOfInterest.length };
 }
 
-async function seedAppointmentStatusTable() {
-    const rows = await db.select().from(appointmentStatus).limit(1);
+async function seedOfficeTable() {
+    // Don't proceed if table is already seeded
+    const rows = await db.select().from(office).limit(1);
     if (rows.length > 0) return { success: true };
 
-    const response = await db.insert(appointmentStatus).values(appointmentStatuses).returning();
-    return { success: response.length > 0 };
+    const response = await db.insert(office).values(offices).returning();
+
+    // Check response
+    return { success: response.length === offices.length };
+}
+
+async function seedResearchTable() {
+    // Don't proceed if table is already seeded
+    const rows = await db.select().from(research).limit(1);
+    if (rows.length > 0) return { success: true };
+
+    const response = await db.insert(research).values(researches).returning();
+
+    // Check response
+    return { success: response.length === researches.length };
+}
+
+async function seedDummyProfiles() {
+    // Don't proceed if table is already seeded
+    const rows = await db.select().from(profileInfo).limit(1);
+    if (rows.length > 0) return { success: true };
+
+    const { user: adminUser } = await auth.api.createUser({
+        body: {
+            email: ADMIN_EMAIL,
+            password: ADMIN_PASS,
+            name: 'Admin',
+            role: 'user',
+        },
+    });
+    const { user: itUser } = await auth.api.createUser({
+        body: {
+            email: IT_EMAIL,
+            password: IT_PASS,
+            name: 'IT',
+            role: 'admin',
+        },
+    });
+
+    await Promise.all([
+        await db
+            .insert(profileInfo)
+            .values({
+                profileId: adminUser.id,
+                role: 'Admin',
+            })
+            .returning(),
+        await db
+            .insert(profileInfo)
+            .values({
+                profileId: itUser.id,
+                role: 'IT',
+            })
+            .returning(),
+    ]);
+
+    await refreshAccountSearchView();
 }
 
 export async function seedDatabase() {
     // Enable pg_trgm extension
     await db.execute(sql`CREATE EXTENSION IF NOT EXISTS pg_trgm;`);
 
-    // Insert into
-    await seedStatusTable(); // status
-    await seedRankTable(); // rank
-    await seedCourseTable(); // course
-    await seedRoleTable(); // role
-    await seedFieldOfInterestTable(); // field of interest
-    await seedAppointmentStatusTable(); // appointment status
+    // Insert into the most likely constant tables
+    await Promise.all([
+        await seedAppointmentStatusTable(), // appointment status
+        await seedDegreeProgramTable(), // degree program
+        await seedRankTable(), // rank
+        await seedRoleTable(), // role
+        await seedStatusTable(), // status
+    ]);
+
+    // Insert the dummy data tables
+    await Promise.all([
+        await seedAdminPositionTable(), // administrative position
+        await seedCourseTable(), // course
+        await seedFieldOfInterestTable(), // field of interest
+        await seedOfficeTable(), // office
+        await seedResearchTable(), // research
+        await seedDummyProfiles(), // accounts
+    ]);
 }
+
+await seedDatabase();

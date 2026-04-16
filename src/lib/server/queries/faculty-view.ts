@@ -142,7 +142,7 @@ export async function getFacultyAcademicSemester(
         .where(
             and(
                 eq(facultyAcademicSemester.facultyId, facultyid),
-                eq(facultyAcademicSemester.academicSemesterId, currentSemester.id), 
+                eq(facultyAcademicSemester.academicSemesterId, currentSemester.id),
             ),
         )
         .as('current_faculty_semester_sq');

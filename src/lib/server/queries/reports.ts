@@ -639,7 +639,7 @@ export async function getSubjectsByFacultyReport(
 
     const [[name], courses] = await Promise.all([nameQuery, coursesQuery]);
 
-    return typeof name === 'undefined' ? null : { name, courses };
+    return typeof name === 'undefined' || courses.length === 0 ? null : { name, courses };
 }
 
 export async function getFacultyBySubjectReport() {
@@ -711,7 +711,7 @@ export async function getFacultySETReport(facultyid: number, acadYear: number) {
         midyearCoursesQuery,
     ]);
 
-    return typeof facultyInfo === 'undefined'
+    return typeof facultyInfo === 'undefined' || (firstSemCourses.length === 0 && secondSemCourses.length === 0 && midyearCourses.length === 0)
         ? null
         : {
               facultyInfo,

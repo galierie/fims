@@ -48,7 +48,21 @@
 
     // Check for changes
     const haveChanges: boolean[] = $state(Array(5).fill(false));
-    const hasChange = $derived(haveChanges.some((e) => e === true));
+    const basicHaveChanges: boolean[] = $state(Array(2).fill(false));
+    // svelte-ignore state_referenced_locally
+    let remarksValue = $state(semestralRecord?.remarks ?? '');
+    let remarksChanged = $derived(remarksValue !== (semestralRecord?.remarks ?? ''));
+    const hasChange = $derived(
+        haveChanges.some((e) => e === true) ||
+            basicHaveChanges.some((e) => e === true) ||
+            remarksChanged,
+    );
+
+    $effect(() => {
+        if (!viewState.isEditing) {
+            remarksValue = semestralRecord?.remarks ?? '';
+        }
+    });
 
     let isLoading = $state(false);
     let willDiscardChanges = $state(false);
@@ -71,7 +85,7 @@
     );
 
     const loadStatus = $derived(
-        totalCredit < 12 ? 'Underload' : totalCredit <= 18 ? 'Normal' : 'Overload'
+        totalCredit < 12 ? 'Underload' : totalCredit <= 18 ? 'Normal' : 'Overload',
     );
 
     // Handle tab exit with unsaved changes
@@ -94,14 +108,12 @@
     id={semestralRecordFormId}
     bind:this={semestralRecordForm}
     onreset={async (e) => {
+        e.preventDefault();
+
         if (semestralRecord === null) {
-            e.preventDefault();
             isLoading = true;
 
-            semestralRecordForm?.reset();
-
             const { goto } = await import('$app/navigation');
-
             // If "discard changes" is clicked for a new sem record, go to prev URL
             if (previousUrl) await goto(previousUrl);
             else await goto(`/faculty/${facultyid}/profile`);
@@ -117,7 +129,7 @@
         resetViewState();
         isLoading = true;
         return async ({ update }) => {
-            await update({ reset: false }); 
+            await update({ reset: false });
             isLoading = false;
         };
     }}
@@ -166,6 +178,7 @@
                 opts={opts?.get('rankTitles') ?? []}
                 selectedOpt={semestralRecord?.currentRankTitle ?? ''}
                 colSpan={3}
+                bind:hasChange={basicHaveChanges[0]}
             />
         </div>
         <div class="mt-4 grid w-full grid-cols-8">
@@ -179,6 +192,7 @@
                 opts={opts?.get('degrees') ?? []}
                 selectedOpt={semestralRecord?.currentHighestDegree ?? ''}
                 colSpan={3}
+                bind:hasChange={basicHaveChanges[1]}
             />
         </div>
         <div class="mt-8.5">
@@ -190,7 +204,7 @@
                 id="remarks"
                 class="mt-4 h-fit min-h-90 w-full rounded-2xl border-0 bg-white p-1.5 placeholder-fims-gray focus:ring-0"
                 disabled={!viewState.isEditing}
-                value={semestralRecord?.remarks ?? ''}
+                bind:value={remarksValue}
             ></textarea>
         </div>
     </div>
@@ -245,5 +259,7 @@
             willDiscardChanges = false;
         }}
         text="You have unsaved changes. Do you want to discard them?"
+        confirmText="Discard"
+        cancelText="Keep"
     />
 {/if}

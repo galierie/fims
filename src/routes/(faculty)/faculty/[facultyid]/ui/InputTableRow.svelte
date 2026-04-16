@@ -206,7 +206,9 @@
             <input
                 {type}
                 {name}
-                step={type === 'number' && columns[columnNum].name === 'course-section-set' ? 'any' : null}
+                step={type === 'number' && columns[columnNum].name === 'course-section-set'
+                    ? 'any'
+                    : null}
                 class="{colSpanClass} h-8 w-full border-0 focus:ring-0 {isDeleted
                     ? 'text-fims-gray'
                     : ''} py-0"
@@ -220,7 +222,8 @@
                     ((tupleid === undefined && hasValue) || (tupleid !== undefined && hasChange))}
                 onchange={() => {
                     if (type === 'number') {
-                        haveChanges[columnNum] = Number(values[columnNum]) !== Number(formattedDefault);
+                        haveChanges[columnNum] =
+                            Number(values[columnNum]) !== Number(formattedDefault);
                     } else {
                         haveChanges[columnNum] = values[columnNum] !== formattedDefault;
                     }
@@ -229,13 +232,9 @@
         {/if}
     {/each}
 
-    {#if viewState.isEditing}
+    {#if viewState.isEditing && !isDeleted}
         <button type="button" class="absolute top-1.5 -right-5.5 ml-1" onclick={toggleRowDeletion}>
-            {#if isDeleted}
-                <Icon icon="tabler:arrow-back-up-double" class="h-5 w-5 text-fims-green" />
-            {:else}
-                <Icon icon="tabler:trash" class="h-5 w-5 text-fims-red" />
-            {/if}
+            <Icon icon="tabler:trash" class="h-5 w-5 text-fims-red" />
         </button>
     {/if}
 </div>

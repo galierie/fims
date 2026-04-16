@@ -24,6 +24,11 @@ export const AdminPass = 'password';
 export const ITConfig = 'playwright/.auth/it.json';
 export const AdminConfig = 'playwright/.auth/admin.json';
 
+export const DummyEmail = 'dummy@up.edu.ph';
+export const DummyPass = 'pwpwpwpw';
+export const DummyEmail0 = 'some@up.edu.ph';
+export const DummyEmail1 = 'tum@up.edu.ph';
+
 // as of making this, the save confirmation hasn't yet been made
 // so i made this preemtively
 export const SaveConfirmText = 'Save';

@@ -1,7 +1,6 @@
 import { redirect } from '@sveltejs/kit';
 
 import { getUserRoleAndPermissions } from '$lib/server/queries/db-helpers';
-import { seedDatabase } from '$lib/server/db/seed-db.js';
 
 export async function load({ locals, url }) {
     if (typeof locals.user !== 'undefined') {
@@ -17,8 +16,6 @@ export async function load({ locals, url }) {
         const accountColorMap = new Map();
         accountColorMap.set('IT', 'fims-red');
         accountColorMap.set('Admin', 'fims-green');
-
-        await seedDatabase();
 
         return {
             isLoggedIn: true, // if it's not, then this line shouldn't have been reached
