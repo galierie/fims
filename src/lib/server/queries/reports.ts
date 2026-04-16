@@ -711,7 +711,10 @@ export async function getFacultySETReport(facultyid: number, acadYear: number) {
         midyearCoursesQuery,
     ]);
 
-    return typeof facultyInfo === 'undefined' || (firstSemCourses.length === 0 && secondSemCourses.length === 0 && midyearCourses.length === 0)
+    return typeof facultyInfo === 'undefined' ||
+        (firstSemCourses.length === 0 &&
+            secondSemCourses.length === 0 &&
+            midyearCourses.length === 0)
         ? null
         : {
               facultyInfo,

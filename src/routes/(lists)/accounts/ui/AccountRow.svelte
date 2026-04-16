@@ -152,8 +152,12 @@
                 {/if}
             </form>
         </div>
-        <div class="w-40 justify center">
-            <RedButton onclick={async () => {await goto(`/accounts/changePass/${id}`)}}>
+        <div class="justify center w-40">
+            <RedButton
+                onclick={async () => {
+                    await goto(`/accounts/changePass/${id}`);
+                }}
+            >
                 <span>Edit</span>
             </RedButton>
         </div>
