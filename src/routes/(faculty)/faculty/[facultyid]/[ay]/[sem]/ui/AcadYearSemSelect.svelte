@@ -89,6 +89,7 @@
                         <div class="flex items-center">
                             <input
                                 type="number"
+                                data-testid="new-acad-year-input"
                                 bind:value={newAcadYear}
                                 class="mr-1 w-20 rounded-lg border-2 border-fims-green bg-white focus:ring-0"
                             />
@@ -96,6 +97,7 @@
                         </div>
                         <button
                             type="button"
+                            data-testid="acad-year-create"
                             class="group ml-2 text-fims-green"
                             onclick={() => {
                                 isAcadYearDropdownOpen = false;

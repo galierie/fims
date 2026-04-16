@@ -150,7 +150,7 @@
     </div>
 
     <!-- Faculty Record List Table -->
-    <div class="custom-scrollbar mt-2.5 w-full overflow-x-auto">
+    <div class="custom-scrollbar mt-2.5 w-full overflow-x-auto" data-testid="faculty-record-list">
         <div class="w-full min-w-5xl pb-4">
             <!-- Header -->
             <div

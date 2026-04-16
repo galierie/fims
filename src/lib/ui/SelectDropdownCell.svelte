@@ -36,6 +36,7 @@
             <div class="relative flex h-full w-full items-center">
                 <input
                     type="text"
+                    data-testid={`${name}-combobox`}
                     class="h-full w-full border-0 bg-transparent px-0 pl-1 focus:ring-0"
                     bind:value={selectedOpt}
                     placeholder={defaultSelectedOpt !== '-' ? defaultSelectedOpt : ''}
@@ -43,6 +44,7 @@
                 />
                 <button
                     type="button"
+                    data-testid={name}
                     class="absolute right-1 h-full w-4"
                     onclick={() => (isDropdownOpen = !isDropdownOpen)}
                     tabindex="-1"
@@ -56,6 +58,7 @@
         {:else}
             <button
                 type="button"
+                data-testid={name}
                 class="relative h-full w-full"
                 onclick={() => {
                     if (isEditable) isDropdownOpen = !isDropdownOpen;

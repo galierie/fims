@@ -147,7 +147,7 @@
 
     <div class="overflow-x-auto pb-50 whitespace-nowrap">
         <!-- Account List Table -->
-        <div class="custom-scrollbar mt-2.5 w-full">
+        <div class="custom-scrollbar mt-2.5 w-full" data-testid="account-list">
             <div class="w-full min-w-5xl pb-4">
                 <!-- Header -->
                 <div
