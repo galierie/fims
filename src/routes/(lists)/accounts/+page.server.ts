@@ -252,16 +252,23 @@ export const actions = {
     },
 
     async resetAccount({ locals, request }) {
+        // Check existing session
+        if (typeof locals.user === 'undefined') throw redirect(307, '/login');
+
+        // Log action
+        await logChange(locals.user.id, null, 'Action: Reset Password.');
+
+        // Check Permissions
+        const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
+        if (typeof roleObj === 'undefined') throw redirect(307, '/login');
+
+        const { canModifyAccount } = roleObj;
+        if (!canModifyAccount) return fail(403, { error: 'Insufficient permissions.' });
+
         const formData = await request.formData();
         const userid = formData.get('userid') as string;
 
         if (!userid) return fail(400, { error: 'No such account' });
-
-        //permissions check
-        const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
-        if (typeof roleObj === 'undefined') return fail(403, 'Insufficient Permissions');
-
-        if (!roleObj.canModifyAccount) return fail(403, 'Insufficient Permissions');
 
         try {
             const response = await auth.api.setUserPassword({
