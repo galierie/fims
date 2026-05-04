@@ -9,7 +9,7 @@ export const actions: Actions = {
         if (typeof locals.user === 'undefined') throw redirect(307, '/login');
 
         // Log action
-        await logChange(locals.user.id, null, 'Action: Reset Password.');
+        await logChange(locals.user.id, null, 'Action: Change Password.');
 
         // Check Permissions
         const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
