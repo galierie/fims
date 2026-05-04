@@ -1,10 +1,23 @@
-import { getUserRoleAndPermissions } from '$lib/server/queries/db-helpers';
-import { type Actions, error, fail, redirect } from '@sveltejs/kit';
+import { getUserRoleAndPermissions, logChange } from '$lib/server/queries/db-helpers';
+import { type Actions, fail, redirect } from '@sveltejs/kit';
 import { auth } from '$lib/server/auth.js';
 import { APIError } from 'better-auth';
 
 export const actions: Actions = {
     async changePassword({ locals, request }) {
+        // Check existing session
+        if (typeof locals.user === 'undefined') throw redirect(307, '/login');
+
+        // Log action
+        await logChange(locals.user.id, null, 'Action: Reset Password.');
+
+        // Check Permissions
+        const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
+        if (typeof roleObj === 'undefined') throw redirect(307, '/login');
+
+        const { canModifyAccount } = roleObj;
+        if (!canModifyAccount) return fail(403, { error: 'Insufficient permissions.' });
+
         const formData = await request.formData();
 
         const userid = formData.get('userid') as string;
@@ -16,12 +29,6 @@ export const actions: Actions = {
         if (!newPass) return fail(403, 'Must input a password');
 
         if (newPass.length === 0) return fail(403, 'Nust input a password');
-
-        //permissions check
-        const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
-        if (typeof roleObj === 'undefined') return fail(403, 'Insufficient Permissions');
-
-        if (!roleObj.canModifyAccount) return fail(403, 'Insufficient Permissions');
 
         try {
             const response = await auth.api.setUserPassword({
