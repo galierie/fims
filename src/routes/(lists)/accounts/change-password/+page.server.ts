@@ -24,7 +24,7 @@ export const actions: Actions = {
         const formData = await request.formData();
         const requiredFormInputs = [
             formData.get('userId') as string | null,
-            formData.get('oldPassword') as string | null,
+            formData.get('currentPassword') as string | null,
             formData.get('newPassword') as string | null,
         ];
 
@@ -32,7 +32,7 @@ export const actions: Actions = {
 
         try {
             assertAllRequiredFormInputs(requiredFormInputs);
-            const [userId, oldPassword, newPassword] = requiredFormInputs;
+            const [userId, currentPassword, newPassword] = requiredFormInputs;
 
             // No empty strings as new password
             if (newPassword.length === 0)
@@ -42,30 +42,15 @@ export const actions: Actions = {
             if (userId !== locals.user.id)
                 return fail(403, { error: 'Insufficient permissions.' });
 
-            // Verify old password before changing
-            const verifyResponse = await auth.api.verifyPassword({
-                body: {
-                    password: oldPassword,
-                },
-                headers: request.headers,
-            });
-
-            if (!verifyResponse) {
-                return fail(400, { error: 'Failed to verify old account password.' });
-            }
-
             // Change password
-            const response = await auth.api.setUserPassword({
+            await auth.api.changePassword({
                 body: {
-                    userId,
                     newPassword,
+                    currentPassword,
+                    revokeOtherSessions: true,
                 },
                 headers: request.headers,
             });
-
-            if (!response.status) {
-                return fail(400, 'Failed to change account password');
-            }
 
             success = true;
         } catch (error) {
