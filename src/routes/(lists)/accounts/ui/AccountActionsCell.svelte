@@ -105,7 +105,7 @@
             }}
         >
             <Icon icon="tabler:edit" class="mr-2 h-6 w-6" />
-            <span>Edit Password</span>
+            <span>Change Password</span>
         </button>
     </div>
 </div>
