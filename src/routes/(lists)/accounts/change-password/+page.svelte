@@ -51,13 +51,13 @@
                 <label for="newPassword" class="text-right w-45"
                     >New Password: </label
                 >
-                <input name="newPassword" type="password" class="ml-1 h-8 w-50 rounded-sm border-0 bg-white p-1 placeholder-fims-gray focus:ring-0 2xl:w-75" placeholder="-" required bind:value={newPassword} />
+                <input name="newPassword" type="password" class="ml-1 h-8 w-50 rounded-sm border-0 bg-white p-1 placeholder-fims-gray focus:ring-0 2xl:w-75" placeholder="Min. 8 characters" required bind:value={newPassword} />
             </div>
             <div class="flex justify-center items-center">
                 <label for="newPasswordReentry" class="text-right w-45"
                     >Retype New Password: </label
                 >
-                <input name="newPasswordReentry" type="password" class="ml-1 h-8 w-50 rounded-sm border-0 bg-white p-1 placeholder-fims-gray focus:ring-0 2xl:w-75" placeholder="-" required bind:value={newPasswordReentry} />
+                <input name="newPasswordReentry" type="password" class="ml-1 h-8 w-50 rounded-sm border-0 bg-white p-1 placeholder-fims-gray focus:ring-0 2xl:w-75" placeholder="Min. 8 characters" required bind:value={newPasswordReentry} />
             </div>
             <div class="flex justify-around gap-5">
                 <RedButton
@@ -69,7 +69,7 @@
                         Cancel
                     </RedButton
                 >
-                {#if currentPassword !== '' && newPassword !== '' && newPassword === newPasswordReentry}
+                {#if currentPassword.length >= 8 && newPassword.length >= 8 && newPassword === newPasswordReentry}
                     <GreenButton type="submit" name="userId" value={userId}>
                         <Icon icon="tabler:check" class="mr-2 h-6 w-6" />
                         Confirm Password Change
