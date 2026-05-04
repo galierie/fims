@@ -203,15 +203,7 @@
                                 class="h-full w-full border-0 p-2 focus:ring-0"
                             />
                         </div>
-                        <div class="w-50">
-                            <input
-                                type="password"
-                                name="password"
-                                placeholder="Set initial password"
-                                class="h-full w-full border-0 p-2 focus:ring-0"
-                            />
-                        </div>
-                        <div class="w-40">
+                        <div class="w-40 px-0!">
                             <SelectDropdownCell
                                 name="role"
                                 opts={userRoles}
@@ -219,12 +211,22 @@
                                 isEditable={true}
                             />
                         </div>
-                        <div class="w-85 2xl:w-100"></div>
-                        <div class="w-50 justify-center">
-                            <GreenButton type="submit">
+                        <div class="w-85 2xl:w-100">
+                            <input
+                                type="password"
+                                name="password"
+                                placeholder="Set initial password"
+                                class="h-full w-full border-0 p-2 focus:ring-0"
+                            />
+                        </div>
+                        <div class="w-100 justify-center py-1 px-1!">
+                            <button
+                                type="submit"
+                                class="flex w-full h-full rounded-sm px-2 hover:bg-fims-green text-fims-green hover:text-white items-center"
+                            >
                                 <Icon icon="tabler:device-floppy" class="mr-2 h-6 w-6" />
                                 <span>Save</span>
-                            </GreenButton>
+                            </button>
                         </div>
                     </form>
                 {/if}
