@@ -42,6 +42,9 @@ importers:
       '@html-eslint/eslint-plugin':
         specifier: ^0.54.2
         version: 0.54.2(eslint@9.39.4(jiti@2.6.1))(jiti@2.6.1)
+      '@html-eslint/eslint-plugin-svelte':
+        specifier: ^0.60.0
+        version: 0.60.0(eslint@9.39.4(jiti@2.6.1))(svelte-eslint-parser@1.6.0(svelte@5.49.1(@typescript-eslint/types@8.59.2)))
       '@neondatabase/serverless':
         specifier: ^1.1.0
         version: 1.1.0
@@ -799,6 +802,17 @@ packages:
   '@fast-csv/parse@4.3.6':
     resolution: {integrity: sha512-uRsLYksqpbDmWaSmzvJcuApSEe38+6NQZBUsuAyMZKqHxH0g1wcJgsKUvN3WC8tewaqFjBMMGrkHmC+T7k8LvA==}
 
+  '@html-eslint/core@0.60.0':
+    resolution: {integrity: sha512-P2+ymEBt7EZ8sh1xc4XNA1/zSyDhSA1ppWyBBwPvGfY8VnDfmtd5UKr6AD24htABwzNJ6WcBIV3lAx5crtozfg==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@html-eslint/eslint-plugin-svelte@0.60.0':
+    resolution: {integrity: sha512-oyhGdqrTKx5p6vJwua2PHUSUaQi4kvSyQx1cqRUGdblcNDMq8jse+vaHfRwwbA0cVocUzuNKWX2niECPN6lseA==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    peerDependencies:
+      eslint: '>=8.0.0 || ^10.0.0-0'
+      svelte-eslint-parser: ^1.0.0
+
   '@html-eslint/eslint-plugin@0.54.2':
     resolution: {integrity: sha512-C6jhJqVGTS9AW3Z84Ni/Cs6h3XcRHUXi1YkRaAYI08MeNj6ZWIXhwKBEJgEGK2YxzOcM1TpZEvHL4d5z7aC7Eg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
@@ -816,6 +830,9 @@ packages:
 
   '@html-eslint/types@0.54.0':
     resolution: {integrity: sha512-bfJolxay0POMYaFWTCH1MBitEaxIEKZOoROGOLZiRBaPvQrzhwYQktuyt5X1PcHqUB4HwEtYgSdpjYGT4JbrvA==}
+
+  '@html-eslint/types@0.60.0':
+    resolution: {integrity: sha512-3PJaoNKK/xSTnRLPMz/6ZEr0Snr4GRjYIQJrw+nDMek1K0HstQ7KIqI7XswzT/S1kXT7B16gwXanCTjIPybjmw==}
 
   '@humanfs/core@0.19.2':
     resolution: {integrity: sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA==}
@@ -1458,6 +1475,9 @@ packages:
 
   '@vitest/utils@4.1.5':
     resolution: {integrity: sha512-76wdkrmfXfqGjueGgnb45ITPyUi1ycZ4IHgC2bhPDUfWHklY/q3MdLOAB+TF1e6xfl8NxNY0ZYaPCFNWSsw3Ug==}
+
+  '@vscode/l10n@0.0.18':
+    resolution: {integrity: sha512-KYSIHVmslkaCDyw013pphY+d7x1qV8IZupYfeIfzNA+nsaWHbn5uPuQRvdRFsa9zFzGeudPuoGoZ1Op4jrJXIQ==}
 
   abort-controller@3.0.0:
     resolution: {integrity: sha512-h8lQ8tacZYnR3vNQTgibj+tODHI5/+l06Au2Pcriv/Gmet0eaj4TwWH41sO9wnHDiQsEj19q0drzdWdeAHtweg==}
@@ -2158,6 +2178,9 @@ packages:
   html-encoding-sniffer@6.0.0:
     resolution: {integrity: sha512-CV9TW3Y3f8/wT0BRFc1/KAVQ3TUHiXmaAb6VW9vtiMFf7SLoMd1PdAc4W3KFOFETBJUb90KatHqlsZMWV+R9Gg==}
     engines: {node: ^20.19.0 || ^22.12.0 || >=24.0.0}
+
+  html-standard@0.0.13:
+    resolution: {integrity: sha512-6oNfW3c1t44O7jVXu0tp4E5MbHifWlXrHlZBPt6y7vFdgLOUUh8hyzoRhfUgozlBUK6oLLYhqP1uIqbZ8ggcBA==}
 
   http-proxy-agent@7.0.2:
     resolution: {integrity: sha512-T1gkAiYYDWYx3V5Bmyu7HcfcvL7mUrTWiM6yOfa3PIphViJ/gFPbvidQ+veqSOHci/PxBcDabeUNCzpOODJZig==}
@@ -3176,6 +3199,18 @@ packages:
       jsdom:
         optional: true
 
+  vscode-css-languageservice@6.3.10:
+    resolution: {integrity: sha512-eq5N9Er3fC4vA9zd9EFhyBG90wtCCuXgRSpAndaOgXMh1Wgep5lBgRIeDgjZBW9pa+332yC9+49cZMW8jcL3MA==}
+
+  vscode-languageserver-textdocument@1.0.12:
+    resolution: {integrity: sha512-cxWNPesCnQCcMPeenjKKsOCKQZ/L6Tv19DTRIGuLWe32lyzWhihGVJ/rcckZXJxfdKCFvRLS3fpBIsV/ZGX4zA==}
+
+  vscode-languageserver-types@3.17.5:
+    resolution: {integrity: sha512-Ld1VelNuX9pdF39h2Hgaeb5hEZM2Z3jUrrMgWQAu82jMtZp7p3vJT3BzToKtZI7NgQssZje5o0zryOrhQvzQAg==}
+
+  vscode-uri@3.1.0:
+    resolution: {integrity: sha512-/BpdSx+yCQGnCvecbyXdxHDkuk55/G3xwnC0GqY4gmQ3j+A+g8kzzgB4Nk/SINjqn6+waqw3EgbVF2QKExkRxQ==}
+
   w3c-xmlserializer@5.0.0:
     resolution: {integrity: sha512-o8qghlI8NZHU1lLPrpi2+Uq7abh4GGPpYANlalzWxyWteJOCsr/P+oPBA49TOLu5FTZO4d3F9MnWJfiMo4BkmA==}
     engines: {node: '>=18'}
@@ -3712,6 +3747,17 @@ snapshots:
       lodash.isundefined: 3.0.1
       lodash.uniq: 4.5.0
 
+  '@html-eslint/core@0.60.0':
+    dependencies:
+      '@html-eslint/types': 0.60.0
+      html-standard: 0.0.13
+
+  '@html-eslint/eslint-plugin-svelte@0.60.0(eslint@9.39.4(jiti@2.6.1))(svelte-eslint-parser@1.6.0(svelte@5.49.1(@typescript-eslint/types@8.59.2)))':
+    dependencies:
+      '@html-eslint/core': 0.60.0
+      eslint: 9.39.4(jiti@2.6.1)
+      svelte-eslint-parser: 1.6.0(svelte@5.49.1(@typescript-eslint/types@8.59.2))
+
   '@html-eslint/eslint-plugin@0.54.2(eslint@9.39.4(jiti@2.6.1))(jiti@2.6.1)':
     dependencies:
       '@eslint/plugin-kit': 0.4.1
@@ -3759,6 +3805,12 @@ snapshots:
     transitivePeerDependencies:
       - jiti
       - supports-color
+
+  '@html-eslint/types@0.60.0':
+    dependencies:
+      '@types/css-tree': 2.3.11
+      '@types/estree': 1.0.8
+      es-html-parser: 0.3.1
 
   '@humanfs/core@0.19.2':
     dependencies:
@@ -4338,6 +4390,8 @@ snapshots:
       '@vitest/pretty-format': 4.1.5
       convert-source-map: 2.0.0
       tinyrainbow: 3.1.0
+
+  '@vscode/l10n@0.0.18': {}
 
   abort-controller@3.0.0:
     dependencies:
@@ -4966,6 +5020,11 @@ snapshots:
     transitivePeerDependencies:
       - '@noble/hashes'
     optional: true
+
+  html-standard@0.0.13:
+    dependencies:
+      vscode-css-languageservice: 6.3.10
+      vscode-languageserver-textdocument: 1.0.12
 
   http-proxy-agent@7.0.2:
     dependencies:
@@ -5869,6 +5928,19 @@ snapshots:
       jsdom: 28.1.0(@noble/hashes@2.2.0)
     transitivePeerDependencies:
       - msw
+
+  vscode-css-languageservice@6.3.10:
+    dependencies:
+      '@vscode/l10n': 0.0.18
+      vscode-languageserver-textdocument: 1.0.12
+      vscode-languageserver-types: 3.17.5
+      vscode-uri: 3.1.0
+
+  vscode-languageserver-textdocument@1.0.12: {}
+
+  vscode-languageserver-types@3.17.5: {}
+
+  vscode-uri@3.1.0: {}
 
   w3c-xmlserializer@5.0.0:
     dependencies:
