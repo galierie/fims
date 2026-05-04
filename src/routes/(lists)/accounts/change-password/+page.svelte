@@ -27,7 +27,7 @@
                         await goto('/accounts');
                     }}>Cancel</RedButton
                 >
-                <GreenButton type="submit" name="userid" value={userId}>Confirm</GreenButton>
+                <GreenButton type="submit" name="userId" value={userId}>Confirm</GreenButton>
             </div>
         </form>
     </div>

@@ -28,11 +28,11 @@ export const actions: Actions = {
         const { canModifyAccount } = roleObj;
         const formData = await request.formData();
 
-        const userid = formData.get('userid') as string;
-        if (typeof userid === 'undefined') return fail(403, 'No such account');
-        if (!userid) return fail(403, 'No such account');
+        const userId = formData.get('userId') as string;
+        if (typeof userId === 'undefined') return fail(403, 'No such account');
+        if (!userId) return fail(403, 'No such account');
 
-        if (!canModifyAccount && userid !== locals.user.id) return fail(403, { error: 'Insufficient permissions.' });
+        if (!canModifyAccount && userId !== locals.user.id) return fail(403, { error: 'Insufficient permissions.' });
 
         const newPass = formData.get('newpass') as string;
         if (typeof newPass === 'undefined') return fail(403, 'Must input a password');
@@ -42,7 +42,7 @@ export const actions: Actions = {
         try {
             const response = await auth.api.setUserPassword({
                 body: {
-                    userId: userid,
+                    userId,
                     newPassword: newPass,
                 },
                 headers: request.headers,
