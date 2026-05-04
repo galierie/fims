@@ -60,6 +60,7 @@ export async function getFacultyRecordList(
     // fallback ID in case there are no entries for current AcademicSemester
     const currentAcademicSemesterId = latestAcademicSemester?.academicSemesterid ?? -1;
 
+    // Handle search keywords
     const searchFilter = searchTerm
         ? ilike(facultyRecordSearchView.searchcontent, `%${searchTerm}%`)
         : undefined;
