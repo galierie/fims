@@ -19,6 +19,8 @@
         willMake = !willMake;
     }
     
+    let newEmail = $state('');
+    let newPassword = $state('');
     let makeForm: HTMLFormElement | null = $state(null);
 </script>
 
@@ -46,8 +48,10 @@
         <input
             type="email"
             name="email"
-            placeholder="Enter email here"
+            placeholder="Enter email here; must be UP email"
             class="h-full w-full border-0 p-2 focus:ring-0"
+            bind:value={newEmail}
+            required
         />
     </div>
     <div class="w-40 px-0!">
@@ -62,14 +66,17 @@
         <input
             type="password"
             name="password"
-            placeholder="Set initial password"
+            placeholder="Set initial password; min. 8 characters"
             class="h-full w-full border-0 p-2 focus:ring-0"
+            bind:value={newPassword}
+            required
         />
     </div>
     <div class="w-100 justify-center py-1 px-1!">
         <button
             type="submit"
-            class="flex w-full h-full rounded-sm px-2 hover:bg-fims-green text-fims-green hover:text-white items-center"
+            class="flex w-full h-full rounded-sm px-2 hover:bg-fims-green text-fims-green hover:text-white items-center disabled:border-fims-gray disabled:bg-fims-white disabled:text-fims-gray"
+            disabled={!newEmail.endsWith('@up.edu.ph') || newPassword.length < 8}
         >
             <Icon icon="tabler:device-floppy" class="mr-2 h-6 w-6" />
             <span>Save</span>
