@@ -1,14 +1,15 @@
 <script lang="ts">
+    import Icon from '@iconify/svelte';
+
     import type { FilterObject } from '$lib/types/filter';
     import { goto } from '$app/navigation';
-    import Icon from '@iconify/svelte';
     import { page } from '$app/state';
 
     interface Props extends FilterObject {
         isFiltering: boolean;
     }
 
-    // eslint-disable-next-line prefer-const, no-useless-assignment -- bindable variable changes state and triggers false-positive no-useless-assignment
+    // eslint-disable-next-line no-useless-assignment -- bindable variable changes state and triggers false-positive no-useless-assignment
     let { name, filter, opts, selectedOpts, isFiltering = $bindable() }: Props = $props();
 
     let isFilterOpen = $state(false);

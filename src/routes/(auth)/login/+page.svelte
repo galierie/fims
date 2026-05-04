@@ -1,7 +1,8 @@
 <script lang="ts">
-    import { enhance } from '$app/forms';
-    import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
     import Icon from '@iconify/svelte';
+
+    import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
+    import { enhance } from '$app/forms';
 
     const { form } = $props();
 

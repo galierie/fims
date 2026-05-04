@@ -1,23 +1,25 @@
 <script lang="ts">
-    import { enhance } from '$app/forms';
     import Icon from '@iconify/svelte';
     import { onMount } from 'svelte';
-    import { browser } from '$app/environment';
 
-    import AcadYearSemSelect from './AcadYearSemSelect.svelte';
-    import FieldDropdown from './FieldDropdown.svelte';
+    import DeleteConfirmation from '$lib/ui/DeleteConfirmation.svelte';
     import GreenButton from '$lib/ui/GreenButton.svelte';
     import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
     import RedButton from '$lib/ui/RedButton.svelte';
-    import DeleteConfirmation from '$lib/ui/DeleteConfirmation.svelte';
-    import AdminSection from './sections/AdminSection.svelte';
-    import TeachingSection from './sections/TeachingSection.svelte';
-    import ResearchSection from './sections/ResearchSection.svelte';
-    import ExtensionSection from './sections/ExtensionSection.svelte';
-    import StudyLoadSection from './sections/StudyLoadSection.svelte';
-
-    import { viewState, setToEdit, resetViewState } from '../../../states/view-state.svelte.js';
+    import { browser } from '$app/environment';
+    import { enhance } from '$app/forms';
     import type { FacultySemestralRecordDTO } from '$lib/server/queries/faculty-view.js';
+
+    import { resetViewState, setToEdit, viewState } from '../../../states/view-state.svelte.js';
+
+    import AcadYearSemSelect from './AcadYearSemSelect.svelte';
+    import FieldDropdown from './FieldDropdown.svelte';
+
+    import AdminSection from './sections/AdminSection.svelte';
+    import ExtensionSection from './sections/ExtensionSection.svelte';
+    import ResearchSection from './sections/ResearchSection.svelte';
+    import StudyLoadSection from './sections/StudyLoadSection.svelte';
+    import TeachingSection from './sections/TeachingSection.svelte';
 
     interface AcadYearSemOpts {
         acadYear: number | null;
@@ -60,9 +62,7 @@
             remarksValue = semestralRecord?.remarks ?? '';
             lastRemarks = semestralRecord?.remarks ?? '';
         }
-        if (!viewState.isEditing) 
-            remarksValue = semestralRecord?.remarks ?? '';
-        
+        if (!viewState.isEditing) remarksValue = semestralRecord?.remarks ?? '';
     });
 
     const hasChange = $derived(

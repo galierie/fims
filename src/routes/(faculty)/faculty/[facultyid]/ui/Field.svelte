@@ -45,9 +45,8 @@
     // svelte-ignore state_referenced_locally
     let currentValue = $state(defaultValue ?? '');
     $effect(() => {
-        if (!viewState.isEditing) 
-            currentValue = defaultValue ?? '';
-        
+        if (!viewState.isEditing) currentValue = defaultValue ?? '';
+
         hasChange = immutable ? false : String(currentValue) !== String(defaultValue ?? '');
     });
 

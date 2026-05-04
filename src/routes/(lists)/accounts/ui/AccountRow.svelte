@@ -1,9 +1,10 @@
 <script lang="ts">
-    import { enhance } from '$app/forms';
-    import type { AccountDTO } from '$lib/server/queries/account-list';
     import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
     import SaveConfirmation from '$lib/ui/SaveConfirmation.svelte';
     import SelectDropdownCell from '$lib/ui/SelectDropdownCell.svelte';
+    import type { AccountDTO } from '$lib/server/queries/account-list';
+    import { enhance } from '$app/forms';
+
     import AccountActionsCell from './AccountActionsCell.svelte';
 
     interface Props {
@@ -30,11 +31,8 @@
             userRoles.includes(selectedOpt) &&
             selectedOpt !== role &&
             !willChangeRole
-        ) 
-            if (changeRoleForm !== null) 
-                changeRoleForm.requestSubmit();
-            
-        
+        )
+            if (changeRoleForm !== null) changeRoleForm.requestSubmit();
     });
 
     let changeRoleForm: HTMLFormElement | null = $state(null);

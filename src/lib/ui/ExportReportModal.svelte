@@ -1,7 +1,8 @@
 <script lang="ts">
-    import GreenButton from '$lib/ui/GreenButton.svelte';
     import Icon from '@iconify/svelte';
     import { fade, scale } from 'svelte/transition';
+
+    import GreenButton from '$lib/ui/GreenButton.svelte';
 
     interface Props {
         onCancel: () => void;

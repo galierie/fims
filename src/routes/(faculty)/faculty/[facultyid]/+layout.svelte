@@ -1,19 +1,16 @@
 <script lang="ts">
     import Icon from '@iconify/svelte';
-    import GreenButton from '$lib/ui/GreenButton.svelte';
-    import RedButton from '$lib/ui/RedButton.svelte';
-    import DeleteConfirmation from '$lib/ui/DeleteConfirmation.svelte';
-    import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
-    import Tab from './ui/Tab.svelte';
-    import ExportReportModal from '$lib/ui/ExportReportModal.svelte';
 
+    import DeleteConfirmation from '$lib/ui/DeleteConfirmation.svelte';
+    import ExportReportModal from '$lib/ui/ExportReportModal.svelte';
+    import GreenButton from '$lib/ui/GreenButton.svelte';
+    import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
+    import RedButton from '$lib/ui/RedButton.svelte';
     import { enhance } from '$app/forms';
     import { page } from '$app/state';
 
-    import {
-        chosenSemestralRecord,
-        chooseSemestralRecord,
-    } from './states/chosen-semestral-record.svelte.js';
+    import Tab from './ui/Tab.svelte';
+    import { chooseSemestralRecord, chosenSemestralRecord } from './states/chosen-semestral-record.svelte.js';
     import { viewState } from './states/view-state.svelte.js';
 
     const { data, children } = $props();

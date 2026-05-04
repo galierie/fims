@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { goto } from '$app/navigation';
     import GreenButton from '$lib/ui/GreenButton.svelte';
+    import { goto } from '$app/navigation';
 
     const { data } = $props();
     const facultyid = $derived(data.facultyid);

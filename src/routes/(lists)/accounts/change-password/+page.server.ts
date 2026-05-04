@@ -60,7 +60,7 @@ export const actions: Actions = {
 
         if (success) return redirect(303, '/');
         return fail(500, {
-                error: 'Failed to change account password. (Unknown/Internal error)',
-            });
+            error: 'Failed to change account password. (Unknown/Internal error)',
+        });
     },
 };

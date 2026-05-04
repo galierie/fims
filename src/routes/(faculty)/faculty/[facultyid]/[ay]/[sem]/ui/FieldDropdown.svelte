@@ -14,7 +14,6 @@
         hasChange?: boolean;
     }
 
-     
     let {
         label,
         name,
@@ -40,9 +39,8 @@
             currentSelectedOpt = defaultSelectedOpt;
             lastDefault = defaultSelectedOpt;
         }
-        if (!viewState.isEditing) 
-            currentSelectedOpt = defaultSelectedOpt;
-        
+        if (!viewState.isEditing) currentSelectedOpt = defaultSelectedOpt;
+
         hasChange = immutable ? false : currentSelectedOpt !== defaultSelectedOpt;
     });
 </script>

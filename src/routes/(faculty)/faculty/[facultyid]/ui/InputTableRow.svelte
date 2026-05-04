@@ -1,9 +1,12 @@
 <script lang="ts">
-    import type { InputColumnType, InputCellValue } from '$lib/types/input-table';
-    import ExpandableCell from './ExpandableCell.svelte';
-    import SelectDropdownCell from '$lib/ui/SelectDropdownCell.svelte';
-    import { viewState } from '../states/view-state.svelte';
     import Icon from '@iconify/svelte';
+
+    import SelectDropdownCell from '$lib/ui/SelectDropdownCell.svelte';
+    import type { InputCellValue, InputColumnType } from '$lib/types/input-table';
+
+    import { viewState } from '../states/view-state.svelte';
+
+    import ExpandableCell from './ExpandableCell.svelte';
 
     interface Props {
         columns: InputColumnType[];
@@ -18,21 +21,21 @@
     }
 
     let {
-        // eslint-disable-next-line prefer-const -- bindable variable
+         
         columns,
-        // eslint-disable-next-line prefer-const -- bindable variable
+         
         row,
-        // eslint-disable-next-line prefer-const -- bindable variable
+         
         numOfColumns,
-        // eslint-disable-next-line prefer-const -- bindable variable
+         
         isDeleted,
-        // eslint-disable-next-line prefer-const -- bindable variable
+         
         toggleRowDeletion,
 
         hasValue = $bindable(),
-        // eslint-disable-next-line prefer-const -- bindable variable
+         
         rowNum,
-        // eslint-disable-next-line prefer-const -- bindable variable
+         
         tupleid,
         hasChange = $bindable(),
     }: Props = $props();
@@ -221,12 +224,10 @@
                     !isDeleted &&
                     ((tupleid === undefined && hasValue) || (tupleid !== undefined && hasChange))}
                 onchange={() => {
-                    if (type === 'number') 
+                    if (type === 'number')
                         haveChanges[columnNum] =
                             Number(values[columnNum]) !== Number(formattedDefault);
-                     else 
-                        haveChanges[columnNum] = values[columnNum] !== formattedDefault;
-                    
+                    else haveChanges[columnNum] = values[columnNum] !== formattedDefault;
                 }}
             />
         {/if}

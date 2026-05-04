@@ -1,11 +1,12 @@
 <script lang="ts">
-    import SemestralRecordForm from './ui/SemestralRecordForm.svelte';
     import ChangelogList from '$lib/ui/ChangelogList.svelte';
-
-    import { resetViewState, setToEdit } from '../../states/view-state.svelte.js';
-    import { page } from '$app/stores';
-    import { chooseSemestralRecord } from '../../states/chosen-semestral-record.svelte.js';
     import { afterNavigate } from '$app/navigation';
+    import { page } from '$app/stores';
+
+    import { chooseSemestralRecord } from '../../states/chosen-semestral-record.svelte.js';
+    import { resetViewState, setToEdit } from '../../states/view-state.svelte.js';
+
+    import SemestralRecordForm from './ui/SemestralRecordForm.svelte';
 
     const { data } = $props();
     const {

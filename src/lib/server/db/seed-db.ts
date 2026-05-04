@@ -4,7 +4,19 @@ import { ADMIN_EMAIL, ADMIN_PASS, IT_EMAIL, IT_PASS } from '$env/static/private'
 import { auth } from '$lib/server/auth';
 import { refreshAccountSearchView } from '$lib/server/queries/account-list';
 
-import { adminPosition, appointmentStatus, course, degreeProgram, fieldOfInterest, office, profileInfo, rank, research, role, status } from './schema';
+import {
+    adminPosition,
+    appointmentStatus,
+    course,
+    degreeProgram,
+    fieldOfInterest,
+    office,
+    profileInfo,
+    rank,
+    research,
+    role,
+    status,
+} from './schema';
 import { db } from './index';
 
 export const appointmentStatuses = [

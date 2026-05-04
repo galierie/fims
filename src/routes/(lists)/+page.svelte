@@ -1,17 +1,19 @@
 <script lang="ts">
+    import Icon from '@iconify/svelte';
+
+    import DeleteConfirmation from '$lib/ui/DeleteConfirmation.svelte';
+    import ExportReportModal from '$lib/ui/ExportReportModal.svelte';
+    import FilterButton from '$lib/ui/FilterButton.svelte';
+    import GreenButton from '$lib/ui/GreenButton.svelte';
+    import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
+    import RedButton from '$lib/ui/RedButton.svelte';
+    import SearchBar from '$lib/ui/SearchBar.svelte';
+    import SortHeader from '$lib/ui/SortHeader.svelte';
     import { enhance } from '$app/forms';
     import { goto } from '$app/navigation';
     import { page } from '$app/state';
-    import Icon from '@iconify/svelte';
+
     import FacultyRecordRow from './ui/FacultyRecordRow.svelte';
-    import GreenButton from '$lib/ui/GreenButton.svelte';
-    import RedButton from '$lib/ui/RedButton.svelte';
-    import DeleteConfirmation from '$lib/ui/DeleteConfirmation.svelte';
-    import FilterButton from '$lib/ui/FilterButton.svelte';
-    import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
-    import SearchBar from '$lib/ui/SearchBar.svelte';
-    import ExportReportModal from '$lib/ui/ExportReportModal.svelte';
-    import SortHeader from '$lib/ui/SortHeader.svelte';
 
     const { data, form } = $props();
     const {

@@ -1,7 +1,8 @@
 <script lang="ts">
+    import Icon from '@iconify/svelte';
+
     import { goto } from '$app/navigation';
     import { page } from '$app/state';
-    import Icon from '@iconify/svelte';
 
     interface Props {
         name: string;
@@ -9,7 +10,7 @@
         isSorting: boolean;
     }
 
-    // eslint-disable-next-line prefer-const, no-useless-assignment -- bindable variable changes state and triggers false-positive no-useless-assignment
+    // eslint-disable-next-line no-useless-assignment -- bindable variable changes state and triggers false-positive no-useless-assignment
     let { name, key, isSorting = $bindable() }: Props = $props();
 
     const sortStates = ['asc', 'desc', null] as const;

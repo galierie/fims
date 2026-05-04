@@ -3,7 +3,19 @@ import type { PgColumn } from 'drizzle-orm/pg-core';
 
 import type { FilterColumn } from '$lib/types/filter';
 
-import { academicSemester, adminPosition, changelog, faculty, facultyAcademicSemester, facultyAdminPosition, facultyRank, facultyRecordSearchView, profile, rank, status } from '../db/schema';
+import {
+    academicSemester,
+    adminPosition,
+    changelog,
+    faculty,
+    facultyAcademicSemester,
+    facultyAdminPosition,
+    facultyRank,
+    facultyRecordSearchView,
+    profile,
+    rank,
+    status,
+} from '../db/schema';
 import { db } from '../db';
 
 const pageSize = 50;

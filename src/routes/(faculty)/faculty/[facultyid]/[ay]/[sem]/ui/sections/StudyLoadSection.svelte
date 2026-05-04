@@ -1,8 +1,10 @@
 <script lang="ts">
     import Icon from '@iconify/svelte';
-    import InputTable from '../../../../ui/InputTable.svelte';
-    import type { InputColumnType, InputRowValue } from '$lib/types/input-table';
+
     import type { FacultyStudyLoadDTO } from '$lib/server/queries/faculty-view';
+    import type { InputColumnType, InputRowValue } from '$lib/types/input-table';
+
+    import InputTable from '../../../../ui/InputTable.svelte';
 
     interface Props {
         studyLoadCredit: number;
@@ -10,7 +12,7 @@
         hasChange: boolean;
     }
 
-    // eslint-disable-next-line prefer-const -- bindable variable
+     
     let { studyLoadCredit = $bindable(), studyLoad, hasChange = $bindable() }: Props = $props();
 
     $effect(() => {

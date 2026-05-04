@@ -1,12 +1,10 @@
 <script lang="ts">
     import Icon from '@iconify/svelte';
-    import InputTable from '../../../../ui/InputTable.svelte';
+
+    import type { FacultyAdminPositionDTO, FacultyAdminWorksDTO, FacultyCommitteesDTO } from '$lib/server/queries/faculty-view';
     import type { InputColumnType, InputRowValue } from '$lib/types/input-table';
-    import type {
-        FacultyAdminPositionDTO,
-        FacultyCommitteesDTO,
-        FacultyAdminWorksDTO,
-    } from '$lib/server/queries/faculty-view';
+
+    import InputTable from '../../../../ui/InputTable.svelte';
 
     interface Props {
         administrativeLoadCredit: number;
@@ -19,13 +17,13 @@
 
     let {
         administrativeLoadCredit = $bindable(),
-        // eslint-disable-next-line prefer-const -- bindable variable
+         
         adminPositions,
-        // eslint-disable-next-line prefer-const -- bindable variable
+         
         committees,
-        // eslint-disable-next-line prefer-const -- bindable variable
+         
         adminWorks,
-        // eslint-disable-next-line prefer-const -- bindable variable
+         
         opts,
         hasChange = $bindable(),
     }: Props = $props();

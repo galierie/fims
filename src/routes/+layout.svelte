@@ -1,8 +1,10 @@
 <script lang="ts">
-    import './layout.css';
     import favicon from '$lib/assets/favicon.svg';
-    import Header from './ui/Header.svelte';
+
+    import './layout.css';
+
     import Footer from './ui/Footer.svelte';
+    import Header from './ui/Header.svelte';
 
     const { data, children } = $props();
     const { isLoggedIn, accountColor, email } = $derived(data);
