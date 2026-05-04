@@ -17,8 +17,14 @@
     <div class="mt-25 flex w-200 flex-col items-stretch p-20 text-center">
         <h1 class="text-2xl">Change Password</h1>
         <form method="POST" action="?/changePassword" class="mt-5 flex flex-col items-center gap-5" use:enhance>
-            <label for="newpass"
-                >New Password: <input name="newpass" type="password" required /></label
+            <label for="oldPassword"
+                >Old Password: <input name="oldPassword" type="password" required /></label
+            >
+            <label for="newPassword"
+                >New Password: <input name="newPassword" type="password" required /></label
+            >
+            <label for="confirmNewPassword"
+                >Confirm New Password: <input name="confirmNewPassword" type="password" required /></label
             >
             <div class="flex justify-around gap-20">
                 <RedButton
