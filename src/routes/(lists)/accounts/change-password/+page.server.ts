@@ -34,10 +34,6 @@ export const actions: Actions = {
             assertAllRequiredFormInputs(requiredFormInputs);
             const [userId, currentPassword, newPassword] = requiredFormInputs;
 
-            // No empty strings as new password
-            if (newPassword.length === 0)
-                return fail(400, { error: 'Invalid new password.' });
-
             // Ensure that only users can set their own password
             if (userId !== locals.user.id)
                 return fail(403, { error: 'Insufficient permissions.' });
