@@ -84,7 +84,7 @@
         </form>
 
         <!-- Reset Password -->
-        <form method="POST" action="?/resetAccount" class="flex items-center justify-center">
+        <form method="POST" action="?/resetPassword" class="flex items-center justify-center">
             <button
                 type="submit"
                 class="flex w-full rounded-sm p-3 hover:bg-fims-red text-fims-red hover:text-white"

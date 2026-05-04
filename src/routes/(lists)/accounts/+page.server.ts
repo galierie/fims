@@ -251,7 +251,7 @@ export const actions = {
         }
     },
 
-    async resetAccount({ locals, request }) {
+    async resetPassword({ locals, request }) {
         // Check existing session
         if (typeof locals.user === 'undefined') throw redirect(307, '/login');
 
