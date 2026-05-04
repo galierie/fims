@@ -16,6 +16,7 @@ import {
     status,
 } from '../db/schema';
 import { db } from '../db';
+import type { PgColumn } from 'drizzle-orm/pg-core';
 
 const pageSize = 50;
 
@@ -73,18 +74,6 @@ export async function getFacultyRecordList(
         .where(searchFilter)
         .as('search_sq');
 
-    // Process filter queries
-    const filterQueries: Array<SQL | undefined> = [];
-    filterMap.forEach(({ obj, column }) => {
-        const { selectedOpts } = obj;
-        const sameColumnQueries: SQLWrapper[] = [];
-        selectedOpts.forEach((opt) => {
-            sameColumnQueries.push(eq(column, opt));
-        });
-
-        if (sameColumnQueries.length) filterQueries.push(or(...sameColumnQueries));
-    });
-
     // Get only the single most recent admin position per AcademicSemester
     const adminPositionSq = db
         .selectDistinctOn([facultyAdminPosition.facultyAcademicSemesterId], {
@@ -126,6 +115,20 @@ export async function getFacultyRecordList(
         sortOrder = [...sortOrder, ...orders];
     });
     sortOrder.push(isNext ? asc(faculty.id) : desc(faculty.id));
+
+    // Process filter queries
+    const filterQueries: Array<SQL | undefined> = [];
+    filterMap.forEach(({ obj, column }) => {
+        const { selectedOpts } = obj;
+        const sameColumnQueries: SQLWrapper[] = [];
+        selectedOpts.forEach((opt) => {
+            // TODO: Generalize column to subquery mappings
+            const processedColumn = (column === adminPosition.title) ? adminPositionSq.title : column;
+            sameColumnQueries.push(sql`${processedColumn} = ${opt}`);
+        });
+
+        if (sameColumnQueries.length) filterQueries.push(or(...sameColumnQueries));
+    });
 
     // Get faculty records from database
     const shownFields = await db
