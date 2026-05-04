@@ -1,7 +1,7 @@
-import { getUserRoleAndPermissions, logChange } from '$lib/server/queries/db-helpers';
+import { logChange } from '$lib/server/queries/db-helpers';
 import { type Actions, fail, redirect } from '@sveltejs/kit';
-import { auth } from '$lib/server/auth.js';
-import { APIError } from 'better-auth';
+import { auth } from '$lib/server/auth';
+import { assertAllRequiredFormInputs } from '$lib/utils/assert';
 
 export async function load({ locals }) {
     // Check existing session
@@ -21,29 +21,44 @@ export const actions: Actions = {
         // Log action
         await logChange(locals.user.id, null, 'Action: Change Password.');
 
-        // Check Permissions
-        const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
-        if (typeof roleObj === 'undefined') throw redirect(307, '/login');
-
-        const { canModifyAccount } = roleObj;
         const formData = await request.formData();
+        const requiredFormInputs = [
+            formData.get('userId') as string | null,
+            formData.get('oldPassword') as string | null,
+            formData.get('newPassword') as string | null,
+        ];
 
-        const userId = formData.get('userId') as string;
-        if (typeof userId === 'undefined') return fail(403, 'No such account');
-        if (!userId) return fail(403, 'No such account');
-
-        if (!canModifyAccount && userId !== locals.user.id) return fail(403, { error: 'Insufficient permissions.' });
-
-        const newPass = formData.get('newpass') as string;
-        if (typeof newPass === 'undefined') return fail(403, 'Must input a password');
-        if (!newPass) return fail(403, 'Must input a password');
-        if (newPass.length === 0) return fail(403, 'Nust input a password');
+        let success = false;
 
         try {
+            assertAllRequiredFormInputs(requiredFormInputs);
+            const [userId, oldPassword, newPassword] = requiredFormInputs;
+
+            // No empty strings as new password
+            if (newPassword.length === 0)
+                return fail(400, { error: 'Invalid new password.' });
+
+            // Ensure that only users can set their own password
+            if (userId !== locals.user.id)
+                return fail(403, { error: 'Insufficient permissions.' });
+
+            // Verify old password before changing
+            const verifyResponse = await auth.api.verifyPassword({
+                body: {
+                    password: oldPassword,
+                },
+                headers: request.headers,
+            });
+
+            if (!verifyResponse) {
+                return fail(400, { error: 'Failed to verify old account password.' });
+            }
+
+            // Change password
             const response = await auth.api.setUserPassword({
                 body: {
                     userId,
-                    newPassword: newPass,
+                    newPassword,
                 },
                 headers: request.headers,
             });
@@ -51,15 +66,20 @@ export const actions: Actions = {
             if (!response.status) {
                 return fail(400, 'Failed to change account password');
             }
+
+            success = true;
         } catch (error) {
-            console.log(error);
             return fail(500, {
                 error:
-                    error instanceof APIError
+                    error instanceof Error
                         ? error.message
                         : 'Failed to change account password. (Unknown/Internal error)',
             });
         }
-        return redirect(303, '/accounts');
+
+        if (success)
+            return redirect(303, '/');
+        else
+            return fail(500, { error: 'Failed to change account password. (Unknown/Internal error)' });
     },
 };
