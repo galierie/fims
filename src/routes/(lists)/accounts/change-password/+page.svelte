@@ -30,7 +30,7 @@
                 <RedButton
                     type="button"
                     onclick={async () => {
-                        await goto('/accounts');
+                        await goto('/');
                     }}>Cancel</RedButton
                 >
                 <GreenButton type="submit" name="userId" value={userId}>Confirm</GreenButton>
