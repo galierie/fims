@@ -1,27 +1,9 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 
 import type { ChangelogRecordStructure } from '$lib/ui/ChangelogList.svelte';
-import {
-    getAllAdminPositions,
-    getAllCourses,
-    getAllFacultyAcademicSemesters,
-    getAllOffices,
-    getAllResearches,
-    getAllSemesterms,
-    getFacultyEducationalAttainments,
-    getFacultyPromotionHistory,
-    getFacultySemestralRecords,
-} from '$lib/server/queries/faculty-view';
-import {
-    getFacultyRecordChangelogs,
-    refreshFacultyRecordSearchView,
-} from '$lib/server/queries/faculty-list.js';
-import {
-    getUserRoleAndPermissions,
-    logChange,
-    deleteSemestralRecord,
-    updateSemestralRecords,
-} from '$lib/server/queries/db-helpers';
+import { deleteSemestralRecord, getUserRoleAndPermissions, logChange, updateSemestralRecords } from '$lib/server/queries/db-helpers';
+import { getAllAdminPositions, getAllCourses, getAllFacultyAcademicSemesters, getAllOffices, getAllResearches, getAllSemesterms, getFacultyEducationalAttainments, getFacultyPromotionHistory, getFacultySemestralRecords } from '$lib/server/queries/faculty-view';
+import { getFacultyRecordChangelogs, refreshFacultyRecordSearchView } from '$lib/server/queries/faculty-list.js';
 
 export async function load({ params, locals }) {
     // Check existing session

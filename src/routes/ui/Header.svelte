@@ -1,8 +1,7 @@
 <script lang="ts">
-    import LogOutButton from './LogOutButton.svelte';
+    import OwnAccountActionsDropdown from './OwnAccountActionsDropdown.svelte';
 
     interface Props {
-        accountColor: string;
         email: string;
     }
 
@@ -13,8 +12,7 @@
     <div>
         <span class="font-semibold text-fims-green">Faculty Information Management System</span>
     </div>
-    <div>
-        <span class="text-{accountColor} pr-3 font-semibold">{email}</span>
-        <LogOutButton />
+    <div class="w-fit">
+        <OwnAccountActionsDropdown {email} {accountColor} />
     </div>
 </header>

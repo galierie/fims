@@ -142,7 +142,7 @@ async function processDynamicTable(
     mapCreate: (item: any) => any,
     mapUpdate: (item: any) => any,
 ) {
-    if (data.delete.length > 0) {
+    if (data.delete.length > 0) 
         await Promise.all([
             await db.delete(tableRef).where(inArray(idColumn, data.delete)),
             await logChange(
@@ -151,7 +151,7 @@ async function processDynamicTable(
                 `Deleted records with IDs ${data.delete.join(', ')} from ${getTableName(tableRef)}.`,
             ),
         ]);
-    }
+    
 
     for (const item of data.update)
         await Promise.all([

@@ -1,11 +1,12 @@
+import { alias } from 'drizzle-orm/pg-core';
 import { and, asc, desc, eq, gt, ilike, lt, ne, or, type SQL, type SQLWrapper } from 'drizzle-orm';
 
 import type { FilterColumn } from '$lib/types/filter';
 
 import { accountSearchView, changelog, profile, profileInfo, role } from '../db/schema';
 import { db } from '../db';
+
 import { logChange } from './db-helpers';
-import { alias } from 'drizzle-orm/pg-core';
 
 const pageSize = 50;
 
@@ -152,7 +153,7 @@ export async function changeRole(operatorId: string, id: string, role: string) {
     const returnedIds = await db
         .update(profileInfo)
         .set({
-            role: role,
+            role,
         })
         .where(eq(profileInfo.profileId, id))
         .returning();

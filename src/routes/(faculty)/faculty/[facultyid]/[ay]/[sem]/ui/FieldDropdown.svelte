@@ -14,7 +14,7 @@
         hasChange?: boolean;
     }
 
-    // eslint-disable-next-line prefer-const -- changing value
+     
     let {
         label,
         name,
@@ -34,15 +34,15 @@
     let currentSelectedOpt = $state(defaultSelectedOpt);
     // svelte-ignore state_referenced_locally
     let lastDefault = $state(defaultSelectedOpt);
-    
+
     $effect(() => {
         if (defaultSelectedOpt !== lastDefault) {
             currentSelectedOpt = defaultSelectedOpt;
             lastDefault = defaultSelectedOpt;
         }
-        if (!viewState.isEditing) {
+        if (!viewState.isEditing) 
             currentSelectedOpt = defaultSelectedOpt;
-        }
+        
         hasChange = immutable ? false : currentSelectedOpt !== defaultSelectedOpt;
     });
 </script>
@@ -65,7 +65,8 @@
                 />
             </button>
         {:else}
-            <span class="block h-8 w-45 content-center rounded-sm bg-white px-1.5 text-left 2xl:w-75"
+            <span
+                class="block h-8 w-45 content-center rounded-sm bg-white px-1.5 text-left 2xl:w-75"
                 >{currentSelectedOpt ?? '-'}</span
             >
         {/if}

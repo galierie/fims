@@ -221,12 +221,12 @@
                     !isDeleted &&
                     ((tupleid === undefined && hasValue) || (tupleid !== undefined && hasChange))}
                 onchange={() => {
-                    if (type === 'number') {
+                    if (type === 'number') 
                         haveChanges[columnNum] =
                             Number(values[columnNum]) !== Number(formattedDefault);
-                    } else {
+                     else 
                         haveChanges[columnNum] = values[columnNum] !== formattedDefault;
-                    }
+                    
                 }}
             />
         {/if}

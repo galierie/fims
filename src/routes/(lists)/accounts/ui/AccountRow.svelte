@@ -1,13 +1,10 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
     import type { AccountDTO } from '$lib/server/queries/account-list';
-    import RedButton from '$lib/ui/RedButton.svelte';
-    import Icon from '@iconify/svelte';
     import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
     import SaveConfirmation from '$lib/ui/SaveConfirmation.svelte';
-    import DeleteConfirmation from '$lib/ui/DeleteConfirmation.svelte';
     import SelectDropdownCell from '$lib/ui/SelectDropdownCell.svelte';
-    import { goto } from '$app/navigation';
+    import AccountActionsCell from './AccountActionsCell.svelte';
 
     interface Props {
         account: AccountDTO;
@@ -33,20 +30,14 @@
             userRoles.includes(selectedOpt) &&
             selectedOpt !== role &&
             !willChangeRole
-        ) {
-            if (changeRoleForm !== null) {
+        ) 
+            if (changeRoleForm !== null) 
                 changeRoleForm.requestSubmit();
-            }
-        }
+            
+        
     });
 
-    let willDelete = $state(false);
-    function toggleDeleteModal() {
-        willDelete = !willDelete;
-    }
-
     let changeRoleForm: HTMLFormElement | null = $state(null);
-    let deleteForm: HTMLFormElement | null = $state(null);
 </script>
 
 {#if email}
@@ -63,15 +54,7 @@
             />
         </div>
         <div class="w-66 2xl:w-132"><span>{email}</span></div>
-        <div class="w-50 justify-center">
-            <form method="POST" action="?/resetAccount" class="flex items-center justify-center">
-                <RedButton type="submit" name="userid" value={id}>
-                    <Icon icon="tabler:refresh" class="mr-2 h-6 w-6" />
-                    <span>Reset</span>
-                </RedButton>
-            </form>
-        </div>
-        <div class="w-40">
+        <div class="w-40 px-0!">
             <form
                 method="POST"
                 action="?/changeRole"
@@ -115,51 +98,8 @@
         <div class="w-85 2xl:w-100">
             <span class="truncate text-[#535353]">{logMaker} ({logTimestamp}): {logOperation}</span>
         </div>
-        <div class="w-50 justify-center">
-            <form
-                method="POST"
-                action="?/deleteAccount"
-                class="flex items-center justify-center"
-                bind:this={deleteForm}
-                use:enhance={({ cancel }) => {
-                    if (willDelete) {
-                        isLoading = true;
-                        return async ({ update }) => {
-                            await update();
-                            willDelete = false;
-                            isLoading = false;
-                        };
-                    }
-                    willDelete = true;
-                    cancel();
-                }}
-            >
-                <RedButton type="submit">
-                    <Icon icon="tabler:trash" class="mr-2 h-6 w-6" />
-                    <span>Delete</span>
-                </RedButton>
-
-                <input type="hidden" name="userid" value={id} />
-
-                {#if willDelete}
-                    <DeleteConfirmation
-                        onDelete={() => {
-                            if (deleteForm) deleteForm.requestSubmit();
-                        }}
-                        onCancel={toggleDeleteModal}
-                        text="Are you sure you want to delete the account?"
-                    />
-                {/if}
-            </form>
-        </div>
-        <div class="justify center w-40">
-            <RedButton
-                onclick={async () => {
-                    await goto(`/accounts/changePass/${id}`);
-                }}
-            >
-                <span>Edit</span>
-            </RedButton>
+        <div class="w-100 justify-center px-0!">
+            <AccountActionsCell {id} bind:isLoading />
         </div>
     </div>
 

@@ -1,14 +1,13 @@
 <script lang="ts">
     import Icon from '@iconify/svelte';
+    import AccountCreationForm from './ui/AccountCreationForm.svelte';
     import AccountRow from './ui/AccountRow.svelte';
     import GreenButton from '$lib/ui/GreenButton.svelte';
     import RedButton from '$lib/ui/RedButton.svelte';
     import FilterButton from '$lib/ui/FilterButton.svelte';
     import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
-    import SaveConfirmation from '$lib/ui/SaveConfirmation.svelte';
     import DeleteConfirmation from '$lib/ui/DeleteConfirmation.svelte';
     import SearchBar from '$lib/ui/SearchBar.svelte';
-    import SelectDropdownCell from '$lib/ui/SelectDropdownCell.svelte';
     import SortHeader from '$lib/ui/SortHeader.svelte';
     import ChangelogList from '$lib/ui/ChangelogList.svelte';
     import { enhance } from '$app/forms';
@@ -28,14 +27,8 @@
     } = $derived(data);
 
     let isMakingAccount = $state(false);
-    let willMake = $state(false);
     let willBatchDelete = $state(false);
     let isLoading = $state(false);
-
-    function toggleModal() {
-        isMakingAccount = !isMakingAccount;
-        willMake = !willMake;
-    }
 
     let selectedIds: string[] = $state([]);
 
@@ -62,7 +55,6 @@
         isLoading = false;
     }
 
-    let makeForm: HTMLFormElement | null = $state(null);
     let deleteForm: HTMLFormElement | null = $state(null);
 </script>
 
@@ -157,12 +149,11 @@
                     <div class="w-66 2xl:w-132">
                         <SortHeader name="Email" key="email" bind:isSorting={isLoading} />
                     </div>
-                    <div class="w-50 justify-center"><span>Reset Password?</span></div>
                     <div class="w-40 justify-center">
                         <span>Type</span>
                     </div>
                     <div class="w-85 justify-center 2xl:w-100"><span>Change Logs</span></div>
-                    <div class="w-90 justify-center"><span>Account Action</span></div>
+                    <div class="w-100 justify-center"><span>Account Action</span></div>
                 </div>
 
                 <!-- Rows -->
@@ -176,58 +167,7 @@
 
                 <!-- Account Creation Form -->
                 {#if isMakingAccount}
-                    <form
-                        method="POST"
-                        action="?/makeAccount"
-                        class="flex justify-center [&>div]:flex [&>div]:h-12 [&>div]:items-center [&>div]:border-b [&>div]:border-fims-gray [&>div]:bg-white [&>div]:px-6"
-                        bind:this={makeForm}
-                        use:enhance={({ cancel }) => {
-                            if (willMake) {
-                                isMakingAccount = false;
-                                willMake = false;
-                                isLoading = true;
-                                return async ({ update }) => {
-                                    await update();
-                                    isLoading = false;
-                                };
-                            }
-                            willMake = true;
-                            cancel();
-                        }}
-                    >
-                        <div class="w-25"></div>
-                        <div class="w-66 2xl:w-132">
-                            <input
-                                type="email"
-                                name="email"
-                                placeholder="Enter email here"
-                                class="h-full w-full border-0 p-2 focus:ring-0"
-                            />
-                        </div>
-                        <div class="w-50">
-                            <input
-                                type="password"
-                                name="password"
-                                placeholder="Set initial password"
-                                class="h-full w-full border-0 p-2 focus:ring-0"
-                            />
-                        </div>
-                        <div class="w-40">
-                            <SelectDropdownCell
-                                name="role"
-                                opts={userRoles}
-                                defaultSelectedOpt={userRoles[0]}
-                                isEditable={true}
-                            />
-                        </div>
-                        <div class="w-85 2xl:w-100"></div>
-                        <div class="w-50 justify-center">
-                            <GreenButton type="submit">
-                                <Icon icon="tabler:device-floppy" class="mr-2 h-6 w-6" />
-                                <span>Save</span>
-                            </GreenButton>
-                        </div>
-                    </form>
+                    <AccountCreationForm {userRoles} bind:isLoading bind:isMakingAccount />
                 {/if}
             </div>
         </div>
@@ -250,16 +190,6 @@
     <!-- Changelogs -->
     <ChangelogList changelogFetcher={() => fetchedChangelogs ?? []} />
 </div>
-
-{#if willMake}
-    <SaveConfirmation
-        onSave={() => {
-            if (makeForm) makeForm.requestSubmit();
-        }}
-        onCancel={toggleModal}
-        text="Are you sure you want to save the account?"
-    />
-{/if}
 
 {#if willBatchDelete}
     <form

@@ -1,5 +1,4 @@
 <script lang="ts">
-    import type { Snippet } from 'svelte';
     import ChangelogEntry from '$lib/ui/ChangelogEntry.svelte';
 
     export type ChangelogRecordStructure = {
@@ -26,7 +25,7 @@
 
         <!-- Entries -->
         <div>
-            {#each changelogFetcher() as log}
+            {#each changelogFetcher() as log (log)}
                 <ChangelogEntry timestamp={log.timestamp} email={log.email} info={log.info} />
             {:else}
                 <div class="h-12.5 bg-gray-100 flex items-center justify-center">

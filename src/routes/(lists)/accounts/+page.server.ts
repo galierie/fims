@@ -1,24 +1,12 @@
 import { type Actions, error, fail, redirect } from '@sveltejs/kit';
 import { APIError } from 'better-auth';
 
-import {
-    areYouHere,
-    deleteProfileInfo,
-    getUserRoleAndPermissions,
-    logChange,
-    makeProfileInfo,
-} from '$lib/server/queries/db-helpers';
+import { areYouHere, deleteProfileInfo, getUserRoleAndPermissions, logChange, makeProfileInfo } from '$lib/server/queries/db-helpers';
+import { assertAllRequiredFormInputs } from '$lib/utils/assert';
 import { auth } from '$lib/server/auth';
+import { changeRole, getAccountChangelogs, getAccountList, getAllRoles, refreshAccountSearchView } from '$lib/server/queries/account-list';
 import type { FilterColumn, FilterObject } from '$lib/types/filter';
-import {
-    changeRole,
-    getAccountChangelogs,
-    getAccountList,
-    getAllRoles,
-    refreshAccountSearchView,
-} from '$lib/server/queries/account-list';
 import { profileInfo } from '$lib/server/db/schema';
-import { getHeaders } from 'better-auth/client';
 
 export async function load({ locals, url }) {
     // Check existing session
@@ -117,21 +105,21 @@ export const actions = {
         if (!canAddAccount) return fail(403, { error: 'Insufficient permissions.' });
 
         const data = await request.formData();
-        const email = data.get('email') as string;
-        const password = data.get('password') as string;
-        const role = data.get('role') as string;
+        const requiredFormInputs = [
+            data.get('email') as string | null,
+            data.get('password') as string | null,
+            data.get('role') as string | null,
+        ];
 
-        // Validate credentials
-        if (!email || !email.endsWith('@up.edu.ph')) return fail(400, { error: 'Invalid email.' });
-        if (await areYouHere(email))
-            return fail(400, { error: 'Email is already associated with an account.' });
-
-        if (!password) return fail(400, { error: 'Invalid password.' });
-
-        if (!role) return fail(400, { error: 'Invalid role.' });
-
-        // Register as user
         try {
+            assertAllRequiredFormInputs(requiredFormInputs);
+            const [email, password, role] = requiredFormInputs;
+
+            if (!email.endsWith('@up.edu.ph')) return fail(400, { error: 'Invalid email.' });
+            if (await areYouHere(email))
+                return fail(400, { error: 'Email is already associated with an account.' });
+
+            // Register as user
             const response = await auth.api.createUser({
                 body: {
                     email,
@@ -175,18 +163,18 @@ export const actions = {
         if (!canModifyAccount) return fail(403, { error: 'Insufficient permissions.' });
 
         const data = await request.formData();
-        const userid = data.get('userid') as string;
+        const userId = data.get('userId') as string;
 
         // Validate input
-        if (!userid) return fail(400, { error: 'Failed to delete account.' });
+        if (!userId) return fail(400, { error: 'Failed to delete account.' });
 
         // Delete user info
-        await deleteProfileInfo(locals.user.id, [userid]);
+        await deleteProfileInfo(locals.user.id, [userId]);
 
         // Delete!
         const response = await auth.api.removeUser({
             body: {
-                userId: userid,
+                userId,
             },
             headers: request.headers,
         });
@@ -228,10 +216,10 @@ export const actions = {
 
             // Delete!
             let success = true;
-            userids.forEach(async (userid) => {
+            userids.forEach(async (userId) => {
                 const { success: result } = await auth.api.removeUser({
                     body: {
-                        userId: userid,
+                        userId,
                     },
                     headers: request.headers,
                 });
@@ -251,30 +239,37 @@ export const actions = {
         }
     },
 
-    async resetAccount({ locals, request }) {
-        const formData = await request.formData();
-        const userid = formData.get('userid') as string;
+    async resetPassword({ locals, request }) {
+        // Check existing session
+        if (typeof locals.user === 'undefined') throw redirect(307, '/login');
 
-        if (!userid) return fail(400, { error: 'No such account' });
+        // Log action
+        await logChange(locals.user.id, null, 'Action: Reset Password.');
 
-        //permissions check
+        // Check Permissions
         const [roleObj] = await getUserRoleAndPermissions(locals.user.id);
-        if (typeof roleObj === 'undefined') return fail(403, 'Insufficient Permissions');
+        if (typeof roleObj === 'undefined') throw redirect(307, '/login');
 
-        if (!roleObj.canModifyAccount) return fail(403, 'Insufficient Permissions');
+        const { canModifyAccount } = roleObj;
+        if (!canModifyAccount) return fail(403, { error: 'Insufficient permissions.' });
+
+        const formData = await request.formData();
+        const userId = formData.get('userId') as string;
+
+        if (!userId) return fail(400, { error: 'No such account' });
 
         try {
             const response = await auth.api.setUserPassword({
                 body: {
-                    userId: userid,
+                    userId,
                     newPassword: 'password',
                 },
                 headers: request.headers,
             });
 
-            if (!response.status) {
+            if (!response.status) 
                 return fail(400, 'Failed to reset account password');
-            }
+            
         } catch (error) {
             console.log(error);
             return fail(500, {
