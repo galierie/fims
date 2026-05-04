@@ -10,6 +10,9 @@
 
     const { data } = $props();
     const { userId }: Props = $derived(data);
+
+    let newPassword = $state('');
+    let newPasswordReentry = $state('');
 </script>
 
 <br />
@@ -21,10 +24,10 @@
                 >Old Password: <input name="oldPassword" type="password" required /></label
             >
             <label for="newPassword"
-                >New Password: <input name="newPassword" type="password" required /></label
+                >New Password: <input name="newPassword" type="password" required bind:value={newPassword} /></label
             >
-            <label for="confirmNewPassword"
-                >Confirm New Password: <input name="confirmNewPassword" type="password" required /></label
+            <label for="newPasswordReentry"
+                >Confirm New Password: <input name="newPasswordReentry" type="password" required bind:value={newPasswordReentry} /></label
             >
             <div class="flex justify-around gap-20">
                 <RedButton
@@ -33,7 +36,9 @@
                         await goto('/');
                     }}>Cancel</RedButton
                 >
-                <GreenButton type="submit" name="userId" value={userId}>Confirm</GreenButton>
+                {#if newPassword !== '' && newPassword === newPasswordReentry}
+                    <GreenButton type="submit" name="userId" value={userId}>Confirm Password Change</GreenButton>
+                {/if}
             </div>
         </form>
     </div>
