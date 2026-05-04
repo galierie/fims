@@ -88,7 +88,7 @@
             <button
                 type="submit"
                 class="flex w-full rounded-sm p-3 hover:bg-fims-red text-fims-red hover:text-white"
-                name="userid"
+                name="userId"
                 value={id}
             >
                 <Icon icon="tabler:refresh" class="mr-2 h-6 w-6" />

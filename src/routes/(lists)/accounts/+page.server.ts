@@ -266,14 +266,14 @@ export const actions = {
         if (!canModifyAccount) return fail(403, { error: 'Insufficient permissions.' });
 
         const formData = await request.formData();
-        const userid = formData.get('userid') as string;
+        const userId = formData.get('userId') as string;
 
-        if (!userid) return fail(400, { error: 'No such account' });
+        if (!userId) return fail(400, { error: 'No such account' });
 
         try {
             const response = await auth.api.setUserPassword({
                 body: {
-                    userId: userid,
+                    userId,
                     newPassword: 'password',
                 },
                 headers: request.headers,
