@@ -99,7 +99,7 @@
             <span class="truncate text-[#535353]">{logMaker} ({logTimestamp}): {logOperation}</span>
         </div>
         <div class="w-100 justify-center px-0!">
-            <AccountActionsCell {id} {isLoading} />
+            <AccountActionsCell {id} bind:isLoading />
         </div>
     </div>
 
