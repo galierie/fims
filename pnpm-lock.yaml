@@ -108,6 +108,9 @@ importers:
       svelte-check:
         specifier: ^4.4.7
         version: 4.4.7(picomatch@4.0.4)(svelte@5.49.1(@typescript-eslint/types@8.59.2))(typescript@5.9.3)
+      svelte-eslint-parser:
+        specifier: ^1.6.0
+        version: 1.6.0(svelte@5.49.1(@typescript-eslint/types@8.59.2))
       tailwind-csstree:
         specifier: ^0.1.5
         version: 0.1.5(@eslint/css@0.14.1)
