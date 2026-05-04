@@ -157,12 +157,11 @@
                     <div class="w-66 2xl:w-132">
                         <SortHeader name="Email" key="email" bind:isSorting={isLoading} />
                     </div>
-                    <div class="w-50 justify-center"><span>Reset Password?</span></div>
                     <div class="w-40 justify-center">
                         <span>Type</span>
                     </div>
                     <div class="w-85 justify-center 2xl:w-100"><span>Change Logs</span></div>
-                    <div class="w-90 justify-center"><span>Account Action</span></div>
+                    <div class="w-100 justify-center"><span>Account Action</span></div>
                 </div>
 
                 <!-- Rows -->
