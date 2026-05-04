@@ -18,6 +18,7 @@ import {
     refreshAccountSearchView,
 } from '$lib/server/queries/account-list';
 import { profileInfo } from '$lib/server/db/schema';
+import { assertAllRequiredFormInputs } from '$lib/utils/assert';
 
 export async function load({ locals, url }) {
     // Check existing session
@@ -116,21 +117,21 @@ export const actions = {
         if (!canAddAccount) return fail(403, { error: 'Insufficient permissions.' });
 
         const data = await request.formData();
-        const email = data.get('email') as string;
-        const password = data.get('password') as string;
-        const role = data.get('role') as string;
+        const requiredFormInputs = [
+            data.get('email') as string | null,
+            data.get('password') as string | null,
+            data.get('role') as string | null,
+        ];
 
-        // Validate credentials
-        if (!email || !email.endsWith('@up.edu.ph')) return fail(400, { error: 'Invalid email.' });
-        if (await areYouHere(email))
-            return fail(400, { error: 'Email is already associated with an account.' });
-
-        if (!password) return fail(400, { error: 'Invalid password.' });
-
-        if (!role) return fail(400, { error: 'Invalid role.' });
-
-        // Register as user
         try {
+            assertAllRequiredFormInputs(requiredFormInputs);
+            const[email, password, role] = requiredFormInputs;
+
+            if (!email.endsWith('@up.edu.ph')) return fail(400, { error: 'Invalid email.' });
+            if (await areYouHere(email))
+                return fail(400, { error: 'Email is already associated with an account.' });
+
+            // Register as user
             const response = await auth.api.createUser({
                 body: {
                     email,
