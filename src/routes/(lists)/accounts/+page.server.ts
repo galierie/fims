@@ -228,10 +228,10 @@ export const actions = {
 
             // Delete!
             let success = true;
-            userids.forEach(async (userid) => {
+            userids.forEach(async (userId) => {
                 const { success: result } = await auth.api.removeUser({
                     body: {
-                        userId: userid,
+                        userId,
                     },
                     headers: request.headers,
                 });
