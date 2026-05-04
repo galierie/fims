@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { enhance } from '$app/forms';
     import Icon from '@iconify/svelte';
 
     import DeleteConfirmation from '$lib/ui/DeleteConfirmation.svelte';
+    import { enhance } from '$app/forms';
 
     let isDropdownOpen = $state(false);
 

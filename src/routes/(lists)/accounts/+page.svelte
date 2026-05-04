@@ -1,18 +1,20 @@
 <script lang="ts">
     import Icon from '@iconify/svelte';
-    import AccountCreationForm from './ui/AccountCreationForm.svelte';
-    import AccountRow from './ui/AccountRow.svelte';
-    import GreenButton from '$lib/ui/GreenButton.svelte';
-    import RedButton from '$lib/ui/RedButton.svelte';
-    import FilterButton from '$lib/ui/FilterButton.svelte';
-    import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
+
+    import ChangelogList from '$lib/ui/ChangelogList.svelte';
     import DeleteConfirmation from '$lib/ui/DeleteConfirmation.svelte';
+    import FilterButton from '$lib/ui/FilterButton.svelte';
+    import GreenButton from '$lib/ui/GreenButton.svelte';
+    import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
+    import RedButton from '$lib/ui/RedButton.svelte';
     import SearchBar from '$lib/ui/SearchBar.svelte';
     import SortHeader from '$lib/ui/SortHeader.svelte';
-    import ChangelogList from '$lib/ui/ChangelogList.svelte';
     import { enhance } from '$app/forms';
     import { goto } from '$app/navigation';
     import { page } from '$app/state';
+
+    import AccountCreationForm from './ui/AccountCreationForm.svelte';
+    import AccountRow from './ui/AccountRow.svelte';
     const { data, form } = $props();
     const {
         accountList,

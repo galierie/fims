@@ -1,8 +1,10 @@
 <script lang="ts">
-    import { goto } from '$app/navigation';
-    import GreenButton from './GreenButton.svelte';
     import Icon from '@iconify/svelte';
+
+    import { goto } from '$app/navigation';
     import { page } from '$app/state';
+
+    import GreenButton from './GreenButton.svelte';
     import RedButton from './RedButton.svelte';
 
     interface Props {

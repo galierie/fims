@@ -1,10 +1,22 @@
 import { type Actions, error, fail, redirect } from '@sveltejs/kit';
 import { APIError } from 'better-auth';
 
-import { areYouHere, deleteProfileInfo, getUserRoleAndPermissions, logChange, makeProfileInfo } from '$lib/server/queries/db-helpers';
+import {
+    areYouHere,
+    deleteProfileInfo,
+    getUserRoleAndPermissions,
+    logChange,
+    makeProfileInfo,
+} from '$lib/server/queries/db-helpers';
 import { assertAllRequiredFormInputs } from '$lib/utils/assert';
 import { auth } from '$lib/server/auth';
-import { changeRole, getAccountChangelogs, getAccountList, getAllRoles, refreshAccountSearchView } from '$lib/server/queries/account-list';
+import {
+    changeRole,
+    getAccountChangelogs,
+    getAccountList,
+    getAllRoles,
+    refreshAccountSearchView,
+} from '$lib/server/queries/account-list';
 import type { FilterColumn, FilterObject } from '$lib/types/filter';
 import { profileInfo } from '$lib/server/db/schema';
 
@@ -267,9 +279,7 @@ export const actions = {
                 headers: request.headers,
             });
 
-            if (!response.status) 
-                return fail(400, 'Failed to reset account password');
-            
+            if (!response.status) return fail(400, 'Failed to reset account password');
         } catch (error) {
             console.log(error);
             return fail(500, {

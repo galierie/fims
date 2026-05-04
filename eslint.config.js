@@ -1,10 +1,12 @@
 import css from '@eslint/css';
 import globals from 'globals';
 import html from '@html-eslint/eslint-plugin';
+import htmlSvelte from '@html-eslint/eslint-plugin-svelte';
 import imsort from '@bastidood/eslint-plugin-imsort';
 import js from '@eslint/js';
 import prettier from 'eslint-config-prettier';
 import svelte from 'eslint-plugin-svelte';
+import svelteParser from 'svelte-eslint-parser';
 import ts from 'typescript-eslint';
 import { defineConfig } from 'eslint/config';
 import { tailwind4 } from 'tailwind-csstree';
@@ -14,11 +16,6 @@ import svelteConfig from './svelte.config.js';
 export default defineConfig(
     { ignores: ['.svelte-kit/**/*', 'build/**/*', 'node_modules/**/*'] },
     { languageOptions: { globals: { ...globals.browser, ...globals.node } } },
-    {
-        files: ['**/*.{j,t}s'],
-        extends: [imsort.configs.all],
-        plugins: { '@bastidood/imsort': imsort },
-    },
     {
         files: ['**/*.html'],
         extends: [html.configs['flat/recommended']],
@@ -70,13 +67,8 @@ export default defineConfig(
     },
     {
         files: ['**/*.{j,t}s', '**/*.svelte'],
-        extends: [
-            js.configs.recommended,
-            ...ts.configs.recommended,
-            ...svelte.configs.recommended,
-            prettier,
-            ...svelte.configs.prettier,
-        ],
+        extends: [js.configs.recommended, ...ts.configs.recommended, imsort.configs.all, prettier],
+        plugins: { '@bastidood/imsort': imsort },
         rules: {
             '@typescript-eslint/class-methods-use-this': 'error',
             '@typescript-eslint/default-param-last': 'error',
@@ -147,7 +139,7 @@ export default defineConfig(
             'no-sequences': 'error',
             'no-throw-literal': 'error',
             'no-undef-init': 'error',
-            'no-undefined': 'warn',
+            'no-undefined': 'error',
             'no-underscore-dangle': 'error',
             'no-unmodified-loop-condition': 'error',
             'no-unneeded-ternary': 'error',
@@ -189,9 +181,15 @@ export default defineConfig(
         },
     },
     {
+        files: ['**/*.svelte'],
+        extends: typeof htmlSvelte.configs === 'undefined' ? [] : [htmlSvelte.configs.recommended],
+        languageOptions: { parser: svelteParser },
+    },
+    {
         files: ['**/*.svelte{,.{j,t}s}'],
         extends: [...svelte.configs.recommended, ...svelte.configs.prettier],
         languageOptions: {
+            parser: svelteParser,
             parserOptions: {
                 projectService: true,
                 extraFileExtensions: ['.svelte'],
@@ -200,7 +198,9 @@ export default defineConfig(
             },
         },
         rules: {
+            'prefer-const': 'off',
             'svelte/no-navigation-without-resolve': 'warn',
+            'svelte/prefer-const': 'error',
         },
     },
 );

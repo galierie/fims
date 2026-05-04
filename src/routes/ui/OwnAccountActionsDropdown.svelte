@@ -1,6 +1,7 @@
 <script lang="ts">
-    import { goto, invalidateAll } from '$app/navigation';
     import Icon from '@iconify/svelte';
+
+    import { goto, invalidateAll } from '$app/navigation';
 
     let isDropdownOpen = $state(false);
 

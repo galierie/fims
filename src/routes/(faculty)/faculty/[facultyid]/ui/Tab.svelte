@@ -1,5 +1,6 @@
 <script>
     import { page } from '$app/state';
+
     import { viewState } from '../states/view-state.svelte';
     const { href, name } = $props();
 

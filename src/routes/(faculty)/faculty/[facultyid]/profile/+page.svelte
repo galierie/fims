@@ -1,9 +1,9 @@
 <script lang="ts">
     import Icon from '@iconify/svelte';
 
-    import ProfileForm from '../ui/ProfileForm.svelte';
     import ChangelogList, { type ChangelogRecordStructure } from '$lib/ui/ChangelogList.svelte';
 
+    import ProfileForm from '../ui/ProfileForm.svelte';
     import { resetViewState } from '../states/view-state.svelte.js';
 
     const { data, form } = $props();

@@ -1,11 +1,10 @@
 <script lang="ts">
     import Icon from '@iconify/svelte';
-    import InputTable from '../../../../ui/InputTable.svelte';
+
+    import type { FacultyCoursesTaughtDTO, FacultyMenteesDTO } from '$lib/server/queries/faculty-view';
     import type { InputColumnType, InputRowValue } from '$lib/types/input-table';
-    import type {
-        FacultyCoursesTaughtDTO,
-        FacultyMenteesDTO,
-    } from '$lib/server/queries/faculty-view';
+
+    import InputTable from '../../../../ui/InputTable.svelte';
 
     interface Props {
         teachingLoadCredit: number;
@@ -18,13 +17,13 @@
 
     let {
         teachingLoadCredit = $bindable(),
-        // eslint-disable-next-line prefer-const -- bindable variable
+         
         coursesTaught,
-        // eslint-disable-next-line prefer-const -- bindable variable
+         
         mentees,
-        // eslint-disable-next-line prefer-const -- bindable variable
+         
         opts,
-        // eslint-disable-next-line prefer-const -- bindable variable
+         
         dependencyMaps,
         hasChange = $bindable(),
     }: Props = $props();

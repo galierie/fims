@@ -1,21 +1,21 @@
 <script lang="ts">
-    import { enhance } from '$app/forms';
-    import { goto } from '$app/navigation';
     import Icon from '@iconify/svelte';
     import { onMount } from 'svelte';
-    import { browser } from '$app/environment';
 
-    import Field from './Field.svelte';
+    import DeleteConfirmation from '$lib/ui/DeleteConfirmation.svelte';
     import GreenButton from '$lib/ui/GreenButton.svelte';
-    import InputTable from './InputTable.svelte';
     import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
     import RedButton from '$lib/ui/RedButton.svelte';
-    import DeleteConfirmation from '$lib/ui/DeleteConfirmation.svelte';
-
+    import { browser } from '$app/environment';
+    import { enhance } from '$app/forms';
     import type { FacultyProfileRecordDTO } from '$lib/server/queries/faculty-view.js';
+    import { goto } from '$app/navigation';
     import type { InputColumnType, InputRowValue } from '$lib/types/input-table.js';
 
-    import { viewState, setToEdit, resetViewState } from '../states/view-state.svelte.js';
+    import { resetViewState, setToEdit, viewState } from '../states/view-state.svelte.js';
+
+    import Field from './Field.svelte';
+    import InputTable from './InputTable.svelte';
 
     interface Props {
         profile?: FacultyProfileRecordDTO;
@@ -46,9 +46,7 @@
     const remarksChanged = $derived(remarksValue !== (profile?.remarks ?? ''));
 
     $effect(() => {
-        if (!viewState.isEditing) 
-            remarksValue = profile?.remarks ?? '';
-        
+        if (!viewState.isEditing) remarksValue = profile?.remarks ?? '';
     });
 
     const hasChange = $derived(

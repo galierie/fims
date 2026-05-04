@@ -1,8 +1,10 @@
 <script lang="ts">
     import Icon from '@iconify/svelte';
-    import InputTable from '../../../../ui/InputTable.svelte';
-    import type { InputColumnType, InputRowValue } from '$lib/types/input-table';
+
     import type { FacultyResearchDTO } from '$lib/server/queries/faculty-view';
+    import type { InputColumnType, InputRowValue } from '$lib/types/input-table';
+
+    import InputTable from '../../../../ui/InputTable.svelte';
 
     interface Props {
         researchLoadCredit: number;

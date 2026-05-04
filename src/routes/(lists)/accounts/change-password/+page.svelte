@@ -1,10 +1,11 @@
 <script lang="ts">
+    import Icon from '@iconify/svelte';
+
+    import GreenButton from '$lib/ui/GreenButton.svelte';
+    import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
+    import RedButton from '$lib/ui/RedButton.svelte';
     import { enhance } from '$app/forms';
     import { goto } from '$app/navigation';
-    import GreenButton from '$lib/ui/GreenButton.svelte';
-    import RedButton from '$lib/ui/RedButton.svelte';
-    import Icon from '@iconify/svelte';
-    import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
 
     interface Props {
         userId: string;

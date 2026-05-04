@@ -1,10 +1,12 @@
 <script lang="ts">
     import { onMount } from 'svelte';
 
-    import type { InputColumnType, InputCellValue, InputRowValue } from '$lib/types/input-table';
-    import InputTableRow from './InputTableRow.svelte';
-    import { viewState } from '../states/view-state.svelte';
     import GreenButton from '$lib/ui/GreenButton.svelte';
+    import type { InputCellValue, InputColumnType, InputRowValue } from '$lib/types/input-table';
+
+    import { viewState } from '../states/view-state.svelte';
+
+    import InputTableRow from './InputTableRow.svelte';
 
     interface Props {
         tableName: string;

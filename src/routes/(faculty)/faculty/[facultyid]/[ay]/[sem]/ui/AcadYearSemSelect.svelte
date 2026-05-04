@@ -1,13 +1,10 @@
 <script lang="ts">
-    import { goto } from '$app/navigation';
     import Icon from '@iconify/svelte';
 
     import LoadingScreen from '$lib/ui/LoadingScreen.svelte';
+    import { goto } from '$app/navigation';
 
-    import {
-        chooseSemestralRecord,
-        chosenSemestralRecord,
-    } from '../../../states/chosen-semestral-record.svelte';
+    import { chooseSemestralRecord, chosenSemestralRecord } from '../../../states/chosen-semestral-record.svelte';
     import { viewState } from '../../../states/view-state.svelte';
 
     interface Props {
