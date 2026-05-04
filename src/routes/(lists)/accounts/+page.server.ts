@@ -18,7 +18,6 @@ import {
     refreshAccountSearchView,
 } from '$lib/server/queries/account-list';
 import { profileInfo } from '$lib/server/db/schema';
-import { getHeaders } from 'better-auth/client';
 
 export async function load({ locals, url }) {
     // Check existing session
