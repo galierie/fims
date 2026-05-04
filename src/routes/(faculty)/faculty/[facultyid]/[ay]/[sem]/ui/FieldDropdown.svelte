@@ -7,12 +7,11 @@
         label: string;
         name: string;
         opts: string[];
-        selectedOpt: string | null;
+        defaultSelectedOpt: string | null;
         colStart?: number;
         colSpan?: number;
         immutable?: boolean;
         hasChange?: boolean;
-        initialOpt?: string | null;
     }
 
     // eslint-disable-next-line prefer-const -- changing value
@@ -20,30 +19,38 @@
         label,
         name,
         opts,
-        selectedOpt,
+        defaultSelectedOpt,
         colStart,
         colSpan,
         immutable,
         hasChange = $bindable(false),
-        initialOpt = selectedOpt,
     }: Props = $props();
     let isDropdownOpen = $state(false);
 
     const colStartClass = $derived(colStart === undefined ? '' : `col-start-${colStart}`);
     const colSpanClass = $derived(colSpan === undefined ? '' : `col-span-${colSpan}`);
 
+    // svelte-ignore state_referenced_locally
+    let currentSelectedOpt = $state(defaultSelectedOpt);
+    // svelte-ignore state_referenced_locally
+    let lastDefault = $state(defaultSelectedOpt);
+    
     $effect(() => {
-        if (!viewState.isEditing) {
-            selectedOpt = initialOpt;
+        if (defaultSelectedOpt !== lastDefault) {
+            currentSelectedOpt = defaultSelectedOpt;
+            lastDefault = defaultSelectedOpt;
         }
-        hasChange = immutable ? false : selectedOpt !== initialOpt;
+        if (!viewState.isEditing) {
+            currentSelectedOpt = defaultSelectedOpt;
+        }
+        hasChange = immutable ? false : currentSelectedOpt !== defaultSelectedOpt;
     });
 </script>
 
 <div class="relative w-full {colStartClass} {colSpanClass}">
     <div class="flex w-full items-center justify-end">
         <span class="mr-2 w-fit text-right">{label}</span>
-        {#if viewState.isEditing && (!immutable || (immutable && selectedOpt === null))}
+        {#if viewState.isEditing && (!immutable || (immutable && currentSelectedOpt === null))}
             <button
                 type="button"
                 class="relative h-8 w-45 rounded-sm bg-white px-1.5 text-left 2xl:w-75"
@@ -51,43 +58,43 @@
                     isDropdownOpen = !isDropdownOpen;
                 }}
             >
-                <span>{selectedOpt ? selectedOpt : '-'}</span>
+                <span>{currentSelectedOpt ? currentSelectedOpt : '-'}</span>
                 <Icon
                     icon={isDropdownOpen ? 'tabler:chevron-up' : 'tabler:chevron-down'}
                     class="absolute top-2 right-1.5 h-4 w-4"
                 />
             </button>
         {:else}
-            <span class="h-8 w-45 content-center rounded-sm bg-white px-1.5 text-left 2xl:w-75"
-                >{selectedOpt ?? '-'}</span
+            <span class="block h-8 w-45 content-center rounded-sm bg-white px-1.5 text-left 2xl:w-75"
+                >{currentSelectedOpt ?? '-'}</span
             >
         {/if}
     </div>
 
     <div
-        class="rounded-lg p-1 {isDropdownOpen
+        class="absolute z-50 w-full rounded-lg bg-white p-1 shadow-lg {isDropdownOpen
             ? 'block'
-            : 'hidden'} absolute z-50 w-full bg-white shadow-lg"
+            : 'hidden'}"
     >
         {#each opts as opt (opt)}
-            {#if opt === selectedOpt}
+            {#if opt === currentSelectedOpt}
                 <button
                     type="button"
                     class="flex w-full rounded-sm p-3 hover:bg-[#e9e9e9]"
                     onclick={() => {
-                        selectedOpt = null;
+                        currentSelectedOpt = null;
                         isDropdownOpen = false;
                     }}
                 >
                     <Icon icon="tabler:check" class="h-6 w-8 pr-2 text-fims-green" />
-                    <span>{selectedOpt}</span>
+                    <span>{currentSelectedOpt}</span>
                 </button>
             {:else}
                 <button
                     type="button"
                     class="flex w-full rounded-sm p-3 hover:bg-[#e9e9e9]"
                     onclick={() => {
-                        selectedOpt = opt;
+                        currentSelectedOpt = opt;
                         isDropdownOpen = false;
                     }}
                 >
@@ -98,5 +105,5 @@
         {/each}
     </div>
 
-    <input type="hidden" {name} value={selectedOpt} />
+    <input type="hidden" {name} value={currentSelectedOpt} />
 </div>
