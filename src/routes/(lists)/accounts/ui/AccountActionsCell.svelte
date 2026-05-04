@@ -1,7 +1,6 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
     import Icon from '@iconify/svelte';
-    import { goto } from '$app/navigation';
 
     import DeleteConfirmation from '$lib/ui/DeleteConfirmation.svelte';
 
@@ -95,17 +94,5 @@
                 <span>Reset Password</span>
             </button>
         </form>
-
-        <!-- Change Password -->
-        <button
-            type="button"
-            class="flex w-full rounded-sm p-3 hover:bg-fims-red text-fims-red hover:text-white"
-            onclick={async () => {
-                await goto(`/accounts/changePass/${id}`);
-            }}
-        >
-            <Icon icon="tabler:edit" class="mr-2 h-6 w-6" />
-            <span>Change Password</span>
-        </button>
     </div>
 </div>
