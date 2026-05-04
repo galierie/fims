@@ -16,18 +16,17 @@ export const actions: Actions = {
         if (typeof roleObj === 'undefined') throw redirect(307, '/login');
 
         const { canModifyAccount } = roleObj;
-        if (!canModifyAccount) return fail(403, { error: 'Insufficient permissions.' });
-
         const formData = await request.formData();
 
         const userid = formData.get('userid') as string;
-        const newPass = formData.get('newpass') as string;
-
         if (typeof userid === 'undefined') return fail(403, 'No such account');
         if (!userid) return fail(403, 'No such account');
+
+        if (!canModifyAccount && userid !== locals.user.id) return fail(403, { error: 'Insufficient permissions.' });
+
+        const newPass = formData.get('newpass') as string;
         if (typeof newPass === 'undefined') return fail(403, 'Must input a password');
         if (!newPass) return fail(403, 'Must input a password');
-
         if (newPass.length === 0) return fail(403, 'Nust input a password');
 
         try {
