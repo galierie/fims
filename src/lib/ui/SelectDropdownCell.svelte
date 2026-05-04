@@ -67,7 +67,7 @@
                 <span>{selectedOpt ? selectedOpt : defaultSelectedOpt}</span>
                 <Icon
                     icon={isDropdownOpen ? 'tabler:chevron-up' : 'tabler:chevron-down'}
-                    class="absolute top-0 right-1 h-full w-4"
+                    class="absolute top-0 right-5 h-full w-4"
                 />
             </button>
         {/if}
