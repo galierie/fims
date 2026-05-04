@@ -175,18 +175,18 @@ export const actions = {
         if (!canModifyAccount) return fail(403, { error: 'Insufficient permissions.' });
 
         const data = await request.formData();
-        const userid = data.get('userid') as string;
+        const userId = data.get('userId') as string;
 
         // Validate input
-        if (!userid) return fail(400, { error: 'Failed to delete account.' });
+        if (!userId) return fail(400, { error: 'Failed to delete account.' });
 
         // Delete user info
-        await deleteProfileInfo(locals.user.id, [userid]);
+        await deleteProfileInfo(locals.user.id, [userId]);
 
         // Delete!
         const response = await auth.api.removeUser({
             body: {
-                userId: userid,
+                userId,
             },
             headers: request.headers,
         });

@@ -70,7 +70,7 @@
                 <span>Delete</span>
             </button>
 
-            <input type="hidden" name="userid" value={id} />
+            <input type="hidden" name="userId" value={id} />
 
             {#if willDelete}
                 <DeleteConfirmation
