@@ -56,8 +56,6 @@
     }
 
     let deleteForm: HTMLFormElement | null = $state(null);
-
-    let newPassword = $state('');
 </script>
 
 {#if form?.error}

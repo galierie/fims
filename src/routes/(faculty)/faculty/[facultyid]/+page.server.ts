@@ -1,4 +1,5 @@
 import { error, redirect } from '@sveltejs/kit';
+
 import { getUserRoleAndPermissions, logChange } from '$lib/server/queries/db-helpers';
 
 export async function load({ locals, parent }) {

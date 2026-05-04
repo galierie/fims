@@ -43,12 +43,12 @@
     const basicHaveChanges: boolean[] = $state(Array(15).fill(false)); // Basic fields
     // svelte-ignore state_referenced_locally
     let remarksValue = $state(profile?.remarks ?? '');
-    let remarksChanged = $derived(remarksValue !== (profile?.remarks ?? ''));
+    const remarksChanged = $derived(remarksValue !== (profile?.remarks ?? ''));
 
     $effect(() => {
-        if (!viewState.isEditing) {
+        if (!viewState.isEditing) 
             remarksValue = profile?.remarks ?? '';
-        }
+        
     });
 
     const hasChange = $derived(

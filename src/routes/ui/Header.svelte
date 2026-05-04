@@ -1,5 +1,5 @@
 <script lang="ts">
-    import OwnAccountActionsDropdown from "./OwnAccountActionsDropdown.svelte";
+    import OwnAccountActionsDropdown from './OwnAccountActionsDropdown.svelte';
 
     interface Props {
         email: string;

@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test';
 
 import * as fieldHelp from '../test-helpers/field-test';
-import * as testConsts from '../test-consts';
 import * as seedData from '../seed-data/faculty-admin';
+import * as testConsts from '../test-consts';
 
 // Actual tests
 
@@ -119,11 +119,11 @@ test.describe('viewing and searching records as it', () => {
         await expect(page).toHaveURL('/?status=Active');
         await facultyLastNames.forEach(async (lastName) => {
             const cell = await page.getByText(lastName);
-            if (lastName === 'Galinato' || lastName === 'Mandario') {
+            if (lastName === 'Galinato' || lastName === 'Mandario') 
                 await expect(cell).toBeVisible();
-            } else {
+             else 
                 await expect(cell).not.toBeVisible();
-            }
+            
         });
 
         // Unselect status filter

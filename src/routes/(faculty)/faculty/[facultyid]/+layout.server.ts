@@ -1,7 +1,7 @@
 import { error, redirect } from '@sveltejs/kit';
 
-import { getUserRoleAndPermissions, logChange } from '$lib/server/queries/db-helpers.js';
 import { getAllFacultyAcademicSemesters, getFacultyName } from '$lib/server/queries/faculty-view';
+import { getUserRoleAndPermissions, logChange } from '$lib/server/queries/db-helpers.js';
 
 export async function load({ locals, params }) {
     // Check existing session

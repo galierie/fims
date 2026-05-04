@@ -12,7 +12,7 @@
     }
 
     let { id, isLoading = $bindable() }: Props = $props();
-    
+
     let deleteForm: HTMLFormElement | null = $state(null);
 
     let willDelete = $state(false);
@@ -63,7 +63,7 @@
         >
             <button
                 type="submit"
-                class="flex w-full rounded-sm p-3 hover:bg-fims-red text-fims-red hover:text-white"
+                class="flex w-full rounded-sm p-3 text-fims-red hover:bg-fims-red hover:text-white"
             >
                 <Icon icon="tabler:trash" class="mr-2 h-6 w-6" />
                 <span>Delete</span>
@@ -83,16 +83,21 @@
         </form>
 
         <!-- Reset Password -->
-        <form method="POST" action="?/resetPassword" class="flex items-center justify-center" use:enhance={() => {
-            isLoading = true;
-            return async ({ update }) => {
-                await update();
-                isLoading = false;
-            };
-        }}>
+        <form
+            method="POST"
+            action="?/resetPassword"
+            class="flex items-center justify-center"
+            use:enhance={() => {
+                isLoading = true;
+                return async ({ update }) => {
+                    await update();
+                    isLoading = false;
+                };
+            }}
+        >
             <button
                 type="submit"
-                class="flex w-full rounded-sm p-3 hover:bg-fims-red text-fims-red hover:text-white"
+                class="flex w-full rounded-sm p-3 text-fims-red hover:bg-fims-red hover:text-white"
                 name="userId"
                 value={id}
             >

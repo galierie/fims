@@ -18,7 +18,7 @@
         isMakingAccount = !isMakingAccount;
         willMake = !willMake;
     }
-    
+
     let newEmail = $state('');
     let newPassword = $state('');
     let makeForm: HTMLFormElement | null = $state(null);
@@ -72,10 +72,10 @@
             required
         />
     </div>
-    <div class="w-100 justify-center py-1 px-1!">
+    <div class="w-100 justify-center px-1! py-1">
         <button
             type="submit"
-            class="flex w-full h-full rounded-sm px-2 hover:bg-fims-green text-fims-green hover:text-white items-center disabled:border-fims-gray disabled:bg-fims-white disabled:text-fims-gray"
+            class="flex h-full w-full items-center rounded-sm px-2 text-fims-green hover:bg-fims-green hover:text-white disabled:border-fims-gray disabled:bg-fims-white disabled:text-fims-gray"
             disabled={!newEmail.endsWith('@up.edu.ph') || newPassword.length < 8}
         >
             <Icon icon="tabler:device-floppy" class="mr-2 h-6 w-6" />

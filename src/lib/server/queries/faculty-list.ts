@@ -1,22 +1,10 @@
 import { and, asc, desc, eq, gt, ilike, lt, or, type SQL, type SQLWrapper, sql } from 'drizzle-orm';
+import type { PgColumn } from 'drizzle-orm/pg-core';
 
 import type { FilterColumn } from '$lib/types/filter';
 
-import {
-    academicSemester,
-    adminPosition,
-    changelog,
-    faculty,
-    facultyAcademicSemester,
-    facultyAdminPosition,
-    facultyRank,
-    facultyRecordSearchView,
-    profile,
-    rank,
-    status,
-} from '../db/schema';
+import { academicSemester, adminPosition, changelog, faculty, facultyAcademicSemester, facultyAdminPosition, facultyRank, facultyRecordSearchView, profile, rank, status } from '../db/schema';
 import { db } from '../db';
-import type { PgColumn } from 'drizzle-orm/pg-core';
 
 const pageSize = 50;
 
@@ -123,7 +111,7 @@ export async function getFacultyRecordList(
         const sameColumnQueries: SQLWrapper[] = [];
         selectedOpts.forEach((opt) => {
             // TODO: Generalize column to subquery mappings
-            const processedColumn = (column === adminPosition.title) ? adminPositionSq.title : column;
+            const processedColumn = column === adminPosition.title ? adminPositionSq.title : column;
             sameColumnQueries.push(sql`${processedColumn} = ${opt}`);
         });
 

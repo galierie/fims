@@ -34,41 +34,63 @@
 <div class="flex justify-center">
     <div class="mt-25 p-20 text-center">
         <h1 class="text-2xl">Change Password</h1>
-        <form method="POST" action="?/changePassword" class="mt-5 w-full flex flex-col gap-5" use:enhance={() => {
-            isLoading = true;
-            return async ({ update }) => {
-                await update();
-                isLoading = false;
-            };
-        }}>
-            <div class="flex justify-center items-center">
-                <label for="currentPassword" class="text-right w-45"
-                    >Current Password: </label
-                >
-                <input name="currentPassword" type="password" class="ml-1 h-8 w-50 rounded-sm border-0 bg-white p-1 placeholder-fims-gray focus:ring-0 2xl:w-75" placeholder="-" required bind:value={currentPassword} />
+        <form
+            method="POST"
+            action="?/changePassword"
+            class="mt-5 flex w-full flex-col gap-5"
+            use:enhance={() => {
+                isLoading = true;
+                return async ({ update }) => {
+                    await update();
+                    isLoading = false;
+                };
+            }}
+        >
+            <div class="flex items-center justify-center">
+                <label for="currentPassword" class="w-45 text-right">Current Password: </label>
+                <input
+                    name="currentPassword"
+                    type="password"
+                    class="ml-1 h-8 w-50 rounded-sm border-0 bg-white p-1 placeholder-fims-gray focus:ring-0 2xl:w-75"
+                    placeholder="-"
+                    required
+                    bind:value={currentPassword}
+                />
             </div>
-            <div class="flex justify-center items-center">
-                <label for="newPassword" class="text-right w-45"
-                    >New Password: </label
-                >
-                <input name="newPassword" type="password" class="ml-1 h-8 w-50 rounded-sm border-0 bg-white p-1 placeholder-fims-gray focus:ring-0 2xl:w-75" placeholder="Min. 8 characters" required bind:value={newPassword} />
+            <div class="flex items-center justify-center">
+                <label for="newPassword" class="w-45 text-right">New Password: </label>
+                <input
+                    name="newPassword"
+                    type="password"
+                    class="ml-1 h-8 w-50 rounded-sm border-0 bg-white p-1 placeholder-fims-gray focus:ring-0 2xl:w-75"
+                    placeholder="Min. 8 characters"
+                    required
+                    bind:value={newPassword}
+                />
             </div>
-            <div class="flex justify-center items-center">
-                <label for="newPasswordReentry" class="text-right w-45"
-                    >Retype New Password: </label
-                >
-                <input name="newPasswordReentry" type="password" class="ml-1 h-8 w-50 rounded-sm border-0 bg-white p-1 placeholder-fims-gray focus:ring-0 2xl:w-75" placeholder="Min. 8 characters" required bind:value={newPasswordReentry} />
+            <div class="flex items-center justify-center">
+                <label for="newPasswordReentry" class="w-45 text-right"
+                    >Retype New Password:
+                </label>
+                <input
+                    name="newPasswordReentry"
+                    type="password"
+                    class="ml-1 h-8 w-50 rounded-sm border-0 bg-white p-1 placeholder-fims-gray focus:ring-0 2xl:w-75"
+                    placeholder="Min. 8 characters"
+                    required
+                    bind:value={newPasswordReentry}
+                />
             </div>
             <div class="flex justify-around gap-5">
                 <RedButton
                     type="button"
                     onclick={async () => {
                         await goto('/');
-                    }}>
-                    <Icon icon="tabler:edit-off" class="mr-2 h-6 w-6" />
-                        Cancel
-                    </RedButton
+                    }}
                 >
+                    <Icon icon="tabler:edit-off" class="mr-2 h-6 w-6" />
+                    Cancel
+                </RedButton>
                 {#if currentPassword.length >= 8 && newPassword.length >= 8 && newPassword === newPasswordReentry}
                     <GreenButton type="submit" name="userId" value={userId}>
                         <Icon icon="tabler:check" class="mr-2 h-6 w-6" />

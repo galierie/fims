@@ -14,14 +14,14 @@
     // fims-red
 
     const { accountColor, email }: Props = $props();
-    let isLoading = $state(false);
+    const isLoading = $state(false);
 </script>
 
 <div class="relative h-full w-60">
     <button
         type="button"
         data-testid={`account-action-${email}`}
-        class="h-full w-full flex items-center text-{accountColor} justify-end font-semibold"
+        class="flex h-full w-full items-center text-{accountColor} justify-end font-semibold"
         onclick={() => {
             isDropdownOpen = !isDropdownOpen;
         }}
@@ -29,7 +29,7 @@
         <span>{email}</span>
         <Icon
             icon={isDropdownOpen ? 'tabler:chevron-up' : 'tabler:chevron-down'}
-            class="h-full w-5 ml-3"
+            class="ml-3 h-full w-5"
         />
     </button>
 
@@ -41,7 +41,7 @@
         <!-- Log-out -->
         <button
             type="submit"
-            class="flex w-full rounded-sm p-3 hover:bg-fims-red text-fims-red hover:text-white"
+            class="flex w-full rounded-sm p-3 text-fims-red hover:bg-fims-red hover:text-white"
             onclick={async () => {
                 await fetch('/logout', {
                     method: 'POST',
@@ -60,7 +60,7 @@
         <!-- Change Password -->
         <button
             type="submit"
-            class="flex w-full rounded-sm p-3 hover:bg-fims-red text-fims-red hover:text-white"
+            class="flex w-full rounded-sm p-3 text-fims-red hover:bg-fims-red hover:text-white"
             onclick={async () => {
                 await goto('/accounts/change-password');
             }}

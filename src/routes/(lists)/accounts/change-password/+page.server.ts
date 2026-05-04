@@ -1,7 +1,8 @@
-import { logChange } from '$lib/server/queries/db-helpers';
 import { type Actions, fail, redirect } from '@sveltejs/kit';
-import { auth } from '$lib/server/auth';
+
 import { assertAllRequiredFormInputs } from '$lib/utils/assert';
+import { auth } from '$lib/server/auth';
+import { logChange } from '$lib/server/queries/db-helpers';
 
 export async function load({ locals }) {
     // Check existing session
@@ -10,7 +11,7 @@ export async function load({ locals }) {
     // Log action
     await logChange(locals.user.id, null, 'Action: Attempt to change password.');
 
-    return { userId: locals.user.id }
+    return { userId: locals.user.id };
 }
 
 export const actions: Actions = {
@@ -35,8 +36,7 @@ export const actions: Actions = {
             const [userId, currentPassword, newPassword] = requiredFormInputs;
 
             // Ensure that only users can set their own password
-            if (userId !== locals.user.id)
-                return fail(403, { error: 'Insufficient permissions.' });
+            if (userId !== locals.user.id) return fail(403, { error: 'Insufficient permissions.' });
 
             // Change password
             await auth.api.changePassword({
@@ -58,9 +58,9 @@ export const actions: Actions = {
             });
         }
 
-        if (success)
-            return redirect(303, '/');
-        else
-            return fail(500, { error: 'Failed to change account password. (Unknown/Internal error)' });
+        if (success) return redirect(303, '/');
+        return fail(500, {
+                error: 'Failed to change account password. (Unknown/Internal error)',
+            });
     },
 };

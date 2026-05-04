@@ -51,24 +51,24 @@
     const basicHaveChanges: boolean[] = $state(Array(2).fill(false));
     // svelte-ignore state_referenced_locally
     let remarksValue = $state(semestralRecord?.remarks ?? '');
-    let remarksChanged = $derived(remarksValue !== (semestralRecord?.remarks ?? ''));
+    const remarksChanged = $derived(remarksValue !== (semestralRecord?.remarks ?? ''));
     // svelte-ignore state_referenced_locally
     let lastRemarks = $state(semestralRecord?.remarks ?? '');
-    
+
     $effect(() => {
         if ((semestralRecord?.remarks ?? '') !== lastRemarks) {
             remarksValue = semestralRecord?.remarks ?? '';
             lastRemarks = semestralRecord?.remarks ?? '';
         }
-        if (!viewState.isEditing) {
+        if (!viewState.isEditing) 
             remarksValue = semestralRecord?.remarks ?? '';
-        }
+        
     });
 
     const hasChange = $derived(
-        haveChanges.some((e) => e === true) || 
-        basicHaveChanges.some((e) => e === true) || 
-        remarksChanged
+        haveChanges.some((e) => e === true) ||
+            basicHaveChanges.some((e) => e === true) ||
+            remarksChanged,
     );
 
     let isLoading = $state(false);

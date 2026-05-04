@@ -30,11 +30,11 @@
             userRoles.includes(selectedOpt) &&
             selectedOpt !== role &&
             !willChangeRole
-        ) {
-            if (changeRoleForm !== null) {
+        ) 
+            if (changeRoleForm !== null) 
                 changeRoleForm.requestSubmit();
-            }
-        }
+            
+        
     });
 
     let changeRoleForm: HTMLFormElement | null = $state(null);

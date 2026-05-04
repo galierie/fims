@@ -1,24 +1,12 @@
 import { type Actions, error, fail, redirect } from '@sveltejs/kit';
 import { APIError } from 'better-auth';
 
-import {
-    areYouHere,
-    deleteProfileInfo,
-    getUserRoleAndPermissions,
-    logChange,
-    makeProfileInfo,
-} from '$lib/server/queries/db-helpers';
-import { auth } from '$lib/server/auth';
-import type { FilterColumn, FilterObject } from '$lib/types/filter';
-import {
-    changeRole,
-    getAccountChangelogs,
-    getAccountList,
-    getAllRoles,
-    refreshAccountSearchView,
-} from '$lib/server/queries/account-list';
-import { profileInfo } from '$lib/server/db/schema';
+import { areYouHere, deleteProfileInfo, getUserRoleAndPermissions, logChange, makeProfileInfo } from '$lib/server/queries/db-helpers';
 import { assertAllRequiredFormInputs } from '$lib/utils/assert';
+import { auth } from '$lib/server/auth';
+import { changeRole, getAccountChangelogs, getAccountList, getAllRoles, refreshAccountSearchView } from '$lib/server/queries/account-list';
+import type { FilterColumn, FilterObject } from '$lib/types/filter';
+import { profileInfo } from '$lib/server/db/schema';
 
 export async function load({ locals, url }) {
     // Check existing session
@@ -125,7 +113,7 @@ export const actions = {
 
         try {
             assertAllRequiredFormInputs(requiredFormInputs);
-            const[email, password, role] = requiredFormInputs;
+            const [email, password, role] = requiredFormInputs;
 
             if (!email.endsWith('@up.edu.ph')) return fail(400, { error: 'Invalid email.' });
             if (await areYouHere(email))
@@ -279,9 +267,9 @@ export const actions = {
                 headers: request.headers,
             });
 
-            if (!response.status) {
+            if (!response.status) 
                 return fail(400, 'Failed to reset account password');
-            }
+            
         } catch (error) {
             console.log(error);
             return fail(500, {

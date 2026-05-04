@@ -1,6 +1,7 @@
-import { db } from '$lib/server/db';
-import { academicSemester } from '$lib/server/db/schema';
 import { desc } from 'drizzle-orm';
+
+import { academicSemester } from '$lib/server/db/schema';
+import { db } from '$lib/server/db';
 
 export async function load() {
     // Fetch the absolute latest academic semester in the entire system

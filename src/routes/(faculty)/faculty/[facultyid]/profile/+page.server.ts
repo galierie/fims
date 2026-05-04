@@ -1,22 +1,9 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 
 import type { ChangelogRecordStructure } from '$lib/ui/ChangelogList.svelte';
-import {
-    deleteFacultyRecords,
-    getUserRoleAndPermissions,
-    updateFacultyProfileRecords,
-    logChange,
-} from '$lib/server/queries/db-helpers';
-import {
-    getAllAppointmentStatuses,
-    getAllFieldsOfInterest,
-    getAllRanks,
-    getFacultyProfile,
-} from '$lib/server/queries/faculty-view';
-import {
-    getFacultyRecordChangelogs,
-    refreshFacultyRecordSearchView,
-} from '$lib/server/queries/faculty-list';
+import { deleteFacultyRecords, getUserRoleAndPermissions, logChange, updateFacultyProfileRecords } from '$lib/server/queries/db-helpers';
+import { getAllAppointmentStatuses, getAllFieldsOfInterest, getAllRanks, getFacultyProfile } from '$lib/server/queries/faculty-view';
+import { getFacultyRecordChangelogs, refreshFacultyRecordSearchView } from '$lib/server/queries/faculty-list';
 
 export async function load({ params, locals }) {
     // Check existing session
@@ -47,9 +34,9 @@ export async function load({ params, locals }) {
     if (profile === null) throw error(400, { message: 'No record found.' });
 
     //get changelogs if possible
-    if (canViewChangelogs) {
+    if (canViewChangelogs) 
         fetchedChangelogs = await getFacultyRecordChangelogs(facultyid, 20, 0);
-    }
+    
 
     // Get input dropdown options and dependency mappings
     const opts: Map<string, Array<string>> = new Map();
