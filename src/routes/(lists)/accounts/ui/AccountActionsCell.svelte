@@ -83,7 +83,13 @@
         </form>
 
         <!-- Reset Password -->
-        <form method="POST" action="?/resetPassword" class="flex items-center justify-center" use:enhance>
+        <form method="POST" action="?/resetPassword" class="flex items-center justify-center" use:enhance={() => {
+            isLoading = true;
+            return async ({ update }) => {
+                await update();
+                isLoading = false;
+            };
+        }}>
             <button
                 type="submit"
                 class="flex w-full rounded-sm p-3 hover:bg-fims-red text-fims-red hover:text-white"
