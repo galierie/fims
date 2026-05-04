@@ -3,6 +3,16 @@ import { type Actions, fail, redirect } from '@sveltejs/kit';
 import { auth } from '$lib/server/auth.js';
 import { APIError } from 'better-auth';
 
+export async function load({ locals }) {
+    // Check existing session
+    if (typeof locals.user === 'undefined') throw redirect(307, '/login');
+
+    // Log action
+    await logChange(locals.user.id, null, 'Action: Attempt to change password.');
+
+    return { userId: locals.user.id }
+}
+
 export const actions: Actions = {
     async changePassword({ locals, request }) {
         // Check existing session

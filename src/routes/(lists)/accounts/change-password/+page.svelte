@@ -4,8 +4,12 @@
     import GreenButton from '$lib/ui/GreenButton.svelte';
     import RedButton from '$lib/ui/RedButton.svelte';
 
+    interface Props {
+        userId: string;
+    }
+
     const { data } = $props();
-    const { userid } = $derived(data);
+    const { userId }: Props = $derived(data);
 </script>
 
 <br />
@@ -23,7 +27,7 @@
                         await goto('/accounts');
                     }}>Cancel</RedButton
                 >
-                <GreenButton type="submit" name="userid" value={userid}>Confirm</GreenButton>
+                <GreenButton type="submit" name="userid" value={userId}>Confirm</GreenButton>
             </div>
         </form>
     </div>
